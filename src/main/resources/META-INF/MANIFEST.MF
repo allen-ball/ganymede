@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Built-By: @user.name@
+Build-Jdk: @java.version@
+
+Name: Build-Information
+Build-Time: @timestamp@
+Java-Vendor: @java.vendor@
+Java-Version: @java.version@
+Os-Arch: @os.arch@
+Os-Name: @os.name@
+Os-Version: @os.version@
