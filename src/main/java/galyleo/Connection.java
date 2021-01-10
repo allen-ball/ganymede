@@ -36,9 +36,7 @@ public class Connection {
         this.context = Objects.requireNonNull(context);
         this.properties = Objects.requireNonNull(properties);
 
-        digester =
-            new HMACDigester(properties.getSignatureScheme(),
-                             properties.getKey());
+        digester = new HMACDigesterImpl();
 
         control = socket(SocketType.ROUTER, properties.getControlPort());
         shell = socket(SocketType.ROUTER, properties.getShellPort());
@@ -55,6 +53,12 @@ public class Connection {
                                      properties.getIp(), port));
 
         return socket;
+    }
+
+    private class HMACDigesterImpl extends HMACDigester {
+        public HMACDigesterImpl() {
+            super(properties.getSignatureScheme(), properties.getKey());
+        }
     }
 
     /**

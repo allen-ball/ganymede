@@ -5,7 +5,6 @@ import java.util.stream.Stream;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import lombok.Data;
-import lombok.ToString;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
@@ -18,7 +17,7 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@Data @ToString
+@Data
 public class HMACDigester {
     private final Mac mac;
 
