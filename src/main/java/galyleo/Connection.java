@@ -19,12 +19,12 @@ import org.zeromq.ZMQ;
 public class Connection {
     private final ZMQ.Context context;
     private final Properties properties;
-    private final ZMQ.Socket control = new ControlSocket();
-    private final ZMQ.Socket shell = new ShellSocket();
-    private final ZMQ.Socket stdin = new StdinSocket();
-    private final ZMQ.Socket heartbeat = new HeartbeatSocket();
-    private final ZMQ.Socket iopub = new IOPUBSocket();
     private final HMACDigester digester;
+    private final ZMQ.Socket control;
+    private final ZMQ.Socket shell;
+    private final ZMQ.Socket stdin;
+    private final ZMQ.Socket heartbeat;
+    private final ZMQ.Socket iopub;
 
     /**
      * Sole constructor.
@@ -38,6 +38,11 @@ public class Connection {
         this.digester =
             new HMACDigester(properties.getSignatureScheme(),
                              properties.getKey());
+        this.control = new ControlSocket();
+        this.shell = new ShellSocket();
+        this.stdin = new StdinSocket();
+        this.heartbeat = new HeartbeatSocket();
+        this.iopub = new IOPUBSocket();
     }
 
     /**
