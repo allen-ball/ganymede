@@ -3,8 +3,6 @@ package galyleo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
@@ -12,10 +10,12 @@ import org.zeromq.ZMQ;
 /**
  * Jupyter {@link Connection}.
  *
+ * {@bean.info}
+ *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@ToString @Log4j2
+@Data @Log4j2
 public class Connection {
     private final ZMQ.Context context;
     private final Properties properties;
@@ -35,14 +35,26 @@ public class Connection {
     protected Connection(ZMQ.Context context, Properties properties) {
         this.context = Objects.requireNonNull(context);
         this.properties = Objects.requireNonNull(properties);
-        this.digester =
+
+        digester =
             new HMACDigester(properties.getSignatureScheme(),
                              properties.getKey());
-        this.control = new ControlSocket();
-        this.shell = new ShellSocket();
-        this.stdin = new StdinSocket();
-        this.heartbeat = new HeartbeatSocket();
-        this.iopub = new IOPUBSocket();
+
+        control = socket(SocketType.ROUTER, properties.getControlPort());
+        shell = socket(SocketType.ROUTER, properties.getShellPort());
+        stdin = socket(SocketType.ROUTER, properties.getStdinPort());
+        heartbeat = socket(SocketType.REP, properties.getHeartbeatPort());
+        iopub = socket(SocketType.PUB, properties.getIopubPort());
+    }
+
+    private ZMQ.Socket socket(SocketType type, int port) {
+        var socket = context.socket(type);
+
+        socket.connect(String.format("%s://%s:%d",
+                                     properties.getTransport(),
+                                     properties.getIp(), port));
+
+        return socket;
     }
 
     /**
@@ -62,25 +74,5 @@ public class Connection {
         @JsonProperty("ip")                 private String ip = null;
         @JsonProperty("iopub_port")         private int iopubPort = -1;
         @JsonProperty("key")                private String key = null;
-    }
-
-    private class ControlSocket extends ZMQ.Socket {
-        public ControlSocket() { super(context, SocketType.ROUTER); }
-    }
-
-    private class ShellSocket extends ZMQ.Socket {
-        public ShellSocket() { super(context, SocketType.ROUTER); }
-    }
-
-    private class StdinSocket extends ZMQ.Socket {
-        public StdinSocket() { super(context, SocketType.ROUTER); }
-    }
-
-    private class HeartbeatSocket extends ZMQ.Socket {
-        public HeartbeatSocket() { super(context, SocketType.REP); }
-    }
-
-    private class IOPUBSocket extends ZMQ.Socket {
-        public IOPUBSocket() { super(context, SocketType.PUB); }
     }
 }
