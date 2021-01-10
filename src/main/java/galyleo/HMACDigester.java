@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.util.stream.Stream;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import lombok.Data;
 import lombok.ToString;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
@@ -12,10 +13,12 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
  * HMAC message digester.  See discussion in
  * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#the-wire-protocol target=newtab The Wire Protocol}.
  *
+ * {@bean.info}
+ *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@ToString
+@Data @ToString
 public class HMACDigester {
     private final Mac mac;
 
