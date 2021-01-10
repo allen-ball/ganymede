@@ -9,6 +9,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.zeromq.ZMQ;
 
 /**
  * {@link Connection} {@link Service}.
@@ -21,7 +22,9 @@ import org.springframework.stereotype.Service;
 @Service
 @NoArgsConstructor @ToString @Log4j2
 public class ConnectionService {
-    @Autowired private ObjectMapper mapper = null;
+    private final ZMQ.Context context = ZMQ.context(1);
+    @Autowired
+    private ObjectMapper mapper = null;
 
     /**
      * Create a new connection from a {@link Connection} {@link File}.
@@ -34,7 +37,7 @@ public class ConnectionService {
     public Connection newConnection(String path) throws IOException {
         var properties =
             mapper.readValue(new File(path), Connection.Properties.class);
-        var connection = new Connection(properties);
+        var connection = new Connection(context, properties);
 
         log.info("{}", mapper.writeValueAsString(properties));
 

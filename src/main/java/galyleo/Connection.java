@@ -17,8 +17,8 @@ import org.zeromq.ZMQ;
  */
 @ToString @Log4j2
 public class Connection {
+    private final ZMQ.Context context;
     private final Properties properties;
-    private final ZMQ.Context context = ZMQ.context(1);
     private final ZMQ.Socket control = new ControlSocket();
     private final ZMQ.Socket shell = new ShellSocket();
     private final ZMQ.Socket stdin = new StdinSocket();
@@ -29,9 +29,11 @@ public class Connection {
     /**
      * Sole constructor.
      *
-     * @param   properties      The {@link Connection} {@link Properties}.
+     * @param   context         The {@link ZMQ.Context}.
+     * @param   properties      The {@link Properties}.
      */
-    protected Connection(Properties properties) {
+    protected Connection(ZMQ.Context context, Properties properties) {
+        this.context = Objects.requireNonNull(context);
         this.properties = Objects.requireNonNull(properties);
         this.digester =
             new HMACDigester(properties.getSignatureScheme(),
