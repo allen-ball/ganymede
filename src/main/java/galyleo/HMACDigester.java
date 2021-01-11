@@ -32,35 +32,54 @@ public class HMACDigester {
     public HMACDigester(String scheme, String key) {
         Mac mac = null;
 
-        try {
-            mac = Mac.getInstance(scheme.replaceAll("-", ""));
-            mac.init(new SecretKeySpec(key.getBytes(US_ASCII), scheme));
-        } catch (Exception exception) {
-            throw new ExceptionInInitializerError(exception);
+        if (key != null && (! key.isEmpty())) {
+            try {
+                mac = Mac.getInstance(scheme.replaceAll("-", ""));
+                mac.init(new SecretKeySpec(key.getBytes(US_ASCII), scheme));
+            } catch (Exception exception) {
+                throw new ExceptionInInitializerError(exception);
+            }
         }
 
         this.mac = mac;
     }
 
     /**
-     * Method to calculate a digest for message parts.  See
-     * {@link Mac#update(byte[])} and {@link Mac#doFinal()}.
+     * Method to calculate a digest for message parts.  See {@link
+     * Mac#update(byte[])} and {@link Mac#doFinal()}.
      *
-     * @param   parts   The {@code byte[]} parts of the message to digest.
+     * @param   parts           The {@code byte[]} parts of the message to
+     *                          digest.
      *
      * @return  The digest {@link String}.
      */
     public String digest(byte[]... parts) {
         String digest = "";
 
-        synchronized (mac) {
-            Stream.of(parts).forEach(mac::update);
+        if (mac != null) {
+            synchronized (mac) {
+                Stream.of(parts).forEach(mac::update);
 
-            var bytes = mac.doFinal();
+                var bytes = mac.doFinal();
 
-            digest = new BigInteger(1, bytes).toString(16);
+                digest = new BigInteger(1, bytes).toString(16);
+            }
         }
 
         return digest;
+    }
+
+    /**
+     * Method to verify a digest for message parts.
+     *
+     * @param   digest          The digest to verify.
+     * @param   parts           The {@code byte[]} parts of the message to
+     *                          digest.
+     *
+     * @return  {@code true} if the argument digest matches the one
+     *          calculated; {@code false} otherwise.
+     */
+    public boolean verify(String digest, byte[]... parts) {
+        return digest.equals(digest(parts));
     }
 }

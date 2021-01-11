@@ -37,7 +37,7 @@ public class ConnectionService {
     public Connection newConnection(String path) throws IOException {
         var properties =
             mapper.readValue(new File(path), Connection.Properties.class);
-        var connection = new Connection(context, properties);
+        var connection = new Connection(context, properties, mapper);
 
         log.info("{}", mapper.writeValueAsString(properties));
 
