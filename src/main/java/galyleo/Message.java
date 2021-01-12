@@ -1,12 +1,13 @@
 package galyleo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.Data;
+
+import static java.nio.charset.StandardCharsets.US_ASCII;
 
 /**
  * Jupyter {@link Message}.  See
@@ -19,6 +20,9 @@ import lombok.Data;
  */
 @Data
 public class Message {
+    private static final String DELIMITER_STRING = "<IDS|MSG>";
+    public static final byte[] DELIMITER = DELIMITER_STRING.getBytes(US_ASCII);
+
     private static final String VERSION = "5.3";
 
     private List<byte[]> identities = new ArrayList<>();

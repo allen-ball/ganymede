@@ -1,22 +1,13 @@
 package galyleo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Stream;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
-import org.zeromq.SocketType;
-import org.zeromq.ZMQ;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.stream.Collectors.toList;
 
 /**
  * Jupyter {@link Connection}.
@@ -28,41 +19,20 @@ import static java.util.stream.Collectors.toList;
  */
 @Data @Log4j2
 public class Connection {
-    private static final String DELIMITER_STRING = "<IDS|MSG>";
-    private static final byte[] DELIMITER = DELIMITER_STRING.getBytes(US_ASCII);
-
-    private final ZMQ.Context context;
     private final Properties properties;
-    private final ObjectMapper mapper;
     private final HMACDigester digester;
-    private final ZMQ.Socket controlSocket;
-    private final ZMQ.Socket shellSocket;
-    private final ZMQ.Socket stdinSocket;
-    private final ZMQ.Socket heartbeatSocket;
-    private final ZMQ.Socket iopubSocket;
 
     /**
      * Sole constructor.
      *
-     * @param   context         The {@link ZMQ.Context}.
      * @param   properties      The {@link Properties}.
      * @param   mapper          The {@link ObjectMapper}.
      */
-    protected Connection(ZMQ.Context context,
-                         Properties properties, ObjectMapper mapper) {
-        this.context = Objects.requireNonNull(context);
+    protected Connection(Properties properties, ObjectMapper mapper) {
         this.properties = Objects.requireNonNull(properties);
-        this.mapper = Objects.requireNonNull(mapper);
-
-        digester = new HMACDigesterImpl();
-
-        controlSocket = socket(SocketType.ROUTER, properties.getControlPort());
-        shellSocket = socket(SocketType.ROUTER, properties.getShellPort());
-        stdinSocket = socket(SocketType.ROUTER, properties.getStdinPort());
-        heartbeatSocket = socket(SocketType.REP, properties.getHeartbeatPort());
-        iopubSocket = socket(SocketType.PUB, properties.getIopubPort());
+        this.digester = new HMACDigesterImpl();
     }
-
+/*
     private ZMQ.Socket socket(SocketType type, int port) {
         var socket = context.socket(type);
 
@@ -72,7 +42,7 @@ public class Connection {
 
         return socket;
     }
-
+*/
     private class HMACDigesterImpl extends HMACDigester {
         public HMACDigesterImpl() {
             super(properties.getSignatureScheme(), properties.getKey());
@@ -86,11 +56,11 @@ public class Connection {
      * @param   socket          The {@link ZMQ.Socket}.
      *
      * @return  The {@link Message}.
-     */
+     *
     public Message receive(ZMQ.Socket socket) {
         var identities =
             Stream.generate(() -> socket.recv())
-            .takeWhile(t -> (! Arrays.equals(t, DELIMITER)))
+            .takeWhile(t -> (! Arrays.equals(t, Message.DELIMITER)))
             .collect(toList());
 
         var signature = socket.recvStr();
@@ -150,18 +120,18 @@ public class Connection {
 
         return value;
     }
-
+    */
     /**
      * Method to serialize and send a {@link Message} on a
      * {@link ZMQ.Socket}.
      *
      * @param   socket          The {@link ZMQ.Socket}.
      * @param   message         The {@link Message}.
-     */
+     *
     public void send(ZMQ.Socket socket, Message message) {
         var packets = message.getIdentities().stream().collect(toList());
 
-        packets.add(DELIMITER);
+        packets.add(Message.DELIMITER);
 
         var header = serialize(message.getHeader());
         var parentHeader = serialize(message.getParentHeader());
@@ -194,7 +164,7 @@ public class Connection {
 
         return string.getBytes(UTF_8);
     }
-
+    */
     /**
      * See
      * "{@link.uri https://jupyter-client.readthedocs.io/en/stable/kernels.html#connection-files target=newtab Connection files}".

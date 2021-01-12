@@ -1,7 +1,11 @@
 package galyleo;
 
-import java.util.Objects;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.zeromq.ZMQ;
@@ -12,44 +16,31 @@ import org.zeromq.ZMQ;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
+@Named @Singleton
 @ToString @Log4j2
 public class Kernel extends ScheduledThreadPoolExecutor {
-    private final Connection connection;
+    private final ZMQ.Context context = ZMQ.context(1);
+    private final ObjectMapper mapper = new ObjectMapper();
 
     /**
      * Sole constructor.
-     *
-     * @param   connection      The configured {@link Connection}.
      */
-    public Kernel(Connection connection) {
-        super(8);
+    public Kernel() { super(8); }
 
-        this.connection = Objects.requireNonNull(connection);
-    }
+    /**
+     * Add a connection specified by a {@link Connection} {@link File}.
+     *
+     * @param   path            The path to the {@link Connection}
+     *                          {@link File}.
+     *
+     * @throws  IOException     If the {@link File} cannot be opened or
+     *                          parsed.
+     */
+    public void listen(String path) throws IOException {
+        Connection.Properties properties =
+            mapper.readValue(new File(path), Connection.Properties.class);
+        var connection = new Connection(properties, mapper);
 
-    private void control(Connection connection) {
-    }
-
-    private void shell(Connection connection) {
-    }
-
-    private void stdin(Connection connection) {
-    }
-
-    private void heartbeat(Connection connection) {
-        var socket = connection.getHeartbeatSocket();
-        var poller = connection.getContext().poller(1);
-
-        poller.register(socket, ZMQ.Poller.POLLIN);
-
-        for (;;) {
-            if (poller.poll() > 0) {
-                var message = socket.recv();
-
-                if (message != null) {
-                    socket.send(message);
-                }
-            }
-        }
+        log.info("{}", mapper.writeValueAsString(properties));
     }
 }

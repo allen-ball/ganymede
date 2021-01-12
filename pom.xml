@@ -38,6 +38,10 @@
       <artifactId>spring-boot-starter</artifactId>
     </dependency>
     <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.zeromq</groupId>
       <artifactId>jeromq</artifactId>
     </dependency>
