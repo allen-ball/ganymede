@@ -1,5 +1,6 @@
 package galyleo;
 
+import java.util.concurrent.TimeUnit;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
@@ -44,5 +45,8 @@ public class Launcher implements ApplicationRunner {
 
         var connection =
             service.newConnection(arguments.getNonOptionArgs().get(0));
+        var kernel = new Kernel(connection);
+
+        kernel.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
     }
 }

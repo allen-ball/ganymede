@@ -35,11 +35,11 @@ public class Connection {
     private final Properties properties;
     private final ObjectMapper mapper;
     private final HMACDigester digester;
-    private final ZMQ.Socket control;
-    private final ZMQ.Socket shell;
-    private final ZMQ.Socket stdin;
-    private final ZMQ.Socket heartbeat;
-    private final ZMQ.Socket iopub;
+    private final ZMQ.Socket controlSocket;
+    private final ZMQ.Socket shellSocket;
+    private final ZMQ.Socket stdinSocket;
+    private final ZMQ.Socket heartbeatSocket;
+    private final ZMQ.Socket iopubSocket;
 
     /**
      * Sole constructor.
@@ -56,11 +56,11 @@ public class Connection {
 
         digester = new HMACDigesterImpl();
 
-        control = socket(SocketType.ROUTER, properties.getControlPort());
-        shell = socket(SocketType.ROUTER, properties.getShellPort());
-        stdin = socket(SocketType.ROUTER, properties.getStdinPort());
-        heartbeat = socket(SocketType.REP, properties.getHeartbeatPort());
-        iopub = socket(SocketType.PUB, properties.getIopubPort());
+        controlSocket = socket(SocketType.ROUTER, properties.getControlPort());
+        shellSocket = socket(SocketType.ROUTER, properties.getShellPort());
+        stdinSocket = socket(SocketType.ROUTER, properties.getStdinPort());
+        heartbeatSocket = socket(SocketType.REP, properties.getHeartbeatPort());
+        iopubSocket = socket(SocketType.PUB, properties.getIopubPort());
     }
 
     private ZMQ.Socket socket(SocketType type, int port) {
