@@ -3,6 +3,7 @@ package galyleo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import galyleo.jupyter.Channel;
 import galyleo.jupyter.Connection;
+import galyleo.jupyter.Service;
 import galyleo.jupyter.Socket;
 import java.io.File;
 import java.io.IOException;
@@ -25,10 +26,10 @@ import org.zeromq.ZMQ;
 public class Kernel extends ScheduledThreadPoolExecutor {
     private final ZMQ.Context context = ZMQ.context(1);
     private final ObjectMapper mapper = new ObjectMapper();
-    private final Channel shell;
-    private final Channel control;
+    private final Service shell;
+    private final Service control;
     private final Channel iopub;
-    private final Channel heartbeat;
+    private final Service heartbeat;
 
     /**
      * Sole constructor.
@@ -39,7 +40,7 @@ public class Kernel extends ScheduledThreadPoolExecutor {
         shell = new Shell();
         control = new Control();
         iopub = new IOPub();
-        heartbeat = new Heartbeat();
+        heartbeat = new Service.Heartbeat(context);
 
         submit(shell);
         submit(control);
@@ -64,14 +65,14 @@ public class Kernel extends ScheduledThreadPoolExecutor {
     }
 
     @ToString
-    private abstract class ChannelImpl extends Channel {
-        protected ChannelImpl(SocketType type) {
+    private abstract class ServiceImpl extends Service {
+        protected ServiceImpl(SocketType type) {
             super(Kernel.this.context, type);
         }
     }
 
     @ToString
-    private class Shell extends ChannelImpl {
+    private class Shell extends ServiceImpl {
         public Shell() { super(SocketType.ROUTER); }
 
         @Override
@@ -87,7 +88,7 @@ public class Kernel extends ScheduledThreadPoolExecutor {
     }
 
     @ToString
-    private class Control extends ChannelImpl {
+    private class Control extends ServiceImpl {
         public Control() { super(SocketType.ROUTER); }
 
         @Override
@@ -103,7 +104,7 @@ public class Kernel extends ScheduledThreadPoolExecutor {
     }
 
     @ToString
-    private class IOPub extends ChannelImpl {
+    private class IOPub extends ServiceImpl {
         public IOPub() { super(SocketType.PUB); }
 
         @Override
@@ -114,20 +115,6 @@ public class Kernel extends ScheduledThreadPoolExecutor {
                 while (socket.hasReceiveMore()) {
                     socket.recv();
                 }
-            }
-        }
-    }
-
-    @ToString
-    private class Heartbeat extends ChannelImpl {
-        public Heartbeat() { super(SocketType.REP); }
-
-        @Override
-        protected void handle(Socket socket) {
-            var message = socket.recv();
-
-            if (message != null) {
-                socket.send(message);
             }
         }
     }

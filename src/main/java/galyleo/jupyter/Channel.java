@@ -14,7 +14,7 @@ import org.zeromq.ZMQ;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-public abstract class Channel extends ZMQ.Poller implements Runnable {
+public abstract class Channel extends ZMQ.Poller {
     private final ZMQ.Context context;
     private final SocketType type;
     private final LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<>();
@@ -57,7 +57,12 @@ public abstract class Channel extends ZMQ.Poller implements Runnable {
         }
     }
 
-    private void dispatch() {
+    /**
+     * Callback method to create and connect any outstanding
+     * {@link Socket}s, poll for input, and call {@link #handle(Socket)}
+     * where input is available.
+     */
+    protected void dispatch() {
         connect();
 
         if (getSize() > 0) {
@@ -89,11 +94,4 @@ public abstract class Channel extends ZMQ.Poller implements Runnable {
      * @param   socket          The {@link Socket}.
      */
     protected abstract void handle(Socket socket);
-
-    @Override
-    public void run() {
-        for (;;) {
-            dispatch();
-        }
-    }
 }
