@@ -1,77 +1,78 @@
-package galyleo;
+package galyleo.jupyter;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
-import java.util.Objects;
-import lombok.Data;
+import java.util.Map;
+import java.util.stream.Stream;
 import lombok.extern.log4j.Log4j2;
+import org.zeromq.SocketType;
+import org.zeromq.ZMQ;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.toList;
 
 /**
- * Jupyter {@link Connection}.
+ * Jupyter {@link Socket}.
  *
  * {@bean.info}
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@Data @Log4j2
-public class Connection {
-    private final Properties properties;
+@Log4j2
+public class Socket extends ZMQ.Socket {
     private final HMACDigester digester;
+    private final ObjectMapper mapper;
+    private final String address;
 
     /**
      * Sole constructor.
      *
-     * @param   properties      The {@link Properties}.
-     * @param   mapper          The {@link ObjectMapper}.
+     * @param   context         The {@link ZMQ.Context}.
+     * @param   type            The {@link SocketType}.
+     * @param   address         The {@link Socket}'s address.
      */
-    protected Connection(Properties properties, ObjectMapper mapper) {
-        this.properties = Objects.requireNonNull(properties);
-        this.digester = new HMACDigesterImpl();
-    }
-/*
-    private ZMQ.Socket socket(SocketType type, int port) {
-        var socket = context.socket(type);
+    public Socket(ZMQ.Context context, SocketType type, String address) {
+        super(context, type);
 
-        socket.connect(String.format("%s://%s:%d",
-                                     properties.getTransport(),
-                                     properties.getIp(), port));
+        this.digester = new HMACDigester(null, null);   /* Tacky !!! */
+        this.mapper = new ObjectMapper();               /* Tacky !!! */
+        this.address = address;
+    }
 
-        return socket;
-    }
-*/
-    private class HMACDigesterImpl extends HMACDigester {
-        public HMACDigesterImpl() {
-            super(properties.getSignatureScheme(), properties.getKey());
-        }
-    }
+    /**
+     * See {@link ZMQ.Socket#connect(String)}.
+     *
+     * @return  {@code true} if the {@link Socket} was connected;
+     *          {@code false} otherwise.
+     */
+    public boolean connect() { return connect(address); }
 
     /**
      * Method to receive and de-serialize and {@link Message} on a
      * {@link ZMQ.Socket}.
      *
-     * @param   socket          The {@link ZMQ.Socket}.
-     *
      * @return  The {@link Message}.
-     *
-    public Message receive(ZMQ.Socket socket) {
+     */
+    public Message receive() {
         var identities =
-            Stream.generate(() -> socket.recv())
+            Stream.generate(() -> recv())
             .takeWhile(t -> (! Arrays.equals(t, Message.DELIMITER)))
             .collect(toList());
 
-        var signature = socket.recvStr();
-        var header = socket.recv();
-        var parentHeader = socket.recv();
-        var metadata = socket.recv();
-        var content = socket.recv();
+        var signature = recvStr();
+        var header = recv();
+        var parentHeader = recv();
+        var metadata = recv();
+        var content = recv();
         var buffers = new LinkedList<byte[]>();
 
-        while (socket.hasReceiveMore()) {
-            buffers.add(socket.recv());
+        while (hasReceiveMore()) {
+            buffers.add(recv());
         }
 
         if (! digester.verify(signature, header, parentHeader, metadata, content)) {
@@ -120,15 +121,14 @@ public class Connection {
 
         return value;
     }
-    */
+
     /**
-     * Method to serialize and send a {@link Message} on a
-     * {@link ZMQ.Socket}.
+     * Method to serialize and send a {@link Message} on {@link.this}
+     * {@link Socket}.
      *
-     * @param   socket          The {@link ZMQ.Socket}.
      * @param   message         The {@link Message}.
-     *
-    public void send(ZMQ.Socket socket, Message message) {
+     */
+    public void send(Message message) {
         var packets = message.getIdentities().stream().collect(toList());
 
         packets.add(Message.DELIMITER);
@@ -145,8 +145,8 @@ public class Connection {
 
         var last = packets.size() - 1;
 
-        packets.subList(0, last).forEach(socket::sendMore);
-        socket.send(packets.get(last));
+        packets.subList(0, last).forEach(this::sendMore);
+        send(packets.get(last));
     }
 
     private byte[] serialize(Object object) {
@@ -163,24 +163,5 @@ public class Connection {
         }
 
         return string.getBytes(UTF_8);
-    }
-    */
-    /**
-     * See
-     * "{@link.uri https://jupyter-client.readthedocs.io/en/stable/kernels.html#connection-files target=newtab Connection files}".
-     *
-     * {@bean.info}
-     */
-    @Data
-    public static class Properties {
-        @JsonProperty("control_port")           private int controlPort = -1;
-        @JsonProperty("shell_port")             private int shellPort = -1;
-        @JsonProperty("transport")              private String transport = null;
-        @JsonProperty("signature_scheme")       private String signatureScheme = null;
-        @JsonProperty("stdin_port")             private int stdinPort = -1;
-        @JsonProperty("hb_port")                private int heartbeatPort = -1;
-        @JsonProperty("ip")                     private String ip = null;
-        @JsonProperty("iopub_port")             private int iopubPort = -1;
-        @JsonProperty("key")                    private String key = null;
     }
 }

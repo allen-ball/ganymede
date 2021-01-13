@@ -1,4 +1,4 @@
-package galyleo;
+package galyleo.jupyter;
 
 /**
  * Jupyter {@link Message} types.

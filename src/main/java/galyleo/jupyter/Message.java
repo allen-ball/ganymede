@@ -1,4 +1,4 @@
-package galyleo;
+package galyleo.jupyter;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
@@ -34,7 +34,9 @@ public class Message {
 
     /**
      * See
-     * "{@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#message-header target=newtab Message Header}."
+     * "{@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#message-header target=newtab Message Header}".
+     *
+     * {@bean.info}
      */
     @Data
     public static class Header {

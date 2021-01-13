@@ -1,4 +1,4 @@
-package galyleo;
+package galyleo.jupyter;
 
 import java.math.BigInteger;
 import java.util.stream.Stream;
