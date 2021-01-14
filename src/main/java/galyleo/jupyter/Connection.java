@@ -44,6 +44,28 @@ public class Connection {
         return address;
     }
 
+    /**
+     * Method to connect a kernel's {@link Service}s.
+     *
+     * @param   shell           The shell {@link Service}.
+     * @param   control         The control {@link Service}.
+     * @param   iopub           The iopub {@link Service}.
+     * @param   stdin           The stdin {@link Service}.
+     * @param   heartbeat       The heartbeat {@link Service}.
+     */
+    public void connect(Service.Jupyter shell, Service.Jupyter control,
+                        Service.Jupyter iopub, Service.Jupyter stdin,
+                        Service.Heartbeat heartbeat) {
+        var properties = getProperties();
+        var digester = getDigester();
+
+        shell.connect(address(properties.getShellPort()), digester);
+        control.connect(address(properties.getControlPort()), digester);
+        iopub.connect(address(properties.getIopubPort()), digester);
+        stdin.connect(address(properties.getStdinPort()), digester);
+        heartbeat.connect(address(properties.getHeartbeatPort()));
+    }
+
     private class HMACDigesterImpl extends HMACDigester {
         public HMACDigesterImpl() {
             super(properties.getSignatureScheme(), properties.getKey());

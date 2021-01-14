@@ -1,8 +1,8 @@
 package galyleo.jupyter;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import lombok.Data;
@@ -25,12 +25,12 @@ public class Message {
 
     private static final String VERSION = "5.3";
 
-    private List<byte[]> identities = new ArrayList<>();
+    private List<byte[]> identities = new LinkedList<>();
     private Header header = null;
     private Header parentHeader = null;
     private Map<String,Object> metadata = new LinkedHashMap<>();
     private Map<String,Object> content = new LinkedHashMap<>();
-    private List<byte[]> buffers = new ArrayList<>();
+    private List<byte[]> buffers = new LinkedList<>();
 
     /**
      * See
@@ -40,8 +40,8 @@ public class Message {
      */
     @Data
     public static class Header {
-        @JsonProperty("msg_id")         private String msgId = null;
-        @JsonProperty("msg_type")       private String msgType = null;
+        @JsonProperty("msg_id")         private String messageId = null;
+        @JsonProperty("msg_type")       private String messageType = null;
         @JsonProperty("session")        private String session = null;
         @JsonProperty("username")       private String username = null;
         @JsonProperty("date")           private String date = null;

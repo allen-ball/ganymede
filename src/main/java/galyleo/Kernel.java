@@ -1,8 +1,8 @@
 package galyleo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import galyleo.jupyter.Channel;
 import galyleo.jupyter.Connection;
+import galyleo.jupyter.Message;
 import galyleo.jupyter.Service;
 import galyleo.jupyter.Socket;
 import java.io.File;
@@ -26,10 +26,11 @@ import org.zeromq.ZMQ;
 public class Kernel extends ScheduledThreadPoolExecutor {
     private final ZMQ.Context context = ZMQ.context(1);
     private final ObjectMapper mapper = new ObjectMapper();
-    private final Service shell;
-    private final Service control;
-    private final Channel iopub;
-    private final Service heartbeat;
+    private final Service.Jupyter shell = new Shell();
+    private final Service.Jupyter control = new Control();
+    private final Service.Jupyter iopub = new IOPub();
+    private final Service.Jupyter stdin = new Stdin();
+    private final Service.Heartbeat heartbeat = new Service.Heartbeat(context);
 
     /**
      * Sole constructor.
@@ -37,13 +38,10 @@ public class Kernel extends ScheduledThreadPoolExecutor {
     public Kernel() {
         super(8);
 
-        shell = new Shell();
-        control = new Control();
-        iopub = new IOPub();
-        heartbeat = new Service.Heartbeat(context);
-
         submit(shell);
         submit(control);
+        submit(iopub);
+        submit(stdin);
         submit(heartbeat);
     }
 
@@ -57,17 +55,19 @@ public class Kernel extends ScheduledThreadPoolExecutor {
      *                          parsed.
      */
     public void listen(String path) throws IOException {
-        Connection.Properties properties =
+        var properties =
             mapper.readValue(new File(path), Connection.Properties.class);
         var connection = new Connection(properties);
+
+        connection.connect(shell, control, iopub, stdin, heartbeat);
 
         log.info("Listening to {}", connection);
     }
 
     @ToString
-    private abstract class ServiceImpl extends Service {
+    private abstract class ServiceImpl extends Service.Jupyter {
         protected ServiceImpl(SocketType type) {
-            super(Kernel.this.context, type);
+            super(Kernel.this.context, type, mapper);
         }
     }
 
@@ -76,13 +76,12 @@ public class Kernel extends ScheduledThreadPoolExecutor {
         public Shell() { super(SocketType.ROUTER); }
 
         @Override
-        protected void handle(Socket socket) {
-            var message = socket.recv();
-
-            if (message != null) {
-                while (socket.hasReceiveMore()) {
-                    socket.recv();
-                }
+        protected void handle(Socket socket, Message request) {
+            switch (request.getHeader().getMessageType()) {
+            default:
+                log.warn("Unrecognized message on {}: {}",
+                         socket.getAddress(), request.getHeader());
+                break;
             }
         }
     }
@@ -92,13 +91,12 @@ public class Kernel extends ScheduledThreadPoolExecutor {
         public Control() { super(SocketType.ROUTER); }
 
         @Override
-        protected void handle(Socket socket) {
-            var message = socket.recv();
-
-            if (message != null) {
-                while (socket.hasReceiveMore()) {
-                    socket.recv();
-                }
+        protected void handle(Socket socket, Message request) {
+            switch (request.getHeader().getMessageType()) {
+            default:
+                log.warn("Unrecognized message on {}: {}",
+                         socket.getAddress(), request.getHeader());
+                break;
             }
         }
     }
@@ -108,13 +106,27 @@ public class Kernel extends ScheduledThreadPoolExecutor {
         public IOPub() { super(SocketType.PUB); }
 
         @Override
-        protected void handle(Socket socket) {
-            var message = socket.recv();
+        protected void handle(Socket socket, Message request) {
+            switch (request.getHeader().getMessageType()) {
+            default:
+                log.warn("Unrecognized message on {}: {}",
+                         socket.getAddress(), request.getHeader());
+                break;
+            }
+        }
+    }
 
-            if (message != null) {
-                while (socket.hasReceiveMore()) {
-                    socket.recv();
-                }
+    @ToString
+    private class Stdin extends ServiceImpl {
+        public Stdin() { super(SocketType.ROUTER); }
+
+        @Override
+        protected void handle(Socket socket, Message request) {
+            switch (request.getHeader().getMessageType()) {
+            default:
+                log.warn("Unrecognized message on {}: {}",
+                         socket.getAddress(), request.getHeader());
+                break;
             }
         }
     }
