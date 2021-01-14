@@ -72,6 +72,33 @@ public abstract class Service extends ZMQ.Poller implements Runnable {
     }
 
     /**
+     * Method to queue a message for sending.
+     *
+     * @param   socket          The {@link Socket}.
+     * @param   message         The message {@code byte}s.
+     */
+    public void send(Socket socket, byte[] message) {
+        queue(() -> socket.send(message));
+    }
+
+    /**
+     * Method to queue a multi-part message for sending.
+     *
+     * @param   socket          The {@link Socket}.
+     * @param   blobs           The {@link List} of message parts.
+     */
+    public void send(Socket socket, List<byte[]> blobs) {
+        Runnable runnable = () -> {
+            var last = blobs.size() - 1;
+
+            blobs.subList(0, last).forEach(socket::sendMore);
+            socket.send(blobs.get(last));
+        };
+
+        queue(runnable);
+    }
+
+    /**
      * Method to schedule a {@link Runnable} to be called within
      * {@link #dispatch()}.
      *
@@ -127,33 +154,6 @@ public abstract class Service extends ZMQ.Poller implements Runnable {
      * @param   socket          The {@link Socket}.
      */
     protected abstract void handle(Socket socket);
-
-    /**
-     * Method to queue a message for sending.
-     *
-     * @param   socket          The {@link Socket}.
-     * @param   message         The message {@code byte}s.
-     */
-    public void send(Socket socket, byte[] message) {
-        queue(() -> socket.send(message));
-    }
-
-    /**
-     * Method to queue a multi-part message for sending.
-     *
-     * @param   socket          The {@link Socket}.
-     * @param   blobs           The {@link List} of message parts.
-     */
-    public void send(Socket socket, List<byte[]> blobs) {
-        Runnable runnable = () -> {
-            var last = blobs.size() - 1;
-
-            blobs.subList(0, last).forEach(socket::sendMore);
-            socket.send(blobs.get(last));
-        };
-
-        queue(runnable);
-    }
 
     @Override
     public void run() {
@@ -228,6 +228,34 @@ public abstract class Service extends ZMQ.Poller implements Runnable {
         public void connect(String address, HMACDigester digester) {
             map.put(address, digester);
             connect(address);
+        }
+
+        /**
+         * Method to queue a {@link Message} for sending on all
+         * {@link Socket}s.
+         *
+         * @param   message     The {@link Message}.
+         */
+        public void send(Message message) {
+            for (int i = 0, n = getSize(); i < n; i += 1) {
+                var socket = (Socket) getSocket(i);
+
+                if (socket != null) {
+                    send(socket, message);
+                }
+            }
+        }
+
+        /**
+         * Method to queue a {@link Message} for sending.
+         *
+         * @param   socket      The {@link Socket}.
+         * @param   message     The {@link Message}.
+         */
+        public void send(Socket socket, Message message) {
+            var blobs = serialize(message, map.get(socket.getAddress()));
+
+            send(socket, blobs);
         }
 
         /**
