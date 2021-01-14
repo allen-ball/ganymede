@@ -10,6 +10,9 @@ import java.util.UUID;
 import lombok.Data;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
+import static java.time.ZoneOffset.UTC;
+import static java.time.ZonedDateTime.now;
+import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 
 /**
  * Jupyter {@link Message}.  See
@@ -33,6 +36,110 @@ public class Message {
     private Map<String,Object> metadata = new LinkedHashMap<>();
     private Map<String,Object> content = new LinkedHashMap<>();
     private List<byte[]> buffers = new LinkedList<>();
+
+    /**
+     * Convenience for {@code getHeader().getMessageType()}.
+     *
+     * @return  The {@link Message} type.
+     */
+    public String getMessageType() { return getHeader().getMessageType(); }
+
+    /**
+     * Convenience for {@code getHeader().setMessageType(type)}.
+     *
+     * @param   type            The {@link Message} type.
+     */
+    public void setMessageType(String type) { getHeader().setMessageType(type); }
+
+    /**
+     * Parses a {@link Message} type for an "action".
+     *
+     * @return  The parsed action.
+     */
+    public String getMessageTypeAction() {
+        var action = getMessageType().toLowerCase();
+        var index = action.lastIndexOf("_");
+
+        if (index != -1) {
+            action = action.substring(0, index);
+        }
+
+        return action;
+    }
+
+    /**
+     * Method to determine if this message is a "reply".
+     *
+     * @return  {@code true} if it is a "reply"; {@code false} otherwise.
+     */
+    public boolean isReply() {
+        var type = getMessageType();
+
+        return type != null && type.toLowerCase().endsWith("_reply");
+    }
+
+    /**
+     * Method to determine if this message is a "request".
+     *
+     * @return  {@code true} if it is a "request"; {@code false} otherwise.
+     */
+    public boolean isRequest() {
+        var type = getMessageType();
+
+        return type != null && type.toLowerCase().endsWith("_request");
+    }
+
+    /**
+     * Convenience for {@code getHeader().getDate()}.
+     *
+     * @return  The {@link Message} date.
+     */
+    public String getDate() { return getHeader().getDate(); }
+
+    /**
+     * Convenience for {@code getHeader().setDate(date)}.
+     *
+     * @param   date            The {@link Message} date.
+     */
+    public void setDate(String date) { getHeader().setDate(date); }
+
+    /**
+     * Convenience for {@code getMetadata().get(key)}.
+     *
+     * @param   key             The key into the metadata map.
+     *
+     * @return  The corresponding value (if any).
+     */
+    public Object getMetadata(Object key) { return getMetadata().get(key); }
+
+    /**
+     * Convenience for {@code getMetadata().put(key, value)}.
+     *
+     * @param   key             The key into the metadata map.
+     * @param   value           The value.
+     */
+    public void setMetadata(String key, Object value) {
+        getMetadata().put(key, value);
+    }
+
+    /**
+     * Convenience for {@code getContent().get(key)}.
+     *
+     * @param   key             The key into the content map.
+     *
+     * @return  The corresponding value (if any).
+     */
+    public Object getContent(Object key) { return getContent().get(key); }
+
+    /**
+     * Convenience for {@code getContent().put(key, value)}.
+     *
+     * @param   key             The key into the metadata map.
+     * @param   value           The value.
+     */
+    public void setContent(String key, Object value) {
+        getContent().put(key, value);
+    }
 
     /**
      * Convenience for {@code setContent("status", value)}.
@@ -59,45 +166,17 @@ public class Message {
     }
 
     /**
-     * Convenience for {@code getMetadata().get(key)}.
+     * Create a suitable reply {@link Message} for {@link.this}
+     * {@link Message}.
      *
-     * @param   key             The key into the metadata map.
-     *
-     * @return  The corresponding value (if any).
+     * @return  The reply {@link Message}.
      */
-    public Object getMetadata(Object key) { return getMetadata().get(key); }
+    public Message reply() {
+        if (! isRequest()) {
+            throw new IllegalStateException("Source message is not a request");
+        }
 
-    /**
-     * Convenience for {@code getMetadata().put(key, value)}.
-     *
-     * @param   key             The key into the metadata map.
-     * @param   value           The value.
-     *
-     * @return  The previous value (if any).
-     */
-    public Object setMetadata(String key, Object value) {
-        return getMetadata().put(key, value);
-    }
-
-    /**
-     * Convenience for {@code getContent().get(key)}.
-     *
-     * @param   key             The key into the content map.
-     *
-     * @return  The corresponding value (if any).
-     */
-    public Object getContent(Object key) { return getContent().get(key); }
-
-    /**
-     * Convenience for {@code getContent().put(key, value)}.
-     *
-     * @param   key             The key into the metadata map.
-     * @param   value           The value.
-     *
-     * @return  The previous value (if any).
-     */
-    public Object setContent(String key, Object value) {
-        return getContent().put(key, value);
+        return reply(getMessageTypeAction() + "_reply");
     }
 
     /**
@@ -111,9 +190,9 @@ public class Message {
     public Message reply(String type) {
         var reply = new Message();
 
-        reply.getIdentities().addAll(getIdentities());
+        /* reply.getIdentities().addAll(getIdentities()); */
+        reply.setMessageType(type);
         reply.getHeader().setMessageId(UUID.randomUUID().toString());
-        reply.getHeader().setMessageType(type);
         reply.getHeader().setSession(getHeader().getSession());
         reply.getHeader().setUsername(getHeader().getUsername());
         reply.getHeader().setVersion(VERSION);
@@ -121,6 +200,17 @@ public class Message {
         reply.getBuffers().addAll(getBuffers());
 
         return reply;
+    }
+
+    /**
+     * Set the {@link Header} date value if not already set.
+     */
+    public Message timestamp() {
+        if (getDate() == null) {
+            setDate(now(UTC).format(ISO_INSTANT));
+        }
+
+        return this;
     }
 
     /**

@@ -100,7 +100,7 @@ public abstract class Service extends ZMQ.Poller implements Runnable {
 
     /**
      * Method to schedule a {@link Runnable} to be called within
-     * {@link #dispatch()}.
+     * {@link #dispatch()} {@link Thread}.
      *
      * @param   runnable        The {@link Runnable}.
      *
@@ -199,8 +199,7 @@ public abstract class Service extends ZMQ.Poller implements Runnable {
     @Log4j2 @ToString
     public static abstract class Jupyter extends Service {
         private final ObjectMapper mapper;
-        private final ConcurrentSkipListMap<String,HMACDigester> map =
-            new ConcurrentSkipListMap<>();
+        private final ConcurrentSkipListMap<String,HMACDigester> map = new ConcurrentSkipListMap<>();
 
         /**
          * Sole constructor.
@@ -237,6 +236,8 @@ public abstract class Service extends ZMQ.Poller implements Runnable {
          * @param   message     The {@link Message}.
          */
         public void send(Message message) {
+            message.timestamp();
+
             for (int i = 0, n = getSize(); i < n; i += 1) {
                 var socket = (Socket) getSocket(i);
 
@@ -253,18 +254,20 @@ public abstract class Service extends ZMQ.Poller implements Runnable {
          * @param   message     The {@link Message}.
          */
         public void send(Socket socket, Message message) {
+            message.timestamp();
+
             var blobs = serialize(message, map.get(socket.getAddress()));
 
             send(socket, blobs);
         }
 
         /**
-         * Callback method to handle a {@link Message request}.
+         * Callback method to handle a {@link Message}.
          *
          * @param  socket       The {@link Socket}.
-         * @param  request      The request {@link Message}.
+         * @param  message      The {@link Message}.
          */
-        protected abstract void handle(Socket socket, Message request);
+        protected abstract void handle(Socket socket, Message message);
 
         @Override
         protected void handle(Socket socket) {
