@@ -9,6 +9,7 @@ import galyleo.jupyter.Socket;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicLong;
@@ -45,7 +46,7 @@ public class Kernel extends ScheduledThreadPoolExecutor {
         .in(InputStream.nullInputStream())
         .out(out)
         .err(err);
-    private JShell java = builder.build();
+    private JShell java = null;
 
     /**
      * Sole constructor.
@@ -54,6 +55,8 @@ public class Kernel extends ScheduledThreadPoolExecutor {
         super(8);
 
         mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_VALUES);
+
+        java = builder.build();
 
         submit(shell);
         submit(control);
@@ -127,19 +130,24 @@ public class Kernel extends ScheduledThreadPoolExecutor {
         }
 
         private void execute(Socket socket, Message request) {
-            var code = (String) request.getContent("code");
-            var silent = (Boolean) request.getContent("silent");
-            var store_history = (Boolean) request.getContent("store_history");
-            var user_expressions = (Map<?,?>) request.getContent("user_expressions");
-            var allow_stdin = (Boolean) request.getContent("allow_stdin");
-            var stop_on_error = (Boolean) request.getContent("stop_on_error");
             var reply = request.reply();
 
             try {
-                reply.setStatus("ok");
+                throw new UnsupportedOperationException();
+/*
+                var code = (String) request.getContent("code");
+                var silent = (Boolean) request.getContent("silent");
+                var store_history = (Boolean) request.getContent("store_history");
+                var user_expressions = (Map<?,?>) request.getContent("user_expressions");
+                var allow_stdin = (Boolean) request.getContent("allow_stdin");
+                var stop_on_error = (Boolean) request.getContent("stop_on_error");
+
                 reply.setContent("execution_count", execution_count);
+*/
             } catch (Exception exception) {
                 reply.setStatus(exception);
+            } finally {
+                send(socket, reply);
             }
 
             out.reset();
@@ -147,24 +155,99 @@ public class Kernel extends ScheduledThreadPoolExecutor {
         }
 
         private void inspect(Socket socket, Message request) {
+            var reply = request.reply();
+
+            try {
+                throw new UnsupportedOperationException();
+            } catch (Exception exception) {
+                reply.setStatus(exception);
+            } finally {
+                send(socket, reply);
+            }
         }
 
         private void complete(Socket socket, Message request) {
+            var reply = request.reply();
+
+            try {
+                throw new UnsupportedOperationException();
+            } catch (Exception exception) {
+                reply.setStatus(exception);
+            } finally {
+                send(socket, reply);
+            }
         }
 
         private void history(Socket socket, Message request) {
+            var reply = request.reply();
+
+            try {
+                throw new UnsupportedOperationException();
+            } catch (Exception exception) {
+                reply.setStatus(exception);
+            } finally {
+                send(socket, reply);
+            }
         }
 
         private void is_complete(Socket socket, Message request) {
+            var reply = request.reply();
+
+            try {
+                var code = request.getContent("code");
+
+                reply.setContent("status", "unknown");
+            } catch (Exception exception) {
+                reply.setStatus(exception);
+            } finally {
+                send(socket, reply);
+            }
         }
 
         private void connect(Socket socket, Message request) {
+            var reply = request.reply();
+
+            try {
+                throw new UnsupportedOperationException();
+            } catch (Exception exception) {
+                reply.setStatus(exception);
+            } finally {
+                send(socket, reply);
+            }
         }
 
         private void comm_info(Socket socket, Message request) {
+            var reply = request.reply();
+
+            try {
+                throw new UnsupportedOperationException();
+            } catch (Exception exception) {
+                reply.setStatus(exception);
+            } finally {
+                send(socket, reply);
+            }
         }
 
         private void kernel_info(Socket socket, Message request) {
+            var reply = request.reply();
+
+            try {
+                reply.setContent("protocol_version", PROTOCOL_VERSION);
+                reply.setContent("implementation", "galyle");
+                reply.setContent("implementation_version", "1.0.0");
+
+                var language_info = new LinkedHashMap<String,Object>();
+
+                language_info.put("name", "java");
+                language_info.put("version", System.getProperty("java.vm.specification.version"));
+                language_info.put("mimetype", "text/plain");
+
+                reply.setContent("language_info", language_info);
+            } catch (Exception exception) {
+                reply.setStatus(exception);
+            } finally {
+                send(socket, reply);
+            }
         }
     }
 
@@ -182,12 +265,54 @@ public class Kernel extends ScheduledThreadPoolExecutor {
         }
 
         private void shutdown(Socket socket, Message request) {
+            var reply = request.reply();
+            var restart = (Boolean) request.getContent("restart");
+
+            try {
+                JShell old = java;
+
+                java = null;
+
+                submit(() -> { old.stop(); old.close(); });
+
+                if (restart) {
+                    java = builder.build();
+                    out.reset();
+                    err.reset();
+                }
+            } catch (Exception exception) {
+                reply.setStatus(exception);
+            } finally {
+                send(socket, reply);
+            }
+
+            if (! restart) {
+                queue(() -> shutdownNow());
+            }
         }
 
         private void interrupt(Socket socket, Message request) {
+            var reply = request.reply();
+
+            try {
+                java.stop();
+            } catch (Exception exception) {
+                reply.setStatus(exception);
+            } finally {
+                send(socket, reply);
+            }
         }
 
         private void debug(Socket socket, Message request) {
+            var reply = request.reply();
+
+            try {
+                throw new UnsupportedOperationException();
+            } catch (Exception exception) {
+                reply.setStatus(exception);
+            } finally {
+                send(socket, reply);
+            }
         }
     }
 
@@ -218,8 +343,8 @@ public class Kernel extends ScheduledThreadPoolExecutor {
             }
         }
 
-        private void input(Socket socket, Message request) {
-            log.warn("Ignoring {}", message.getMessageType());
+        private void input(Socket socket, Message reply) {
+            log.warn("Ignoring {}", reply.getMessageType());
         }
     }
 }

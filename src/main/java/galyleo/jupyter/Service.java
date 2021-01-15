@@ -198,6 +198,8 @@ public abstract class Service extends ZMQ.Poller implements Runnable {
      */
     @Log4j2 @ToString
     public static abstract class Jupyter extends Service {
+        protected static final String PROTOCOL_VERSION = "5.3";
+
         private final ObjectMapper mapper;
         private final ConcurrentSkipListMap<String,HMACDigester> map = new ConcurrentSkipListMap<>();
 
@@ -236,7 +238,7 @@ public abstract class Service extends ZMQ.Poller implements Runnable {
          * @param   message     The {@link Message}.
          */
         public void send(Message message) {
-            message.timestamp();
+            stamp(message);
 
             for (int i = 0, n = getSize(); i < n; i += 1) {
                 var socket = (Socket) getSocket(i);
@@ -254,11 +256,19 @@ public abstract class Service extends ZMQ.Poller implements Runnable {
          * @param   message     The {@link Message}.
          */
         public void send(Socket socket, Message message) {
-            message.timestamp();
+            stamp(message);
 
             var blobs = serialize(message, map.get(socket.getAddress()));
 
             send(socket, blobs);
+        }
+
+        private void stamp(Message message) {
+            if (message.getHeader().getVersion() == null) {
+                message.getHeader().setVersion(PROTOCOL_VERSION);
+            }
+
+            message.timestamp();
         }
 
         /**

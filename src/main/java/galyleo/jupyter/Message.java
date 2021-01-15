@@ -28,8 +28,6 @@ public class Message {
     private static final String DELIMITER_STRING = "<IDS|MSG>";
     public static final byte[] DELIMITER = DELIMITER_STRING.getBytes(US_ASCII);
 
-    private static final String VERSION = "5.3";
-
     private List<byte[]> identities = new LinkedList<>();
     private Header header = null;
     private Header parentHeader = null;
@@ -167,7 +165,7 @@ public class Message {
 
     /**
      * Create a suitable reply {@link Message} for {@link.this}
-     * {@link Message}.
+     * {@link Message}.  Initializes message status to "OK".
      *
      * @return  The reply {@link Message}.
      */
@@ -181,7 +179,7 @@ public class Message {
 
     /**
      * Create a suitable reply {@link Message} for {@link.this}
-     * {@link Message}.
+     * {@link Message}.  Initializes message status to "OK".
      *
      * @param   type            The reply {@link Message} type.
      *
@@ -195,8 +193,8 @@ public class Message {
         reply.getHeader().setMessageId(UUID.randomUUID().toString());
         reply.getHeader().setSession(getHeader().getSession());
         reply.getHeader().setUsername(getHeader().getUsername());
-        reply.getHeader().setVersion(VERSION);
         reply.setParentHeader(getHeader());
+        reply.setStatus("ok");
         reply.getBuffers().addAll(getBuffers());
 
         return reply;
@@ -211,44 +209,6 @@ public class Message {
         }
 
         return this;
-    }
-
-    /**
-     * Jupyter {@link Message} types.
-     */
-    public enum Type {
-        /*
-         * Shell
-         */
-        execute_request, execute_reply,
-        inspect_request, inspect_reply,
-        complete_request, complete_reply,
-        history_request, history_reply,
-        is_complete_request, is_complete_reply,
-        comm_info_request, comm_info_reply,
-        kernel_info_request, kernel_info_reply,
-        comm_open, comm_msg, comm_close,
-        /*
-         * Control
-         */
-        shutdown_request, shutdown_reply,
-        interrupt_request, interrupt_reply,
-        debug_request, debug_reply,
-        /*
-         * IOPub
-         */
-        stream,
-        display_data,
-        update_display_data,
-        /* execute_request, execute_reply */
-        error,
-        status,
-        clear_output,
-        debug_event,
-        /*
-         * Stdin
-         */
-        input_request, input_reply;
     }
 
     /**
