@@ -62,6 +62,8 @@
             </execution>
           </executions>
           <configuration>
+            <attach>true</attach>
+            <classifier>uber</classifier>
             <mainClass>${start-class}</mainClass>
           </configuration>
         </plugin>
