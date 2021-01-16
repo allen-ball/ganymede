@@ -80,6 +80,7 @@ public class Connection {
      */
     @Data
     public static class Properties {
+        @JsonProperty("kernel_name")            private String kernelName = null;
         @JsonProperty("control_port")           private int controlPort = -1;
         @JsonProperty("shell_port")             private int shellPort = -1;
         @JsonProperty("transport")              private String transport = null;

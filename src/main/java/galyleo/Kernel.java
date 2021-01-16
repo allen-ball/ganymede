@@ -13,11 +13,17 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicLong;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import jdk.jshell.JShell;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
 
@@ -30,15 +36,32 @@ import org.zeromq.ZMQ;
  * @version $Revision$
  */
 @Named @Singleton
+@SpringBootApplication
 @ToString @Log4j2
-public class Kernel extends ScheduledThreadPoolExecutor {
+public class Kernel extends ScheduledThreadPoolExecutor implements ApplicationRunner {
+
+    /**
+     * Standard {@link SpringApplication} {@code main(String[])}
+     * entry point.
+     *
+     * @param   argv            The command line argument vector.
+     *
+     * @throws  Exception       If the function does not catch
+     *                          {@link Exception}.
+     */
+    public static void main(String[] argv) throws Exception {
+        var application = new SpringApplication(Kernel.class);
+
+        application.run(argv);
+    }
+
     private final ZMQ.Context context = ZMQ.context(1);
     private final ObjectMapper mapper = new ObjectMapper();
     private final Service.Jupyter shell = new Shell();
     private final Service.Jupyter control = new Control();
     private final Service.Jupyter iopub = new IOPub();
     private final Service.Jupyter stdin = new Stdin();
-    private final Service.Heartbeat heartbeat = new Service.Heartbeat(context);
+    private final Service.Heartbeat heartbeat = new Heartbeat();
     private final PrintStreamBuffer out = new PrintStreamBuffer();
     private final PrintStreamBuffer err = new PrintStreamBuffer();
     private final JShell.Builder builder =
@@ -63,6 +86,29 @@ public class Kernel extends ScheduledThreadPoolExecutor {
         submit(iopub);
         submit(stdin);
         submit(heartbeat);
+    }
+
+    @PostConstruct
+    public void init() { }
+
+    @PreDestroy
+    public void destroy() { shutdown(); }
+
+    @Override
+    public void run(ApplicationArguments arguments) throws Exception {
+        var paths = arguments.getOptionValues("connection-file");
+
+        if (! paths.isEmpty()) {
+            for (var path : paths) {
+                try {
+                    listen(path);
+                } catch (Exception exception) {
+                    log.warn("{}", exception);
+                }
+            }
+        } else {
+            throw new IllegalArgumentException("No connection file specified");
+        }
     }
 
     /**
@@ -91,11 +137,14 @@ public class Kernel extends ScheduledThreadPoolExecutor {
         }
 
         @Override
+        protected boolean isTerminating() {
+            return Kernel.this.isTerminating();
+        }
+
+        @Override
         protected void handle(Socket socket, Message message) {
             try {
-                var action = message.getMessageTypeAction();
-
-                dispatch(action, socket, message);
+                dispatch(message.getMessageTypeAction(), socket, message);
             } catch (Exception exception) {
                 log.warn("Could not dispatch {}", message.getHeader(), exception);
             }
@@ -287,7 +336,7 @@ public class Kernel extends ScheduledThreadPoolExecutor {
             }
 
             if (! restart) {
-                queue(() -> shutdownNow());
+                queue(() -> Kernel.this.shutdown());
             }
         }
 
@@ -345,6 +394,16 @@ public class Kernel extends ScheduledThreadPoolExecutor {
 
         private void input(Socket socket, Message reply) {
             log.warn("Ignoring {}", reply.getMessageType());
+        }
+    }
+
+    @ToString
+    private class Heartbeat extends Service.Heartbeat {
+        public Heartbeat() { super(Kernel.this.context); }
+
+        @Override
+        protected boolean isTerminating() {
+            return Kernel.this.isTerminating();
         }
     }
 }

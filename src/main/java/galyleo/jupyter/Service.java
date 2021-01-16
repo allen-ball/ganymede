@@ -109,15 +109,20 @@ public abstract class Service extends ZMQ.Poller implements Runnable {
     protected boolean queue(Runnable runnable) { return queue.add(runnable); }
 
     /**
+     * Callback method to indicate the kernel is terminating.
+     *
+     * @return  {@code true} if the kernel is terminating; {@code false}
+     *          otherwise.
+     */
+    protected abstract boolean isTerminating();
+
+    /**
      * Callback method to create and connect any outstanding
      * {@link Socket}s, poll for input, and call {@link #handle(Socket)}
      * where input is available.
      */
     protected void dispatch() {
-        var list = new LinkedList<Runnable>();
-
-        queue.drainTo(list);
-        list.forEach(Runnable::run);
+        drain();
 
         if (getSize() > 0) {
             int count = poll(timeout);
@@ -147,6 +152,13 @@ public abstract class Service extends ZMQ.Poller implements Runnable {
         }
     }
 
+    private void drain() {
+        var list = new LinkedList<Runnable>();
+
+        queue.drainTo(list);
+        list.forEach(Runnable::run);
+    }
+
     /**
      * Callback method to handle a {@link Socket} that has been signalled
      * for input.
@@ -157,9 +169,11 @@ public abstract class Service extends ZMQ.Poller implements Runnable {
 
     @Override
     public void run() {
-        for (;;) {
+        while (! isTerminating()) {
             dispatch();
         }
+
+        drain();
     }
 
     /**
@@ -170,14 +184,14 @@ public abstract class Service extends ZMQ.Poller implements Runnable {
      * {@bean.info}
      */
     @Log4j2 @ToString
-    public static class Heartbeat extends Service {
+    public abstract static class Heartbeat extends Service {
 
         /**
          * Sole constructor.
          *
          * @param  context      The {@link ZMQ.Context}.
          */
-        public Heartbeat(ZMQ.Context context) {
+        protected Heartbeat(ZMQ.Context context) {
             super(context, SocketType.REP);
         }
 
