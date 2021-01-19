@@ -1,8 +1,8 @@
 package galyleo.jupyter;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.Objects;
 import lombok.Data;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 
 /**
@@ -23,8 +23,8 @@ public class Connection {
      *
      * @param   properties      The {@link Properties}.
      */
-    public Connection(Properties properties) {
-        this.properties = Objects.requireNonNull(properties);
+    public Connection(@NonNull Properties properties) {
+        this.properties = properties;
         this.digester = new HMACDigesterImpl();
     }
 
