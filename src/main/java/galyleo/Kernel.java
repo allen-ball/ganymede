@@ -1,23 +1,21 @@
 package galyleo;
 
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import galyleo.jupyter.Connection;
+import galyleo.jupyter.Dispatcher;
 import galyleo.jupyter.Message;
+import galyleo.jupyter.Server;
 import galyleo.jupyter.Service;
-import galyleo.jupyter.Socket;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import jdk.jshell.JShell;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.ApplicationArguments;
@@ -37,8 +35,8 @@ import org.zeromq.ZMQ;
  */
 @Named @Singleton
 @SpringBootApplication
-@ToString @Log4j2
-public class Kernel extends ScheduledThreadPoolExecutor implements ApplicationRunner {
+@NoArgsConstructor @ToString @Log4j2
+public class Kernel extends Server implements ApplicationRunner {
 
     /**
      * Standard {@link SpringApplication} {@code main(String[])}
@@ -55,13 +53,11 @@ public class Kernel extends ScheduledThreadPoolExecutor implements ApplicationRu
         application.run(argv);
     }
 
-    private final ZMQ.Context context = ZMQ.context(1);
-    private final ObjectMapper mapper = new ObjectMapper();
     private final Service.Jupyter shell = new Shell();
     private final Service.Jupyter control = new Control();
     private final Service.Jupyter iopub = new IOPub();
     private final Service.Jupyter stdin = new Stdin();
-    private final Service.Heartbeat heartbeat = new Heartbeat();
+    private final Service.Heartbeat heartbeat = new Service.Heartbeat(this);
     private final PrintStreamBuffer out = new PrintStreamBuffer();
     private final PrintStreamBuffer err = new PrintStreamBuffer();
     private final JShell.Builder builder =
@@ -71,25 +67,12 @@ public class Kernel extends ScheduledThreadPoolExecutor implements ApplicationRu
         .err(err);
     private JShell java = null;
 
-    /**
-     * Sole constructor.
-     */
-    public Kernel() {
-        super(8);
-
-        mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_VALUES);
-
-        java = builder.build();
-
-        submit(shell);
-        submit(control);
-        submit(iopub);
-        submit(stdin);
-        submit(heartbeat);
-    }
-
     @PostConstruct
-    public void init() { }
+    public void init() {
+        out.reset();
+        err.reset();
+        java = builder.build();
+    }
 
     @PreDestroy
     public void destroy() { shutdown(); }
@@ -122,7 +105,8 @@ public class Kernel extends ScheduledThreadPoolExecutor implements ApplicationRu
      */
     public void listen(String path) throws IOException {
         var properties =
-            mapper.readValue(new File(path), Connection.Properties.class);
+            getObjectMapper()
+            .readValue(new File(path), Connection.Properties.class);
         var connection = new Connection(properties);
 
         connection.connect(shell, control, iopub, stdin, heartbeat);
@@ -131,54 +115,21 @@ public class Kernel extends ScheduledThreadPoolExecutor implements ApplicationRu
     }
 
     @ToString
-    private abstract class ServiceImpl extends Service.Jupyter {
-        protected ServiceImpl(SocketType type) {
-            super(Kernel.this.context, type, mapper);
-        }
-
-        @Override
-        protected boolean isTerminating() {
-            return Kernel.this.isTerminating();
-        }
-
-        @Override
-        protected void handle(Socket socket, Message message) {
-            try {
-                dispatch(message.getMessageTypeAction(), socket, message);
-            } catch (Exception exception) {
-                log.warn("Could not dispatch {}", message.getHeader(), exception);
-            }
-        }
-
-        private void dispatch(String action, Socket socket, Message request) {
-            try {
-                getClass()
-                    .getDeclaredMethod(action, Socket.class, Message.class)
-                    .invoke(this, socket, request);
-            } catch (IllegalAccessException | NoSuchMethodException exception) {
-                log.debug("{}", exception);
-            } catch (Exception exception) {
-                log.warn("Exception invoking {} handler", action, exception);
-            }
-        }
-    }
-
-    @ToString
-    private class Shell extends ServiceImpl {
+    private class Shell extends Service.Jupyter {
         private AtomicLong execution_count = new AtomicLong(1);
 
-        public Shell() { super(SocketType.ROUTER); }
+        public Shell() { super(Kernel.this, SocketType.ROUTER); }
 
         @Override
-        protected void handle(Socket socket, Message message) {
+        protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, Message message) {
             if (message.isRequest()) {
-                super.handle(socket, message);
+                super.dispatch(dispatcher, socket, message);
             } else {
                 log.warn("Ignoring non-request {}", message.getMessageType());
             }
         }
 
-        private void execute(Socket socket, Message request) {
+        private void execute(Dispatcher dispatcher, ZMQ.Socket socket, Message request) {
             var reply = request.reply();
 
             try {
@@ -196,14 +147,14 @@ public class Kernel extends ScheduledThreadPoolExecutor implements ApplicationRu
             } catch (Exception exception) {
                 reply.setStatus(exception);
             } finally {
-                send(socket, reply);
+                reply.send(socket, getObjectMapper(), dispatcher.getDigester());
             }
 
             out.reset();
             err.reset();
         }
 
-        private void inspect(Socket socket, Message request) {
+        private void inspect(Dispatcher dispatcher, ZMQ.Socket socket, Message request) {
             var reply = request.reply();
 
             try {
@@ -211,11 +162,11 @@ public class Kernel extends ScheduledThreadPoolExecutor implements ApplicationRu
             } catch (Exception exception) {
                 reply.setStatus(exception);
             } finally {
-                send(socket, reply);
+                reply.send(socket, getObjectMapper(), dispatcher.getDigester());
             }
         }
 
-        private void complete(Socket socket, Message request) {
+        private void complete(Dispatcher dispatcher, ZMQ.Socket socket, Message request) {
             var reply = request.reply();
 
             try {
@@ -223,11 +174,11 @@ public class Kernel extends ScheduledThreadPoolExecutor implements ApplicationRu
             } catch (Exception exception) {
                 reply.setStatus(exception);
             } finally {
-                send(socket, reply);
+                reply.send(socket, getObjectMapper(), dispatcher.getDigester());
             }
         }
 
-        private void history(Socket socket, Message request) {
+        private void history(Dispatcher dispatcher, ZMQ.Socket socket, Message request) {
             var reply = request.reply();
 
             try {
@@ -235,11 +186,11 @@ public class Kernel extends ScheduledThreadPoolExecutor implements ApplicationRu
             } catch (Exception exception) {
                 reply.setStatus(exception);
             } finally {
-                send(socket, reply);
+                reply.send(socket, getObjectMapper(), dispatcher.getDigester());
             }
         }
 
-        private void is_complete(Socket socket, Message request) {
+        private void is_complete(Dispatcher dispatcher, ZMQ.Socket socket, Message request) {
             var reply = request.reply();
 
             try {
@@ -249,11 +200,11 @@ public class Kernel extends ScheduledThreadPoolExecutor implements ApplicationRu
             } catch (Exception exception) {
                 reply.setStatus(exception);
             } finally {
-                send(socket, reply);
+                reply.send(socket, getObjectMapper(), dispatcher.getDigester());
             }
         }
 
-        private void connect(Socket socket, Message request) {
+        private void connect(Dispatcher dispatcher, ZMQ.Socket socket, Message request) {
             var reply = request.reply();
 
             try {
@@ -261,11 +212,11 @@ public class Kernel extends ScheduledThreadPoolExecutor implements ApplicationRu
             } catch (Exception exception) {
                 reply.setStatus(exception);
             } finally {
-                send(socket, reply);
+                reply.send(socket, getObjectMapper(), dispatcher.getDigester());
             }
         }
 
-        private void comm_info(Socket socket, Message request) {
+        private void comm_info(Dispatcher dispatcher, ZMQ.Socket socket, Message request) {
             var reply = request.reply();
 
             try {
@@ -273,11 +224,11 @@ public class Kernel extends ScheduledThreadPoolExecutor implements ApplicationRu
             } catch (Exception exception) {
                 reply.setStatus(exception);
             } finally {
-                send(socket, reply);
+                reply.send(socket, getObjectMapper(), dispatcher.getDigester());
             }
         }
 
-        private void kernel_info(Socket socket, Message request) {
+        private void kernel_info(Dispatcher dispatcher, ZMQ.Socket socket, Message request) {
             var reply = request.reply();
 
             try {
@@ -295,25 +246,25 @@ public class Kernel extends ScheduledThreadPoolExecutor implements ApplicationRu
             } catch (Exception exception) {
                 reply.setStatus(exception);
             } finally {
-                send(socket, reply);
+                reply.send(socket, getObjectMapper(), dispatcher.getDigester());
             }
         }
     }
 
     @ToString
-    private class Control extends ServiceImpl {
-        public Control() { super(SocketType.ROUTER); }
+    private class Control extends Service.Jupyter {
+        public Control() { super(Kernel.this, SocketType.ROUTER); }
 
         @Override
-        protected void handle(Socket socket, Message message) {
+        protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, Message message) {
             if (message.isRequest()) {
-                super.handle(socket, message);
+                super.dispatch(dispatcher, socket, message);
             } else {
                 log.warn("Ignoring non-request {}", message.getMessageType());
             }
         }
 
-        private void shutdown(Socket socket, Message request) {
+        private void shutdown(Dispatcher dispatcher, ZMQ.Socket socket, Message request) {
             var reply = request.reply();
             var restart = (Boolean) request.getContent("restart");
 
@@ -322,7 +273,9 @@ public class Kernel extends ScheduledThreadPoolExecutor implements ApplicationRu
 
                 java = null;
 
-                submit(() -> { old.stop(); old.close(); });
+                if (old != null) {
+                    submit(() -> { old.stop(); old.close(); });
+                }
 
                 if (restart) {
                     java = builder.build();
@@ -332,15 +285,15 @@ public class Kernel extends ScheduledThreadPoolExecutor implements ApplicationRu
             } catch (Exception exception) {
                 reply.setStatus(exception);
             } finally {
-                send(socket, reply);
+                reply.send(socket, getObjectMapper(), dispatcher.getDigester());
             }
 
             if (! restart) {
-                queue(() -> Kernel.this.shutdown());
+                getServer().shutdown();
             }
         }
 
-        private void interrupt(Socket socket, Message request) {
+        private void interrupt(Dispatcher dispatcher, ZMQ.Socket socket, Message request) {
             var reply = request.reply();
 
             try {
@@ -348,11 +301,11 @@ public class Kernel extends ScheduledThreadPoolExecutor implements ApplicationRu
             } catch (Exception exception) {
                 reply.setStatus(exception);
             } finally {
-                send(socket, reply);
+                reply.send(socket, getObjectMapper(), dispatcher.getDigester());
             }
         }
 
-        private void debug(Socket socket, Message request) {
+        private void debug(Dispatcher dispatcher, ZMQ.Socket socket, Message request) {
             var reply = request.reply();
 
             try {
@@ -360,50 +313,35 @@ public class Kernel extends ScheduledThreadPoolExecutor implements ApplicationRu
             } catch (Exception exception) {
                 reply.setStatus(exception);
             } finally {
-                send(socket, reply);
+                reply.send(socket, getObjectMapper(), dispatcher.getDigester());
             }
         }
     }
 
     @ToString
-    private class IOPub extends ServiceImpl {
-        public IOPub() { super(SocketType.PUB); }
+    private class IOPub extends Service.Jupyter {
+        public IOPub() { super(Kernel.this, SocketType.PUB); }
 
         @Override
-        protected void handle(Socket socket) {
-            socket.recv();
-
-            while (socket.hasReceiveMore()) {
-                socket.recv();
-            }
+        protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, byte[] message) {
         }
     }
 
     @ToString
-    private class Stdin extends ServiceImpl {
-        public Stdin() { super(SocketType.ROUTER); }
+    private class Stdin extends Service.Jupyter {
+        public Stdin() { super(Kernel.this, SocketType.ROUTER); }
 
         @Override
-        protected void handle(Socket socket, Message message) {
+        protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, Message message) {
             if (message.isReply()) {
-                super.handle(socket, message);
+                super.dispatch(dispatcher, socket, message);
             } else {
                 log.warn("Ignoring non-reply {}", message.getMessageType());
             }
         }
 
-        private void input(Socket socket, Message reply) {
+        private void input(Dispatcher dispatcher, ZMQ.Socket socket, Message reply) {
             log.warn("Ignoring {}", reply.getMessageType());
-        }
-    }
-
-    @ToString
-    private class Heartbeat extends Service.Heartbeat {
-        public Heartbeat() { super(Kernel.this.context); }
-
-        @Override
-        protected boolean isTerminating() {
-            return Kernel.this.isTerminating();
         }
     }
 }

@@ -1,27 +1,13 @@
 package galyleo.jupyter;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.stream.Stream;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import lombok.Data;
+import lombok.NonNull;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
-
-import static java.nio.charset.StandardCharsets.US_ASCII;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.concurrent.TimeUnit.MICROSECONDS;
-import static java.util.stream.Collectors.toList;
 
 /**
  * Jupyter {@link Service}.
@@ -31,150 +17,50 @@ import static java.util.stream.Collectors.toList;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@Log4j2
-public abstract class Service extends ZMQ.Poller implements Runnable {
-    private final ZMQ.Context context;
-    private final SocketType type;
-    private final BlockingDeque<Runnable> queue = new LinkedBlockingDeque<>();
-    private final long timeout = 100;
+@Data @Log4j2
+public abstract class Service {
+    @NonNull private final Server server;
+    @NonNull private final SocketType socketType;
+    private final Queue<Dispatcher> dispatcherQueue = new ConcurrentLinkedQueue<>();
 
     /**
-     * Sole constructor.
+     * Method to schedule creation of and binding to a {@link ZMQ.Socket}
+     * for this address.
      *
-     * @param   context         The {@link ZMQ.Context}.
-     * @param   type            The {@link SocketType} for created
-     *                          {@link ZMQ.Socket}s.
+     * @param   address         The address of the {@link ZMQ.Socket} to be
+     *                          created.
+     * @param   digester        The {@link HMACDigester} for this address.
      */
-    protected Service(ZMQ.Context context, SocketType type) {
-        super(context);
+    public void connect(String address, HMACDigester digester) {
+        Dispatcher dispatcher = new Dispatcher(this, address, digester);
 
-        this.context = Objects.requireNonNull(context);
-        this.type = Objects.requireNonNull(type);
+        getDispatcherQueue().add(dispatcher);
+        getServer().submit(dispatcher);
+
+        getServer()
+            .setCorePoolSize(Math.max(getServer().getActiveCount() + 4,
+                                      getServer().getCorePoolSize()));
     }
 
     /**
-     * Method to schedule creation of and connection to a {@link Socket} for
-     * this {@link Service}.
+     * Method to schedule creation of and binding to a {@link ZMQ.Socket} for this {@link Service}.
      *
-     * @param   address         The address of the {@link Socket} to be
+     * @param   address         The address of the {@link ZMQ.Socket} to be
      *                          created.
      */
-    public void connect(String address) {
-        Runnable runnable = () -> {
-            var socket = new Socket(context, type, address);
-
-            socket.connect();
-
-            register(socket, ZMQ.Poller.POLLIN);
-        };
-
-        queue(runnable);
-    }
+    public void connect(String address) { connect(address, null); }
 
     /**
-     * Method to queue a message for sending.
+     * Callback method to dispatch a received {@link Message}.  This method
+     * is called on the same thread that the {@link ZMQ.Socket} was created on
+     * and the implementation may call {@link ZMQ.Socket} methods (including
+     * {@code send()}).
      *
-     * @param   socket          The {@link Socket}.
-     * @param   message         The message {@code byte}s.
+     * @param   dispatcher      The {@link Dispatcher}.
+     * @param   socket          The {@link ZMQ.Socket}.
+     * @param   message         The message.
      */
-    public void send(Socket socket, byte[] message) {
-        queue(() -> socket.send(message));
-    }
-
-    /**
-     * Method to queue a multi-part message for sending.
-     *
-     * @param   socket          The {@link Socket}.
-     * @param   blobs           The {@link List} of message parts.
-     */
-    public void send(Socket socket, List<byte[]> blobs) {
-        Runnable runnable = () -> {
-            var last = blobs.size() - 1;
-
-            blobs.subList(0, last).forEach(socket::sendMore);
-            socket.send(blobs.get(last));
-        };
-
-        queue(runnable);
-    }
-
-    /**
-     * Method to schedule a {@link Runnable} to be called within
-     * {@link #dispatch()} {@link Thread}.
-     *
-     * @param   runnable        The {@link Runnable}.
-     *
-     * @return  See {@link BlockingDeque#add(Object)}.
-     */
-    protected boolean queue(Runnable runnable) { return queue.add(runnable); }
-
-    /**
-     * Callback method to indicate the kernel is terminating.
-     *
-     * @return  {@code true} if the kernel is terminating; {@code false}
-     *          otherwise.
-     */
-    protected abstract boolean isTerminating();
-
-    /**
-     * Callback method to create and connect any outstanding
-     * {@link Socket}s, poll for input, and call {@link #handle(Socket)}
-     * where input is available.
-     */
-    protected void dispatch() {
-        drain();
-
-        if (getSize() > 0) {
-            int count = poll(timeout);
-
-            if (count > 0) {
-                for (int i = 0, n = getSize(); i < n; i += 1) {
-                    if (pollin(i)) {
-                        var socket = getSocket(i);
-
-                        if (socket != null) {
-                            handle((Socket) socket);
-                        }
-                    }
-                }
-            }
-        } else {
-            if (queue.isEmpty()) {
-                try {
-                    var runnable = queue.poll(timeout, MICROSECONDS);
-
-                    if (runnable != null) {
-                        queue.putFirst(runnable);
-                    }
-                } catch (InterruptedException exception) {
-                }
-            }
-        }
-    }
-
-    private void drain() {
-        var list = new LinkedList<Runnable>();
-
-        queue.drainTo(list);
-        list.forEach(Runnable::run);
-    }
-
-    /**
-     * Callback method to handle a {@link Socket} that has been signalled
-     * for input.
-     *
-     * @param   socket          The {@link Socket}.
-     */
-    protected abstract void handle(Socket socket);
-
-    @Override
-    public void run() {
-        while (! isTerminating()) {
-            dispatch();
-        }
-
-        drain();
-    }
+    protected abstract void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, byte[] message);
 
     /**
      * Standard
@@ -183,25 +69,19 @@ public abstract class Service extends ZMQ.Poller implements Runnable {
      *
      * {@bean.info}
      */
-    @Log4j2 @ToString
-    public abstract static class Heartbeat extends Service {
+    @ToString @Log4j2
+    public static class Heartbeat extends Service {
 
         /**
          * Sole constructor.
          *
-         * @param  context      The {@link ZMQ.Context}.
+         * @param  server       The {@link Server}.
          */
-        protected Heartbeat(ZMQ.Context context) {
-            super(context, SocketType.REP);
-        }
+        public Heartbeat(Server server) { super(server, SocketType.REP); }
 
         @Override
-        protected void handle(Socket socket) {
-            var request = socket.recv();
-
-            if (request != null) {
-                socket.send(request);
-            }
+        protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, byte[] message) {
+            socket.send(message);
         }
     }
 
@@ -210,226 +90,59 @@ public abstract class Service extends ZMQ.Poller implements Runnable {
      *
      * {@bean.info}
      */
-    @Log4j2 @ToString
+    @ToString @Log4j2
     public static abstract class Jupyter extends Service {
         protected static final String PROTOCOL_VERSION = "5.3";
-
-        private final ObjectMapper mapper;
-        private final ConcurrentSkipListMap<String,HMACDigester> map = new ConcurrentSkipListMap<>();
 
         /**
          * Sole constructor.
          *
-         * @param  context      The {@link ZMQ.Context}.
+         * @param  server       The {@link Server}.
          * @param  type         The {@link SocketType} for created
          *                      {@link ZMQ.Socket}s.
-         * @param  mapper       The {@link ObjectMapper}.
          */
-        public Jupyter(ZMQ.Context context, SocketType type, ObjectMapper mapper) {
-            super(context, type);
-
-            this.mapper = Objects.requireNonNull(mapper);
-        }
+        public Jupyter(Server server, SocketType type) { super(server, type); }
 
         /**
-         * Method to schedule creation of and connection to a {@link Socket}
-         * for this {@link Service}.
+         * Callback method to dispatch a {@link Message}.  Default
+         * implementation looks for a declared method
+         * {@code action(Dispatcher,ZMQ.Socket,Message)}.
          *
-         * @param  address      The address of the {@link Socket} to be
-         *                      created.
-         * @param  digester     The {@link HMACDigester} for this
-         *                      {@link Socket}.
-         */
-        public void connect(String address, HMACDigester digester) {
-            map.put(address, digester);
-            connect(address);
-        }
-
-        /**
-         * Method to queue a {@link Message} for sending on all
-         * {@link Socket}s.
-         *
-         * @param   message     The {@link Message}.
-         */
-        public void send(Message message) {
-            stamp(message);
-
-            for (int i = 0, n = getSize(); i < n; i += 1) {
-                var socket = (Socket) getSocket(i);
-
-                if (socket != null) {
-                    send(socket, message);
-                }
-            }
-        }
-
-        /**
-         * Method to queue a {@link Message} for sending.
-         *
-         * @param   socket      The {@link Socket}.
-         * @param   message     The {@link Message}.
-         */
-        public void send(Socket socket, Message message) {
-            stamp(message);
-
-            var blobs = serialize(message, map.get(socket.getAddress()));
-
-            send(socket, blobs);
-        }
-
-        private void stamp(Message message) {
-            if (message.getHeader().getVersion() == null) {
-                message.getHeader().setVersion(PROTOCOL_VERSION);
-            }
-
-            message.timestamp();
-        }
-
-        /**
-         * Callback method to handle a {@link Message}.
-         *
-         * @param  socket       The {@link Socket}.
+         * @param  dispatcher   The {@link Dispatcher}.
+         * @param  socket       The {@link ZMQ.Socket}.
          * @param  message      The {@link Message}.
          */
-        protected abstract void handle(Socket socket, Message message);
+        protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, Message message) {
+            var action = message.getMessageTypeAction();
+
+            if (action != null) {
+                try {
+                    var method = getClass().getDeclaredMethod(action, Dispatcher.class, ZMQ.Socket.class, Message.class);
+
+                    method.setAccessible(true);
+                    method.invoke(this, dispatcher, socket, message);
+                } catch (IllegalAccessException | NoSuchMethodException exception) {
+                    log.warn("Could not dispatch '{}'", action, exception);
+                } catch (Exception exception) {
+                    log.warn("Exception invoking '{}' handler", action, exception);
+                }
+            } else {
+                log.warn("Could not determine action from {}", message.getHeader());
+            }
+        }
 
         @Override
-        protected void handle(Socket socket) {
+        protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, byte[] blob) {
             try {
-                var first = socket.recv();
+                var message =
+                    Message.receive(socket, blob,
+                                    getServer().getObjectMapper(),
+                                    dispatcher.getDigester());
 
-                if (first != null) {
-                    var blobs = new LinkedList<byte[]>();
-
-                    blobs.add(first);
-
-                    while (socket.hasReceiveMore()) {
-                        blobs.add(socket.recv());
-                    }
-
-                    var request = deserialize(blobs, map.get(socket.getAddress()));
-
-                    if (request != null) {
-                        handle(socket, request);
-                    }
-                }
+                dispatch(dispatcher, socket, message);
             } catch (Exception exception) {
                 log.warn("{}", exception);
             }
-        }
-
-        private Message deserialize(List<byte[]> blobs, HMACDigester digester) {
-            Iterator<byte[]> iterator = blobs.iterator();
-            var identities = new LinkedList<byte[]>();
-
-            while (iterator.hasNext()) {
-                byte[] blob = iterator.next();
-
-                if (! Arrays.equals(blob, Message.DELIMITER)) {
-                    identities.add(blob);
-                } else {
-                    break;
-                }
-            }
-
-            var signature = new String(iterator.next(), US_ASCII);
-            var header = iterator.next();
-            var parentHeader = iterator.next();
-            var metadata = iterator.next();
-            var content = iterator.next();
-            var buffers = new LinkedList<byte[]>();
-
-            while (iterator.hasNext()) {
-                buffers.add(iterator.next());
-            }
-
-            if (digester != null) {
-                if (! digester.verify(signature, header, parentHeader, metadata, content)) {
-                    throw new SecurityException("Invalid signature");
-                }
-            }
-
-            var message = new Message();
-
-            message.setIdentities(identities);
-            message.setHeader(deserialize(header, Message.Header.class));
-            message.setParentHeader(deserialize(parentHeader, Message.Header.class));
-            message.getMetadata().putAll(deserialize(metadata));
-            message.getContent().putAll(deserialize(content));
-            message.setBuffers(buffers);
-
-            return message;
-        }
-
-        private <T> T deserialize(byte[] bytes, Class<T> type) {
-            T value = null;
-
-            try {
-                var string = new String(bytes, UTF_8);
-                var node = mapper.readTree(string);
-
-                if (! node.isEmpty()) {
-                    value = mapper.readValue(string, type);
-                }
-            } catch (Exception exception) {
-                log.warn("{}", exception);
-            }
-
-            return value;
-        }
-
-        private Map<String,Object> deserialize(byte[] bytes) {
-            Map<String,Object> value = null;
-
-            try {
-                value =
-                    mapper.readValue(new String(bytes, UTF_8),
-                                     new TypeReference<Map<String,Object>>() { });
-            } catch (Exception exception) {
-                log.warn("{}", exception);
-            }
-
-            return value;
-        }
-
-        private List<byte[]> serialize(Message message, HMACDigester digester) {
-            var blobs = message.getIdentities().stream().collect(toList());
-
-            blobs.add(Message.DELIMITER);
-
-            var header = serialize(message.getHeader());
-            var parentHeader = serialize(message.getParentHeader());
-            var metadata = serialize(message.getMetadata());
-            var content = serialize(message.getContent());
-
-            var digest = "";
-
-            if (digester != null) {
-                digest =
-                    digester.digest(header, parentHeader, metadata, content);
-            }
-
-            blobs.add(digest.getBytes(US_ASCII));
-
-            Collections.addAll(blobs, header, parentHeader, metadata, content);
-
-            return blobs;
-        }
-
-        private byte[] serialize(Object object) {
-            var string = "{}";
-
-            if (object == null) {
-                object = Collections.emptyMap();
-            }
-
-            try {
-                string = mapper.writeValueAsString(object);
-            } catch (Exception exception) {
-                log.warn("{}", exception);
-            }
-
-            return string.getBytes(UTF_8);
         }
     }
 }
