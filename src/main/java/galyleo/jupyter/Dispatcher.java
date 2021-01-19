@@ -10,8 +10,8 @@ import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
 
 /**
- * Jupyter {@link Socket} {@link Dispatcher}.  All {@link Socket} creation
- * and manipulation calls happens in the {@link #run()} method.
+ * Jupyter {@link ZMQ.Socket} {@link Dispatcher}.  All {@link ZMQ.Socket}
+ * creation and manipulation calls happens in the {@link #run()} method.
  *
  * {@bean.info}
  *
@@ -19,7 +19,7 @@ import org.zeromq.ZMQ;
  * @version $Revision$
  */
 @Data @Log4j2
-public abstract class Dispatcher implements Runnable {
+public class Dispatcher implements Runnable {
     @NonNull private final Service service;
     @NonNull private final String address;
     private final HMACDigester digester;
@@ -27,7 +27,7 @@ public abstract class Dispatcher implements Runnable {
     /**
      * Callback method to dispatch a received message.  Default
      * implementation calls
-     * {@link Service#dispatch(Dispatcher,ZMQ.Socket,Message)}.
+     * {@link Service#dispatch(Dispatcher,ZMQ.Socket,byte[])}.
      *
      * @param   socket          The {@link ZMQ.Socket}.
      * @param   message         The message.
@@ -38,10 +38,11 @@ public abstract class Dispatcher implements Runnable {
 
     @Override
     public void run() {
-        var context = getService().getServer().getContext();
+        var server = getService().getServer();
+        var context = server.getContext();
         var type = getService().getSocketType();
 
-        for (;;) {
+        while (! server.isTerminating()) {
             try (ZMQ.Socket socket = context.socket(type)) {
                 if (socket.bind(getAddress())) {
                     log.info("Bound {} {}", type, address);
@@ -52,7 +53,7 @@ public abstract class Dispatcher implements Runnable {
                 try (ZMQ.Poller poller = context.poller(1)) {
                     poller.register(socket, ZMQ.Poller.POLLIN);
 
-                    for (;;) {
+                    while (! server.isTerminating()) {
                         int events = poller.poll(0);
 
                         if (events > 0 && poller.pollin(0)) {
