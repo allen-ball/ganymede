@@ -55,7 +55,7 @@ public class Kernel extends Server implements ApplicationRunner {
 
     private final Service.Jupyter shell = new Shell();
     private final Service.Jupyter control = new Control();
-    private final Service.Jupyter iopub = new IOPub();
+    private final Service.Jupyter iopub = new Service.IOPub(this);
     private final Service.Jupyter stdin = new Stdin();
     private final Service.Heartbeat heartbeat = new Service.Heartbeat(this);
     private final PrintStreamBuffer out = new PrintStreamBuffer();
@@ -315,15 +315,6 @@ public class Kernel extends Server implements ApplicationRunner {
             } finally {
                 reply.send(socket, getObjectMapper(), dispatcher.getDigester());
             }
-        }
-    }
-
-    @ToString
-    private class IOPub extends Service.Jupyter {
-        public IOPub() { super(Kernel.this, SocketType.PUB); }
-
-        @Override
-        protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, byte[] message) {
         }
     }
 

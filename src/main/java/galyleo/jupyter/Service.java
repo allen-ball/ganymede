@@ -1,5 +1,6 @@
 package galyleo.jupyter;
 
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import lombok.Data;
@@ -92,6 +93,10 @@ public abstract class Service {
      */
     @ToString @Log4j2
     public static abstract class Jupyter extends Service {
+        private static final Class<?>[] PARAMETERS = {
+            Dispatcher.class, ZMQ.Socket.class, Message.class
+        };
+
         protected static final String PROTOCOL_VERSION = "5.3";
 
         /**
@@ -117,17 +122,19 @@ public abstract class Service {
 
             if (action != null) {
                 try {
-                    var method = getClass().getDeclaredMethod(action, Dispatcher.class, ZMQ.Socket.class, Message.class);
+                    var method = getClass().getDeclaredMethod(action, PARAMETERS);
 
                     method.setAccessible(true);
                     method.invoke(this, dispatcher, socket, message);
                 } catch (IllegalAccessException | NoSuchMethodException exception) {
                     log.warn("Could not dispatch '{}'", action, exception);
                 } catch (Exception exception) {
-                    log.warn("Exception invoking '{}' handler", action, exception);
+                    log.warn("Exception invoking '{}' handler",
+                             action, exception);
                 }
             } else {
-                log.warn("Could not determine action from {}", message.getHeader());
+                log.warn("Could not determine action from {}",
+                         message.getHeader());
             }
         }
 
@@ -143,6 +150,40 @@ public abstract class Service {
             } catch (Exception exception) {
                 log.warn("{}", exception);
             }
+        }
+    }
+
+    /**
+     * {@link Jupyter Jupyter} {@link IOPub IOPub} {@link Service}.
+     *
+     * {@bean.info}
+     */
+    @ToString @Log4j2
+    public static class IOPub extends Jupyter {
+
+        /**
+         * Sole constructor.
+         *
+         * @param  server       The {@link Server}.
+         */
+        public IOPub(Server server) { super(server, SocketType.PUB); }
+
+        /**
+         * Method to schedule a message for publishing.
+         *
+         * @param   message     The message to send.
+         */
+        public void pub(Message message) {
+            getDispatcherQueue().forEach(t -> t.pub(message));
+        }
+
+        @Override
+        protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, byte[] message) {
+            throw new UnsupportedOperationException();
+        }
+        @Override
+        protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, Message message) {
+            message.send(socket, getServer().getObjectMapper(), dispatcher.getDigester());
         }
     }
 }
