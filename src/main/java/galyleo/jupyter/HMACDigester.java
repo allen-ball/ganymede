@@ -5,6 +5,7 @@ import java.util.stream.Stream;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import lombok.Data;
+import lombok.extern.log4j.Log4j2;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
@@ -17,7 +18,7 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@Data
+@Data @Log4j2
 public class HMACDigester {
     private final Mac mac;
 
@@ -63,6 +64,12 @@ public class HMACDigester {
                 var bytes = mac.doFinal();
 
                 digest = new BigInteger(1, bytes).toString(16);
+            }
+
+            var length = 2 * mac.getMacLength();
+
+            while (digest.length() < length) {
+                digest = "0" + digest;
             }
         }
 
