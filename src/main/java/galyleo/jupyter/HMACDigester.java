@@ -46,20 +46,20 @@ public class HMACDigester {
     }
 
     /**
-     * Method to calculate a digest for message parts.  See {@link
-     * Mac#update(byte[])} and {@link Mac#doFinal()}.
+     * Method to calculate a digest for message frames.  See
+     * {@link Mac#update(byte[])} and {@link Mac#doFinal()}.
      *
-     * @param   parts           The {@code byte[]} parts of the message to
+     * @param   frames          The {@code byte[]} frames of the message to
      *                          digest.
      *
      * @return  The digest {@link String}.
      */
-    public String digest(byte[]... parts) {
+    public String digest(byte[]... frames) {
         String digest = "";
 
         if (mac != null) {
             synchronized (mac) {
-                Stream.of(parts).forEach(mac::update);
+                Stream.of(frames).forEach(mac::update);
 
                 var bytes = mac.doFinal();
 
@@ -77,16 +77,16 @@ public class HMACDigester {
     }
 
     /**
-     * Method to verify a digest for message parts.
+     * Method to verify a digest for message frames.
      *
      * @param   digest          The digest to verify.
-     * @param   parts           The {@code byte[]} parts of the message to
+     * @param   frames          The {@code byte[]} frames of the message to
      *                          digest.
      *
      * @return  {@code true} if the argument digest matches the one
      *          calculated; {@code false} otherwise.
      */
-    public boolean verify(String digest, byte[]... parts) {
-        return digest.equals(digest(parts));
+    public boolean verify(String digest, byte[]... frames) {
+        return digest.equals(digest(frames));
     }
 }

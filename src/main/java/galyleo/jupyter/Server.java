@@ -26,4 +26,11 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
     protected Server() { super(16); }
 
     { getObjectMapper().enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_VALUES); }
+
+    /**
+     * Method to get {@link.this} {@link Server}'s session ID.
+     *
+     * @return  The session ID.
+     */
+    protected abstract String getSession();
 }

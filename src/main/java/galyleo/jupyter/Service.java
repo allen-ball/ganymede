@@ -1,6 +1,5 @@
 package galyleo.jupyter;
 
-import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import lombok.Data;
@@ -52,16 +51,30 @@ public abstract class Service {
     public void connect(String address) { connect(address, null); }
 
     /**
-     * Callback method to dispatch a received {@link Message}.  This method
-     * is called on the same thread that the {@link ZMQ.Socket} was created on
-     * and the implementation may call {@link ZMQ.Socket} methods (including
-     * {@code send()}).
+     * Callback method to receive and dispatch a {@link Message}.  This
+     * method is called on the same thread that the {@link ZMQ.Socket} was
+     * created on and the implementation may call {@link ZMQ.Socket} methods
+     * (including {@code send()}).
      *
      * @param   dispatcher      The {@link Dispatcher}.
      * @param   socket          The {@link ZMQ.Socket}.
-     * @param   message         The message.
+     * @param   frame           The first message frame.
      */
-    protected abstract void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, byte[] message);
+    protected abstract void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, byte[] frame);
+
+    /**
+     * Callback method to dispatch a {@link Message}.  This method is called
+     * on the same thread that the {@link ZMQ.Socket} was created on and the
+     * implementation may call {@link ZMQ.Socket} methods
+     * (including {@code send()}).
+     *
+     * @param   dispatcher      The {@link Dispatcher}.
+     * @param   socket          The {@link ZMQ.Socket}.
+     * @param   message         The {@link Message}.
+     */
+    protected void send(Dispatcher dispatcher, ZMQ.Socket socket, Message message) {
+        message.send(socket, getServer().getObjectMapper(), dispatcher.getDigester());
+    }
 
     /**
      * Standard
@@ -81,8 +94,8 @@ public abstract class Service {
         public Heartbeat(Server server) { super(server, SocketType.REP); }
 
         @Override
-        protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, byte[] message) {
-            socket.send(message);
+        protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, byte[] frame) {
+            socket.send(frame);
         }
     }
 
@@ -133,16 +146,15 @@ public abstract class Service {
                              action, exception);
                 }
             } else {
-                log.warn("Could not determine action from {}",
-                         message.getHeader());
+                log.warn("Could not determine action from {}", message.header());
             }
         }
 
         @Override
-        protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, byte[] blob) {
+        protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, byte[] frame) {
             try {
                 var message =
-                    Message.receive(socket, blob,
+                    Message.receive(socket, frame,
                                     getServer().getObjectMapper(),
                                     dispatcher.getDigester());
 
@@ -169,21 +181,42 @@ public abstract class Service {
         public IOPub(Server server) { super(server, SocketType.PUB); }
 
         /**
-         * Method to schedule a message for publishing.
+         * Method to schedule a {@link Message} for publishing.
          *
-         * @param   message     The message to send.
+         * @param   message     The {@link Message} to send.
          */
         public void pub(Message message) {
             getDispatcherQueue().forEach(t -> t.pub(message));
         }
 
+        /**
+         * Parameter to {@link #pub(Status)}.
+         */
+        public enum Status { starting, busy, idle };
+
+        /**
+         * Method to compose and schedule a {@link Status Status}
+         * {@link Message} for publishing.
+         *
+         * @param   status      The {@link Message} {@link Status Status}.
+         */
+        public void pub(Status status) {
+            Message message = new Message();
+
+            message.msg_type("status");
+            message.content().put("execution_state", status.name());
+
+            pub(message);
+        }
+
         @Override
-        protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, byte[] message) {
+        protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, byte[] frame) {
             throw new UnsupportedOperationException();
         }
+
         @Override
         protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, Message message) {
-            message.send(socket, getServer().getObjectMapper(), dispatcher.getDigester());
+            send(dispatcher, socket, message);
         }
     }
 }

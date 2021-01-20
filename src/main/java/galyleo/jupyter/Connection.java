@@ -6,7 +6,8 @@ import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * Jupyter {@link Connection}.
+ * Jupyter {@link Connection}.  See
+ * "{@link.uri https://jupyter-client.readthedocs.io/en/stable/kernels.html#connection-files target=newtab Connection files}".
  *
  * {@bean.info}
  *
@@ -15,15 +16,15 @@ import lombok.extern.log4j.Log4j2;
  */
 @Data @Log4j2
 public class Connection {
-    private final Properties properties;
-    private final HMACDigester digester;
+    @NonNull private final Properties properties;
+    @NonNull private final HMACDigester digester;
 
     /**
      * Sole constructor.
      *
      * @param   properties      The {@link Properties}.
      */
-    public Connection(@NonNull Properties properties) {
+    public Connection(Properties properties) {
         this.properties = properties;
         this.digester = new HMACDigesterImpl();
     }

@@ -1,8 +1,10 @@
 package galyleo.jupyter;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import galyleo.PrintStreamBuffer;
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
+import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j2;
 import org.zeromq.ZMQ;
 
@@ -26,36 +29,110 @@ import static java.util.stream.Collectors.toList;
  * Jupyter {@link Message}.  See
  * "{@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#general-message-format target=newtab General Message Format}."
  *
- * {@bean.info}
- *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@Data @Log4j2
+@Data @Accessors(fluent = true) @Log4j2
 public class Message {
     private static final String DELIMITER_STRING = "<IDS|MSG>";
     private static final byte[] DELIMITER = DELIMITER_STRING.getBytes(US_ASCII);
 
-    private List<byte[]> identities = new LinkedList<>();
-    private Header header = new Header();
-    private Header parentHeader = null;
-    private Map<String,Object> metadata = new LinkedHashMap<>();
-    private Map<String,Object> content = new LinkedHashMap<>();
-    private List<byte[]> buffers = new LinkedList<>();
+    private static final StackWalker WALKER = StackWalker.getInstance();
 
-    /**
-     * Convenience for {@code getHeader().getMessageType()}.
-     *
-     * @return  The {@link Message} type.
-     */
-    public String getMessageType() { return getHeader().getMessageType(); }
+    protected final List<byte[]> envelope = new LinkedList<>();
+    protected ObjectNode header = new ObjectNode(JsonNodeFactory.instance);
+    protected ObjectNode parentHeader = new ObjectNode(JsonNodeFactory.instance);
+    protected ObjectNode metadata = new ObjectNode(JsonNodeFactory.instance);
+    protected ObjectNode content = new ObjectNode(JsonNodeFactory.instance);
+    protected final List<byte[]> buffers = new LinkedList<>();
 
-    /**
-     * Convenience for {@code getHeader().setMessageType(type)}.
-     *
-     * @param   type            The {@link Message} type.
-     */
-    public void setMessageType(String type) { getHeader().setMessageType(type); }
+    { msg_id(UUID.randomUUID().toString()); }
+
+    private String getCallingMethodName(int skip) {
+        String name =
+            WALKER.walk(t -> t.map(StackWalker.StackFrame::getMethodName)
+                                  .skip(1)
+                                  .findFirst())
+            .get();
+
+        return name;
+    }
+
+    private String asText(JsonNode node) {
+        return (node != null) ? node.asText() : null;
+    }
+
+    public String msg_id() {
+        JsonNode node = header().get(getCallingMethodName(1));
+
+        return asText(node);
+    }
+
+    public Message msg_id(String value) {
+        header().put(getCallingMethodName(1), value);
+
+        return this;
+    }
+
+    public String msg_type() {
+        JsonNode node = header().get(getCallingMethodName(1));
+
+        return asText(node);
+    }
+
+    public Message msg_type(String value) {
+        header().put(getCallingMethodName(1), value);
+
+        return this;
+    }
+
+    public String session() {
+        JsonNode node = header().get(getCallingMethodName(1));
+
+        return asText(node);
+    }
+
+    public Message session(String value) {
+        header().put(getCallingMethodName(1), value);
+
+        return this;
+    }
+
+    public String username() {
+        JsonNode node = header().get(getCallingMethodName(1));
+
+        return asText(node);
+    }
+
+    public Message username(String value) {
+        header().put(getCallingMethodName(1), value);
+
+        return this;
+    }
+
+    public String date() {
+        JsonNode node = header().get(getCallingMethodName(1));
+
+        return asText(node);
+    }
+
+    public Message date(String value) {
+        header().put(getCallingMethodName(1), value);
+
+        return this;
+    }
+
+    public String version() {
+        JsonNode node = header().get(getCallingMethodName(1));
+
+        return asText(node);
+    }
+
+    public Message version(String value) {
+        header().put(getCallingMethodName(1), value);
+
+        return this;
+    }
 
     /**
      * Parses a {@link Message} type for an "action".
@@ -63,7 +140,7 @@ public class Message {
      * @return  The parsed action.
      */
     public String getMessageTypeAction() {
-        var action = getMessageType().toLowerCase();
+        var action = msg_type().toLowerCase();
         var index = action.lastIndexOf("_");
 
         if (index != -1) {
@@ -79,7 +156,7 @@ public class Message {
      * @return  {@code true} if it is a "reply"; {@code false} otherwise.
      */
     public boolean isReply() {
-        var type = getMessageType();
+        var type = msg_type();
 
         return type != null && type.toLowerCase().endsWith("_reply");
     }
@@ -90,69 +167,17 @@ public class Message {
      * @return  {@code true} if it is a "request"; {@code false} otherwise.
      */
     public boolean isRequest() {
-        var type = getMessageType();
+        var type = msg_type();
 
         return type != null && type.toLowerCase().endsWith("_request");
     }
 
     /**
-     * Convenience for {@code getHeader().getDate()}.
-     *
-     * @return  The {@link Message} date.
-     */
-    public String getDate() { return getHeader().getDate(); }
-
-    /**
-     * Convenience for {@code getHeader().setDate(date)}.
-     *
-     * @param   date            The {@link Message} date.
-     */
-    public void setDate(String date) { getHeader().setDate(date); }
-
-    /**
-     * Convenience for {@code getMetadata().get(key)}.
-     *
-     * @param   key             The key into the metadata map.
-     *
-     * @return  The corresponding value (if any).
-     */
-    public Object getMetadata(Object key) { return getMetadata().get(key); }
-
-    /**
-     * Convenience for {@code getMetadata().put(key, value)}.
-     *
-     * @param   key             The key into the metadata map.
-     * @param   value           The value.
-     */
-    public void setMetadata(String key, Object value) {
-        getMetadata().put(key, value);
-    }
-
-    /**
-     * Convenience for {@code getContent().get(key)}.
-     *
-     * @param   key             The key into the content map.
-     *
-     * @return  The corresponding value (if any).
-     */
-    public Object getContent(Object key) { return getContent().get(key); }
-
-    /**
-     * Convenience for {@code getContent().put(key, value)}.
-     *
-     * @param   key             The key into the metadata map.
-     * @param   value           The value.
-     */
-    public void setContent(String key, Object value) {
-        getContent().put(key, value);
-    }
-
-    /**
-     * Convenience for {@code setContent("status", value)}.
+     * Convenience for {@code getContent().put("status", value)}.
      *
      * @param   value           The value.
      */
-    public void setStatus(String value) { setContent("status", value); }
+    public void setStatus(String value) { content().put("status", value); }
 
     /**
      * Method to set status for a {@link Throwable}.
@@ -161,59 +186,61 @@ public class Message {
      */
     public void setStatus(Throwable throwable) {
         setStatus("error");
-        setContent("ename", throwable.getClass().getCanonicalName());
-        setContent("evalue", throwable.getMessage());
+        content().put("ename", throwable.getClass().getCanonicalName());
+        content().put("evalue", throwable.getMessage());
 
         PrintStreamBuffer buffer = new PrintStreamBuffer();
 
         throwable.printStackTrace(buffer);
 
-        setContent("traceback", buffer.toString().split("\\R"));
+        content().put("traceback", buffer.toString().split("\\R")[0]);
     }
 
     /**
      * Create a suitable reply {@link Message} for {@link.this}
      * {@link Message}.  Initializes message status to "OK".
      *
+     * @param   session         The kernel session ID.
+     *
      * @return  The reply {@link Message}.
      */
-    public Message reply() {
+    public Message reply(String session) {
         if (! isRequest()) {
             throw new IllegalStateException("Source message is not a request");
         }
 
-        return reply(getMessageTypeAction() + "_reply");
+        return reply(session, getMessageTypeAction() + "_reply");
     }
 
     /**
      * Create a suitable reply {@link Message} for {@link.this}
      * {@link Message}.  Initializes message status to "OK".
      *
+     * @param   session         The kernel session ID.
      * @param   type            The reply {@link Message} type.
      *
      * @return  The reply {@link Message}.
      */
-    public Message reply(String type) {
+    public Message reply(String session, String type) {
         var reply = new Message();
 
-        reply.getIdentities().addAll(getIdentities());
-        reply.setMessageType(type);
-        reply.getHeader().setMessageId(UUID.randomUUID().toString());
-        reply.getHeader().setSession(getHeader().getSession());
-        reply.getHeader().setUsername(getHeader().getUsername());
-        reply.setParentHeader(getHeader());
+        reply.envelope().addAll(envelope());
+        reply.msg_type(type);
+        reply.session(session);
+        reply.username(username());
+        reply.parentHeader().setAll(header());
         reply.setStatus("ok");
-        reply.getBuffers().addAll(getBuffers());
+        reply.buffers().addAll(buffers());
 
         return reply;
     }
 
     /**
-     * Set the {@link Header} date value if not already set.
+     * Set the {@link date()} value if not already set.
      */
     public Message timestamp() {
-        if (getDate() == null) {
-            setDate(now(UTC).format(ISO_INSTANT));
+        if (date() == null) {
+            date(now(UTC).format(ISO_INSTANT));
         }
 
         return this;
@@ -227,14 +254,14 @@ public class Message {
      *                          {@code null}).
      */
     public List<byte[]> serialize(ObjectMapper mapper, HMACDigester digester) {
-        var blobs = getIdentities().stream().collect(toList());
+        var frames = envelope().stream().collect(toList());
 
-        blobs.add(DELIMITER);
+        frames.add(DELIMITER);
 
-        var header = serialize(mapper, getHeader());
-        var parentHeader = serialize(mapper, getParentHeader());
-        var metadata = serialize(mapper, getMetadata());
-        var content = serialize(mapper, getContent());
+        var header = serialize(mapper, header());
+        var parentHeader = serialize(mapper, parentHeader());
+        var metadata = serialize(mapper, metadata());
+        var content = serialize(mapper, content());
 
         var digest = "";
 
@@ -242,24 +269,20 @@ public class Message {
             digest = digester.digest(header, parentHeader, metadata, content);
         }
 
-        Collections.addAll(blobs,
+        Collections.addAll(frames,
                            digest.getBytes(US_ASCII),
                            header, parentHeader, metadata, content);
 
-        blobs.addAll(getBuffers());
+        frames.addAll(buffers());
 
-        return blobs;
+        return frames;
     }
 
-    private byte[] serialize(ObjectMapper mapper, Object object) {
+    private byte[] serialize(ObjectMapper mapper, JsonNode node) {
         var string = "{}";
 
-        if (object == null) {
-            object = Collections.emptyMap();
-        }
-
         try {
-            string = mapper.writeValueAsString(object);
+            string = mapper.writeValueAsString(node);
         } catch (Exception exception) {
             log.warn("{}", exception);
         }
@@ -271,22 +294,22 @@ public class Message {
      * Method to receive a {@link Message} on a {@link ZMQ.Socket}.
      *
      * @param   socket          The {@link ZMQ.Socket}.
+     * @param   frame           The first message frame.
      * @param   mapper          The {@link ObjectMapper}.
      * @param   digester        The {@link HMACDigester} (may be
      *                          {@code null}).
      */
-    public static Message receive(ZMQ.Socket socket, byte[] blob,
+    public static Message receive(ZMQ.Socket socket, byte[] frame,
                                   ObjectMapper mapper, HMACDigester digester) {
-        var identities = new LinkedList<byte[]>();
-        var identity = blob;
+        var envelope = new LinkedList<byte[]>();
 
-        while (! Arrays.equals(identity, DELIMITER)) {
-            identities.add(identity);
+        while (! Arrays.equals(frame, DELIMITER)) {
+            envelope.add(frame);
 
-            identity = socket.recv();
+            frame = socket.recv();
         }
 
-        var signature = socket.recvStr();
+        var signature = socket.recv();
         var header = socket.recv();
         var parentHeader = socket.recv();
         var metadata = socket.recv();
@@ -298,47 +321,29 @@ public class Message {
         }
 
         if (digester != null) {
-            if (! digester.verify(signature, header, parentHeader, metadata, content)) {
+            if (! digester.verify(new String(signature, US_ASCII),
+                                  header, parentHeader, metadata, content)) {
                 throw new SecurityException("Invalid signature");
             }
         }
 
         var message = new Message();
 
-        message.setIdentities(identities);
-        message.setHeader(deserialize(mapper, Message.Header.class, header));
-        message.setParentHeader(deserialize(mapper, Message.Header.class, parentHeader));
-        message.getMetadata().putAll(deserialize(mapper, metadata));
-        message.getContent().putAll(deserialize(mapper, content));
-        message.setBuffers(buffers);
+        message.envelope().addAll(envelope);
+        message.header().setAll(deserialize(mapper, header));
+        message.parentHeader().setAll(deserialize(mapper, parentHeader));
+        message.metadata().setAll(deserialize(mapper, metadata));
+        message.content().setAll(deserialize(mapper, content));
+        message.buffers().addAll(buffers);
 
         return message;
     }
 
-    private static <T> T deserialize(ObjectMapper mapper, Class<T> type, byte[] bytes) {
-        T value = null;
+    private static ObjectNode deserialize(ObjectMapper mapper, byte[] bytes) {
+        ObjectNode value = null;
 
         try {
-            var string = new String(bytes, UTF_8);
-            var node = mapper.readTree(string);
-
-            if (! node.isEmpty()) {
-                value = mapper.readValue(string, type);
-            }
-        } catch (Exception exception) {
-            log.warn("{}", exception);
-        }
-
-        return value;
-    }
-
-    private static Map<String,Object> deserialize(ObjectMapper mapper, byte[] bytes) {
-        Map<String,Object> value = null;
-
-        try {
-            value =
-                mapper.readValue(new String(bytes, UTF_8),
-                                 new TypeReference<Map<String,Object>>() { });
+            value = (ObjectNode) mapper.readTree(new String(bytes, UTF_8));
         } catch (Exception exception) {
             log.warn("{}", exception);
         }
@@ -355,32 +360,17 @@ public class Message {
      *                          {@code null}).
      */
     public void send(ZMQ.Socket socket, ObjectMapper mapper, HMACDigester digester) {
-        if (getHeader().getVersion() == null) {
-            getHeader().setVersion(/* getService().PROTOCOL_VERSION */ "5.3");
+        if (version() == null) {
+            version(/* getService().PROTOCOL_VERSION */ "5.3");
         }
 
         timestamp();
 
-        var blobs = serialize(mapper, digester);
-        var last = blobs.size() - 1;
+        var list = serialize(mapper, digester);
+        var iterator = list.iterator();
 
-        blobs.subList(0, last).forEach(socket::sendMore);
-        socket.send(blobs.get(last));
-    }
-
-    /**
-     * See
-     * "{@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#message-header target=newtab Message Header}".
-     *
-     * {@bean.info}
-     */
-    @Data
-    public static class Header {
-        @JsonProperty("msg_id")         private String messageId = null;
-        @JsonProperty("msg_type")       private String messageType = null;
-        @JsonProperty("session")        private String session = null;
-        @JsonProperty("username")       private String username = null;
-        @JsonProperty("date")           private String date = null;
-        @JsonProperty("version")        private String version = null;
+        while (iterator.hasNext()) {
+            socket.send(iterator.next(), iterator.hasNext() ? ZMQ.SNDMORE : 0);
+        }
     }
 }

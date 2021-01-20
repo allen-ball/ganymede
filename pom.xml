@@ -8,7 +8,7 @@
   <description>Jupyter Java Kernel</description>
   <groupId>ball</groupId>
   <artifactId>galyleo</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   <parent>
     <groupId>ball</groupId>

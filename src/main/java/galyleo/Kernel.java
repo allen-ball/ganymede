@@ -8,7 +8,6 @@ import galyleo.jupyter.Service;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.LinkedHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -53,10 +52,10 @@ public class Kernel extends Server implements ApplicationRunner {
         application.run(argv);
     }
 
-    private final Service.Jupyter shell = new Shell();
-    private final Service.Jupyter control = new Control();
-    private final Service.Jupyter iopub = new Service.IOPub(this);
-    private final Service.Jupyter stdin = new Stdin();
+    private final Shell shell = new Shell();
+    private final Control control = new Control();
+    private final Service.IOPub iopub = new Service.IOPub(this);
+    private final Stdin stdin = new Stdin();
     private final Service.Heartbeat heartbeat = new Service.Heartbeat(this);
     private final PrintStreamBuffer out = new PrintStreamBuffer();
     private final PrintStreamBuffer err = new PrintStreamBuffer();
@@ -66,6 +65,7 @@ public class Kernel extends Server implements ApplicationRunner {
         .out(out)
         .err(err);
     private JShell java = null;
+    private int restarts = 0;
 
     @PostConstruct
     public void init() {
@@ -89,6 +89,9 @@ public class Kernel extends Server implements ApplicationRunner {
                     log.warn("{}", exception);
                 }
             }
+
+            iopub.pub(Service.IOPub.Status.starting);
+            iopub.pub(Service.IOPub.Status.idle);
         } else {
             throw new IllegalArgumentException("No connection file specified");
         }
@@ -104,14 +107,22 @@ public class Kernel extends Server implements ApplicationRunner {
      *                          parsed.
      */
     public void listen(String path) throws IOException {
-        var properties =
-            getObjectMapper()
-            .readValue(new File(path), Connection.Properties.class);
+        var mapper = getObjectMapper();
+        var node = mapper.readTree(new File(path));
+        var properties = mapper.treeToValue(node, Connection.Properties.class);
         var connection = new Connection(properties);
 
         connection.connect(shell, control, iopub, stdin, heartbeat);
 
         log.info("Listening to {}", connection);
+    }
+
+    @Override
+    protected String getSession() {
+        return String.join("-",
+                           Kernel.class.getCanonicalName(),
+                           String.valueOf(ProcessHandle.current().pid()),
+                           String.valueOf(restarts));
     }
 
     @ToString
@@ -125,29 +136,55 @@ public class Kernel extends Server implements ApplicationRunner {
             if (message.isRequest()) {
                 super.dispatch(dispatcher, socket, message);
             } else {
-                log.warn("Ignoring non-request {}", message.getMessageType());
+                log.warn("Ignoring non-request {}", message.msg_type());
+            }
+        }
+
+        private void kernel_info(Dispatcher dispatcher, ZMQ.Socket socket, Message request) {
+            var reply = request.reply(getSession());
+
+            try {
+                iopub.pub(Service.IOPub.Status.busy);
+
+                reply.content().put("protocol_version", PROTOCOL_VERSION);
+                reply.content().put("implementation", "galyleo");
+                reply.content().put("implementation_version", "1.0.0");
+
+                var language_info = reply.content().with("language_info");
+
+                language_info.put("name", "java");
+                language_info.put("version", System.getProperty("java.version"));
+                language_info.put("mimetype", "text/plain");
+                language_info.put("file_extension", ".java");
+
+                reply.content().set("language_info", language_info);
+
+                var help_links = reply.content().with("help_links");
+            } catch (Exception exception) {
+                reply.setStatus(exception);
+            } finally {
+                iopub.pub(Service.IOPub.Status.idle);
+
+                send(dispatcher, socket, reply);
             }
         }
 
         private void execute(Dispatcher dispatcher, ZMQ.Socket socket, Message request) {
-            var reply = request.reply();
+            var reply = request.reply(getSession());
 
             try {
-                throw new UnsupportedOperationException();
-/*
-                var code = (String) request.getContent("code");
-                var silent = (Boolean) request.getContent("silent");
-                var store_history = (Boolean) request.getContent("store_history");
-                var user_expressions = (Map<?,?>) request.getContent("user_expressions");
-                var allow_stdin = (Boolean) request.getContent("allow_stdin");
-                var stop_on_error = (Boolean) request.getContent("stop_on_error");
+                var code = request.content().get("code");
+                var silent = request.content().get("silent");
+                var store_history = request.content().get("store_history");
+                var user_expressions = request.content().get("user_expressions");
+                var allow_stdin = request.content().get("allow_stdin");
+                var stop_on_error = request.content().get("stop_on_error");
 
-                reply.setContent("execution_count", execution_count);
-*/
+                reply.content().put("execution_count", String.valueOf(execution_count));
             } catch (Exception exception) {
                 reply.setStatus(exception);
             } finally {
-                reply.send(socket, getObjectMapper(), dispatcher.getDigester());
+                send(dispatcher, socket, reply);
             }
 
             out.reset();
@@ -155,98 +192,76 @@ public class Kernel extends Server implements ApplicationRunner {
         }
 
         private void inspect(Dispatcher dispatcher, ZMQ.Socket socket, Message request) {
-            var reply = request.reply();
+            var reply = request.reply(getSession());
 
             try {
                 throw new UnsupportedOperationException();
             } catch (Exception exception) {
                 reply.setStatus(exception);
             } finally {
-                reply.send(socket, getObjectMapper(), dispatcher.getDigester());
+                send(dispatcher, socket, reply);
             }
         }
 
         private void complete(Dispatcher dispatcher, ZMQ.Socket socket, Message request) {
-            var reply = request.reply();
+            var reply = request.reply(getSession());
 
             try {
                 throw new UnsupportedOperationException();
             } catch (Exception exception) {
                 reply.setStatus(exception);
             } finally {
-                reply.send(socket, getObjectMapper(), dispatcher.getDigester());
+                send(dispatcher, socket, reply);
             }
         }
 
         private void history(Dispatcher dispatcher, ZMQ.Socket socket, Message request) {
-            var reply = request.reply();
+            var reply = request.reply(getSession());
 
             try {
                 throw new UnsupportedOperationException();
             } catch (Exception exception) {
                 reply.setStatus(exception);
             } finally {
-                reply.send(socket, getObjectMapper(), dispatcher.getDigester());
+                send(dispatcher, socket, reply);
             }
         }
 
         private void is_complete(Dispatcher dispatcher, ZMQ.Socket socket, Message request) {
-            var reply = request.reply();
+            var reply = request.reply(getSession());
 
             try {
-                var code = request.getContent("code");
+                var code = request.content().get("code");
 
-                reply.setContent("status", "unknown");
+                reply.content().put("status", "unknown");
             } catch (Exception exception) {
                 reply.setStatus(exception);
             } finally {
-                reply.send(socket, getObjectMapper(), dispatcher.getDigester());
+                send(dispatcher, socket, reply);
             }
         }
 
         private void connect(Dispatcher dispatcher, ZMQ.Socket socket, Message request) {
-            var reply = request.reply();
+            var reply = request.reply(getSession());
 
             try {
                 throw new UnsupportedOperationException();
             } catch (Exception exception) {
                 reply.setStatus(exception);
             } finally {
-                reply.send(socket, getObjectMapper(), dispatcher.getDigester());
+                send(dispatcher, socket, reply);
             }
         }
 
         private void comm_info(Dispatcher dispatcher, ZMQ.Socket socket, Message request) {
-            var reply = request.reply();
+            var reply = request.reply(getSession());
 
             try {
                 throw new UnsupportedOperationException();
             } catch (Exception exception) {
                 reply.setStatus(exception);
             } finally {
-                reply.send(socket, getObjectMapper(), dispatcher.getDigester());
-            }
-        }
-
-        private void kernel_info(Dispatcher dispatcher, ZMQ.Socket socket, Message request) {
-            var reply = request.reply();
-
-            try {
-                reply.setContent("protocol_version", PROTOCOL_VERSION);
-                reply.setContent("implementation", "galyle");
-                reply.setContent("implementation_version", "1.0.0");
-
-                var language_info = new LinkedHashMap<String,Object>();
-
-                language_info.put("name", "java");
-                language_info.put("version", System.getProperty("java.vm.specification.version"));
-                language_info.put("mimetype", "text/plain");
-
-                reply.setContent("language_info", language_info);
-            } catch (Exception exception) {
-                reply.setStatus(exception);
-            } finally {
-                reply.send(socket, getObjectMapper(), dispatcher.getDigester());
+                send(dispatcher, socket, reply);
             }
         }
     }
@@ -260,13 +275,13 @@ public class Kernel extends Server implements ApplicationRunner {
             if (message.isRequest()) {
                 super.dispatch(dispatcher, socket, message);
             } else {
-                log.warn("Ignoring non-request {}", message.getMessageType());
+                log.warn("Ignoring non-request {}", message.msg_type());
             }
         }
 
         private void shutdown(Dispatcher dispatcher, ZMQ.Socket socket, Message request) {
-            var reply = request.reply();
-            var restart = (Boolean) request.getContent("restart");
+            var reply = request.reply(getSession());
+            var restart = false /* request.content().get("restart") */;
 
             try {
                 JShell old = java;
@@ -279,13 +294,14 @@ public class Kernel extends Server implements ApplicationRunner {
 
                 if (restart) {
                     java = builder.build();
+                    restarts += 1;
                     out.reset();
                     err.reset();
                 }
             } catch (Exception exception) {
                 reply.setStatus(exception);
             } finally {
-                reply.send(socket, getObjectMapper(), dispatcher.getDigester());
+                send(dispatcher, socket, reply);
             }
 
             if (! restart) {
@@ -294,26 +310,26 @@ public class Kernel extends Server implements ApplicationRunner {
         }
 
         private void interrupt(Dispatcher dispatcher, ZMQ.Socket socket, Message request) {
-            var reply = request.reply();
+            var reply = request.reply(getSession());
 
             try {
                 java.stop();
             } catch (Exception exception) {
                 reply.setStatus(exception);
             } finally {
-                reply.send(socket, getObjectMapper(), dispatcher.getDigester());
+                send(dispatcher, socket, reply);
             }
         }
 
         private void debug(Dispatcher dispatcher, ZMQ.Socket socket, Message request) {
-            var reply = request.reply();
+            var reply = request.reply(getSession());
 
             try {
                 throw new UnsupportedOperationException();
             } catch (Exception exception) {
                 reply.setStatus(exception);
             } finally {
-                reply.send(socket, getObjectMapper(), dispatcher.getDigester());
+                send(dispatcher, socket, reply);
             }
         }
     }
@@ -327,12 +343,12 @@ public class Kernel extends Server implements ApplicationRunner {
             if (message.isReply()) {
                 super.dispatch(dispatcher, socket, message);
             } else {
-                log.warn("Ignoring non-reply {}", message.getMessageType());
+                log.warn("Ignoring non-reply {}", message.msg_type());
             }
         }
 
         private void input(Dispatcher dispatcher, ZMQ.Socket socket, Message reply) {
-            log.warn("Ignoring {}", reply.getMessageType());
+            log.warn("Ignoring {}", reply.msg_type());
         }
     }
 }

@@ -1,8 +1,5 @@
 package galyleo.jupyter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 import lombok.Data;
@@ -16,6 +13,8 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 /**
  * Jupyter {@link ZMQ.Socket} {@link Dispatcher}.  All {@link ZMQ.Socket}
  * creation and manipulation calls happens in the {@link #run()} method.
+ * See {@link.uri https://zguide.zeromq.org/ target=newtab ØMQ - The Guide},
+ * {@link.uri https://zguide.zeromq.org/docs/chapter3/ target=newtab Chapter 3}.
  *
  * {@bean.info}
  *
@@ -35,10 +34,10 @@ public class Dispatcher implements Runnable {
      * {@link Service#dispatch(Dispatcher,ZMQ.Socket,byte[])}.
      *
      * @param   socket          The {@link ZMQ.Socket}.
-     * @param   message         The message.
+     * @param   frame           The first message frame.
      */
-    protected void dispatch(ZMQ.Socket socket, byte[] message) {
-        getService().dispatch(this, socket, message);
+    protected void dispatch(ZMQ.Socket socket, byte[] frame) {
+        getService().dispatch(this, socket, frame);
     }
 
     /**
@@ -47,7 +46,7 @@ public class Dispatcher implements Runnable {
      * {@link Service.Jupyter#dispatch(Dispatcher,ZMQ.Socket,Message)}.
      *
      * @param   socket          The {@link ZMQ.Socket}.
-     * @param   message         The message.
+     * @param   message         The {@link Message}.
      */
     protected void dispatch(ZMQ.Socket socket, Message message) {
         ((Service.Jupyter) getService()).dispatch(this, socket, message);
