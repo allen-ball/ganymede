@@ -1,4 +1,4 @@
-package galyleo.jupyter;
+package galyleo.server;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -46,17 +46,17 @@ public class Connection {
     }
 
     /**
-     * Method to connect a kernel's {@link Service}s.
+     * Method to connect a kernel's {@link Channel}s.
      *
-     * @param   shell           The shell {@link Service}.
-     * @param   control         The control {@link Service}.
-     * @param   iopub           The iopub {@link Service}.
-     * @param   stdin           The stdin {@link Service}.
-     * @param   heartbeat       The heartbeat {@link Service}.
+     * @param   shell           The shell {@link Channel}.
+     * @param   control         The control {@link Channel}.
+     * @param   iopub           The iopub {@link Channel}.
+     * @param   stdin           The stdin {@link Channel}.
+     * @param   heartbeat       The heartbeat {@link Channel}.
      */
-    public void connect(Service.Jupyter shell, Service.Jupyter control,
-                        Service.Jupyter iopub, Service.Jupyter stdin,
-                        Service.Heartbeat heartbeat) {
+    public void connect(Channel.Jupyter shell, Channel.Jupyter control,
+                        Channel.Jupyter iopub, Channel.Jupyter stdin,
+                        Channel.Heartbeat heartbeat) {
         var properties = getProperties();
         var digester = getDigester();
 

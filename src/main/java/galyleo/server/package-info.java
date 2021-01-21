@@ -5,6 +5,6 @@
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 @Manifest.Section
-package galyleo.jupyter;
+package galyleo.server;
 
 import ball.annotation.Manifest;

@@ -1,4 +1,4 @@
-package galyleo.jupyter;
+package galyleo.server;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;

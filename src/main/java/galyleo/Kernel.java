@@ -1,10 +1,10 @@
 package galyleo;
 
-import galyleo.jupyter.Connection;
-import galyleo.jupyter.Dispatcher;
-import galyleo.jupyter.Message;
-import galyleo.jupyter.Server;
-import galyleo.jupyter.Service;
+import galyleo.server.Channel;
+import galyleo.server.Connection;
+import galyleo.server.Dispatcher;
+import galyleo.server.Message;
+import galyleo.server.Server;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,9 +54,9 @@ public class Kernel extends Server implements ApplicationRunner {
 
     private final Shell shell = new Shell();
     private final Control control = new Control();
-    private final Service.IOPub iopub = new Service.IOPub(this);
+    private final Channel.IOPub iopub = new Channel.IOPub(this);
     private final Stdin stdin = new Stdin();
-    private final Service.Heartbeat heartbeat = new Service.Heartbeat(this);
+    private final Channel.Heartbeat heartbeat = new Channel.Heartbeat(this);
     private final PrintStreamBuffer out = new PrintStreamBuffer();
     private final PrintStreamBuffer err = new PrintStreamBuffer();
     private final JShell.Builder builder =
@@ -90,8 +90,8 @@ public class Kernel extends Server implements ApplicationRunner {
                 }
             }
 
-            iopub.pub(Service.IOPub.Status.starting);
-            iopub.pub(Service.IOPub.Status.idle);
+            iopub.pub(Channel.IOPub.Status.starting);
+            iopub.pub(Channel.IOPub.Status.idle);
         } else {
             throw new IllegalArgumentException("No connection file specified");
         }
@@ -126,7 +126,7 @@ public class Kernel extends Server implements ApplicationRunner {
     }
 
     @ToString
-    private class Shell extends Service.Jupyter {
+    private class Shell extends Channel.Jupyter {
         private AtomicLong execution_count = new AtomicLong(1);
 
         public Shell() { super(Kernel.this, SocketType.ROUTER); }
@@ -144,7 +144,7 @@ public class Kernel extends Server implements ApplicationRunner {
             var reply = request.reply(getSession());
 
             try {
-                iopub.pub(Service.IOPub.Status.busy);
+                iopub.pub(Channel.IOPub.Status.busy);
 
                 reply.content().put("protocol_version", PROTOCOL_VERSION);
                 reply.content().put("implementation", "galyleo");
@@ -163,7 +163,7 @@ public class Kernel extends Server implements ApplicationRunner {
             } catch (Exception exception) {
                 reply.setStatus(exception);
             } finally {
-                iopub.pub(Service.IOPub.Status.idle);
+                iopub.pub(Channel.IOPub.Status.idle);
 
                 send(dispatcher, socket, reply);
             }
@@ -267,7 +267,7 @@ public class Kernel extends Server implements ApplicationRunner {
     }
 
     @ToString
-    private class Control extends Service.Jupyter {
+    private class Control extends Channel.Jupyter {
         public Control() { super(Kernel.this, SocketType.ROUTER); }
 
         @Override
@@ -335,7 +335,7 @@ public class Kernel extends Server implements ApplicationRunner {
     }
 
     @ToString
-    private class Stdin extends Service.Jupyter {
+    private class Stdin extends Channel.Jupyter {
         public Stdin() { super(Kernel.this, SocketType.ROUTER); }
 
         @Override

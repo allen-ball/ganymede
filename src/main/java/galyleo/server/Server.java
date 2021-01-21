@@ -1,4 +1,4 @@
-package galyleo.jupyter;
+package galyleo.server;
 
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

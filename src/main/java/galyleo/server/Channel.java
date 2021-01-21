@@ -1,4 +1,4 @@
-package galyleo.jupyter;
+package galyleo.server;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -10,7 +10,7 @@ import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
 
 /**
- * Jupyter {@link Service}.
+ * Jupyter server {@link Channel}.
  *
  * {@bean.info}
  *
@@ -18,7 +18,7 @@ import org.zeromq.ZMQ;
  * @version $Revision$
  */
 @Data @Log4j2
-public abstract class Service {
+public abstract class Channel {
     @NonNull private final Server server;
     @NonNull private final SocketType socketType;
     private final Queue<Dispatcher> dispatcherQueue = new ConcurrentLinkedQueue<>();
@@ -43,7 +43,8 @@ public abstract class Service {
     }
 
     /**
-     * Method to schedule creation of and binding to a {@link ZMQ.Socket} for this {@link Service}.
+     * Method to schedule creation of and binding to a {@link ZMQ.Socket}
+     * for this {@link Channel}.
      *
      * @param   address         The address of the {@link ZMQ.Socket} to be
      *                          created.
@@ -79,12 +80,12 @@ public abstract class Service {
     /**
      * Standard
      * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#heartbeat-for-kernels Heartbeat}
-     * {@link Service}.
+     * {@link Channel}.
      *
      * {@bean.info}
      */
     @ToString @Log4j2
-    public static class Heartbeat extends Service {
+    public static class Heartbeat extends Channel {
 
         /**
          * Sole constructor.
@@ -100,12 +101,12 @@ public abstract class Service {
     }
 
     /**
-     * Jupyter {@link Service} abstract base class.
+     * Jupyter {@link Channel} abstract base class.
      *
      * {@bean.info}
      */
     @ToString @Log4j2
-    public static abstract class Jupyter extends Service {
+    public static abstract class Jupyter extends Channel {
         private static final Class<?>[] PARAMETERS = {
             Dispatcher.class, ZMQ.Socket.class, Message.class
         };
@@ -166,7 +167,7 @@ public abstract class Service {
     }
 
     /**
-     * {@link Jupyter Jupyter} {@link IOPub IOPub} {@link Service}.
+     * {@link Jupyter Jupyter} {@link IOPub IOPub} {@link Channel}.
      *
      * {@bean.info}
      */

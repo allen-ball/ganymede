@@ -1,4 +1,4 @@
-package galyleo.jupyter;
+package galyleo.server;
 
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -23,7 +23,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
  */
 @Data @Log4j2
 public class Dispatcher implements Runnable {
-    @NonNull private final Service service;
+    @NonNull private final Channel channel;
     @NonNull private final String address;
     private final HMACDigester digester;
     private final BlockingDeque<Message> outgoing = new LinkedBlockingDeque<>();
@@ -31,25 +31,25 @@ public class Dispatcher implements Runnable {
     /**
      * Callback method to dispatch a received message.  Default
      * implementation calls
-     * {@link Service#dispatch(Dispatcher,ZMQ.Socket,byte[])}.
+     * {@link Channel#dispatch(Dispatcher,ZMQ.Socket,byte[])}.
      *
      * @param   socket          The {@link ZMQ.Socket}.
      * @param   frame           The first message frame.
      */
     protected void dispatch(ZMQ.Socket socket, byte[] frame) {
-        getService().dispatch(this, socket, frame);
+        getChannel().dispatch(this, socket, frame);
     }
 
     /**
      * Callback method to dispatch a {@link Message}.  Default
      * implementation calls
-     * {@link Service.Jupyter#dispatch(Dispatcher,ZMQ.Socket,Message)}.
+     * {@link Channel.Jupyter#dispatch(Dispatcher,ZMQ.Socket,Message)}.
      *
      * @param   socket          The {@link ZMQ.Socket}.
      * @param   message         The {@link Message}.
      */
     protected void dispatch(ZMQ.Socket socket, Message message) {
-        ((Service.Jupyter) getService()).dispatch(this, socket, message);
+        ((Channel.Jupyter) getChannel()).dispatch(this, socket, message);
     }
 
     /**
@@ -58,7 +58,7 @@ public class Dispatcher implements Runnable {
      * @param   message         The message to send.
      */
     public void pub(Message message) {
-        var type = getService().getSocketType();
+        var type = getChannel().getSocketType();
 
         switch (type) {
         case PUB:
@@ -72,11 +72,11 @@ public class Dispatcher implements Runnable {
 
     @Override
     public void run() {
-        var server = getService().getServer();
+        var server = getChannel().getServer();
         var context = server.getContext();
         var mapper = server.getObjectMapper();
         var digester = getDigester();
-        var type = getService().getSocketType();
+        var type = getChannel().getSocketType();
 
         while (! server.isTerminating()) {
             try (ZMQ.Socket socket = context.socket(type)) {
