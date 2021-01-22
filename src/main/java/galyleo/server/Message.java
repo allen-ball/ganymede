@@ -19,7 +19,6 @@ import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j2;
 import org.zeromq.ZMQ;
 
-import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.ZoneOffset.UTC;
 import static java.time.ZonedDateTime.now;
@@ -36,7 +35,7 @@ import static java.util.stream.Collectors.toList;
 @Data @Accessors(fluent = true) @Log4j2
 public class Message {
     private static final String DELIMITER_STRING = "<IDS|MSG>";
-    private static final byte[] DELIMITER = DELIMITER_STRING.getBytes(US_ASCII);
+    private static final byte[] DELIMITER = DELIMITER_STRING.getBytes(UTF_8);
 
     private static final StackWalker WALKER = StackWalker.getInstance();
 
@@ -272,7 +271,7 @@ public class Message {
         }
 
         Collections.addAll(frames,
-                           digest.getBytes(US_ASCII),
+                           digest.getBytes(UTF_8),
                            header, parentHeader, metadata, content);
 
         frames.addAll(buffers());
@@ -323,7 +322,7 @@ public class Message {
         }
 
         if (digester != null) {
-            if (! digester.verify(new String(signature, US_ASCII),
+            if (! digester.verify(new String(signature, UTF_8),
                                   header, parentHeader, metadata, content)) {
                 throw new SecurityException("Invalid signature");
             }

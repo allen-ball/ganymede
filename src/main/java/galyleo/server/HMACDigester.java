@@ -7,7 +7,7 @@ import javax.crypto.spec.SecretKeySpec;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 
-import static java.nio.charset.StandardCharsets.US_ASCII;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * HMAC message digester.  See discussion in
@@ -36,7 +36,7 @@ public class HMACDigester {
         if (key != null && (! key.isEmpty())) {
             try {
                 mac = Mac.getInstance(scheme.replaceAll("-", ""));
-                mac.init(new SecretKeySpec(key.getBytes(US_ASCII), scheme));
+                mac.init(new SecretKeySpec(key.getBytes(UTF_8), scheme));
             } catch (Exception exception) {
                 throw new ExceptionInInitializerError(exception);
             }
