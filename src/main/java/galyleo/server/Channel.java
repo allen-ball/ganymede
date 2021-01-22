@@ -1,5 +1,6 @@
 package galyleo.server;
 
+import java.lang.reflect.Method;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import lombok.Data;
@@ -158,9 +159,18 @@ public abstract class Channel {
      */
     @ToString @Log4j2
     public static abstract class Control extends Protocol {
-        private static final Class<?>[] PARAMETERS = {
-            Dispatcher.class, ZMQ.Socket.class, Message.class, Message.class
-        };
+        private static abstract class PROTOTYPE {
+            private void action(Dispatcher dispatcher, ZMQ.Socket socket,
+                                Message request, Message reply) throws Exception {
+            }
+        }
+
+        private static final Method PROTOTYPE;
+
+        static {
+            PROTOTYPE = PROTOTYPE.class.getDeclaredMethods()[0];
+            PROTOTYPE.setAccessible(true);
+        }
 
         /**
          * Sole constructor.
@@ -177,7 +187,7 @@ public abstract class Channel {
                 var reply = message.reply(getServer().getSession());
 
                 try {
-                    var method = getClass().getDeclaredMethod(action, PARAMETERS);
+                    var method = getClass().getDeclaredMethod(action, PROTOTYPE.getParameterTypes());
 
                     method.setAccessible(true);
                     method.invoke(this, dispatcher, socket, message, reply);
