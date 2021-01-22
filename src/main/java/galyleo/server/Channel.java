@@ -10,7 +10,7 @@ import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
 
 /**
- * Jupyter server {@link Channel}.
+ * {@link Server} {@link Channel}.
  *
  * {@bean.info}
  *
@@ -101,16 +101,12 @@ public abstract class Channel {
     }
 
     /**
-     * Jupyter {@link Channel} abstract base class.
+     * Jupyter protocol {@link Channel} abstract base class.
      *
      * {@bean.info}
      */
     @ToString @Log4j2
-    public static abstract class Jupyter extends Channel {
-        private static final Class<?>[] PARAMETERS = {
-            Dispatcher.class, ZMQ.Socket.class, Message.class
-        };
-
+    public static abstract class Protocol extends Channel {
         protected static final String PROTOCOL_VERSION = "5.3";
 
         /**
@@ -120,7 +116,7 @@ public abstract class Channel {
          * @param  type         The {@link SocketType} for created
          *                      {@link ZMQ.Socket}s.
          */
-        public Jupyter(Server server, SocketType type) { super(server, type); }
+        public Protocol(Server server, SocketType type) { super(server, type); }
 
         /**
          * Callback method to dispatch a {@link Message}.  Default
@@ -131,25 +127,7 @@ public abstract class Channel {
          * @param  socket       The {@link ZMQ.Socket}.
          * @param  message      The {@link Message}.
          */
-        protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, Message message) {
-            var action = message.getMessageTypeAction();
-
-            if (action != null) {
-                try {
-                    var method = getClass().getDeclaredMethod(action, PARAMETERS);
-
-                    method.setAccessible(true);
-                    method.invoke(this, dispatcher, socket, message);
-                } catch (IllegalAccessException | NoSuchMethodException exception) {
-                    log.warn("Could not dispatch '{}'", action, exception);
-                } catch (Exception exception) {
-                    log.warn("Exception invoking '{}' handler",
-                             action, exception);
-                }
-            } else {
-                log.warn("Could not determine action from {}", message.header());
-            }
-        }
+        protected abstract void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, Message message);
 
         @Override
         protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, byte[] frame) {
@@ -167,12 +145,60 @@ public abstract class Channel {
     }
 
     /**
-     * {@link Jupyter Jupyter} {@link IOPub IOPub} {@link Channel}.
+     * {@link Control Control} {@link Channel} abstract base class.  The
+     * default implementation of
+     * {@link #dispatch(Dispatcher,ZMQ.Socket,Message)} constructs a
+     * {@link Message reply} skeleton, executes a declared method of the
+     * form
+     * {@code action(Dispatcher,ZMQ.Socket,Message,Message) throws Exception},
+     * catches any {@link Exception} and updates the reply as necessary, and
+     * send the reply.
      *
      * {@bean.info}
      */
     @ToString @Log4j2
-    public static class IOPub extends Jupyter {
+    public static abstract class Control extends Protocol {
+        private static final Class<?>[] PARAMETERS = {
+            Dispatcher.class, ZMQ.Socket.class, Message.class, Message.class
+        };
+
+        /**
+         * Sole constructor.
+         *
+         * @param  server       The {@link Server}.
+         */
+        protected Control(Server server) { super(server, SocketType.ROUTER); }
+
+        @Override
+        protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, Message message) {
+            var action = message.getMessageTypeAction();
+
+            if (action != null) {
+                var reply = message.reply(getServer().getSession());
+
+                try {
+                    var method = getClass().getDeclaredMethod(action, PARAMETERS);
+
+                    method.setAccessible(true);
+                    method.invoke(this, dispatcher, socket, message, reply);
+                } catch (Exception exception) {
+                    reply.status(exception);
+                } finally {
+                    send(dispatcher, socket, reply);
+                }
+            } else {
+                log.warn("Could not determine action from {}", message.header());
+            }
+        }
+    }
+
+    /**
+     * {@link IOPub IOPub} {@link Channel}.
+     *
+     * {@bean.info}
+     */
+    @ToString @Log4j2
+    public static class IOPub extends Protocol {
 
         /**
          * Sole constructor.
@@ -191,7 +217,35 @@ public abstract class Channel {
         }
 
         /**
-         * Parameter to {@link #pub(Status)}.
+         * Parameter to {@link #pub(Stream,Message,String)}.
+         */
+        public enum Stream { stderr, stdout };
+
+        /**
+         * Method to compose and schedule a {@link Stream Stream}
+         * {@link Message} for publishing.
+         *
+         * @param   stream      The {@link Message} {@link Stream Stream}.
+         * @param   referent    The subject {@link Message}.
+         * @param   text        The text {@link String}.
+         */
+        public void pub(Stream stream, Message referent, String text) {
+            Message message = new Message();
+
+            message.msg_type("stream");
+
+            if (referent != null) {
+                message.parentHeader().setAll(referent.header());
+            }
+
+            message.content().put("name", stream.name());
+            message.content().put("text", text);
+
+            pub(message);
+        }
+
+        /**
+         * Parameter to {@link #pub(Status,Message)}.
          */
         public enum Status { starting, busy, idle };
 
@@ -200,11 +254,17 @@ public abstract class Channel {
          * {@link Message} for publishing.
          *
          * @param   status      The {@link Message} {@link Status Status}.
+         * @param   referent    The subject {@link Message}.
          */
-        public void pub(Status status) {
+        public void pub(Status status, Message referent) {
             Message message = new Message();
 
             message.msg_type("status");
+
+            if (referent != null) {
+                message.parentHeader().setAll(referent.header());
+            }
+
             message.content().put("execution_state", status.name());
 
             pub(message);
@@ -218,6 +278,72 @@ public abstract class Channel {
         @Override
         protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, Message message) {
             send(dispatcher, socket, message);
+        }
+    }
+
+    /**
+     * {@link Stdin Stdin} {@link Channel} abstract base class.
+     *
+     * {@bean.info}
+     */
+    @ToString @Log4j2
+    public static abstract class Stdin extends Protocol {
+
+        /**
+         * Sole constructor.
+         *
+         * @param  server       The {@link Server}.
+         */
+        protected Stdin(Server server) { super(server, SocketType.ROUTER); }
+    }
+
+    /**
+     * {@link Shell Shell} {@link Channel} abstract base class.
+     *
+     * {@bean.info}
+     */
+    @ToString @Log4j2
+    public static abstract class Shell extends Control {
+        private final IOPub iopub;
+        private final Stdin stdin;
+
+        /**
+         * Sole constructor.
+         *
+         * @param  server       The {@link Server}.
+         * @param  iopub        The associated {@link IOPub IOPub}
+         *                      {@link Channel}.
+         * @param  stdin        The associated {@link Stdin Stdin}
+         *                      {@link Channel}.
+         */
+        protected Shell(Server server, IOPub iopub, Stdin stdin) {
+            super(server);
+
+            this.iopub = iopub;
+            this.stdin = stdin;
+        }
+
+        @Override
+        public void connect(String address, HMACDigester digester) {
+            boolean isStarting = getDispatcherQueue().isEmpty();
+
+            super.connect(address, digester);
+
+            if (isStarting) {
+                iopub.pub(Channel.IOPub.Status.starting, null);
+                iopub.pub(Channel.IOPub.Status.idle, null);
+            }
+        }
+
+        @Override
+        protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, Message message) {
+            try {
+                iopub.pub(Channel.IOPub.Status.busy, message);
+
+                super.dispatch(dispatcher, socket, message);
+            } finally {
+                iopub.pub(Channel.IOPub.Status.idle, message);
+            }
         }
     }
 }

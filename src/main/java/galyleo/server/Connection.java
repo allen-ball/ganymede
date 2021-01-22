@@ -54,8 +54,8 @@ public class Connection {
      * @param   stdin           The stdin {@link Channel}.
      * @param   heartbeat       The heartbeat {@link Channel}.
      */
-    public void connect(Channel.Jupyter shell, Channel.Jupyter control,
-                        Channel.Jupyter iopub, Channel.Jupyter stdin,
+    public void connect(Channel.Shell shell, Channel.Control control,
+                        Channel.IOPub iopub, Channel.Stdin stdin,
                         Channel.Heartbeat heartbeat) {
         var properties = getProperties();
         var digester = getDigester();

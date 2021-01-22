@@ -43,13 +43,13 @@ public class Dispatcher implements Runnable {
     /**
      * Callback method to dispatch a {@link Message}.  Default
      * implementation calls
-     * {@link Channel.Jupyter#dispatch(Dispatcher,ZMQ.Socket,Message)}.
+     * {@link Channel.Protocol#dispatch(Dispatcher,ZMQ.Socket,Message)}.
      *
      * @param   socket          The {@link ZMQ.Socket}.
      * @param   message         The {@link Message}.
      */
     protected void dispatch(ZMQ.Socket socket, Message message) {
-        ((Channel.Jupyter) getChannel()).dispatch(this, socket, message);
+        ((Channel.Protocol) getChannel()).dispatch(this, socket, message);
     }
 
     /**

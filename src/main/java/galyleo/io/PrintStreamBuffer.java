@@ -1,4 +1,4 @@
-package galyleo;
+package galyleo.io;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -7,6 +7,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * {@link PrintStream} buffer.
+ *
+ * @see ByteArrayOutputStream
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$

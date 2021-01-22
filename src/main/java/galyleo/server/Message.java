@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import galyleo.PrintStreamBuffer;
+import galyleo.io.PrintStreamBuffer;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Stream;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j2;
@@ -177,23 +178,24 @@ public class Message {
      *
      * @param   value           The value.
      */
-    public void setStatus(String value) { content().put("status", value); }
+    public void status(String value) { content().put("status", value); }
 
     /**
      * Method to set status for a {@link Throwable}.
      *
      * @param   throwable       The {@link Throwable}.
      */
-    public void setStatus(Throwable throwable) {
-        setStatus("error");
+    public void status(Throwable throwable) {
+        status("error");
         content().put("ename", throwable.getClass().getCanonicalName());
         content().put("evalue", throwable.getMessage());
 
-        PrintStreamBuffer buffer = new PrintStreamBuffer();
+        var array = content().putArray("traceback");
+        var buffer = new PrintStreamBuffer();
 
         throwable.printStackTrace(buffer);
 
-        content().put("traceback", buffer.toString().split("\\R")[0]);
+        Stream.of(buffer.toString().split("\\R")).forEach(t -> array.add(t));
     }
 
     /**
@@ -229,7 +231,7 @@ public class Message {
         reply.session(session);
         reply.username(username());
         reply.parentHeader().setAll(header());
-        reply.setStatus("ok");
+        reply.status("ok");
         reply.buffers().addAll(buffers());
 
         return reply;
