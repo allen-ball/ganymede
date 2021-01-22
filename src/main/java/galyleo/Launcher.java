@@ -1,12 +1,15 @@
 package galyleo;
 
+import galyleo.install.Install;
 import galyleo.kernel.Kernel;
+import java.util.Map;
+import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.SpringApplication;
 
-import static lombok.AccessLevel.PRIVATE;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * Galyleo application launcher.
@@ -14,8 +17,11 @@ import static lombok.AccessLevel.PRIVATE;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@NoArgsConstructor(access = PRIVATE) @ToString @Log4j2
-public abstract class Launcher {
+@NoArgsConstructor @ToString @Log4j2
+public class Launcher {
+    private static final Map<String,Class<?>> MODES =
+        Stream.of(Install.class, Kernel.class)
+        .collect(toMap(k -> k.getSimpleName().toLowerCase(), v -> v));
 
     /**
      * Standard {@link SpringApplication} {@code main(String[])}
@@ -27,8 +33,15 @@ public abstract class Launcher {
      *                          {@link Exception}.
      */
     public static void main(String[] argv) throws Exception {
-        var application = new SpringApplication(Kernel.class);
+        var mode = System.getProperty("mode", Kernel.class.getSimpleName());
+        var type = MODES.get(mode.toLowerCase());
 
-        application.run(argv);
+        if (type != null) {
+            var application = new SpringApplication(type);
+
+            application.run(argv);
+        } else {
+            throw new IllegalArgumentException("Invalid mode: " + mode);
+        }
     }
 }

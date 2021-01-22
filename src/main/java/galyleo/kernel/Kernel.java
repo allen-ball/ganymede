@@ -94,7 +94,7 @@ public class Kernel extends Server implements ApplicationRunner {
     public void run(ApplicationArguments arguments) throws Exception {
         var paths = arguments.getOptionValues("connection-file");
 
-        if (! paths.isEmpty()) {
+        if (! (paths == null || paths.isEmpty())) {
             for (var path : paths) {
                 try {
                     listen(path);
