@@ -20,7 +20,7 @@
   <inceptionYear>2021</inceptionYear>
   <properties>
     <jse.target>11</jse.target>
-    <start-class>galyleo.Kernel</start-class>
+    <start-class>galyleo.Launcher</start-class>
   </properties>
   <dependencies verbose="true">
     <dependency>

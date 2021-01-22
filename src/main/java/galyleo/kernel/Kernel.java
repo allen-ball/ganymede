@@ -1,4 +1,4 @@
-package galyleo;
+package galyleo.kernel;
 
 import galyleo.io.PrintStreamBuffer;
 import galyleo.server.Channel;
@@ -24,7 +24,6 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
@@ -41,22 +40,6 @@ import org.zeromq.ZMQ;
 @SpringBootApplication
 @NoArgsConstructor @ToString @Log4j2
 public class Kernel extends Server implements ApplicationRunner {
-
-    /**
-     * Standard {@link SpringApplication} {@code main(String[])}
-     * entry point.
-     *
-     * @param   argv            The command line argument vector.
-     *
-     * @throws  Exception       If the function does not catch
-     *                          {@link Exception}.
-     */
-    public static void main(String[] argv) throws Exception {
-        var application = new SpringApplication(Kernel.class);
-
-        application.run(argv);
-    }
-
     private final Channel.Heartbeat heartbeat = new Channel.Heartbeat(this);
     private final Channel.Control control = new Control();
     private final Channel.IOPub iopub = new Channel.IOPub(this);

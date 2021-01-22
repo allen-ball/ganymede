@@ -5,6 +5,6 @@
  * @version $Revision$
  */
 @Manifest.Section
-package galyleo.magic;
+package galyleo.kernel.magic;
 
 import ball.annotation.Manifest;
