@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
@@ -36,36 +37,46 @@ public class Install implements ApplicationRunner {
         .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_VALUES)
         .enable(SerializationFeature.INDENT_OUTPUT);
 
-    @Value("project.groupId")
-    private String groupId = null;
-    @Value("project.artifactId")
-    private String artifactId = null;
-    @Value("project.version")
-    private String version = null;
-    @Value("project.packaging")
-    private String packaging = null;
+    @Value("${id:galyleo-${project.version}-java-${java.version}}")
+    private String id = null;
+    @Value("${display-name:Galyleo ${project.version} (Java ${java.version})}")
+    private String display_name = null;
+    @Value("${env:}")
+    private List<String> envvars = null;
+    @Value("${copy-jar:true}")
+    private boolean copyJar = true;
 
     @Override
     public void run(ApplicationArguments arguments) throws Exception {
+        var sysPrefix = false;
+
+        for (var argument : arguments.getSourceArgs()) {
+            if (argument.equals("--sys-prefix")) {
+                sysPrefix = true;
+            } else if (argument.equals("--user")) {
+                sysPrefix = false;
+            }
+        }
+
         var tmp = Files.createTempDirectory(getClass().getPackage().getName() + "-");
 
         try {
             /*
              * java
              */
-            var java = "java";
+            var java = ProcessHandle.current().info().command().orElse("java");
             /*
-             * application.jar
+             * kernel.jar
              */
-            var jar = new ApplicationHome().getSource();
+            var jarPath = new ApplicationHome().getSource().toPath();
             /*
              * which python
              */
-            var python = locate("python", arguments.getOptionValues("python-path"));
+            var python = which("python");
             /*
              * which jupyter
              */
-            var jupyter = locate("jupyter", arguments.getOptionValues("jupyter-path"));
+            var jupyter = which("jupyter");
             /*
              * jupyter --paths --json
              */
@@ -73,8 +84,6 @@ public class Install implements ApplicationRunner {
             /*
              * kernelspec
              */
-            var id = "galyleo";
-            var display_name = "Galyleo";
             var kernelspec = tmp.resolve(id);
 
             Files.createDirectory(kernelspec);
@@ -83,45 +92,57 @@ public class Install implements ApplicationRunner {
              */
             var kernel = mapper.createObjectNode();
             var argv = kernel.withArray("argv");
+            var jar = jarPath.toAbsolutePath().toString();
+            if (copyJar) {
+                copy(jarPath.toFile(),
+                     kernelspec.resolve(jarPath.getFileName()).toFile());
 
-            Stream.of(java, "-Dmode=kernel", "-jar", jar, "--connection-file={connection_file}")
+                jar =
+                    Paths.get(paths.at("/data").get(sysPrefix ? 1 : 0).asText(),
+                              "kernels", id, jarPath.getFileName().toString())
+                    .toString();
+            }
+
+            Stream.of(java, "-Dmode=kernel",
+                      "-jar", jar,
+                      "--connection-file={connection_file}")
                 .map(Object::toString)
                 .forEach(t -> argv.add(t));
 
             kernel.put("display_name", display_name);
 
             var env = kernel.with("env");
-            var values = arguments.getOptionValues("env");
 
-            if (values != null) {
-                for (var value : values) {
-                    var pair = value.split("=", 2);
+            for (var envvar : envvars) {
+                var pair = envvar.split("=", 2);
 
-                    env.put(pair[0], (pair.length > 1) ? pair[1] : "");
-                }
+                env.put(pair[0], (pair.length > 1) ? pair[1] : "");
             }
 
             kernel.put("interrupt_mode", "message");
             kernel.put("language", "java");
 
             mapper.writeValue(kernelspec.resolve("kernel.json").toFile(), kernel);
-
+            /*
+             * logo-16x16.png and logo-32x32.png
+             */
             for (var png : List.of("16x16.png", "32x32.png")) {
-                try (var in =
-                         getClass()
-                         .getResourceAsStream("/static/images/ball-java-jar-" + png)) {
+                var path = "/static/images/ball-java-jar-" + png;
+
+                try (var in = getClass().getResourceAsStream(path)) {
                     var bytes = copyToByteArray(in);
 
                     copy(bytes, kernelspec.resolve("logo-" + png).toFile());
+                } catch (Exception exception) {
+                    log.warn("Could not copy resource: {}", path, exception);
                 }
             }
-
-            copy(jar, kernelspec.resolve(jar.getName()).toFile());
             /*
              * jupyter kernelspec install <kernelspec>
              */
             new ProcessBuilder(jupyter, "kernelspec", "install", kernelspec.toString(),
-                               "--replace", "--sys-prefix")
+                               sysPrefix ? "--sys-prefix" : "--user",
+                               "--replace")
                 .inheritIO()
                 .start().waitFor();
         } catch (Exception exception) {
@@ -129,18 +150,6 @@ public class Install implements ApplicationRunner {
         } finally {
             deleteRecursively(tmp);
         }
-    }
-
-    private String locate(String name, List<String> values) throws Exception {
-        String path = null;
-
-        if (values != null && (! values.isEmpty())) {
-            path = values.get(values.size() - 1);
-        } else {
-            path = which(name);
-        }
-
-        return path;
     }
 
     private String which(String command) throws Exception {
