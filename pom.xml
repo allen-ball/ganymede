@@ -25,6 +25,10 @@
   <dependencies verbose="true">
     <dependency>
       <groupId>ball</groupId>
+      <artifactId>ball-java-jar</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ball</groupId>
       <artifactId>ball-util</artifactId>
     </dependency>
     <dependency>
