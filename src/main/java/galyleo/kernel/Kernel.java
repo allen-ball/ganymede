@@ -25,6 +25,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.system.ApplicationHome;
 import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
 
@@ -60,6 +61,7 @@ public class Kernel extends Server implements ApplicationRunner {
             .in(new ByteArrayInputStream(new byte[] { }))
             .out(out).err(err)
             .build();
+        java.addToClasspath(new ApplicationHome().getSource().toString());
 
         setSession(String.join("-",
                                Kernel.class.getCanonicalName(),
@@ -203,6 +205,8 @@ public class Kernel extends Server implements ApplicationRunner {
                     .in(new ByteArrayInputStream(new byte[] { }))
                     .out(out).err(err)
                     .build();
+                java.addToClasspath(new ApplicationHome().getSource().toString());
+
                 out.reset();
                 err.reset();
             }
