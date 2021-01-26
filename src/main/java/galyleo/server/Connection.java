@@ -25,7 +25,7 @@ public class Connection {
      * Sole constructor.
      *
      * @param   node            The {@link JsonNode} describing the
-     *                          the {@link Connection}.
+     *                          {@link Connection}.
      */
     public Connection(JsonNode node) {
         this.node = node;
@@ -35,11 +35,16 @@ public class Connection {
     /**
      * Method to connect a kernel's {@link Channel}s.
      *
-     * @param   shell           The shell {@link Channel}.
-     * @param   control         The control {@link Channel}.
-     * @param   iopub           The iopub {@link Channel}.
-     * @param   stdin           The stdin {@link Channel}.
-     * @param   heartbeat       The heartbeat {@link Channel}.
+     * @param   shell           The {@link Channel.Shell Shell}
+     *                          {@link Channel}.
+     * @param   control         The {@link Channel.Control Control}
+     *                          {@link Channel}.
+     * @param   iopub           The {@link Channel.IOPub IOPub}
+     *                          {@link Channel}.
+     * @param   stdin           The {@link Channel.Stdin Stdin}
+     *                          {@link Channel}.
+     * @param   heartbeat       The {@link Channel.Heartbeat Heartbeat}
+     *                          {@link Channel}.
      */
     public void connect(Channel.Shell shell, Channel.Control control,
                         Channel.IOPub iopub, Channel.Stdin stdin,

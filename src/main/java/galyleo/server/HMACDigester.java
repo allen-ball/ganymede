@@ -25,10 +25,8 @@ public class HMACDigester {
     /**
      * Sole constructor.
      *
-     * @param   scheme          See
-     *                          {@link Connection.Properties Connection.Properties.signatureScheme}.
-     * @param   key             See
-     *                          {@link Connection.Properties Connection.Properties.key}.
+     * @param   scheme          The signature scheme.
+     * @param   key             See key.
      */
     public HMACDigester(String scheme, String key) {
         Mac mac = null;
