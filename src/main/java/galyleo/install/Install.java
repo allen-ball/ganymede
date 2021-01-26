@@ -185,6 +185,12 @@ public class Install implements ApplicationRunner {
 
         try (var in = process.getInputStream()) {
             node = mapper.readTree(in);
+
+            var status = process.waitFor();
+
+            if (status != 0) {
+                throw new IOException("Cannot read output of " + List.of(argv));
+            }
         }
 
         return node;
