@@ -1,0 +1,6 @@
+2021-01-26  Allen D. Ball  <ball@hcf.dev>
+
+	* src/main/java/galyleo/server/Connection.java:
+	Parse Connection JsonNode argument directly instead of
+	deserializing to a custom Properties class.
+

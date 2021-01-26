@@ -146,7 +146,7 @@ public class Install implements ApplicationRunner {
                 .inheritIO()
                 .start().waitFor();
         } catch (Exception exception) {
-            log.warn("{}", exception.getMessage(), exception);
+            log.fatal("{}", exception.getMessage(), exception);
         } finally {
             deleteRecursively(tmp);
         }

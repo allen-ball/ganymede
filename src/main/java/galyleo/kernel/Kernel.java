@@ -1,5 +1,6 @@
 package galyleo.kernel;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import galyleo.io.PrintStreamBuffer;
 import galyleo.server.Channel;
 import galyleo.server.Connection;
@@ -74,11 +75,22 @@ public class Kernel extends Server implements ApplicationRunner {
      * @throws  IOException     If the {@link File} cannot be opened or
      *                          parsed.
      */
-    public void listen(String path) throws IOException {
-        var mapper = getObjectMapper();
-        var node = mapper.readTree(new File(path));
-        var properties = mapper.treeToValue(node, Connection.Properties.class);
-        var connection = new Connection(properties);
+    public void bind(String path) throws IOException {
+        bind(getObjectMapper().readTree(new File(path)));
+    }
+
+    /**
+     * Add a connection specified by a {@link JsonNode}.
+     *
+     * @param   node            The {@link JsonNode} descibing the
+     *                          {@link Connection}.
+     *
+     * @throws  IOException     If the {@link JsonNode} cannot be parsed or
+     *                          if the {@link Connection} cannot be
+     *                          established.
+     */
+    public void bind(JsonNode node) throws IOException {
+        var connection = new Connection(node);
 
         connection.connect(shell, control, iopub, stdin, heartbeat);
 
@@ -92,7 +104,7 @@ public class Kernel extends Server implements ApplicationRunner {
         if (! (paths == null || paths.isEmpty())) {
             for (var path : paths) {
                 try {
-                    listen(path);
+                    bind(path);
                 } catch (Exception exception) {
                     log.warn("{}", exception);
                 }

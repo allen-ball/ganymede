@@ -1,6 +1,8 @@
 package galyleo.server;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
@@ -16,33 +18,18 @@ import lombok.extern.log4j.Log4j2;
  */
 @Data @Log4j2
 public class Connection {
-    @NonNull private final Properties properties;
+    @NonNull private final JsonNode node;
     @NonNull private final HMACDigester digester;
 
     /**
      * Sole constructor.
      *
-     * @param   properties      The {@link Properties}.
+     * @param   node            The {@link JsonNode} describing the
+     *                          the {@link Connection}.
      */
-    public Connection(Properties properties) {
-        this.properties = properties;
+    public Connection(JsonNode node) {
+        this.node = node;
         this.digester = new HMACDigesterImpl();
-    }
-
-    /**
-     * Method to get a socket address for {@link.this} {@link Connection} on
-     * the specified port.
-     *
-     * @param   port            The port number.
-     *
-     * @return  The address (as a {@link String}).
-     */
-    public String address(int port) {
-        String address =
-            String.format("%s://%s:%d",
-                          properties.getTransport(), properties.getIp(), port);
-
-        return address;
     }
 
     /**
@@ -57,39 +44,29 @@ public class Connection {
     public void connect(Channel.Shell shell, Channel.Control control,
                         Channel.IOPub iopub, Channel.Stdin stdin,
                         Channel.Heartbeat heartbeat) {
-        var properties = getProperties();
         var digester = getDigester();
 
-        shell.connect(address(properties.getShellPort()), digester);
-        control.connect(address(properties.getControlPort()), digester);
-        iopub.connect(address(properties.getIopubPort()), digester);
-        stdin.connect(address(properties.getStdinPort()), digester);
-        heartbeat.connect(address(properties.getHeartbeatPort()));
+        shell.connect(getAddress("shell_port"), digester);
+        control.connect(getAddress("control_port"), digester);
+        iopub.connect(getAddress("iopub_port"), digester);
+        stdin.connect(getAddress("stdin_port"), digester);
+        heartbeat.connect(getAddress("hb_port"));
+    }
+
+    private String getAddress(String portName) {
+        String address =
+            String.format("%s://%s:%d",
+                          node.at("/transport").asText(),
+                          node.at("/ip").asText(),
+                          node.at("/" + portName).asInt());
+
+        return address;
     }
 
     private class HMACDigesterImpl extends HMACDigester {
         public HMACDigesterImpl() {
-            super(properties.getSignatureScheme(), properties.getKey());
+            super(node.at("/signature_scheme").asText(),
+                  node.at("/key").asText());
         }
-    }
-
-    /**
-     * See
-     * "{@link.uri https://jupyter-client.readthedocs.io/en/stable/kernels.html#connection-files target=newtab Connection files}".
-     *
-     * {@bean.info}
-     */
-    @Data
-    public static class Properties {
-        @JsonProperty("kernel_name")            private String kernelName = null;
-        @JsonProperty("control_port")           private int controlPort = -1;
-        @JsonProperty("shell_port")             private int shellPort = -1;
-        @JsonProperty("transport")              private String transport = null;
-        @JsonProperty("signature_scheme")       private String signatureScheme = null;
-        @JsonProperty("stdin_port")             private int stdinPort = -1;
-        @JsonProperty("hb_port")                private int heartbeatPort = -1;
-        @JsonProperty("ip")                     private String ip = null;
-        @JsonProperty("iopub_port")             private int iopubPort = -1;
-        @JsonProperty("key")                    private String key = null;
     }
 }
