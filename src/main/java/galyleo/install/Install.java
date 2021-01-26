@@ -127,14 +127,14 @@ public class Install implements ApplicationRunner {
              * logo-16x16.png and logo-32x32.png
              */
             for (var png : List.of("16x16.png", "32x32.png")) {
-                var path = "/static/images/ball-java-jar-" + png;
+                var from = "/static/images/ball-java-jar-" + png;
+                var to = kernelspec.resolve("logo-" + png).toFile();
 
-                try (var in = getClass().getResourceAsStream(path)) {
-                    var bytes = copyToByteArray(in);
-
-                    copy(bytes, kernelspec.resolve("logo-" + png).toFile());
+                try (var in = getClass().getResourceAsStream(from)) {
+                    copy(copyToByteArray(in), to);
                 } catch (Exception exception) {
-                    log.warn("Could not copy resource: {}", path, exception);
+                    log.warn("Could not copy resource {} to {}",
+                             from, to, exception);
                 }
             }
             /*
