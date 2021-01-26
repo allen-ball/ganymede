@@ -19,7 +19,15 @@ import static java.util.stream.Collectors.toMap;
  */
 @NoArgsConstructor @ToString @Log4j2
 public class Launcher {
-    private static final Map<String,Class<?>> MODES =
+
+    /**
+     * Defined {@link #MODES}.  The {@link Launcher} should be invoked with
+     * {@code java -Dmode=<mode> ...} where mode is one of {@link MODES}
+     * keys.
+     *
+     * {@include}
+     */
+    protected static final Map<String,Class<?>> MODES =
         Stream.of(Install.class, Kernel.class)
         .collect(toMap(k -> k.getSimpleName().toLowerCase(), v -> v));
 

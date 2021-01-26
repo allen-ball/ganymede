@@ -6,33 +6,27 @@ import galyleo.server.Connection;
 import galyleo.server.Dispatcher;
 import galyleo.server.Message;
 import galyleo.server.Server;
+import galyleo.shell.Java;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import jdk.jshell.JShell;
-import jdk.jshell.SourceCodeAnalysis;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.system.ApplicationHome;
-import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
 
 /**
  * Galyleo Jupyter {@link Kernel}.
- *
- * @see JShell
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
@@ -46,27 +40,24 @@ public class Kernel extends Server implements ApplicationRunner {
     private final Channel.IOPub iopub = new Channel.IOPub(this);
     private final Channel.Stdin stdin = new Stdin();
     private final Channel.Shell shell = new Shell();
+    private final Java java = new Java();
     private final AtomicInteger execution_count = new AtomicInteger(0);
-    private final PrintStreamBuffer out = new PrintStreamBuffer();
-    private final PrintStreamBuffer err = new PrintStreamBuffer();
-    private JShell java = null;
-    private int restarts = 0;
+    private InputStream in = null;
+    private PrintStreamBuffer out = null;
+    private PrintStreamBuffer err = null;
 
     @PostConstruct
     public void init() {
-        out.reset();
-        err.reset();
-        java =
-            JShell.builder()
-            .in(new ByteArrayInputStream(new byte[] { }))
-            .out(out).err(err)
-            .build();
-        java.addToClasspath(new ApplicationHome().getSource().toString());
+        in = new ByteArrayInputStream(new byte[] { });
+        out = new PrintStreamBuffer();
+        err = new PrintStreamBuffer();
+
+        java.start(in, out, err);
 
         setSession(String.join("-",
                                Kernel.class.getCanonicalName(),
                                String.valueOf(ProcessHandle.current().pid()),
-                               String.valueOf(restarts)));
+                               String.valueOf(java.restarts())));
     }
 
     @PreDestroy
@@ -109,72 +100,6 @@ public class Kernel extends Server implements ApplicationRunner {
         }
     }
 
-    /**
-     * Method to execute code (typically a cell's contents).
-     *
-     * @param   code            The code to execute.
-     */
-    protected void execute(String code) throws Exception {
-/*
-        while (! isTerminating()) {
-            var info = java.sourceCodeAnalysis().analyzeCompletion(code);
-
-            switch (info.completeness()) {
-            case COMPLETE:
-                var events = java.eval(info.source());
-                var exception =
-                    events.stream()
-                    .map(t -> t.exception())
-                    .filter(Objects::nonNull)
-                    .findFirst().orElse(null);
-
-                if (exception != null) {
-                    throw exception;
-                }
-                break;
-
-            case EMPTY:
-                break;
-
-            case COMPLETE_WITH_SEMI:
-            case CONSIDERED_INCOMPLETE:
-            case DEFINITELY_INCOMPLETE:
-            case UNKNOWN:
-            default:
-                throw new IllegalArgumentException(code);
-                // break;
-            }
-
-            code = info.remaining();
-
-            if (code.isEmpty()) {
-                break;
-            }
-        }
-*/
-        java.eval(code);
-    }
-
-    /**
-     * Method to evaluate an expression.
-     *
-     * @param   code            The code to execute.
-     *
-     * @return  The result of evaluating the expression.
-     */
-    protected Object evaluate(String code) throws Exception {
-        var info = java.sourceCodeAnalysis().analyzeCompletion(code);
-
-        if (info.completeness().equals(SourceCodeAnalysis.Completeness.COMPLETE_WITH_SEMI)) {
-            throw new IllegalArgumentException("Code is not an expression: "
-                                               + info.source());
-        }
-
-        var events = java.eval(info.source());
-
-        return events.get(events.size() - 1).value();
-    }
-
     @ToString
     private class Control extends Channel.Control {
         public Control() { super(Kernel.this); }
@@ -191,32 +116,19 @@ public class Kernel extends Server implements ApplicationRunner {
         private void shutdown(Dispatcher dispatcher, ZMQ.Socket socket,
                               Message request, Message reply) throws Exception {
             var restart = request.content().at("/restart").asBoolean();
-            var old = java;
-
-            java = null;
-
-            if (old != null) {
-                submit(() -> { old.stop(); old.close(); });
-            }
 
             if (restart) {
-                java =
-                    JShell.builder()
-                    .in(new ByteArrayInputStream(new byte[] { }))
-                    .out(out).err(err)
-                    .build();
-                java.addToClasspath(new ApplicationHome().getSource().toString());
+                in = new ByteArrayInputStream(new byte[] { });
+                out = new PrintStreamBuffer();
+                err = new PrintStreamBuffer();
 
-                out.reset();
-                err.reset();
+                java.restart(in, out, err);
             }
-
-            restarts += 1;
 
             setSession(String.join("-",
                                    Kernel.class.getCanonicalName(),
                                    String.valueOf(ProcessHandle.current().pid()),
-                                   String.valueOf(restarts)));
+                                   String.valueOf(java.restarts())));
 
             if (! restart) {
                 submit(() -> getServer().shutdown());
@@ -295,7 +207,7 @@ public class Kernel extends Server implements ApplicationRunner {
             try {
                 try {
                     if (! code.isEmpty()) {
-                        Kernel.this.execute(code);
+                        java.execute(code);
                     }
                     /*
                      * Tacky !!!
@@ -312,7 +224,7 @@ public class Kernel extends Server implements ApplicationRunner {
                         var expression = entry.getValue().asText();
 
                         try {
-                            out.put(name, String.valueOf(Kernel.this.evaluate(expression)));
+                            out.put(name, String.valueOf(java.evaluate(expression)));
                         } catch (Throwable throwable) {
                             var error = out.with(name);
 
@@ -324,8 +236,8 @@ public class Kernel extends Server implements ApplicationRunner {
                             var buffer = new PrintStreamBuffer();
 
                             throwable.printStackTrace(buffer);
-
-                            Stream.of(buffer.toString().split("\\R")).forEach(t -> array.add(t));
+                            Stream.of(buffer.toString().split("\\R"))
+                                .forEach(t -> array.add(t));
                         }
                     }
                 } finally {

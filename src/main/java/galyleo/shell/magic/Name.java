@@ -1,4 +1,4 @@
-package galyleo.kernel.magic;
+package galyleo.shell.magic;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

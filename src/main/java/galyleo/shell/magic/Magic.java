@@ -1,4 +1,4 @@
-package galyleo.kernel.magic;
+package galyleo.shell.magic;
 
 /**
  * {@link Magic} service interface.
