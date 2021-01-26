@@ -40,28 +40,30 @@ public class Kernel extends Server implements ApplicationRunner {
     private final Channel.IOPub iopub = new Channel.IOPub(this);
     private final Channel.Stdin stdin = new Stdin();
     private final Channel.Shell shell = new Shell();
-    private final Java java = new Java();
     private final AtomicInteger execution_count = new AtomicInteger(0);
     private InputStream in = null;
     private PrintStreamBuffer out = null;
     private PrintStreamBuffer err = null;
+    private final Java java = new Java();
 
     @PostConstruct
-    public void init() {
+    public void init() { restart(); }
+
+    @PreDestroy
+    public void destroy() { shutdown(); }
+
+    private void restart() {
         in = new ByteArrayInputStream(new byte[] { });
         out = new PrintStreamBuffer();
         err = new PrintStreamBuffer();
 
-        java.start(in, out, err);
+        java.restart(in, out, err);
 
         setSession(String.join("-",
                                Kernel.class.getCanonicalName(),
                                String.valueOf(ProcessHandle.current().pid()),
                                String.valueOf(java.restarts())));
     }
-
-    @PreDestroy
-    public void destroy() { shutdown(); }
 
     /**
      * Add a connection specified by a {@link Connection} {@link File}.
@@ -118,19 +120,8 @@ public class Kernel extends Server implements ApplicationRunner {
             var restart = request.content().at("/restart").asBoolean();
 
             if (restart) {
-                in = new ByteArrayInputStream(new byte[] { });
-                out = new PrintStreamBuffer();
-                err = new PrintStreamBuffer();
-
-                java.restart(in, out, err);
-            }
-
-            setSession(String.join("-",
-                                   Kernel.class.getCanonicalName(),
-                                   String.valueOf(ProcessHandle.current().pid()),
-                                   String.valueOf(java.restarts())));
-
-            if (! restart) {
+                Kernel.this.restart();
+            } else {
                 submit(() -> getServer().shutdown());
             }
         }
