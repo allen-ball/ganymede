@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Named;
@@ -208,13 +207,28 @@ public class Kernel extends Server implements ApplicationRunner {
             var stop_on_error = request.content().at("/stop_on_error").asBoolean();
 
             try {
-                try {
-                    if (! code.isEmpty()) {
-                        java.execute(code);
+                if (! code.isEmpty()) {
+                    if (! silent) {
+                        if (store_history) {
+                            execution_count.incrementAndGet();
+
+                            var execute_input = request.reply(getSession(), "execute_input");
+
+                            execute_input.content().put("code", code);
+                            execute_input.content().put("execution_count", execution_count.intValue());
+
+                            iopub.pub(execute_input);
+                        }
                     }
-                    /*
-                     * Tacky !!!
-                     */
+
+                    java.execute(code);
+                }
+            } catch (Throwable throwable) {
+                reply.content().setAll(toStandardErrorMessage(throwable, code));
+            } finally {
+                reply.content().put("execution_count", execution_count.intValue());
+
+                if (reply.content().get("status").asText().equals("ok")) {
                     reply.content().withArray("payload");
 
                     var in = request.content().at("/user_expressions");
@@ -229,46 +243,40 @@ public class Kernel extends Server implements ApplicationRunner {
                         try {
                             out.put(name, String.valueOf(java.evaluate(expression)));
                         } catch (Throwable throwable) {
-                            var error = out.with(name);
-
-                            error.put("status", "error");
-                            error.put("ename", throwable.getClass().getCanonicalName());
-                            error.put("evalue", expression);
-
-                            var array = error.putArray("traceback");
-                            var buffer = new PrintStreamBuffer();
-
-                            throwable.printStackTrace(buffer);
-                            Stream.of(buffer.toString().split("\\R"))
-                                .forEach(t -> array.add(t));
+                            out.set(name, toStandardErrorMessage(throwable, expression));
                         }
                     }
-                } finally {
-                    if (! (code.isEmpty() && silent)) {
-                        if (store_history) {
-                            execution_count.incrementAndGet();
-                        }
-                    }
-
-                    reply.content().put("execution_count", execution_count.intValue());
                 }
-            } finally {
-                if (! silent) {
-                    var text = out.toString();
 
-                    if (! text.isEmpty()) {
-                        iopub.pub(Channel.IOPub.Stream.stdout, request, text);
-                    }
-
-                    text = err.toString();
-
-                    if (! text.isEmpty()) {
-                        iopub.pub(Channel.IOPub.Stream.stderr, request, text);
-                    }
-                }
+                var stdout = out.toString();
+                var stderr = err.toString();
 
                 out.reset();
                 err.reset();
+
+                if (! silent) {
+                    var execute_result = request.reply(getSession(), "execute_result");
+
+                    execute_result.content().put("execution_count", execution_count.intValue());
+
+                    var data = execute_result.content().with("data");
+                    var metadata = execute_result.content().with("metadata");
+
+                    data.put("text/plain", stdout);
+                    metadata.with("text/plain");
+
+                    stdout = "";
+
+                    iopub.pub(execute_result);
+
+                    if (! stdout.isEmpty()) {
+                        iopub.stdout(request, stdout);
+                    }
+
+                    if (! stderr.isEmpty()) {
+                        iopub.stderr(request, stderr);
+                    }
+                }
             }
         }
 

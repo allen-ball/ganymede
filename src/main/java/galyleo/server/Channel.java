@@ -255,6 +255,26 @@ public abstract class Channel {
         }
 
         /**
+         * See {@link #pub(Stream,Message,String)}.
+         *
+         * @param   referent    The subject {@link Message}.
+         * @param   text        The text {@link String}.
+         */
+        public void stdout(Message referent, String text) {
+            pub(Stream.stdout, referent, text);
+        }
+
+        /**
+         * See {@link #pub(Stream,Message,String)}.
+         *
+         * @param   referent    The subject {@link Message}.
+         * @param   text        The text {@link String}.
+         */
+        public void stderr(Message referent, String text) {
+            pub(Stream.stderr, referent, text);
+        }
+
+        /**
          * Parameter to {@link #pub(Status,Message)}.
          */
         public enum Status { starting, busy, idle };
