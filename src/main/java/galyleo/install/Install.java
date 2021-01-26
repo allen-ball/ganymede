@@ -93,18 +93,18 @@ public class Install implements ApplicationRunner {
             var kernel = mapper.createObjectNode();
             var argv = kernel.withArray("argv");
             var jar = jarPath.toAbsolutePath().toString();
-            if (copyJar) {
-                copy(jarPath.toFile(),
-                     kernelspec.resolve(jarPath.getFileName()).toFile());
 
-                jar =
-                    Paths.get(paths.at("/data").get(sysPrefix ? 1 : 0).asText(),
-                              "kernels", id, jarPath.getFileName().toString())
-                    .toString();
+            if (copyJar) {
+                var name = "kernel.jar";
+
+                copy(jarPath.toFile(), kernelspec.resolve(name).toFile());
+
+                var prefix = paths.at("/data").get(sysPrefix ? 1 : 0).asText();
+
+                jar = Paths.get(prefix, "kernels", id, name).toString();
             }
 
-            Stream.of(java, "-Dmode=kernel",
-                      "-jar", jar,
+            Stream.of(java, "-Dmode=kernel", "-jar", jar,
                       "--connection-file={connection_file}")
                 .map(Object::toString)
                 .forEach(t -> argv.add(t));
