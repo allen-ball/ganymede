@@ -126,8 +126,7 @@ public class Kernel extends Server implements ApplicationRunner {
             }
         }
 
-        private void shutdown(Dispatcher dispatcher, ZMQ.Socket socket,
-                              Message request, Message reply) throws Exception {
+        private void shutdown(Dispatcher dispatcher, Message request, Message reply) throws Exception {
             var restart = request.content().at("/restart").asBoolean();
 
             if (restart) {
@@ -137,13 +136,11 @@ public class Kernel extends Server implements ApplicationRunner {
             }
         }
 
-        private void interrupt(Dispatcher dispatcher, ZMQ.Socket socket,
-                               Message request, Message reply) throws Exception {
+        private void interrupt(Dispatcher dispatcher, Message request, Message reply) throws Exception {
             java.stop();
         }
 
-        private void debug(Dispatcher dispatcher, ZMQ.Socket socket,
-                           Message request, Message reply) throws Exception {
+        private void debug(Dispatcher dispatcher, Message request, Message reply) throws Exception {
             throw new UnsupportedOperationException();
         }
     }
@@ -177,8 +174,7 @@ public class Kernel extends Server implements ApplicationRunner {
             }
         }
 
-        private void kernel_info(Dispatcher dispatcher, ZMQ.Socket socket,
-                                 Message request, Message reply) throws Exception {
+        private void kernel_info(Dispatcher dispatcher, Message request, Message reply) throws Exception {
             var content = reply.content();
 
             content.put("protocol_version", PROTOCOL_VERSION);
@@ -197,8 +193,7 @@ public class Kernel extends Server implements ApplicationRunner {
             var help_links = content.with("help_links");
         }
 
-        private void execute(Dispatcher dispatcher, ZMQ.Socket socket,
-                             Message request, Message reply) throws Exception {
+        private void execute(Dispatcher dispatcher, Message request, Message reply) throws Exception {
             var code = request.content().at("/code").asText();
             var silent = request.content().at("/silent").asBoolean();
             var store_history = request.content().at("/store_history").asBoolean();
@@ -280,35 +275,29 @@ public class Kernel extends Server implements ApplicationRunner {
             }
         }
 
-        private void inspect(Dispatcher dispatcher, ZMQ.Socket socket,
-                             Message request, Message reply) throws Exception {
+        private void inspect(Dispatcher dispatcher, Message request, Message reply) throws Exception {
             throw new UnsupportedOperationException();
         }
 
-        private void complete(Dispatcher dispatcher, ZMQ.Socket socket,
-                              Message request, Message reply) throws Exception {
+        private void complete(Dispatcher dispatcher, Message request, Message reply) throws Exception {
             throw new UnsupportedOperationException();
         }
 
-        private void history(Dispatcher dispatcher, ZMQ.Socket socket,
-                             Message request, Message reply) throws Exception {
+        private void history(Dispatcher dispatcher, Message request, Message reply) throws Exception {
             throw new UnsupportedOperationException();
         }
 
-        private void is_complete(Dispatcher dispatcher, ZMQ.Socket socket,
-                                 Message request, Message reply) throws Exception {
+        private void is_complete(Dispatcher dispatcher, Message request, Message reply) throws Exception {
             var code = request.content().at("/code");
 
             reply.content().put("status", "unknown");
         }
 
-        private void connect(Dispatcher dispatcher, ZMQ.Socket socket,
-                             Message request, Message reply) throws Exception {
+        private void connect(Dispatcher dispatcher, Message request, Message reply) throws Exception {
             throw new UnsupportedOperationException();
         }
 
-        private void comm_info(Dispatcher dispatcher, ZMQ.Socket socket,
-                               Message request, Message reply) throws Exception {
+        private void comm_info(Dispatcher dispatcher, Message request, Message reply) throws Exception {
             throw new UnsupportedOperationException();
         }
     }

@@ -150,8 +150,7 @@ public abstract class Channel {
      * default implementation of
      * {@link #dispatch(Dispatcher,ZMQ.Socket,Message)} constructs a
      * {@link Message reply} skeleton, executes a declared method of the
-     * form
-     * {@code action(Dispatcher,ZMQ.Socket,Message,Message) throws Exception},
+     * form {@code action(Dispatcher,Message,Message) throws Exception},
      * catches any {@link Exception} and updates the reply as necessary, and
      * send the reply.
      *
@@ -160,8 +159,7 @@ public abstract class Channel {
     @ToString @Log4j2
     public static abstract class Control extends Protocol {
         private static abstract class PROTOTYPE {
-            private void action(Dispatcher dispatcher, ZMQ.Socket socket,
-                                Message request, Message reply) throws Exception {
+            private void action(Dispatcher dispatcher, Message request, Message reply) throws Exception {
             }
         }
 
@@ -190,7 +188,7 @@ public abstract class Channel {
                     var method = getClass().getDeclaredMethod(action, PROTOTYPE.getParameterTypes());
 
                     method.setAccessible(true);
-                    method.invoke(this, dispatcher, socket, message, reply);
+                    method.invoke(this, dispatcher, message, reply);
                 } catch (Exception exception) {
                     reply.status(exception);
                 } finally {
