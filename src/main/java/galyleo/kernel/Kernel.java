@@ -75,7 +75,7 @@ public class Kernel extends Server implements ApplicationRunner {
      *                          parsed.
      */
     public void bind(String path) throws IOException {
-        bind(getObjectMapper().readTree(new File(path)));
+        bind(OBJECT_MAPPER.readTree(new File(path)));
     }
 
     /**

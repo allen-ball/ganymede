@@ -1,9 +1,6 @@
 package galyleo.install;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -18,6 +15,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.system.ApplicationHome;
 
+import static galyleo.server.Server.OBJECT_MAPPER;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.springframework.util.FileCopyUtils.copy;
 import static org.springframework.util.FileCopyUtils.copyToByteArray;
@@ -32,11 +30,6 @@ import static org.springframework.util.FileSystemUtils.deleteRecursively;
 @SpringBootApplication
 @NoArgsConstructor @ToString @Log4j2
 public class Install implements ApplicationRunner {
-    private final ObjectMapper mapper =
-        new ObjectMapper()
-        .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_VALUES)
-        .enable(SerializationFeature.INDENT_OUTPUT);
-
     @Value("${id:galyleo-${project.version}-java-${java.version}}")
     private String id = null;
     @Value("${display-name:Galyleo ${project.version} (Java ${java.version})}")
@@ -90,7 +83,7 @@ public class Install implements ApplicationRunner {
             /*
              * kernel.json
              */
-            var kernel = mapper.createObjectNode();
+            var kernel = OBJECT_MAPPER.createObjectNode();
             var argv = kernel.withArray("argv");
             var jar = jarPath.toAbsolutePath().toString();
 
@@ -122,7 +115,7 @@ public class Install implements ApplicationRunner {
             kernel.put("interrupt_mode", "message");
             kernel.put("language", "java");
 
-            mapper.writeValue(kernelspec.resolve("kernel.json").toFile(), kernel);
+            OBJECT_MAPPER.writeValue(kernelspec.resolve("kernel.json").toFile(), kernel);
             /*
              * logo-16x16.png and logo-32x32.png
              */
@@ -175,7 +168,7 @@ public class Install implements ApplicationRunner {
     }
 
     private JsonNode getOutputAsJson(String... argv) throws Exception {
-        var node = mapper.nullNode();
+        var node = OBJECT_MAPPER.nullNode();
         var process =
             new ProcessBuilder(argv)
             .inheritIO()
@@ -184,7 +177,7 @@ public class Install implements ApplicationRunner {
             .start();
 
         try (var in = process.getInputStream()) {
-            node = mapper.readTree(in);
+            node = OBJECT_MAPPER.readTree(in);
 
             var status = process.waitFor();
 

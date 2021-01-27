@@ -1,5 +1,8 @@
 2021-01-26  Allen D. Ball  <ball@hcf.dev>
 
+	* src/main/java/galyleo/server/Server.java:
+	Provide public static OBJECT_MAPPER field.
+
 	* src/main/java/galyleo/server/Channel.java (Control):
 	Changed action method prototype to
 	"void action(Dispatcher,Message,Message) throws Exception".

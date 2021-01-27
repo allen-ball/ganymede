@@ -5,7 +5,6 @@ import java.util.concurrent.LinkedBlockingDeque;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
-import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -74,7 +73,6 @@ public class Dispatcher implements Runnable {
     public void run() {
         var server = getChannel().getServer();
         var context = server.getContext();
-        var mapper = server.getObjectMapper();
         var digester = getDigester();
         var type = getChannel().getSocketType();
 

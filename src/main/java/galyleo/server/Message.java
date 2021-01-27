@@ -1,17 +1,13 @@
 package galyleo.server;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import galyleo.io.PrintStreamBuffer;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 import lombok.Data;
@@ -19,6 +15,7 @@ import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j2;
 import org.zeromq.ZMQ;
 
+import static galyleo.server.Server.OBJECT_MAPPER;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.ZoneOffset.UTC;
 import static java.time.ZonedDateTime.now;
@@ -250,19 +247,18 @@ public class Message {
     /**
      * Method to serialize a {@link Message}.
      *
-     * @param   mapper          The {@link ObjectMapper}.
      * @param   digester        The {@link HMACDigester} (may be
      *                          {@code null}).
      */
-    public List<byte[]> serialize(ObjectMapper mapper, HMACDigester digester) {
+    public List<byte[]> serialize(HMACDigester digester) {
         var frames = envelope().stream().collect(toList());
 
         frames.add(DELIMITER);
 
-        var header = serialize(mapper, header());
-        var parentHeader = serialize(mapper, parentHeader());
-        var metadata = serialize(mapper, metadata());
-        var content = serialize(mapper, content());
+        var header = serialize(header());
+        var parentHeader = serialize(parentHeader());
+        var metadata = serialize(metadata());
+        var content = serialize(content());
 
         var digest = "";
 
@@ -279,11 +275,11 @@ public class Message {
         return frames;
     }
 
-    private byte[] serialize(ObjectMapper mapper, JsonNode node) {
+    private byte[] serialize(JsonNode node) {
         var string = "{}";
 
         try {
-            string = mapper.writeValueAsString(node);
+            string = OBJECT_MAPPER.writeValueAsString(node);
         } catch (Exception exception) {
             log.warn("{}", exception);
         }
@@ -296,12 +292,10 @@ public class Message {
      *
      * @param   socket          The {@link ZMQ.Socket}.
      * @param   frame           The first message frame.
-     * @param   mapper          The {@link ObjectMapper}.
      * @param   digester        The {@link HMACDigester} (may be
      *                          {@code null}).
      */
-    public static Message receive(ZMQ.Socket socket, byte[] frame,
-                                  ObjectMapper mapper, HMACDigester digester) {
+    public static Message receive(ZMQ.Socket socket, byte[] frame, HMACDigester digester) {
         var envelope = new LinkedList<byte[]>();
 
         while (! Arrays.equals(frame, DELIMITER)) {
@@ -331,20 +325,20 @@ public class Message {
         var message = new Message();
 
         message.envelope().addAll(envelope);
-        message.header().setAll(deserialize(mapper, header));
-        message.parentHeader().setAll(deserialize(mapper, parentHeader));
-        message.metadata().setAll(deserialize(mapper, metadata));
-        message.content().setAll(deserialize(mapper, content));
+        message.header().setAll(deserialize(header));
+        message.parentHeader().setAll(deserialize(parentHeader));
+        message.metadata().setAll(deserialize(metadata));
+        message.content().setAll(deserialize(content));
         message.buffers().addAll(buffers);
 
         return message;
     }
 
-    private static ObjectNode deserialize(ObjectMapper mapper, byte[] bytes) {
+    private static ObjectNode deserialize(byte[] bytes) {
         ObjectNode value = null;
 
         try {
-            value = (ObjectNode) mapper.readTree(new String(bytes, UTF_8));
+            value = (ObjectNode) OBJECT_MAPPER.readTree(new String(bytes, UTF_8));
         } catch (Exception exception) {
             log.warn("{}", exception);
         }
@@ -356,18 +350,17 @@ public class Message {
      * Method to send a {@link Message}.
      *
      * @param   socket          The {@link ZMQ.Socket}.
-     * @param   mapper          The {@link ObjectMapper}.
      * @param   digester        The {@link HMACDigester} (may be
      *                          {@code null}).
      */
-    public void send(ZMQ.Socket socket, ObjectMapper mapper, HMACDigester digester) {
+    public void send(ZMQ.Socket socket, HMACDigester digester) {
         if (version() == null) {
             version(/* getService().PROTOCOL_VERSION */ "5.3");
         }
 
         timestamp();
 
-        var list = serialize(mapper, digester);
+        var list = serialize(digester);
         var iterator = list.iterator();
 
         while (iterator.hasNext()) {

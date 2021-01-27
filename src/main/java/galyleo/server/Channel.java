@@ -75,7 +75,7 @@ public abstract class Channel {
      * @param   message         The {@link Message}.
      */
     protected void send(Dispatcher dispatcher, ZMQ.Socket socket, Message message) {
-        message.send(socket, getServer().getObjectMapper(), dispatcher.getDigester());
+        message.send(socket, dispatcher.getDigester());
     }
 
     /**
@@ -133,10 +133,7 @@ public abstract class Channel {
         @Override
         protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, byte[] frame) {
             try {
-                var message =
-                    Message.receive(socket, frame,
-                                    getServer().getObjectMapper(),
-                                    dispatcher.getDigester());
+                var message = Message.receive(socket, frame, dispatcher.getDigester());
 
                 dispatch(dispatcher, socket, message);
             } catch (Exception exception) {
@@ -152,15 +149,14 @@ public abstract class Channel {
      * {@link Message reply} skeleton, executes a declared method of the
      * form {@code action(Dispatcher,Message,Message) throws Exception},
      * catches any {@link Exception} and updates the reply as necessary, and
-     * send the reply.
+     * sends the reply.
      *
      * {@bean.info}
      */
     @ToString @Log4j2
     public static abstract class Control extends Protocol {
-        private static abstract class PROTOTYPE {
-            private void action(Dispatcher dispatcher, Message request, Message reply) throws Exception {
-            }
+        private interface PROTOTYPE {
+            public void action(Dispatcher dispatcher, Message request, Message reply) throws Exception;
         }
 
         private static final Method PROTOTYPE;

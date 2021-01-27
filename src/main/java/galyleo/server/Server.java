@@ -24,11 +24,16 @@ import static lombok.AccessLevel.PROTECTED;
  */
 @Getter(PROTECTED) @Setter(PROTECTED) @Log4j2
 public abstract class Server extends ScheduledThreadPoolExecutor {
-    private final ZMQ.Context context = ZMQ.context(8);
-    private final ObjectMapper objectMapper =
+
+    /**
+     * Common {@link Server} static {@link ObjectMapper} instance.
+     */
+    public static final ObjectMapper OBJECT_MAPPER =
         new ObjectMapper()
         .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_VALUES)
         .enable(SerializationFeature.INDENT_OUTPUT);
+
+    private final ZMQ.Context context = ZMQ.context(8);
     private String session = null;
 
     /**
@@ -45,7 +50,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
      * @return  The corresponding {@link ObjectNode}.
      */
     protected ObjectNode toStandardErrorMessage(Throwable throwable, String evalue) {
-        var node = getObjectMapper().createObjectNode();
+        var node = OBJECT_MAPPER.createObjectNode();
 
         node.put("status", "error");
         node.put("ename", throwable.getClass().getCanonicalName());
