@@ -1,3 +1,12 @@
+2021-01-27  Allen D. Ball  <ball@hcf.dev>
+
+	* src/main/java/galyleo/server/Message.java:
+	Added Message creation methods for side-effect messages.
+
+	* src/main/java/galyleo/server/Server.java:
+	Provide stamp(Message) to add protocol verison, session, and date
+	to outgoing messages.
+
 2021-01-26  Allen D. Ball  <ball@hcf.dev>
 
 	* src/main/java/galyleo/server/Server.java:

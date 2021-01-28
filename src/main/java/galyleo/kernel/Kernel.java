@@ -207,19 +207,14 @@ public class Kernel extends Server implements ApplicationRunner {
                         if (store_history) {
                             execution_count.incrementAndGet();
 
-                            var execute_input = request.reply(getSession(), "execute_input");
-
-                            execute_input.content().put("code", code);
-                            execute_input.content().put("execution_count", execution_count.intValue());
-
-                            iopub.pub(execute_input);
+                            iopub.pub(request.execute_input(code, execution_count.intValue()));
                         }
                     }
 
                     java.execute(code);
                 }
             } catch (Throwable throwable) {
-                reply.content().setAll(toStandardErrorMessage(throwable, code));
+                reply.status(throwable, code);
             } finally {
                 reply.content().put("execution_count", execution_count.intValue());
 
@@ -238,7 +233,7 @@ public class Kernel extends Server implements ApplicationRunner {
                         try {
                             out.put(name, String.valueOf(java.evaluate(expression)));
                         } catch (Throwable throwable) {
-                            out.set(name, toStandardErrorMessage(throwable, expression));
+                            out.set(name, Message.toStatus(throwable, expression));
                         }
                     }
                 }
@@ -250,26 +245,18 @@ public class Kernel extends Server implements ApplicationRunner {
                 err.reset();
 
                 if (! silent) {
-                    var execute_result = request.reply(getSession(), "execute_result");
-
-                    execute_result.content().put("execution_count", execution_count.intValue());
-
-                    var data = execute_result.content().with("data");
-                    var metadata = execute_result.content().with("metadata");
-
-                    data.put("text/plain", stdout);
-                    metadata.with("text/plain");
+                    var execute_result = request.execute_result(execution_count.intValue(), stdout);
 
                     stdout = "";
 
                     iopub.pub(execute_result);
 
                     if (! stdout.isEmpty()) {
-                        iopub.stdout(request, stdout);
+                        iopub.pub(request.stream(Message.stream.stdout, stdout));
                     }
 
                     if (! stderr.isEmpty()) {
-                        iopub.stderr(request, stderr);
+                        iopub.pub(request.stream(Message.stream.stderr, stderr));
                     }
                 }
             }

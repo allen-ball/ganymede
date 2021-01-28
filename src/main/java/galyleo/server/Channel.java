@@ -65,17 +65,18 @@ public abstract class Channel {
     protected abstract void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, byte[] frame);
 
     /**
-     * Callback method to dispatch a {@link Message}.  This method is called
-     * on the same thread that the {@link ZMQ.Socket} was created on and the
-     * implementation may call {@link ZMQ.Socket} methods
-     * (including {@code send()}).
+     * Callback method to {@link Server#stamp(Message) stamp} and dispatch a
+     * {@link Message}.  This method is called on the same thread that the
+     * {@link ZMQ.Socket} was created on and the implementation may call
+     * {@link ZMQ.Socket} methods (including {@code send()}).
      *
      * @param   dispatcher      The {@link Dispatcher}.
      * @param   socket          The {@link ZMQ.Socket}.
      * @param   message         The {@link Message}.
      */
     protected void send(Dispatcher dispatcher, ZMQ.Socket socket, Message message) {
-        message.send(socket, dispatcher.getDigester());
+        getServer().stamp(message)
+            .send(socket, dispatcher.getDigester());
     }
 
     /**
@@ -108,7 +109,6 @@ public abstract class Channel {
      */
     @ToString @Log4j2
     public static abstract class Protocol extends Channel {
-        protected static final String PROTOCOL_VERSION = "5.3";
 
         /**
          * Sole constructor.
@@ -178,7 +178,7 @@ public abstract class Channel {
             var action = message.getMessageTypeAction();
 
             if (action != null) {
-                var reply = message.reply(getServer().getSession());
+                var reply = message.reply();
 
                 try {
                     var method = getClass().getDeclaredMethod(action, PROTOTYPE.getParameterTypes());
@@ -218,80 +218,6 @@ public abstract class Channel {
          */
         public void pub(Message message) {
             getDispatcherQueue().forEach(t -> t.pub(message));
-        }
-
-        /**
-         * Parameter to {@link #pub(Stream,Message,String)}.
-         */
-        public enum Stream { stderr, stdout };
-
-        /**
-         * Method to compose and schedule a {@link Stream Stream}
-         * {@link Message} for publishing.
-         *
-         * @param   stream      The {@link Message} {@link Stream Stream}.
-         * @param   referent    The subject {@link Message}.
-         * @param   text        The text {@link String}.
-         */
-        public void pub(Stream stream, Message referent, String text) {
-            Message message = new Message();
-
-            message.msg_type("stream");
-
-            if (referent != null) {
-                message.parentHeader().setAll(referent.header());
-            }
-
-            message.content().put("name", stream.name());
-            message.content().put("text", text);
-
-            pub(message);
-        }
-
-        /**
-         * See {@link #pub(Stream,Message,String)}.
-         *
-         * @param   referent    The subject {@link Message}.
-         * @param   text        The text {@link String}.
-         */
-        public void stdout(Message referent, String text) {
-            pub(Stream.stdout, referent, text);
-        }
-
-        /**
-         * See {@link #pub(Stream,Message,String)}.
-         *
-         * @param   referent    The subject {@link Message}.
-         * @param   text        The text {@link String}.
-         */
-        public void stderr(Message referent, String text) {
-            pub(Stream.stderr, referent, text);
-        }
-
-        /**
-         * Parameter to {@link #pub(Status,Message)}.
-         */
-        public enum Status { starting, busy, idle };
-
-        /**
-         * Method to compose and schedule a {@link Status Status}
-         * {@link Message} for publishing.
-         *
-         * @param   status      The {@link Message} {@link Status Status}.
-         * @param   referent    The subject {@link Message}.
-         */
-        public void pub(Status status, Message referent) {
-            Message message = new Message();
-
-            message.msg_type("status");
-
-            if (referent != null) {
-                message.parentHeader().setAll(referent.header());
-            }
-
-            message.content().put("execution_state", status.name());
-
-            pub(message);
         }
 
         @Override
@@ -354,19 +280,19 @@ public abstract class Channel {
             super.connect(address, digester);
 
             if (isStarting) {
-                iopub.pub(Channel.IOPub.Status.starting, null);
-                iopub.pub(Channel.IOPub.Status.idle, null);
+                iopub.pub(Message.status(Message.status.starting, null));
+                iopub.pub(Message.status(Message.status.idle, null));
             }
         }
 
         @Override
         protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, Message message) {
             try {
-                iopub.pub(Channel.IOPub.Status.busy, message);
+                iopub.pub(message.status(Message.status.busy));
 
                 super.dispatch(dispatcher, socket, message);
             } finally {
-                iopub.pub(Channel.IOPub.Status.idle, message);
+                iopub.pub(message.status(Message.status.idle));
             }
         }
     }

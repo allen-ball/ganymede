@@ -26,6 +26,12 @@ import static lombok.AccessLevel.PROTECTED;
 public abstract class Server extends ScheduledThreadPoolExecutor {
 
     /**
+     * The
+     * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#versioning target=newtab Jupyter message specification version}.
+     */
+    protected static final String PROTOCOL_VERSION = "5.3";
+
+    /**
      * Common {@link Server} static {@link ObjectMapper} instance.
      */
     public static final ObjectMapper OBJECT_MAPPER =
@@ -42,26 +48,23 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
     protected Server() { super(16); }
 
     /**
-     * Method to create a "standard" error node.
+     * Method to stamp and outgoing {@link Message}.  Adds
+     * {@link #PROTOCOL_VERSION}, session, and
+     * {@link Message#timestamp() timestamp} if not already specified.
      *
-     * @param   throwable       The {@link Throwable} source of the error.
-     * @param   evalue          The expression value.
+     * @param   message         The {@link Message} to stamp.
      *
-     * @return  The corresponding {@link ObjectNode}.
+     * @return  The {@link Message}.
      */
-    protected ObjectNode toStandardErrorMessage(Throwable throwable, String evalue) {
-        var node = OBJECT_MAPPER.createObjectNode();
+    public Message stamp(Message message) {
+        if (message.version() == null) {
+            message.version(PROTOCOL_VERSION);
+        }
 
-        node.put("status", "error");
-        node.put("ename", throwable.getClass().getCanonicalName());
-        node.put("evalue", evalue);
+        if (message.session() == null) {
+            message.session(getSession());
+        }
 
-        var array = node.putArray("traceback");
-        var buffer = new PrintStreamBuffer();
-
-        throwable.printStackTrace(buffer);
-        Stream.of(buffer.toString().split("\\R")).forEach(t -> array.add(t));
-
-        return node;
+        return message.timestamp();
     }
 }

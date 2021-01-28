@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j2;
 import org.zeromq.ZMQ;
@@ -21,6 +22,7 @@ import static java.time.ZoneOffset.UTC;
 import static java.time.ZonedDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static java.util.stream.Collectors.toList;
+import static lombok.AccessLevel.PRIVATE;
 
 /**
  * Jupyter {@link Message}.  See
@@ -29,12 +31,14 @@ import static java.util.stream.Collectors.toList;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@Data @Accessors(fluent = true) @Log4j2
+@NoArgsConstructor(access = PRIVATE) @Data @Accessors(fluent = true) @Log4j2
 public class Message {
     private static final String DELIMITER_STRING = "<IDS|MSG>";
     private static final byte[] DELIMITER = DELIMITER_STRING.getBytes(UTF_8);
 
     private static final StackWalker WALKER = StackWalker.getInstance();
+
+    /* private enum Status { ok, error } */
 
     protected final List<byte[]> envelope = new LinkedList<>();
     protected ObjectNode header = new ObjectNode(JsonNodeFactory.instance);
@@ -44,20 +48,6 @@ public class Message {
     protected final List<byte[]> buffers = new LinkedList<>();
 
     { msg_id(UUID.randomUUID().toString()); }
-
-    private String getCallingMethodName(int skip) {
-        String name =
-            WALKER.walk(t -> t.map(StackWalker.StackFrame::getMethodName)
-                                  .skip(1)
-                                  .findFirst())
-            .get();
-
-        return name;
-    }
-
-    private String asText(JsonNode node) {
-        return (node != null) ? node.asText() : null;
-    }
 
     public String msg_id() {
         JsonNode node = header().get(getCallingMethodName(1));
@@ -131,6 +121,10 @@ public class Message {
         return this;
     }
 
+    private String asText(JsonNode node) {
+        return (node != null) ? node.asText() : null;
+    }
+
     /**
      * Parses a {@link Message} type for an "action".
      *
@@ -170,11 +164,14 @@ public class Message {
     }
 
     /**
-     * Convenience for {@code getContent().put("status", value)}.
+     * Method to set status for a {@link Throwable}.
      *
-     * @param   value           The value.
+     * @param   throwable       The {@link Throwable}.
+     * @param   evalue          The expression value.
      */
-    public void status(String value) { content().put("status", value); }
+    public void status(Throwable throwable, String evalue) {
+        content().setAll(toStatus(throwable, evalue));
+    }
 
     /**
      * Method to set status for a {@link Throwable}.
@@ -182,56 +179,123 @@ public class Message {
      * @param   throwable       The {@link Throwable}.
      */
     public void status(Throwable throwable) {
-        status("error");
-        content().put("ename", throwable.getClass().getCanonicalName());
-        content().put("evalue", throwable.getMessage());
-
-        var array = content().putArray("traceback");
-        var buffer = new PrintStreamBuffer();
-
-        throwable.printStackTrace(buffer);
-
-        Stream.of(buffer.toString().split("\\R")).forEach(t -> array.add(t));
+        content().setAll(toStatus(throwable, throwable.getMessage()));
     }
 
     /**
      * Create a suitable reply {@link Message} for {@link.this}
-     * {@link Message}.  Initializes message status to "OK".
-     *
-     * @param   session         The kernel session ID.
+     * {@link Message}.  Copies {@link.this} {@link Message}'s envelope and
+     * buffers and initializes the message status to "OK".
      *
      * @return  The reply {@link Message}.
      */
-    public Message reply(String session) {
+    public Message reply() {
         if (! isRequest()) {
             throw new IllegalStateException("Source message is not a request");
         }
 
-        return reply(session, getMessageTypeAction() + "_reply");
-    }
-
-    /**
-     * Create a suitable reply {@link Message} for {@link.this}
-     * {@link Message}.  Initializes message status to "OK".
-     *
-     * @param   session         The kernel session ID.
-     * @param   type            The reply {@link Message} type.
-     *
-     * @return  The reply {@link Message}.
-     */
-    public Message reply(String session, String type) {
         var reply = new Message();
 
         reply.envelope().addAll(envelope());
-        reply.msg_type(type);
-        reply.session(session);
+        reply.msg_type(getMessageTypeAction() + "_reply");
         reply.username(username());
         reply.parentHeader().setAll(header());
-        reply.status("ok");
+        reply.content().put("status", "ok");
         reply.buffers().addAll(buffers());
 
         return reply;
     }
+
+    /**
+     * Parameter to {@link Message#stream(Message.stream,String)}.
+     */
+    public enum stream { stderr, stdout };
+
+    /**
+     * See
+     * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#streams-stdout-stderr-etc stream}.
+     */
+    public Message stream(stream stream, String text) {
+        var message = new Message();
+
+        message.msg_type(getCallingMethodName(1));
+        message.username(username());
+        message.parentHeader().setAll(header());
+        message.content().put("name", stream.name());
+        message.content().put("text", text);
+
+        return message;
+    }
+
+    /**
+     * See
+     * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#code-inputs execute_input}.
+     */
+    public Message execute_input(String code, int execution_count) {
+        var message = new Message();
+
+        message.msg_type(getCallingMethodName(1));
+        message.username(username());
+        message.parentHeader().setAll(header());
+
+        message.content().put("code", code);
+        message.content().put("execution_count", execution_count);
+
+        return message;
+    }
+
+    /**
+     * See
+     * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#id6 execute_result}.
+     */
+    public Message execute_result(int execution_count, String stdout) {
+        var message = new Message();
+
+        message.msg_type(getCallingMethodName(1));
+        message.username(username());
+        message.parentHeader().setAll(header());
+
+        message.content().put("execution_count", execution_count);
+
+        var data = message.content().with("data");
+        var metadata = message.content().with("metadata");
+
+        data.put("text/plain", stdout);
+        metadata.with("text/plain");
+
+        return message;
+    }
+
+    /**
+     * Parameter to {@link Message#status(Message.status)} and
+     * {@link Message#status(Message.status,Message)}.
+     */
+    public enum status { starting, busy, idle };
+
+    /**
+     * See
+     * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#kernel-status status}.
+     */
+    public static Message status(status status, Message request) {
+        var message = new Message();
+
+        message.msg_type(getCallingMethodName(1));
+
+        if (request != null) {
+            message.username(request.username());
+            message.parentHeader().setAll(request.header());
+        }
+
+        message.content().put("execution_state", status.name());
+
+        return message;
+    }
+
+    /**
+     * See
+     * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#kernel-status status}.
+     */
+    public Message status(status status) { return status(status, this); }
 
     /**
      * Set the {@link date()} value if not already set.
@@ -347,6 +411,40 @@ public class Message {
     }
 
     /**
+     * Method to create a "standard" error node.
+     *
+     * @param   throwable       The {@link Throwable} source of the error.
+     * @param   evalue          The expression value.
+     *
+     * @return  The corresponding {@link ObjectNode}.
+     */
+    public static ObjectNode toStatus(Throwable throwable, String evalue) {
+        var node = OBJECT_MAPPER.createObjectNode();
+
+        node.put("status", "error");
+        node.put("ename", throwable.getClass().getCanonicalName());
+        node.put("evalue", evalue);
+
+        var array = node.putArray("traceback");
+        var buffer = new PrintStreamBuffer();
+
+        throwable.printStackTrace(buffer);
+        Stream.of(buffer.toString().split("\\R")).forEach(t -> array.add(t));
+
+        return node;
+    }
+
+    private static String getCallingMethodName(int skip) {
+        String name =
+            WALKER.walk(t -> t.map(StackWalker.StackFrame::getMethodName)
+                                  .skip(skip)
+                                  .findFirst())
+            .get();
+
+        return name;
+    }
+
+    /**
      * Method to send a {@link Message}.
      *
      * @param   socket          The {@link ZMQ.Socket}.
@@ -354,12 +452,6 @@ public class Message {
      *                          {@code null}).
      */
     public void send(ZMQ.Socket socket, HMACDigester digester) {
-        if (version() == null) {
-            version(/* getService().PROTOCOL_VERSION */ "5.3");
-        }
-
-        timestamp();
-
         var list = serialize(digester);
         var iterator = list.iterator();
 
