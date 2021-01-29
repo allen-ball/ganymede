@@ -61,7 +61,7 @@ public class Install implements ApplicationRunner {
             /*
              * kernel.jar
              */
-            var jarPath = new ApplicationHome().getSource().toPath();
+            var jarPath = new ApplicationHome(getClass()).getSource().toPath();
             /*
              * which python
              */
