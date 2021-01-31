@@ -5,13 +5,13 @@ import lombok.NoArgsConstructor;
 import static lombok.AccessLevel.PRIVATE;
 
 /**
- * {@link galyleo.shell.Java} Notebook {@link Runtime} methods.
+ * {@link galyleo.shell.Java} Notebook static imported methods.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
 @NoArgsConstructor(access = PRIVATE)
-public abstract class Runtime {
+public abstract class Imports {
 
     /**
      * Method to print from a Notebook cell.

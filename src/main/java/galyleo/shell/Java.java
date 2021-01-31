@@ -1,11 +1,12 @@
 package galyleo.shell;
 
-import galyleo.shell.java.Runtime;
+import galyleo.shell.java.Imports;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import jdk.jshell.JShell;
 import jdk.jshell.SourceCodeAnalysis;
@@ -29,7 +30,7 @@ import static jdk.jshell.Snippet.Status.REJECTED;
  */
 @NoArgsConstructor @ToString @Log4j2
 public class Java extends Shell {
-    private int restarts = 0;
+    private final AtomicInteger restarts = new AtomicInteger(0);
     private JShell java = null;
     private InputStream in = null;
     private PrintStream out = null;
@@ -47,7 +48,7 @@ public class Java extends Shell {
 
             var analyzer = java.sourceCodeAnalysis();
             var imports =
-                Stream.of(Runtime.class.getDeclaredMethods())
+                Stream.of(Imports.class.getDeclaredMethods())
                 .filter(t -> isPublic(t.getModifiers()) && isStatic(t.getModifiers()))
                 .map(t -> String.format("import static %s.%s;",
                                         t.getDeclaringClass().getName(), t.getName()))
@@ -55,7 +56,12 @@ public class Java extends Shell {
                 .collect(toSet());
 
             for (var snippet : imports) {
-                var events = java.eval(snippet.source());
+                java.eval(snippet.source())
+                    .stream()
+                    .filter(t -> t.status().equals(REJECTED))
+                    .forEach(t -> log.warn("{}: {}",
+                                           t.status(),
+                                           t.snippet().source().trim()));
             }
         }
     }
@@ -76,7 +82,7 @@ public class Java extends Shell {
                 this.java = null;
 
                 if (java != null) {
-                    restarts += 1;
+                    restarts.incrementAndGet();
                 }
             }
         }
@@ -166,9 +172,7 @@ public class Java extends Shell {
      * @return  The result of evaluating the expression.
      */
     @Override
-    public Object evaluate(String code) throws Exception {
-        log.warn("evaluate(): {}", code);
-
+    public String evaluate(String code) throws Exception {
         throw new UnsupportedOperationException();
     }
 
@@ -180,5 +184,5 @@ public class Java extends Shell {
     }
 
     @Override
-    public int restarts() { return restarts; }
+    public int restarts() { return restarts.intValue(); }
 }

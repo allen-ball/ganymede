@@ -263,14 +263,31 @@ public class Kernel extends Server implements ApplicationRunner {
         }
 
         private void inspect(Dispatcher dispatcher, Message request, Message reply) throws Exception {
+            var code = request.content().at("/code").asText();
+            var cursor_pos = request.content().at("/cursor_pos").asInt();
+            var detail_level = request.content().at("/detail_level").asInt();
+
             throw new UnsupportedOperationException();
         }
 
         private void complete(Dispatcher dispatcher, Message request, Message reply) throws Exception {
+            var code = request.content().at("/code").asText();
+            var cursor_pos = request.content().at("/cursor_pos").asInt();
+
             throw new UnsupportedOperationException();
         }
 
         private void history(Dispatcher dispatcher, Message request, Message reply) throws Exception {
+            var output = request.content().at("/output").asBoolean();
+            var raw = request.content().at("/raw").asBoolean();
+            var hist_access_type = request.content().at("/hist_access_type").asText();
+            var session = request.content().at("/session").asInt();
+            var start = request.content().at("/start").asInt();
+            var stop = request.content().at("/stop").asInt();
+            var n = request.content().at("/n").asInt();
+            var pattern = request.content().at("/pattern").asText();
+            var unique = request.content().at("/unique").asBoolean();
+
             throw new UnsupportedOperationException();
         }
 
