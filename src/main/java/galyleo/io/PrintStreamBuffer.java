@@ -46,4 +46,7 @@ public class PrintStreamBuffer extends PrintStream {
      */
     @Override
     public String toString() { return buffer.toString(UTF_8); }
+
+    @Override
+    public void close() { }
 }

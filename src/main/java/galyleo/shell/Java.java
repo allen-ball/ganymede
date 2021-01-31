@@ -1,13 +1,23 @@
 package galyleo.shell;
 
+import galyleo.shell.java.Runtime;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TreeMap;
+import java.util.stream.Stream;
 import jdk.jshell.JShell;
 import jdk.jshell.SourceCodeAnalysis;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.system.ApplicationHome;
+
+import static java.lang.reflect.Modifier.isPublic;
+import static java.lang.reflect.Modifier.isStatic;
+import static java.util.stream.Collectors.toSet;
+import static jdk.jshell.Snippet.Status.REJECTED;
 
 /**
  * Galyleo {@link Java} {@link Shell}.
@@ -19,14 +29,34 @@ import org.springframework.boot.system.ApplicationHome;
  */
 @NoArgsConstructor @ToString @Log4j2
 public class Java extends Shell {
-    private JShell java = null;
     private int restarts = 0;
+    private JShell java = null;
+    private InputStream in = null;
+    private PrintStream out = null;
+    private PrintStream err = null;
 
     @Override
     public void start(InputStream in, PrintStream out, PrintStream err) {
         synchronized (this) {
+            this.in = in;
+            this.out = out;
+            this.err = err;
+
             java = JShell.builder().in(in).out(out).err(err).build();
-            java.addToClasspath(new ApplicationHome().getSource().toString());
+            java.addToClasspath(new ApplicationHome(getClass()).getSource().toString());
+
+            var analyzer = java.sourceCodeAnalysis();
+            var imports =
+                Stream.of(Runtime.class.getDeclaredMethods())
+                .filter(t -> isPublic(t.getModifiers()) && isStatic(t.getModifiers()))
+                .map(t -> String.format("import static %s.%s;",
+                                        t.getDeclaringClass().getName(), t.getName()))
+                .map(t -> analyzer.analyzeCompletion(t))
+                .collect(toSet());
+
+            for (var snippet : imports) {
+                var events = java.eval(snippet.source());
+            }
         }
     }
 
@@ -54,12 +84,12 @@ public class Java extends Shell {
 
     @Override
     public void execute(String code) throws Exception {
-/*
-        while (! isTerminating()) {
-            var info = java.sourceCodeAnalysis().analyzeCompletion(code);
+        try {
+            var iterator = parse(code).entrySet().iterator();
 
-            switch (info.completeness()) {
-            case COMPLETE:
+            while (iterator.hasNext()) {
+                var entry = iterator.next();
+                var info = entry.getValue();
                 var events = java.eval(info.source());
                 var exception =
                     events.stream()
@@ -70,28 +100,62 @@ public class Java extends Shell {
                 if (exception != null) {
                     throw exception;
                 }
-                break;
 
-            case EMPTY:
-                break;
+                var rejected =
+                    events.stream()
+                    .filter(t -> t.status().equals(REJECTED))
+                    .findFirst().orElse(null);
 
-            case COMPLETE_WITH_SEMI:
-            case CONSIDERED_INCOMPLETE:
-            case DEFINITELY_INCOMPLETE:
-            case UNKNOWN:
-            default:
-                throw new IllegalArgumentException(code);
-                // break;
+                if (rejected != null) {
+                    String message =
+                        String.format("%s: %s",
+                                      rejected.status(),
+                                      rejected.snippet().source().trim());
+
+                    throw new Exception(message);
+                }
+
+                if (! iterator.hasNext()) {
+                    if (! events.isEmpty()) {
+                        var event = events.get(events.size() - 1);
+
+                        switch (event.snippet().kind()) {
+                        case EXPRESSION:
+                        case VAR:
+                            out.println(String.valueOf(event.value()));
+                            break;
+
+                        default:
+                            break;
+                        }
+                    }
+                }
             }
-
-            code = info.remaining();
-
-            if (code.isEmpty()) {
-                break;
-            }
+        } catch (Exception exception) {
+            exception.printStackTrace(err);
+            throw exception;
+        } finally {
+            out.flush();
+            err.flush();
         }
-*/
-        java.eval(code);
+    }
+
+    private Map<Integer,SourceCodeAnalysis.CompletionInfo> parse(String code) {
+        var map = new TreeMap<Integer,SourceCodeAnalysis.CompletionInfo>();
+        var analyzer = java.sourceCodeAnalysis();
+        var offset = 0;
+        var remaining = code;
+
+        while (! remaining.isEmpty()) {
+            var value = analyzer.analyzeCompletion(remaining);
+
+            map.put(offset, value);
+
+            offset += value.source().length();
+            remaining = remaining.substring(value.source().length());
+        }
+
+        return map;
     }
 
     /**
@@ -103,16 +167,9 @@ public class Java extends Shell {
      */
     @Override
     public Object evaluate(String code) throws Exception {
-        var info = java.sourceCodeAnalysis().analyzeCompletion(code);
+        log.warn("evaluate(): {}", code);
 
-        if (info.completeness().equals(SourceCodeAnalysis.Completeness.COMPLETE_WITH_SEMI)) {
-            throw new IllegalArgumentException("Code is not an expression: "
-                                               + info.source());
-        }
-
-        var events = java.eval(info.source());
-
-        return events.get(events.size() - 1).value();
+        throw new UnsupportedOperationException();
     }
 
     @Override

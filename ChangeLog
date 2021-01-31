@@ -1,3 +1,9 @@
+2021-01-30  Allen D. Ball  <ball@hcf.dev>
+
+	* src/main/java/galyleo/shell/Java.java:
+	Implemented Java.execute(String).
+	Linked-in galyleo.shell.java.Runtime.
+
 2021-01-29  Allen D. Ball  <ball@hcf.dev>
 
 	* pom.xml: Create a shaded JAR.
