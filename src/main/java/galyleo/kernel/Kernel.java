@@ -1,7 +1,6 @@
 package galyleo.kernel;
 
 import galyleo.server.Server;
-import galyleo.shell.Java;
 import galyleo.shell.Shell;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -24,7 +23,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 @NoArgsConstructor @ToString @Log4j2
 public class Kernel extends Server implements ApplicationRunner {
-    private final Shell shell = new Java();
+    private final Shell shell = new Shell();
 
     @PostConstruct
     public void init() throws Exception { restart(); }

@@ -1,10 +1,11 @@
 package galyleo.shell.magic;
 
-import galyleo.shell.Java;
+import galyleo.shell.Shell;
 import java.util.Base64;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.stream.Stream;
+import jdk.jshell.JShell;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toMap;
@@ -35,7 +36,7 @@ public interface Magic {
     public String[] getNames();
 
     /**
-     * Implementation method.  Executed in the {@link Java} {@code JShell}.
+     * Implementation method.  Executed in the {@link Java} {@link JShell}.
      *
      * @param   magic           The initial magic line.
      * @param   code            The remainder of the cell.
@@ -55,12 +56,12 @@ public interface Magic {
     }
 
     /**
-     * Method to request execution in the {@link Java} {@code JShell}.
+     * Method to request execution in the {@link Java} {@link JShell}.
      *
-     * @param   java            The target {@link Java} shell.
+     * @param   shell           The target {@link Shell}.
      * @param   code            The cell code.
      */
-    public static void execute(Java java, String code) throws Exception {
+    public static void execute(Shell shell, String code) throws Exception {
         if (! isCellMagic(code)) {
             throw new IllegalStateException("Code is not magic");
         }
@@ -71,11 +72,11 @@ public interface Magic {
                           Magic.class.getCanonicalName(),
                           encoder.encodeToString(code.getBytes(UTF_8)));
 
-        java.execute(expression);
+        shell.execute(expression);
     }
 
     /**
-     * Target method to execute in the {@link Java} {@code JShell}.
+     * Target method to execute in the {@link Java} {@link JShell}.
      *
      * @param   base64          The cell code (Base64-encoded).
      */
