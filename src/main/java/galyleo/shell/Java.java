@@ -31,7 +31,7 @@ import static jdk.jshell.Snippet.Status.REJECTED;
 @NoArgsConstructor @ToString @Log4j2
 public class Java extends Shell {
     private final AtomicInteger restarts = new AtomicInteger(0);
-    private JShell java = null;
+    private JShell jshell = null;
     private InputStream in = null;
     private PrintStream out = null;
     private PrintStream err = null;
@@ -43,10 +43,10 @@ public class Java extends Shell {
             this.out = out;
             this.err = err;
 
-            java = JShell.builder().in(in).out(out).err(err).build();
-            java.addToClasspath(new ApplicationHome(getClass()).getSource().toString());
+            jshell = JShell.builder().in(in).out(out).err(err).build();
+            jshell.addToClasspath(new ApplicationHome(getClass()).getSource().toString());
 
-            var analyzer = java.sourceCodeAnalysis();
+            var analyzer = jshell.sourceCodeAnalysis();
             var imports =
                 Stream.of(Imports.class.getDeclaredMethods())
                 .filter(t -> isPublic(t.getModifiers()) && isStatic(t.getModifiers()))
@@ -55,8 +55,8 @@ public class Java extends Shell {
                 .map(t -> analyzer.analyzeCompletion(t))
                 .collect(toSet());
 
-            for (var snippet : imports) {
-                java.eval(snippet.source())
+            for (var analysis : imports) {
+                jshell.eval(analysis.source())
                     .stream()
                     .filter(t -> t.status().equals(REJECTED))
                     .forEach(t -> log.warn("{}: {}",
@@ -78,10 +78,10 @@ public class Java extends Shell {
     @Override
     public void close() {
         synchronized (this) {
-            try (var java = this.java) {
-                this.java = null;
+            try (var jshell = this.jshell) {
+                this.jshell = null;
 
-                if (java != null) {
+                if (jshell != null) {
                     restarts.incrementAndGet();
                 }
             }
@@ -96,7 +96,7 @@ public class Java extends Shell {
             while (iterator.hasNext()) {
                 var entry = iterator.next();
                 var info = entry.getValue();
-                var events = java.eval(info.source());
+                var events = jshell.eval(info.source());
                 var exception =
                     events.stream()
                     .map(t -> t.exception())
@@ -107,18 +107,16 @@ public class Java extends Shell {
                     throw exception;
                 }
 
-                var rejected =
+                String reason =
                     events.stream()
                     .filter(t -> t.status().equals(REJECTED))
+                    .map(t -> String.format("%s: %s",
+                                            t.status(),
+                                            t.snippet().source().trim()))
                     .findFirst().orElse(null);
 
-                if (rejected != null) {
-                    String message =
-                        String.format("%s: %s",
-                                      rejected.status(),
-                                      rejected.snippet().source().trim());
-
-                    throw new Exception(message);
+                if (reason != null) {
+                    throw new Exception(reason);
                 }
 
                 if (! iterator.hasNext()) {
@@ -128,7 +126,7 @@ public class Java extends Shell {
                         switch (event.snippet().kind()) {
                         case EXPRESSION:
                         case VAR:
-                            out.println(String.valueOf(event.value()));
+                            out.println(event.value());
                             break;
 
                         default:
@@ -148,7 +146,7 @@ public class Java extends Shell {
 
     private Map<Integer,SourceCodeAnalysis.CompletionInfo> parse(String code) {
         var map = new TreeMap<Integer,SourceCodeAnalysis.CompletionInfo>();
-        var analyzer = java.sourceCodeAnalysis();
+        var analyzer = jshell.sourceCodeAnalysis();
         var offset = 0;
         var remaining = code;
 
@@ -167,19 +165,26 @@ public class Java extends Shell {
     /**
      * Method to evaluate an expression.
      *
-     * @param   code            The code to execute.
+     * @param   expression      The expression to evaluate.
      *
      * @return  The result of evaluating the expression.
      */
     @Override
-    public String evaluate(String code) throws Exception {
-        throw new UnsupportedOperationException();
+    public String evaluate(String expression) throws Exception {
+        var analyzer = jshell.sourceCodeAnalysis();
+        var info = analyzer.analyzeCompletion(expression);
+
+        if (! info.completeness().isComplete()) {
+            throw new IllegalArgumentException(expression);
+        }
+
+        return jshell.eval(info.source()).get(0).value();
     }
 
     @Override
     public void stop() {
-        if (java != null) {
-            java.stop();
+        if (jshell != null) {
+            jshell.stop();
         }
     }
 
