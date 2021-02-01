@@ -2,6 +2,7 @@ package galyleo.kernel;
 
 import galyleo.server.Server;
 import galyleo.shell.Java;
+import galyleo.shell.Shell;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Named;
@@ -23,7 +24,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 @NoArgsConstructor @ToString @Log4j2
 public class Kernel extends Server implements ApplicationRunner {
-    private final Java java = new Java();
+    private final Shell shell = new Java();
 
     @PostConstruct
     public void init() throws Exception { restart(); }
@@ -35,30 +36,30 @@ public class Kernel extends Server implements ApplicationRunner {
     protected void restart() throws Exception {
         super.restart();
 
-        java.restart(getIn(), getOut(), getErr());
+        shell.restart(getIn(), getOut(), getErr());
 
         setSession(String.join("-",
                                Kernel.class.getCanonicalName(),
                                String.valueOf(ProcessHandle.current().pid()),
-                               String.valueOf(java.restarts())));
+                               String.valueOf(shell.restarts())));
     }
 
     @Override
     protected void execute(String code) throws Exception {
-        java.execute(code);
+        shell.execute(code);
     }
 
     @Override
     protected String evaluate(String expression) throws Exception {
-        return java.evaluate(expression);
+        return shell.evaluate(expression);
     }
 
     @Override
     protected void interrupt() {
-        var java = this.java;
+        var shell = this.shell;
 
-        if (java != null) {
-            java.stop();
+        if (shell != null) {
+            shell.stop();
         }
     }
 

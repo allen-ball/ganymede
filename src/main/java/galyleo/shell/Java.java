@@ -171,13 +171,6 @@ public class Java extends Shell {
         return map;
     }
 
-    /**
-     * Method to evaluate an expression.
-     *
-     * @param   expression      The expression to evaluate.
-     *
-     * @return  The result of evaluating the expression.
-     */
     @Override
     public String evaluate(String expression) throws Exception {
         var analyzer = jshell.sourceCodeAnalysis();

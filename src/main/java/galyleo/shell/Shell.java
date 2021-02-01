@@ -53,7 +53,7 @@ public abstract class Shell implements AutoCloseable {
      *
      * @return  The result of evaluating the expression.
      */
-    public abstract Object evaluate(String code) throws Exception;
+    public abstract String evaluate(String code) throws Exception;
 
     /**
      * Method to stop (interrupt) a {@link Shell}.
