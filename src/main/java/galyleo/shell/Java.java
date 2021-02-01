@@ -1,6 +1,7 @@
 package galyleo.shell;
 
 import galyleo.shell.java.Imports;
+import galyleo.shell.magic.Magic;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Map;
@@ -90,6 +91,14 @@ public class Java extends Shell {
 
     @Override
     public void execute(String code) throws Exception {
+        if (Magic.isCellMagic(code)) {
+            Magic.execute(this, code);
+        } else {
+            java(code);
+        }
+    }
+
+    private void java(String code) throws Exception {
         try {
             var iterator = parse(code).entrySet().iterator();
 

@@ -8,9 +8,14 @@ package galyleo.shell.magic;
  */
 public interface AnnotatedMagic extends Magic {
     @Override
-    default String getName() {
-        Name annotation = getClass().getAnnotation(Name.class);
+    default String[] getNames() {
+        Names annotation = getClass().getAnnotation(Names.class);
+        String[] value = (annotation != null) ? annotation.value() : null;
 
-        return (annotation != null) ? annotation.value() : getClass().getSimpleName();
+        if (value == null || value.length == 0) {
+            value = new String[] { getClass().getSimpleName().toLowerCase() };
+        }
+
+        return value;
     }
 }
