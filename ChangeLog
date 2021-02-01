@@ -1,5 +1,9 @@
 2021-02-01  Allen D. Ball  <ball@hcf.dev>
 
+	* src/main/java/galyleo/kernel/Kernel.java,
+	src/main/java/galyleo/server/Server.java:
+	Re-factored all communications code to Server.
+
 	* src/main/java/galyleo/shell/magic/:
 	Initial magic implementation.
 
