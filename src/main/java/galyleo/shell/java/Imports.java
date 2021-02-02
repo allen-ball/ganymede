@@ -7,7 +7,7 @@ import static galyleo.server.Server.OBJECT_MAPPER;
 import static lombok.AccessLevel.PRIVATE;
 
 /**
- * {@link galyleo.shell.Java} Notebook static imported methods.
+ * {@link galyleo.shell.Shell} Notebook static imported methods.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$

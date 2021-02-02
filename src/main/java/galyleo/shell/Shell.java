@@ -4,13 +4,10 @@ import galyleo.shell.java.Imports;
 import galyleo.shell.magic.Magic;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import jdk.jshell.JShell;
-import jdk.jshell.SourceCodeAnalysis;
+import jdk.jshell.JShellException;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
@@ -110,102 +107,41 @@ public class Shell implements AutoCloseable {
      * @param   code            The code to execute.
      */
     public void execute(String code) throws Exception {
-        if (Magic.isCellMagic(code)) {
-            Magic.execute(this, code);
-        } else {
-            java(code);
-        }
-    }
-
-    private void java(String code) throws Exception {
         try {
-            var iterator = parse(code).entrySet().iterator();
+            if (Magic.isCellMagic(code)) {
+                var pair = code.split("\\R", 2);
+                var magic = pair[0];
 
-            while (iterator.hasNext()) {
-                var entry = iterator.next();
-                var info = entry.getValue();
-                var events = jshell.eval(info.source());
-                var exception =
-                    events.stream()
-                    .map(t -> t.exception())
-                    .filter(Objects::nonNull)
-                    .findFirst().orElse(null);
+                code = (pair.length > 1 && pair[1] != null) ? pair[1] : "";
 
-                if (exception != null) {
-                    throw exception;
+                var name = magic.substring(Magic.CELL.length()).split("\\s+")[0];
+
+                if (Magic.MAP.containsKey(name)) {
+                    Magic.MAP.get(name).execute(jshell, in, out, err, magic, code);
+                } else {
+                    throw new IllegalArgumentException(magic);
                 }
-
-                String reason =
-                    events.stream()
-                    .filter(t -> t.status().equals(REJECTED))
-                    .map(t -> String.format("%s: %s",
-                                            t.status(),
-                                            t.snippet().source().trim()))
-                    .findFirst().orElse(null);
-
-                if (reason != null) {
-                    throw new Exception(reason);
-                }
-
-                if (! iterator.hasNext()) {
-                    if (! events.isEmpty()) {
-                        var event = events.get(events.size() - 1);
-
-                        switch (event.snippet().kind()) {
-                        case EXPRESSION:
-                        case VAR:
-                            out.println(event.value());
-                            break;
-
-                        default:
-                            break;
-                        }
-                    }
-                }
+            } else {
+                Magic.MAP.get("java").execute(jshell, in, out, err, null, code);
             }
-        } catch (Exception exception) {
+        } catch (JShellException exception) {
             exception.printStackTrace(err);
             throw exception;
-        } finally {
-            out.flush();
-            err.flush();
+        } catch (Exception exception) {
+            err.println(exception);
+            throw exception;
         }
-    }
-
-    private Map<Integer,SourceCodeAnalysis.CompletionInfo> parse(String code) {
-        var map = new TreeMap<Integer,SourceCodeAnalysis.CompletionInfo>();
-        var analyzer = jshell.sourceCodeAnalysis();
-        var offset = 0;
-        var remaining = code;
-
-        while (! remaining.isEmpty()) {
-            var value = analyzer.analyzeCompletion(remaining);
-
-            map.put(offset, value);
-
-            offset += value.source().length();
-            remaining = remaining.substring(value.source().length());
-        }
-
-        return map;
     }
 
     /**
      * Method to evaluate an expression.
      *
-     * @param   code            The code to execute.
+     * @param   expression      The code to evaluate.
      *
      * @return  The result of evaluating the expression.
      */
     public String evaluate(String expression) throws Exception {
-        var analyzer = jshell.sourceCodeAnalysis();
-        var info = analyzer.analyzeCompletion(expression);
-
-        if (! info.completeness().isComplete()) {
-            throw new IllegalArgumentException(expression);
-        }
-
-        return jshell.eval(info.source()).get(0).value();
+        return Magic.evaluate(jshell, expression);
     }
 
     /**

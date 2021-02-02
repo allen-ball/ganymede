@@ -1,5 +1,7 @@
 2021-02-01  Allen D. Ball  <ball@hcf.dev>
 
+	* Added Java Magic and re-factored Shell and Magic accordingly.
+
 	* src/main/java/galyleo/shell/Shell.java:
 	Moved implementation from Java (and removed Java).
 

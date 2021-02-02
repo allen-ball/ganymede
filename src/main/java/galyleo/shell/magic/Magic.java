@@ -1,6 +1,7 @@
 package galyleo.shell.magic;
 
-import galyleo.shell.Shell;
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.Base64;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -17,6 +18,10 @@ import static java.util.stream.Collectors.toMap;
  * @version $Revision$
  */
 public interface Magic {
+
+    /**
+     * Cell {@link Magic} indicator.
+     */
     public static final String CELL = "%%";
 
     /**
@@ -29,6 +34,16 @@ public interface Magic {
         .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
 
     /**
+     * See {@link #decode(String)}.
+     */
+    public static final Base64.Decoder DECODER = Base64.getDecoder();
+
+    /**
+     * See {@link #encode(String)}.
+     */
+    public static final Base64.Encoder ENCODER = Base64.getEncoder();
+
+    /**
      * Method to get the names associated with {@link.this} {@link Magic}.
      *
      * @return  The names.
@@ -36,7 +51,23 @@ public interface Magic {
     public String[] getNames();
 
     /**
-     * Implementation method.  Executed in the {@link Java} {@link JShell}.
+     * Entry-point method.  Executed in the {@link galyleo.shell.Shell}.
+     *
+     * @param   jshell          The {@link JShell}.
+     * @param   in              The {@code in} {@link InputStream}.
+     * @param   out             The {@code out} {@link PrintStream}.
+     * @param   err             The {@code err} {@link PrintStream}.
+     * @param   magic           The initial magic line.
+     * @param   code            The remainder of the cell.
+     */
+    default void execute(JShell jshell,
+                         InputStream in, PrintStream out, PrintStream err,
+                         String magic, String code) throws Exception {
+        sendTo(jshell, getNames()[0], magic, code);
+    }
+
+    /**
+     * Implementation method.  Executed in the {@link JShell} instance.
      *
      * @param   magic           The initial magic line.
      * @param   code            The remainder of the cell.
@@ -45,7 +76,7 @@ public interface Magic {
 
     /**
      * Method to determine if the code is cell magic (starts with
-     * '{@code %%}'.
+     * '{@code %%}').
      *
      * @param   code            The code to test.
      *
@@ -56,46 +87,80 @@ public interface Magic {
     }
 
     /**
-     * Method to request execution in the {@link Java} {@link JShell}.
+     * Static method to send a request to be executed in the {@link JShell}
+     * instance.  The {@link #sendTo(JShell,String,String,String)} method
+     * packs the arguments and creates a
+     * {@link #receive(String,String,String)} expression which is evaluated
+     * in the {@link JShell}.
      *
-     * @param   shell           The target {@link Shell}.
-     * @param   code            The cell code.
+     * @param   jshell          The {@link JShell}.
+     * @param   name            The magic name (key into {@link #MAP}.
+     * @param   magic           The initial magic line.
+     * @param   code            The remainder of the cell.
      */
-    public static void execute(Shell shell, String code) throws Exception {
-        if (! isCellMagic(code)) {
-            throw new IllegalStateException("Code is not magic");
-        }
-
-        var encoder = Base64.getEncoder();
-        var expression =
-            String.format("%s.execute(\"%s\")",
-                          Magic.class.getCanonicalName(),
-                          encoder.encodeToString(code.getBytes(UTF_8)));
-
-        shell.execute(expression);
+    public static void sendTo(JShell jshell, String name, String magic, String code) throws Exception {
+        evaluate(jshell,
+                 String.format("%s.receive(\"%s\", \"%s\", \"%s\")",
+                               Magic.class.getCanonicalName(),
+                               name, encode(magic), encode(code)));
     }
 
     /**
-     * Target method to execute in the {@link Java} {@link JShell}.
+     * Static method to receive a request in the {@link JShell} instance.
+     * The {@link #sendTo(JShell,String,String,String)} method packs the
+     * arguments and creates a {@link #receive(String,String,String)}
+     * expression which is evaluated in the {@link JShell}.
      *
-     * @param   base64          The cell code (Base64-encoded).
+     * @param   name            The magic name (key into {@link #MAP}.
+     * @param   magic           The initial magic line.
+     * @param   code            The remainder of the cell.
      */
-    public static void execute(String base64) throws Exception {
-        var code = new String(Base64.getDecoder().decode(base64), UTF_8);
-
-        if (! isCellMagic(code)) {
-            throw new IllegalStateException("Code is not magic");
-        }
-
-        var pair = code.split("\\R", 2);
-        var magic = pair[0];
-        var rest = (pair.length > 1) ? pair[1] : "";
-        var name = magic.substring(CELL.length()).split("\\W+", 2)[0];
-
+    public static void receive(String name, String magic, String code) throws Exception {
         if (MAP.containsKey(name)) {
-            MAP.get(name).execute(magic, rest);
+            MAP.get(name).execute(decode(magic), decode(code));
         } else {
-            throw new IllegalArgumentException(magic);
+            throw new IllegalStateException("Magic " + name + " not found");
         }
+    }
+
+    /**
+     * Convenience method to {@link Base64}-decode a {@link String}.
+     *
+     * @param   string          The encoded {@link String}.
+     *
+     * @return  The decoded {@link String}.
+     */
+    public static String decode(String string) {
+        return new String(DECODER.decode(string), UTF_8);
+    }
+
+    /**
+     * Convenience method to {@link Base64}-encode a {@link String}.
+     *
+     * @param   string          The un-encoded {@link String}.
+     *
+     * @return  The encoded {@link String}.
+     */
+    public static String encode(String string) {
+        return ENCODER.encodeToString(((string != null) ? string : "").getBytes(UTF_8));
+    }
+
+    /**
+     * Method to evaluate an expression.
+     *
+     * @param   jshell          The {@link JShell}.
+     * @param   expression      The expression to evaluate.
+     *
+     * @return  The result of evaluating the expression.
+     */
+    public static String evaluate(JShell jshell, String expression) throws Exception {
+        var analyzer = jshell.sourceCodeAnalysis();
+        var info = analyzer.analyzeCompletion(expression);
+
+        if (! info.completeness().isComplete()) {
+            throw new IllegalArgumentException(expression);
+        }
+
+        return jshell.eval(info.source()).get(0).value();
     }
 }

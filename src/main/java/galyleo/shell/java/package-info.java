@@ -1,5 +1,5 @@
 /**
- * {@link galyleo.shell.Java} Notebook run-time classes.
+ * {@link galyleo.shell.Shell} Notebook run-time classes.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$

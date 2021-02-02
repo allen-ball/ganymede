@@ -16,7 +16,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 @ServiceProviderFor({ Magic.class })
 @NoArgsConstructor @ToString @Log4j2
-public class Script extends AbstractMagic {
+public class Script implements AnnotatedMagic {
     @Override
     public void execute(String magic, String code) throws Exception {
         var command = magic.substring(CELL.length()).trim();

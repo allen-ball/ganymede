@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 import static lombok.AccessLevel.PRIVATE;
 
 /**
- * {@link galyleo.shell.Java} well-known static fields.
+ * {@link galyleo.shell.Shell} well-known static fields.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
