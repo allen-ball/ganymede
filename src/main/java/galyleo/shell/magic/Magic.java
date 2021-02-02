@@ -1,12 +1,12 @@
 package galyleo.shell.magic;
 
+import galyleo.shell.Shell;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Base64;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.stream.Stream;
-import jdk.jshell.JShell;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toMap;
@@ -53,21 +53,21 @@ public interface Magic {
     /**
      * Entry-point method.  Executed in the {@link galyleo.shell.Shell}.
      *
-     * @param   jshell          The {@link JShell}.
+     * @param   shell           The {@link Shell}.
      * @param   in              The {@code in} {@link InputStream}.
      * @param   out             The {@code out} {@link PrintStream}.
      * @param   err             The {@code err} {@link PrintStream}.
      * @param   magic           The initial magic line.
      * @param   code            The remainder of the cell.
      */
-    default void execute(JShell jshell,
+    default void execute(Shell shell,
                          InputStream in, PrintStream out, PrintStream err,
                          String magic, String code) throws Exception {
-        sendTo(jshell, getNames()[0], magic, code);
+        sendTo(shell, getNames()[0], magic, code);
     }
 
     /**
-     * Implementation method.  Executed in the {@link JShell} instance.
+     * Implementation method.  Executed in the {@link jdk.jshell.JShell} instance.
      *
      * @param   magic           The initial magic line.
      * @param   code            The remainder of the cell.
@@ -87,31 +87,31 @@ public interface Magic {
     }
 
     /**
-     * Static method to send a request to be executed in the {@link JShell}
-     * instance.  The {@link #sendTo(JShell,String,String,String)} method
-     * packs the arguments and creates a
-     * {@link #receive(String,String,String)} expression which is evaluated
-     * in the {@link JShell}.
+     * Static method to send a request to be executed in the
+     * {@link jdk.jshell.JShell} instance.  The
+     * {@link #sendTo(Shell,String,String,String)} method packs the
+     * arguments and creates a {@link #receive(String,String,String)}
+     * expression which is evaluated in the {@link jdk.jshell.JShell}.
      *
-     * @param   jshell          The {@link JShell}.
-     * @param   name            The magic name (key into {@link #MAP}.
+     * @param   shell           The {@link Shell}.
+     * @param   name            The magic name (key into {@link #MAP}).
      * @param   magic           The initial magic line.
      * @param   code            The remainder of the cell.
      */
-    public static void sendTo(JShell jshell, String name, String magic, String code) throws Exception {
-        evaluate(jshell,
-                 String.format("%s.receive(\"%s\", \"%s\", \"%s\")",
-                               Magic.class.getCanonicalName(),
-                               name, encode(magic), encode(code)));
+    public static void sendTo(Shell shell, String name, String magic, String code) throws Exception {
+        shell.evaluate(String.format("%s.receive(\"%s\", \"%s\", \"%s\")",
+                                     Magic.class.getCanonicalName(),
+                                     name, encode(magic), encode(code)));
     }
 
     /**
-     * Static method to receive a request in the {@link JShell} instance.
-     * The {@link #sendTo(JShell,String,String,String)} method packs the
-     * arguments and creates a {@link #receive(String,String,String)}
-     * expression which is evaluated in the {@link JShell}.
+     * Static method to receive a request in the {@link jdk.jshell.JShell}
+     * instance.  The {@link #sendTo(Shell,String,String,String)} method
+     * packs the arguments and creates
+     * a {@link #receive(String,String,String)} expression which is
+     * evaluated in the {@link jdk.jshell.JShell}.
      *
-     * @param   name            The magic name (key into {@link #MAP}.
+     * @param   name            The magic name (key into {@link #MAP}).
      * @param   magic           The initial magic line.
      * @param   code            The remainder of the cell.
      */
@@ -143,24 +143,5 @@ public interface Magic {
      */
     public static String encode(String string) {
         return ENCODER.encodeToString(((string != null) ? string : "").getBytes(UTF_8));
-    }
-
-    /**
-     * Method to evaluate an expression.
-     *
-     * @param   jshell          The {@link JShell}.
-     * @param   expression      The expression to evaluate.
-     *
-     * @return  The result of evaluating the expression.
-     */
-    public static String evaluate(JShell jshell, String expression) throws Exception {
-        var analyzer = jshell.sourceCodeAnalysis();
-        var info = analyzer.analyzeCompletion(expression);
-
-        if (! info.completeness().isComplete()) {
-            throw new IllegalArgumentException(expression);
-        }
-
-        return jshell.eval(info.source()).get(0).value();
     }
 }

@@ -99,7 +99,7 @@ public class Shell implements AutoCloseable {
     @Override
     public void close() {
         synchronized (this) {
-            try (var jshell = this.jshell) {
+            try (var jshell = jshell()) {
                 this.jshell = null;
 
                 if (jshell != null) {
@@ -129,6 +129,13 @@ public class Shell implements AutoCloseable {
     }
 
     /**
+     * Accessor to the active {@link JShell} instance.
+     *
+     * @return  The {@link JShell} instance.
+     */
+    public JShell jshell() { return jshell; }
+
+    /**
      * Method to manage and add path(s) to the {@link JShell} instance.  See
      * {@link JShell#addToClasspath(String)}.
      *
@@ -139,7 +146,7 @@ public class Shell implements AutoCloseable {
             if (! classpath.contains(path)) {
                 classpath.add(path);
 
-                var jshell = this.jshell;
+                var jshell = jshell();
 
                 if (jshell != null) {
                     jshell.addToClasspath(path);
@@ -165,13 +172,13 @@ public class Shell implements AutoCloseable {
 
                 if (Magic.MAP.containsKey(name)) {
                     Magic.MAP.get(name)
-                        .execute(jshell, in, out, err, magic, code);
+                        .execute(this, in, out, err, magic, code);
                 } else {
                     throw new IllegalArgumentException(magic);
                 }
             } else {
                 Magic.MAP.get("java")
-                    .execute(jshell, in, out, err, null, code);
+                    .execute(this, in, out, err, null, code);
             }
         } catch (JShellException exception) {
             exception.printStackTrace(err);
@@ -190,13 +197,23 @@ public class Shell implements AutoCloseable {
      * @return  The result of evaluating the expression.
      */
     public String evaluate(String expression) throws Exception {
-        return Magic.evaluate(jshell, expression);
+        var jshell = jshell();
+        var analyzer = jshell.sourceCodeAnalysis();
+        var info = analyzer.analyzeCompletion(expression);
+
+        if (! info.completeness().isComplete()) {
+            throw new IllegalArgumentException(expression);
+        }
+
+        return jshell.eval(info.source()).get(0).value();
     }
 
     /**
      * Method to stop (interrupt) a {@link Shell}.
      */
     public void stop() {
+        var jshell = jshell();
+
         if (jshell != null) {
             jshell.stop();
         }

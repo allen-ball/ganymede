@@ -20,7 +20,7 @@ public class Script implements AnnotatedMagic {
     @Override
     public void execute(String magic, String code) throws Exception {
         var command = magic.substring(CELL.length()).trim();
-        var pair = command.split("\\W+", 2);
+        var pair = command.split("\\s+", 2);
 
         if (pair.length != 2) {
             throw new IllegalArgumentException(magic);
@@ -29,7 +29,7 @@ public class Script implements AnnotatedMagic {
         command = pair[1];
 
         var process =
-            new ProcessBuilder(command.split("\\W+"))
+            new ProcessBuilder(command.split("\\s+"))
             .redirectInput(PIPE)
             .redirectErrorStream(true)
             .redirectOutput(PIPE)
