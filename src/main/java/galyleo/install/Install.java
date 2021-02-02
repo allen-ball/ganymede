@@ -24,6 +24,8 @@ import static org.springframework.util.FileSystemUtils.deleteRecursively;
 /**
  * Galyleo Jupyter {@link galyleo.kernel.Kernel} {@link Install}er.
  *
+ * {@injected.fields}
+ *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */

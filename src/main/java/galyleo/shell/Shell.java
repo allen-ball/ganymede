@@ -1,9 +1,15 @@
 package galyleo.shell;
 
-import galyleo.shell.java.Imports;
+import galyleo.shell.java.StaticImports;
 import galyleo.shell.magic.Magic;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.nio.file.DirectoryIteratorException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import jdk.jshell.JShell;
@@ -33,6 +39,9 @@ public class Shell implements AutoCloseable {
     private InputStream in = null;
     private PrintStream out = null;
     private PrintStream err = null;
+    private final List<String> classpath = new ArrayList<>();
+
+    { classpath.add(new ApplicationHome(getClass()).getSource().toString()); }
 
     /**
      * Method to start a {@link Shell}.
@@ -48,11 +57,11 @@ public class Shell implements AutoCloseable {
             this.err = err;
 
             jshell = JShell.builder().in(in).out(out).err(err).build();
-            jshell.addToClasspath(new ApplicationHome(getClass()).getSource().toString());
+            classpath.forEach(t -> jshell.addToClasspath(t));
 
             var analyzer = jshell.sourceCodeAnalysis();
             var imports =
-                Stream.of(Imports.class.getDeclaredMethods())
+                Stream.of(StaticImports.class.getDeclaredMethods())
                 .filter(t -> isPublic(t.getModifiers()) && isStatic(t.getModifiers()))
                 .map(t -> String.format("import static %s.%s;",
                                         t.getDeclaringClass().getName(), t.getName()))
@@ -64,8 +73,7 @@ public class Shell implements AutoCloseable {
                     .stream()
                     .filter(t -> t.status().equals(REJECTED))
                     .forEach(t -> log.warn("{}: {}",
-                                           t.status(),
-                                           t.snippet().source().trim()));
+                                           t.status(), t.snippet().source()));
             }
         }
     }
@@ -102,6 +110,45 @@ public class Shell implements AutoCloseable {
     }
 
     /**
+     * Method to search for and add jars to the {@link JShell} instance
+     * {@code classpath}.  See {@link #addToClasspath(String...)}.
+     *
+     * @param   paths           The diretcory path(s) to search.
+     */
+    public void addJarsToClasspath(String... paths) throws IOException {
+        for (var path : paths) {
+            try (var stream =
+                     Files.newDirectoryStream(Paths.get(path), "*.jar")) {
+                for (var entry : stream) {
+                    addToClasspath(entry.toString());
+                }
+            } catch (DirectoryIteratorException exception) {
+                throw exception.getCause();
+            }
+        }
+    }
+
+    /**
+     * Method to manage and add path(s) to the {@link JShell} instance.  See
+     * {@link JShell#addToClasspath(String)}.
+     *
+     * @param   paths           The path(s) to add.
+     */
+    public void addToClasspath(String... paths) {
+        for (var path : paths) {
+            if (! classpath.contains(path)) {
+                classpath.add(path);
+
+                var jshell = this.jshell;
+
+                if (jshell != null) {
+                    jshell.addToClasspath(path);
+                }
+            }
+        }
+    }
+
+    /**
      * Method to execute code (typically a cell's contents).
      *
      * @param   code            The code to execute.
@@ -117,12 +164,14 @@ public class Shell implements AutoCloseable {
                 var name = magic.substring(Magic.CELL.length()).split("\\s+")[0];
 
                 if (Magic.MAP.containsKey(name)) {
-                    Magic.MAP.get(name).execute(jshell, in, out, err, magic, code);
+                    Magic.MAP.get(name)
+                        .execute(jshell, in, out, err, magic, code);
                 } else {
                     throw new IllegalArgumentException(magic);
                 }
             } else {
-                Magic.MAP.get("java").execute(jshell, in, out, err, null, code);
+                Magic.MAP.get("java")
+                    .execute(jshell, in, out, err, null, code);
             }
         } catch (JShellException exception) {
             exception.printStackTrace(err);

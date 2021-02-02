@@ -7,13 +7,13 @@ import static galyleo.server.Server.OBJECT_MAPPER;
 import static lombok.AccessLevel.PRIVATE;
 
 /**
- * {@link galyleo.shell.Shell} Notebook static imported methods.
+ * {@link galyleo.shell.Shell} Notebook statically imported methods.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
 @NoArgsConstructor(access = PRIVATE)
-public abstract class Imports {
+public abstract class StaticImports {
 
     /**
      * Method to print from a Notebook cell.

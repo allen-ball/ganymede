@@ -4,10 +4,13 @@
 
 	* src/main/java/galyleo/shell/Shell.java:
 	Moved implementation from Java (and removed Java).
+	Added addJarsToClasspath(String...) and addToClasspath(String...)
+	methods.
 
 	* src/main/java/galyleo/kernel/Kernel.java,
 	src/main/java/galyleo/server/Server.java:
 	Re-factored all communications code to Server.
+	Add Spark JARs to classpath if SPARK_HOME is satisfied.
 
 	* src/main/java/galyleo/shell/magic/:
 	Initial magic implementation.

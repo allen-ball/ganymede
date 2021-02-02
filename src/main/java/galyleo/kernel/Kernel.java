@@ -2,6 +2,8 @@ package galyleo.kernel;
 
 import galyleo.server.Server;
 import galyleo.shell.Shell;
+import java.nio.file.Paths;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Named;
@@ -9,12 +11,15 @@ import javax.inject.Singleton;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * Galyleo Jupyter {@link Kernel}.
+ *
+ * {@injected.fields}
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
@@ -23,10 +28,25 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 @NoArgsConstructor @ToString @Log4j2
 public class Kernel extends Server implements ApplicationRunner {
+    @Value("${connection-file:}")
+    private List<String> paths = null;
+    @Value("${spark-home:}")
+    private String sparkHome = null;
+
     private final Shell shell = new Shell();
 
     @PostConstruct
-    public void init() throws Exception { restart(); }
+    public void init() throws Exception {
+        try {
+            if (sparkHome != null) {
+                shell.addJarsToClasspath(Paths.get(sparkHome, "jars").toString());
+            }
+        } catch (Exception exception) {
+            log.warn("{}: {}", sparkHome, exception);
+        }
+
+        restart();
+    }
 
     @PreDestroy
     public void destroy() { shutdown(); }
@@ -64,9 +84,7 @@ public class Kernel extends Server implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments arguments) throws Exception {
-        var paths = arguments.getOptionValues("connection-file");
-
-        if (! (paths == null || paths.isEmpty())) {
+        if (paths != null && (! paths.isEmpty())) {
             for (var path : paths) {
                 try {
                     bind(path);

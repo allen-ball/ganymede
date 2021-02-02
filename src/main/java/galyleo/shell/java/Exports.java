@@ -14,7 +14,7 @@ import static lombok.AccessLevel.PRIVATE;
 public abstract class Exports {
 
     /**
-     * Result of last {@link Imports#print(Object)} call.
+     * Result of last {@link StaticImports#print(Object)} call.
      */
     public static String execute_result = null;
 }
