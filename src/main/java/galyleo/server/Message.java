@@ -440,7 +440,8 @@ public class Message {
     }
 
     /**
-     * Method to create {@link execute_result} {@link Message} content.
+     * Method to create {@link #execute_result(int,ObjectNode)}
+     * {@link Message} content.
      *
      * @param   object          The {@link Object} to encode.
      *
