@@ -3,11 +3,18 @@ package galyleo.shell.magic;
 import galyleo.shell.Shell;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.StreamTokenizer;
+import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static java.io.StreamTokenizer.TT_EOF;
+import static java.io.StreamTokenizer.TT_EOL;
+import static java.io.StreamTokenizer.TT_WORD;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toMap;
 
@@ -85,6 +92,86 @@ public interface Magic {
      */
     public static boolean isCellMagic(String code) {
         return code.startsWith(CELL);
+    }
+
+    /**
+     * Method to parse a cell magic command.  The code must start with
+     * "{@code %%}".  "{@code #}" to the EOL is a comment.  The command is
+     * either a word or a single punctuation character.  Words may be quoted
+     * with double quotes.
+     *
+     * @param   code            The code to parse.
+     *
+     * @return  The array of command arguments.
+     *
+     * @throws  IllegalArgumentException
+     *                          If the magic line can't be parsed.
+     */
+    public static String[] getCellMagicCommand(String code) {
+        var list = new ArrayList<String>();
+
+        try (var reader = new StringReader(code)) {
+            var tokenizer = new StreamTokenizer(reader);
+
+            tokenizer.eolIsSignificant(true);
+            tokenizer.lowerCaseMode(false);
+            tokenizer.commentChar('#');
+            tokenizer.wordChars('0', '9');
+
+            for (int i = 0; i < CELL.length(); i += 1) {
+                tokenizer.nextToken();
+
+                if (tokenizer.ttype != CELL.charAt(i)) {
+                    throw new IllegalArgumentException();
+                }
+            }
+
+            tokenizer.nextToken();
+
+            switch (tokenizer.ttype) {
+            case TT_WORD:
+                list.add(tokenizer.sval);
+                break;
+
+            default:
+                list.add(Character.toString(tokenizer.ttype));
+                break;
+
+            case TT_EOF:
+            case TT_EOL:
+                throw new IllegalArgumentException();
+                /* break; */
+            }
+
+            IntStream.range(0, 256)
+                .filter(t -> "\"\\#".indexOf(t) == -1)
+                .filter(t -> (! Character.isWhitespace(t)))
+                .forEach(t -> tokenizer.wordChars(t, t));
+
+            for (;;) {
+                tokenizer.nextToken();
+
+                if (tokenizer.ttype == TT_EOF || tokenizer.ttype == TT_EOL) {
+                    break;
+                }
+
+                switch (tokenizer.ttype) {
+                case TT_WORD:
+                    list.add(tokenizer.sval);
+                    break;
+
+                default:
+                    list.add(Character.toString(tokenizer.ttype));
+                    break;
+                }
+            }
+        } catch (IllegalStateException exception) {
+            throw exception;
+        } catch (Exception exception) {
+            throw new IllegalArgumentException(code.split("\\R", 2)[0]);
+        }
+
+        return list.toArray(new String[] { });
     }
 
     /**

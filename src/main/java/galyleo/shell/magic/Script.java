@@ -1,6 +1,7 @@
 package galyleo.shell.magic;
 
 import ball.annotation.ServiceProviderFor;
+import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
@@ -15,21 +16,18 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @version $Revision$
  */
 @ServiceProviderFor({ Magic.class })
+@Names({ "script", "!" })
 @NoArgsConstructor @ToString @Log4j2
 public class Script implements AnnotatedMagic {
     @Override
     public void execute(String magic, String code) throws Exception {
-        var command = magic.substring(CELL.length()).trim();
-        var pair = command.split("\\s+", 2);
-
-        if (pair.length != 2) {
-            throw new IllegalArgumentException(magic);
-        }
-
-        command = pair[1];
+        var argv =
+            Stream.of(Magic.getCellMagicCommand(magic))
+            .skip(1)
+            .toArray(String[]::new);
 
         var process =
-            new ProcessBuilder(command.split("\\s+"))
+            new ProcessBuilder(argv)
             .redirectInput(PIPE)
             .redirectErrorStream(true)
             .redirectOutput(PIPE)

@@ -138,18 +138,18 @@ public class Shell implements AutoCloseable {
     public void execute(String code) throws Exception {
         try {
             if (Magic.isCellMagic(code)) {
-                var pair = code.split("\\R", 2);
-                var magic = pair[0];
+                var lines = code.split("\\R", 2);
+                var magic = lines[0];
 
-                code = (pair.length > 1 && pair[1] != null) ? pair[1] : "";
+                code = (lines.length > 1) ? lines[1] : "";
 
-                var name = magic.substring(Magic.CELL.length()).split("\\s+")[0];
+                var argv = Magic.getCellMagicCommand(magic);
 
-                if (Magic.MAP.containsKey(name)) {
-                    Magic.MAP.get(name)
+                if (argv.length > 0 && Magic.MAP.containsKey(argv[0])) {
+                    Magic.MAP.get(argv[0])
                         .execute(this, in, out, err, magic, code);
                 } else {
-                    throw new IllegalArgumentException(magic);
+                    throw new IllegalArgumentException(code.split("\\R", 2)[0]);
                 }
             } else {
                 Magic.MAP.get("java")
@@ -190,13 +190,13 @@ public class Shell implements AutoCloseable {
         var string = literal;
 
         if (literal != null) {
-            try {
-                var parser = new StreamTokenizer(new StringReader(literal));
+            try (var reader = new StringReader(literal)) {
+                var tokenizer = new StreamTokenizer(reader);
 
-                parser.nextToken();
+                tokenizer.nextToken();
 
-                if (parser.ttype == '"') {
-                    string = parser.sval;
+                if (tokenizer.ttype == '"') {
+                    string = tokenizer.sval;
                 }
             } catch (IOException exception) {
             }
