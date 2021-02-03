@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import galyleo.io.PrintStreamBuffer;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -108,6 +110,15 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
      * @param   code            The cell code to execute.
      */
     protected abstract void execute(String code) throws Exception;
+
+    /**
+     * Method to get an {@link ArrayNode} of accumulated events from the
+     * {@link Shell} (and {@link jdk.jshell.JShell}) from last
+     * {@link #execute(String)} call.
+     *
+     * @return  The {@link ArrayNode}.
+     */
+    protected abstract ArrayNode getExecutionEvents();
 
     /**
      * Method to evaluate an expression.
@@ -264,11 +275,12 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
                         try {
                             out.put(name, String.valueOf(Server.this.evaluate(expression)));
                         } catch (Throwable throwable) {
-                            out.set(name, Message.toStatus(throwable, expression));
+                            out.set(name, Message.content(throwable, expression));
                         }
                     }
                 }
 
+                var events = getExecutionEvents();
                 var stdout = out.toString();
                 var stderr = err.toString();
 
@@ -276,11 +288,19 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
                 err.reset();
 
                 if (! silent) {
-                    var execute_result = request.execute_result(execution_count.intValue(), stdout);
+                    var iterator = events.iterator();
 
-                    stdout = "";
+                    while (iterator.hasNext()) {
+                        try {
+                            var execute_result =
+                                request.execute_result(execution_count.intValue(),
+                                                       (ObjectNode) iterator.next());
 
-                    iopub.pub(execute_result);
+                            iopub.pub(execute_result);
+                        } catch (Exception exception) {
+                            log.warn("{}", exception);
+                        }
+                    }
 
                     if (! stdout.isEmpty()) {
                         iopub.pub(request.stream(Message.stream.stdout, stdout));

@@ -1,4 +1,4 @@
-package galyleo.shell.java;
+package galyleo.shell.jshell;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.NoArgsConstructor;
@@ -37,10 +37,8 @@ public abstract class StaticImports {
 
             data.put(type, String.valueOf(object));
             metadata.with(type);
-            /*
-             * Exports.execute_result = OBJECT_MAPPER.writeValueAsString(node);
-             */
-            System.out.println(object);
+
+            ExecutionEvents.json.add(node);
         } catch (Exception exception) {
             System.out.println(object);
             exception.printStackTrace(System.err);

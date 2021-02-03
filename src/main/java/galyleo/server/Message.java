@@ -170,7 +170,7 @@ public class Message {
      * @param   evalue          The expression value.
      */
     public void status(Throwable throwable, String evalue) {
-        content().setAll(toStatus(throwable, evalue));
+        content().setAll(content(throwable, evalue));
     }
 
     /**
@@ -179,7 +179,7 @@ public class Message {
      * @param   throwable       The {@link Throwable}.
      */
     public void status(Throwable throwable) {
-        content().setAll(toStatus(throwable, throwable.getMessage()));
+        status(throwable, throwable.getMessage());
     }
 
     /**
@@ -200,7 +200,7 @@ public class Message {
         reply.msg_type(getMessageTypeAction() + "_reply");
         reply.username(username());
         reply.parentHeader().setAll(header());
-        reply.content().put("status", "ok");
+        reply.content().setAll(content(null, null));
         reply.buffers().addAll(buffers());
 
         return reply;
@@ -248,7 +248,7 @@ public class Message {
      * See
      * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#id6 execute_result}.
      */
-    public Message execute_result(int execution_count, String stdout) {
+    public Message execute_result(int execution_count, ObjectNode content) {
         var message = new Message();
 
         message.msg_type(getCallingMethodName(1));
@@ -256,12 +256,7 @@ public class Message {
         message.parentHeader().setAll(header());
 
         message.content().put("execution_count", execution_count);
-
-        var data = message.content().with("data");
-        var metadata = message.content().with("metadata");
-
-        data.put("text/plain", stdout);
-        metadata.with("text/plain");
+        message.content().setAll(content);
 
         return message;
     }
@@ -411,25 +406,35 @@ public class Message {
     }
 
     /**
-     * Method to create a "standard" error node.
+     * Method to create a "standard" error node.  If both arguments are
+     * {@code null} then an {@link ObjectNode} with {@code status = "ok"} is
+     * created.
      *
      * @param   throwable       The {@link Throwable} source of the error.
      * @param   evalue          The expression value.
      *
      * @return  The corresponding {@link ObjectNode}.
      */
-    public static ObjectNode toStatus(Throwable throwable, String evalue) {
+    public static ObjectNode content(Throwable throwable, String evalue) {
         var node = OBJECT_MAPPER.createObjectNode();
 
-        node.put("status", "error");
-        node.put("ename", throwable.getClass().getCanonicalName());
-        node.put("evalue", evalue);
+        if (throwable != null || evalue != null) {
+            node.put("status", "error");
+            node.put("ename", throwable.getClass().getCanonicalName());
+            node.put("evalue", evalue);
 
-        var array = node.putArray("traceback");
-        var buffer = new PrintStreamBuffer();
+            var array = node.putArray("traceback");
 
-        throwable.printStackTrace(buffer);
-        Stream.of(buffer.toString().split("\\R")).forEach(t -> array.add(t));
+            if (throwable != null) {
+                var buffer = new PrintStreamBuffer();
+
+                throwable.printStackTrace(buffer);
+                Stream.of(buffer.toString().split("\\R"))
+                    .forEach(t -> array.add(t));
+            }
+        } else {
+            node.put("status", "ok");
+        }
 
         return node;
     }

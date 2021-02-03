@@ -1,13 +1,19 @@
 package galyleo.kernel;
 
+import galyleo.shell.jshell.ExecutionEvents;
+import galyleo.shell.jshell.StaticImports;
+import java.nio.file.Paths;
+import java.util.stream.Stream;
+import org.springframework.boot.system.ApplicationHome;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import galyleo.server.Server;
 import galyleo.shell.Shell;
-import java.nio.file.Paths;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import jdk.jshell.JShell;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
@@ -15,6 +21,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import static java.lang.reflect.Modifier.isPublic;
+import static java.lang.reflect.Modifier.isStatic;
+import static java.util.stream.Collectors.toSet;
+import static jdk.jshell.Snippet.Status.REJECTED;
 
 /**
  * Galyleo Jupyter {@link Kernel}.
@@ -37,6 +48,8 @@ public class Kernel extends Server implements ApplicationRunner {
 
     @PostConstruct
     public void init() throws Exception {
+        shell.addToClasspath(new ApplicationHome(getClass()).getSource().toString());
+
         try {
             if (sparkHome != null) {
                 shell.addJarsToClasspath(Paths.get(sparkHome, "jars").toString());
@@ -56,6 +69,7 @@ public class Kernel extends Server implements ApplicationRunner {
         super.restart();
 
         shell.restart(getIn(), getOut(), getErr());
+        initialize(shell.jshell());
 
         setSession(String.join("-",
                                Kernel.class.getCanonicalName(),
@@ -63,9 +77,37 @@ public class Kernel extends Server implements ApplicationRunner {
                                String.valueOf(shell.restarts())));
     }
 
+    private void initialize(JShell jshell) throws Exception {
+        var analyzer = jshell.sourceCodeAnalysis();
+        var imports =
+            Stream.of(StaticImports.class.getDeclaredMethods())
+            .filter(t -> isPublic(t.getModifiers()) && isStatic(t.getModifiers()))
+            .map(t -> String.format("import static %s.%s;",
+                                    t.getDeclaringClass().getName(), t.getName()))
+            .map(t -> analyzer.analyzeCompletion(t))
+            .collect(toSet());
+
+        for (var analysis : imports) {
+            jshell.eval(analysis.source())
+                .stream()
+                .filter(t -> t.status().equals(REJECTED))
+                .forEach(t -> log.warn("{}: {}",
+                                       t.status(), t.snippet().source()));
+        }
+    }
+
     @Override
     protected void execute(String code) throws Exception {
         shell.execute(code);
+    }
+
+    @Override
+    protected ArrayNode getExecutionEvents() {
+        var node = ExecutionEvents.get();
+
+        node.addAll(ExecutionEvents.get(shell));
+
+        return node;
     }
 
     @Override

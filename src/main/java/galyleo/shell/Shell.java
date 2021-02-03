@@ -1,28 +1,22 @@
 package galyleo.shell;
 
-import galyleo.shell.java.StaticImports;
 import galyleo.shell.magic.Magic;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.StreamTokenizer;
+import java.io.StringReader;
 import java.nio.file.DirectoryIteratorException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
 import jdk.jshell.JShell;
 import jdk.jshell.JShellException;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.boot.system.ApplicationHome;
-
-import static java.lang.reflect.Modifier.isPublic;
-import static java.lang.reflect.Modifier.isStatic;
-import static java.util.stream.Collectors.toSet;
-import static jdk.jshell.Snippet.Status.REJECTED;
 
 /**
  * Galyleo {@link Shell}.
@@ -41,9 +35,7 @@ public class Shell implements AutoCloseable {
     private PrintStream err = null;
     private final List<String> classpath = new ArrayList<>();
 
-    { classpath.add(new ApplicationHome(getClass()).getSource().toString()); }
-
-    /**
+   /**
      * Method to start a {@link Shell}.
      *
      * @param   in              The {@code in} {@link InputStream}.
@@ -58,23 +50,6 @@ public class Shell implements AutoCloseable {
 
             jshell = JShell.builder().in(in).out(out).err(err).build();
             classpath.forEach(t -> jshell.addToClasspath(t));
-
-            var analyzer = jshell.sourceCodeAnalysis();
-            var imports =
-                Stream.of(StaticImports.class.getDeclaredMethods())
-                .filter(t -> isPublic(t.getModifiers()) && isStatic(t.getModifiers()))
-                .map(t -> String.format("import static %s.%s;",
-                                        t.getDeclaringClass().getName(), t.getName()))
-                .map(t -> analyzer.analyzeCompletion(t))
-                .collect(toSet());
-
-            for (var analysis : imports) {
-                jshell.eval(analysis.source())
-                    .stream()
-                    .filter(t -> t.status().equals(REJECTED))
-                    .forEach(t -> log.warn("{}: {}",
-                                           t.status(), t.snippet().source()));
-            }
         }
     }
 
@@ -205,7 +180,29 @@ public class Shell implements AutoCloseable {
             throw new IllegalArgumentException(expression);
         }
 
-        return jshell.eval(info.source()).get(0).value();
+        return unescape(jshell.eval(info.source()).get(0).value());
+    }
+
+    /**
+     * https://stackoverflow.com/questions/3537706/how-to-unescape-a-java-string-literal-in-java
+     */
+    private String unescape(String literal) {
+        var string = literal;
+
+        if (literal != null) {
+            try {
+                var parser = new StreamTokenizer(new StringReader(literal));
+
+                parser.nextToken();
+
+                if (parser.ttype == '"') {
+                    string = parser.sval;
+                }
+            } catch (IOException exception) {
+            }
+        }
+
+        return string;
     }
 
     /**

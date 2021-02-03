@@ -1,5 +1,9 @@
 2021-02-02  Allen D. Ball  <ball@hcf.dev>
 
+	* Create StaticImports.print(Object) -> ExecutionEvents.get(Shell)
+	channel to create execution_result message content in the JShell
+	instance.
+
 	* Re-factored Magic interfaces to accept Shell instead of JShell.
 
 2021-02-01  Allen D. Ball  <ball@hcf.dev>
