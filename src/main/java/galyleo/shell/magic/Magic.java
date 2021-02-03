@@ -67,7 +67,8 @@ public interface Magic {
     }
 
     /**
-     * Implementation method.  Executed in the {@link jdk.jshell.JShell} instance.
+     * Implementation method.  Executed in the {@link jdk.jshell.JShell}
+     * instance.
      *
      * @param   magic           The initial magic line.
      * @param   code            The remainder of the cell.
