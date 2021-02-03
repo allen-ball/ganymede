@@ -1,5 +1,9 @@
 2021-02-02  Allen D. Ball  <ball@hcf.dev>
 
+	* src/main/java/galyleo/server/Message.java:
+	Added static content(Object) method to create content for
+	execute_result messages.
+
 	* Create StaticImports.print(Object) -> ExecutionEvents.get(Shell)
 	channel to create execution_result message content in the JShell
 	instance.

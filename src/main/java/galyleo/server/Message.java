@@ -439,6 +439,33 @@ public class Message {
         return node;
     }
 
+    /**
+     * Method to create {@link execute_result} {@link Message} content.
+     *
+     * @param   object          The {@link Object} to encode.
+     *
+     * @return  The {@link Message} content.
+     */
+    public static ObjectNode content(Object object) {
+        var node = OBJECT_MAPPER.createObjectNode();
+        var data = node.with("data");
+        var metadata = node.with("metadata");
+
+        if (object instanceof JsonNode) {
+            var type = "application/json";
+
+            data.set(type, (JsonNode) object);
+            metadata.with(type);
+        }
+
+        var type = "text/plain";
+
+        data.put(type, String.valueOf(object));
+        metadata.with(type);
+
+        return node;
+    }
+
     private static String getCallingMethodName(int skip) {
         String name =
             WALKER.walk(t -> t.map(StackWalker.StackFrame::getMethodName)
