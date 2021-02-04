@@ -3,6 +3,7 @@ package galyleo.shell;
 import galyleo.shell.magic.AnnotatedMagic;
 import galyleo.shell.magic.Magic;
 import galyleo.shell.magic.MagicNames;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -10,14 +11,15 @@ import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.nio.file.DirectoryIteratorException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
-import java.util.stream.Stream;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 import jdk.jshell.JShell;
 import jdk.jshell.JShellException;
 import jdk.jshell.SourceCodeAnalysis;
@@ -99,15 +101,31 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
     }
 
     /**
+     * Accessor to the active {@link JShell} instance.
+     *
+     * @return  The {@link JShell} instance.
+     */
+    public JShell jshell() { return jshell; }
+
+    /**
+     * Method to search for and add jars to the {@link JShell} instance
+     * {@code classpath}.  See {@link #addToClasspath(String...)}.
+     *
+     * @param   files           The diretcories ({@link File}s) to search.
+     */
+    public void addJarsToClasspath(File... files) throws IOException {
+        addJarsToClasspath(Stream.of(files).map(File::toPath).toArray(Path[]::new));
+    }
+
+    /**
      * Method to search for and add jars to the {@link JShell} instance
      * {@code classpath}.  See {@link #addToClasspath(String...)}.
      *
      * @param   paths           The diretcory path(s) to search.
      */
-    public void addJarsToClasspath(String... paths) throws IOException {
+    public void addJarsToClasspath(Path... paths) throws IOException {
         for (var path : paths) {
-            try (var stream =
-                     Files.newDirectoryStream(Paths.get(path), "*.jar")) {
+            try (var stream = Files.newDirectoryStream(path, "*.jar")) {
                 for (var entry : stream) {
                     addToClasspath(entry.toString());
                 }
@@ -118,11 +136,34 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
     }
 
     /**
-     * Accessor to the active {@link JShell} instance.
+     * Method to search for and add jars to the {@link JShell} instance
+     * {@code classpath}.  See {@link #addToClasspath(String...)}.
      *
-     * @return  The {@link JShell} instance.
+     * @param   paths           The diretcory path(s) to search.
      */
-    public JShell jshell() { return jshell; }
+    public void addJarsToClasspath(String... paths) throws IOException {
+        addJarsToClasspath(Stream.of(paths).map(Paths::get).toArray(Path[]::new));
+    }
+
+    /**
+     * Method to manage and add path(s) to the {@link JShell} instance.  See
+     * {@link JShell#addToClasspath(String)}.
+     *
+     * @param   files           The {@link File}s to add.
+     */
+    public void addToClasspath(File... files) {
+        addToClasspath(Stream.of(files).map(File::toPath).toArray(Path[]::new));
+    }
+
+    /**
+     * Method to manage and add path(s) to the {@link JShell} instance.  See
+     * {@link JShell#addToClasspath(String)}.
+     *
+     * @param   paths           The path(s) to add.
+     */
+    public void addToClasspath(Path... paths) {
+        addToClasspath(Stream.of(paths).map(Path::toString).toArray(String[]::new));
+    }
 
     /**
      * Method to manage and add path(s) to the {@link JShell} instance.  See

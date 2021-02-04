@@ -48,11 +48,11 @@ public class Kernel extends Server implements ApplicationRunner {
 
     @PostConstruct
     public void init() throws Exception {
-        shell.addToClasspath(new ApplicationHome(getClass()).getSource().toString());
+        shell.addToClasspath(new ApplicationHome(getClass()).getSource());
 
         try {
             if (sparkHome != null) {
-                shell.addJarsToClasspath(Paths.get(sparkHome, "jars").toString());
+                shell.addJarsToClasspath(Paths.get(sparkHome, "jars"));
             }
         } catch (Exception exception) {
             log.warn("{}: {}", sparkHome, exception);

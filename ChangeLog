@@ -1,5 +1,9 @@
 2021-02-03  Allen D. Ball  <ball@hcf.dev>
 
+	* src/main/java/galyleo/shell/Shell.java:
+	Added addToClasspath({File,Path}...) and
+	addJarsToClasspath({File,Path}...) method variants.
+
 	* Re-factored Shell as a Magic implementation.
 
 	* src/main/java/galyleo/shell/magic/Magic.java:
