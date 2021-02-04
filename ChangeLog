@@ -1,5 +1,7 @@
 2021-02-03  Allen D. Ball  <ball@hcf.dev>
 
+	* Re-factored Shell as a Magic implementation.
+
 	* src/main/java/galyleo/shell/magic/Magic.java:
 	Added static getCellMagicCommand(String) method.
 
@@ -16,8 +18,6 @@
 	* Re-factored Magic interfaces to accept Shell instead of JShell.
 
 2021-02-01  Allen D. Ball  <ball@hcf.dev>
-
-	* Added Java Magic and re-factored Shell and Magic accordingly.
 
 	* src/main/java/galyleo/shell/Shell.java:
 	Added addJarsToClasspath(String...) and addToClasspath(String...)

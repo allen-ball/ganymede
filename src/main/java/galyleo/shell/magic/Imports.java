@@ -16,12 +16,17 @@ import lombok.extern.log4j.Log4j2;
  */
 @ServiceProviderFor({ Magic.class })
 @NoArgsConstructor @ToString @Log4j2
-public class Imports extends Java {
+public class Imports implements AnnotatedMagic {
     @Override
     public void execute(Shell shell,
                         InputStream in, PrintStream out, PrintStream err,
                         String magic, String code) throws Exception {
         shell.jshell().imports()
             .forEach(t -> out.println(t.source()));
+    }
+
+    @Override
+    public void execute(String magic, String code) throws Exception {
+        throw new IllegalArgumentException(magic);
     }
 }

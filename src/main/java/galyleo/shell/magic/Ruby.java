@@ -17,7 +17,7 @@ public class Ruby extends Script {
     @Override
     public void execute(String magic, String code) throws Exception {
         try {
-            super.execute(CELL + super.getNames()[0]
+            super.execute(CELL + super.getMagicNames()[0]
                           + " " + magic.substring(CELL.length()),
                           code);
         } catch (IllegalArgumentException exception) {

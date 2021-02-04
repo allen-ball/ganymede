@@ -16,7 +16,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @version $Revision$
  */
 @ServiceProviderFor({ Magic.class })
-@Names({ "script", "!" })
+@MagicNames({ "script", "!" })
 @NoArgsConstructor @ToString @Log4j2
 public class Script implements AnnotatedMagic {
     @Override

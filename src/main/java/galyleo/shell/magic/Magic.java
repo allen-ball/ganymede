@@ -37,7 +37,7 @@ public interface Magic {
     public static final Map<String,Magic> MAP =
         ServiceLoader.load(Magic.class).stream()
         .map(ServiceLoader.Provider::get)
-        .flatMap(v -> Stream.of(v.getNames()).map(k -> Map.entry(k, v)))
+        .flatMap(v -> Stream.of(v.getMagicNames()).map(k -> Map.entry(k, v)))
         .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
 
     /**
@@ -55,7 +55,7 @@ public interface Magic {
      *
      * @return  The names.
      */
-    public String[] getNames();
+    public String[] getMagicNames();
 
     /**
      * Entry-point method.  Executed in the {@link galyleo.shell.Shell}.
@@ -70,7 +70,7 @@ public interface Magic {
     default void execute(Shell shell,
                          InputStream in, PrintStream out, PrintStream err,
                          String magic, String code) throws Exception {
-        sendTo(shell, getNames()[0], magic, code);
+        sendTo(shell, getMagicNames()[0], magic, code);
     }
 
     /**
