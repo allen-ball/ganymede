@@ -7,8 +7,8 @@
   <modelVersion>4.0.0</modelVersion>
   <name>Galyleo</name>
   <description>Jupyter Java Kernel</description>
-  <groupId>ball</groupId>
-  <artifactId>galyleo</artifactId>
+  <groupId>galyleo</groupId>
+  <artifactId>galyleo-kernel</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   <parent>
