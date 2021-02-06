@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import galyleo.server.Server;
 import galyleo.shell.Shell;
 import java.util.List;
+import java.util.Objects;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Named;
@@ -40,9 +41,11 @@ import static jdk.jshell.Snippet.Status.REJECTED;
 @NoArgsConstructor @ToString @Log4j2
 public class Kernel extends Server implements ApplicationRunner {
     @Value("${connection-file:}")
-    private List<String> paths = null;
+    private List<String> connection_files = null;
     @Value("${spark-home:}")
-    private String sparkHome = null;
+    private String spark_home = null;
+    @Value("${hadoop-home:}")
+    private String hadoop_home = null;
 
     private final Shell shell = new Shell();
 
@@ -51,11 +54,19 @@ public class Kernel extends Server implements ApplicationRunner {
         shell.addToClasspath(new ApplicationHome(getClass()).getSource());
 
         try {
-            if (sparkHome != null) {
-                shell.addJarsToClasspath(Paths.get(sparkHome, "jars"));
+            if (spark_home != null) {
+                shell.addJarsToClasspath(Paths.get(spark_home, "jars"));
             }
         } catch (Exception exception) {
-            log.warn("{}: {}", sparkHome, exception);
+            log.warn("{}: {}", spark_home, exception);
+        }
+
+        try {
+            if (hadoop_home != null && (! Objects.equals(hadoop_home, spark_home))) {
+                shell.addJarsToClasspath(Paths.get(hadoop_home, "jars"));
+            }
+        } catch (Exception exception) {
+            log.warn("{}: {}", hadoop_home, exception);
         }
 
         restart();
@@ -126,8 +137,8 @@ public class Kernel extends Server implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments arguments) throws Exception {
-        if (paths != null && (! paths.isEmpty())) {
-            for (var path : paths) {
+        if (connection_files != null && (! connection_files.isEmpty())) {
+            for (var path : connection_files) {
                 try {
                     bind(path);
                 } catch (Exception exception) {

@@ -120,7 +120,7 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
      * Method to search for and add jars to the {@link JShell} instance
      * {@code classpath}.  See {@link #addToClasspath(String...)}.
      *
-     * @param   files           The diretcories ({@link File}s) to search.
+     * @param   files           The directories ({@link File}s) to search.
      */
     public void addJarsToClasspath(File... files) throws IOException {
         addJarsToClasspath(Stream.of(files).map(File::toPath).toArray(Path[]::new));
@@ -130,7 +130,7 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
      * Method to search for and add jars to the {@link JShell} instance
      * {@code classpath}.  See {@link #addToClasspath(String...)}.
      *
-     * @param   paths           The diretcory path(s) to search.
+     * @param   paths           The directory path(s) to search.
      */
     public void addJarsToClasspath(Path... paths) throws IOException {
         for (var path : paths) {
@@ -150,7 +150,7 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
      * Method to search for and add jars to the {@link JShell} instance
      * {@code classpath}.  See {@link #addToClasspath(String...)}.
      *
-     * @param   paths           The diretcory path(s) to search.
+     * @param   paths           The directory path(s) to search.
      */
     public void addJarsToClasspath(String... paths) throws IOException {
         addJarsToClasspath(Stream.of(paths).map(Paths::get).toArray(Path[]::new));
