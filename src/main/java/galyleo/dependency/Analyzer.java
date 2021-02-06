@@ -1,5 +1,6 @@
 package galyleo.dependency;
 
+import ball.annotation.CompileTimeCheck;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashSet;
@@ -29,6 +30,7 @@ import static org.apache.maven.artifact.ArtifactUtils.versionlessKey;
  */
 @NoArgsConstructor @ToString @Log4j2
 public class Analyzer {
+    @CompileTimeCheck
     private static final Pattern POM_PROPERTIES_ENTRY_PATTERN =
         Pattern.compile("(?i)^META-INF/maven/(?<g>[^/]+)/(?<a>[^/]+)/pom.properties$");
 
