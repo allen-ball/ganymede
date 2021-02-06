@@ -1,5 +1,6 @@
 package galyleo.shell;
 
+import galyleo.dependency.Analyzer;
 import galyleo.shell.magic.AnnotatedMagic;
 import galyleo.shell.magic.Magic;
 import galyleo.shell.magic.MagicNames;
@@ -13,10 +14,11 @@ import java.nio.file.DirectoryIteratorException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
@@ -26,7 +28,12 @@ import jdk.jshell.SourceCodeAnalysis;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactUtils;
 
+import static java.util.Collections.disjoint;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 import static jdk.jshell.Snippet.Status.REJECTED;
 
 /**
@@ -45,7 +52,8 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
     private InputStream in = null;
     private PrintStream out = null;
     private PrintStream err = null;
-    private final List<String> classpath = new ArrayList<>();
+    private final Analyzer analyzer = new Analyzer();
+    private final Map<File,Set<Artifact>> classpath = new LinkedHashMap<>();
 
    /**
      * Method to start a {@link Shell}.
@@ -61,7 +69,8 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
             this.err = err;
 
             jshell = JShell.builder().in(in).out(out).err(err).build();
-            classpath.forEach(t -> jshell.addToClasspath(t));
+            classpath.keySet()
+                .forEach(t -> jshell.addToClasspath(t.toString()));
         }
 
         Stream.of(getMagicNames()).forEach(t -> MAP.put(t, this));
@@ -125,9 +134,11 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
      */
     public void addJarsToClasspath(Path... paths) throws IOException {
         for (var path : paths) {
+            path = path.toAbsolutePath();
+
             try (var stream = Files.newDirectoryStream(path, "*.jar")) {
                 for (var entry : stream) {
-                    addToClasspath(entry.toString());
+                    addToClasspath(entry.toFile());
                 }
             } catch (DirectoryIteratorException exception) {
                 throw exception.getCause();
@@ -152,7 +163,46 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
      * @param   files           The {@link File}s to add.
      */
     public void addToClasspath(File... files) {
-        addToClasspath(Stream.of(files).map(File::toPath).toArray(Path[]::new));
+        for (var file : files) {
+            file = file.getAbsoluteFile();
+
+            if (! classpath.containsKey(file)) {
+                var artifacts = analyzer.getJarArtifacts(file);
+
+                if (artifacts.isEmpty()) {
+                    log.warn("{}: Cannot identify artifact", file);
+                }
+
+                var installed =
+                    classpath.entrySet().stream()
+                    .flatMap(t -> t.getValue().stream().map(u -> Map.entry(u, t.getKey())))
+                    .map(t -> Map.entry(ArtifactUtils.versionlessKey(t.getKey()), t.getValue()))
+                    .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (t, u) -> t));
+                var updates =
+                    artifacts.stream()
+                    .map(t -> ArtifactUtils.versionlessKey(t))
+                    .collect(toSet());
+
+                if (! disjoint(installed.keySet(), updates)) {
+                    log.warn("{}:", file);
+
+                    for (var key : updates) {
+                        if (installed.containsKey(key)) {
+                            log.warn("    {} provided by {}",
+                                     key, installed.get(key));
+                        }
+                    }
+                }
+
+                updates.removeAll(installed.keySet());
+
+                if (artifacts.isEmpty() || (! updates.isEmpty())) {
+                    addToClasspath(file, artifacts);
+                } else {
+                    log.warn("{}: Skipping...", file);
+                }
+            }
+        }
     }
 
     /**
@@ -162,7 +212,7 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
      * @param   paths           The path(s) to add.
      */
     public void addToClasspath(Path... paths) {
-        addToClasspath(Stream.of(paths).map(Path::toString).toArray(String[]::new));
+        addToClasspath(Stream.of(paths).map(Path::toFile).toArray(File[]::new));
     }
 
     /**
@@ -172,14 +222,24 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
      * @param   paths           The path(s) to add.
      */
     public void addToClasspath(String... paths) {
-        for (var path : paths) {
-            if (! classpath.contains(path)) {
-                classpath.add(path);
+        addToClasspath(Stream.of(paths).map(File::new).toArray(File[]::new));
+    }
 
+    /**
+     * Method to add resolved a path to the {@link JShell} instance.  See
+     * {@link JShell#addToClasspath(String)}.
+     *
+     * @param   file            The {@link File} to add.
+     * @param   collection      The {@link Collection} of {@link Artifact}s
+     *                          this {@link File} represents.
+     */
+    protected void addToClasspath(File file, Collection<Artifact> collection) {
+        if (! classpath.containsKey(file)) {
+            if (classpath.put(file, collection.stream().collect(toSet())) == null) {
                 var jshell = jshell();
 
                 if (jshell != null) {
-                    jshell.addToClasspath(path);
+                    jshell.addToClasspath(file.toString());
                 }
             }
         }

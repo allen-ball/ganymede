@@ -1,3 +1,8 @@
+2021-02-05  Allen D. Ball  <ball@hcf.dev>
+
+	* Analyze JARs added to the Shell's classpath to determine the
+	Maven artifact(s) implemented.
+
 2021-02-03  Allen D. Ball  <ball@hcf.dev>
 
 	* src/main/java/galyleo/shell/Shell.java:

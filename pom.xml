@@ -17,6 +17,14 @@
     <version>20210107-SNAPSHOT</version>
     <relativePath/>
   </parent>
+  <repositories>
+    <repository>
+      <id>repo.hcf.dev-RELEASE</id>
+      <name>hcf.dev RELEASE Repository</name>
+      <url>https://repo.hcf.dev/maven/release/</url>
+      <layout>default</layout>
+    </repository>
+  </repositories>
   <inceptionYear>2021</inceptionYear>
   <properties>
     <jse.target>11</jse.target>
@@ -42,6 +50,10 @@
     <dependency>
       <groupId>javax.inject</groupId>
       <artifactId>javax.inject</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
