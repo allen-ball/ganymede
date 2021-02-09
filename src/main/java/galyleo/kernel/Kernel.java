@@ -31,7 +31,6 @@ import org.springframework.context.event.EventListener;
 
 import static java.lang.reflect.Modifier.isPublic;
 import static java.lang.reflect.Modifier.isStatic;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toSet;
 import static jdk.jshell.Snippet.Status.REJECTED;
 
@@ -105,10 +104,9 @@ public class Kernel extends Server implements ApplicationContextAware,
     }
 
     @Override
-    public void bind(String path) throws IOException {
-        super.bind(path);
+    protected void bind(String id, File file) throws IOException {
+        super.bind(id, file);
 
-        var file = new File(path);
         var node = (ObjectNode) OBJECT_MAPPER.readTree(file);
 
         node.put("pid", ProcessHandle.current().pid());

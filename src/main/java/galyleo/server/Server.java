@@ -1,7 +1,6 @@
 package galyleo.server;
 
 import ball.annotation.CompileTimeCheck;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -90,15 +89,29 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
             .filter(t -> t.matches())
             .map(t -> t.group("id"))
             .orElse(null);
-        var node = OBJECT_MAPPER.readTree(file);
-        var connection = new Connection(node);
 
-        connections.put(id, connection);
+        bind(id, file);
+    }
+
+    /**
+     * Add a connection specified by a {@link Connection} {@link File}.
+     *
+     * @param   id              The kernel ID.
+     * @param   file            The {@link Connection} {@link File}.
+     *
+     * @throws  IOException     If the {@link File} cannot be opened or
+     *                          parsed.
+     */
+    protected void bind(String id, File file) throws IOException {
+        var node = OBJECT_MAPPER.readTree(file);
+        var connection = new Connection(id, (ObjectNode) node);
+
+        connections.put(connection.getId(), connection);
 
         connection.connect(shell, control, iopub, stdin, heartbeat);
 
         log.info("Connected to {} {}",
-                 id, connection.getNode().toPrettyString());
+                 connection.getId(), connection.getNode().toPrettyString());
     }
 
     /**
@@ -357,21 +370,35 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
             reply.content().put("status", "unknown");
         }
 
+        @Deprecated(since = "5.1")
         private void connect(Dispatcher dispatcher, Message request, Message reply) throws Exception {
-            throw new UnsupportedOperationException();
+            reply.content().setAll(dispatcher.getConnection().getNode());
         }
 
         private void comm_info(Dispatcher dispatcher, Message request, Message reply) throws Exception {
+            var comms = reply.content().with("comms");
             /*
-             * Empty reply
-             */
-            reply.content().with("comms");
-            /*
-             * Returned dictionary can be narrowed to target_name.
+             * Currently unsupported so empty reply.  But remember to *copy*
+             * internal state since output may be culled after satisfying
+             * query.
              */
             if (request.content().hasNonNull("target_name")) {
                 var target_name =
                     request.content().at("/target_name").asText();
+                var iterator = comms.fields();
+
+                while (iterator.hasNext()) {
+                    var entry = iterator.next();
+                    var dict = entry.getValue();
+
+                    if (dict.isObject()) {
+                        ((ObjectNode) dict).retain(target_name);
+
+                        if (dict.isEmpty()) {
+                            iterator.remove();
+                        }
+                    }
+                }
             }
         }
     }

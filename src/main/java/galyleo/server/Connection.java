@@ -1,8 +1,6 @@
 package galyleo.server;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
@@ -18,16 +16,19 @@ import lombok.extern.log4j.Log4j2;
  */
 @Data @Log4j2
 public class Connection {
-    @NonNull private final JsonNode node;
+    @NonNull private final String id;
+    @NonNull private final ObjectNode node;
     @NonNull private final HMACDigester digester;
 
     /**
      * Sole constructor.
      *
-     * @param   node            The {@link JsonNode} describing the
+     * @param   id              The kernel ID.
+     * @param   node            The {@link ObjectNode} describing the
      *                          {@link Connection}.
      */
-    public Connection(JsonNode node) {
+    public Connection(String id, ObjectNode node) {
+        this.id = id;
         this.node = node;
         this.digester = new HMACDigesterImpl();
     }
@@ -51,11 +52,11 @@ public class Connection {
                         Channel.Heartbeat heartbeat) {
         var digester = getDigester();
 
-        shell.connect(getAddress("shell_port"), digester);
-        control.connect(getAddress("control_port"), digester);
-        iopub.connect(getAddress("iopub_port"), digester);
-        stdin.connect(getAddress("stdin_port"), digester);
-        heartbeat.connect(getAddress("hb_port"));
+        shell.connect(this, getAddress("shell_port"));
+        control.connect(this, getAddress("control_port"));
+        iopub.connect(this, getAddress("iopub_port"));
+        stdin.connect(this, getAddress("stdin_port"));
+        heartbeat.connect(this, getAddress("hb_port"));
     }
 
     private String getAddress(String portName) {

@@ -29,12 +29,12 @@ public abstract class Channel {
      * Method to schedule creation of and binding to a {@link ZMQ.Socket}
      * for this address.
      *
+     * @param   connection      The kernel {@link Connection}.
      * @param   address         The address of the {@link ZMQ.Socket} to be
      *                          created.
-     * @param   digester        The {@link HMACDigester} for this address.
      */
-    public void connect(String address, HMACDigester digester) {
-        Dispatcher dispatcher = new Dispatcher(this, address, digester);
+    public void connect(Connection connection, String address) {
+        Dispatcher dispatcher = new Dispatcher(this, connection, address);
 
         getDispatcherQueue().add(dispatcher);
         getServer().submit(dispatcher);
@@ -43,15 +43,6 @@ public abstract class Channel {
             .setCorePoolSize(Math.max(getServer().getActiveCount() + 4,
                                       getServer().getCorePoolSize()));
     }
-
-    /**
-     * Method to schedule creation of and binding to a {@link ZMQ.Socket}
-     * for this {@link Channel}.
-     *
-     * @param   address         The address of the {@link ZMQ.Socket} to be
-     *                          created.
-     */
-    public void connect(String address) { connect(address, null); }
 
     /**
      * Callback method to receive and dispatch a {@link Message}.  This
@@ -77,7 +68,7 @@ public abstract class Channel {
      */
     protected void send(Dispatcher dispatcher, ZMQ.Socket socket, Message message) {
         getServer().stamp(message)
-            .send(socket, dispatcher.getDigester());
+            .send(socket, dispatcher.getConnection().getDigester());
     }
 
     /**
@@ -134,7 +125,8 @@ public abstract class Channel {
         @Override
         protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, byte[] frame) {
             try {
-                var message = Message.receive(socket, frame, dispatcher.getDigester());
+                var message =
+                    Message.receive(socket, frame, dispatcher.getConnection().getDigester());
 
                 dispatch(dispatcher, socket, message);
             } catch (Exception exception) {
@@ -281,10 +273,10 @@ public abstract class Channel {
         }
 
         @Override
-        public void connect(String address, HMACDigester digester) {
+        public void connect(Connection connection, String address) {
             boolean isStarting = getDispatcherQueue().isEmpty();
 
-            super.connect(address, digester);
+            super.connect(connection, address);
 
             if (isStarting) {
                 iopub.pub(Message.status(Message.status.starting, null));

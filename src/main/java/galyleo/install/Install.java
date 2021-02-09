@@ -77,6 +77,10 @@ public class Install implements ApplicationRunner {
              */
             var paths = getOutputAsJson(jupyter, "--paths", "--json");
             /*
+             * jupyter --runtime-dir
+             */
+            var runtime_dir = getOutputAsString(jupyter, "--runtime-dir");
+            /*
              * kernelspec
              */
             var kernelspec = tmp.resolve(id);

@@ -23,8 +23,8 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 @Data @Log4j2
 public class Dispatcher implements Runnable {
     @NonNull private final Channel channel;
+    @NonNull private final Connection connection;
     @NonNull private final String address;
-    private final HMACDigester digester;
     private final BlockingDeque<Message> outgoing = new LinkedBlockingDeque<>();
 
     /**
@@ -73,7 +73,7 @@ public class Dispatcher implements Runnable {
     public void run() {
         var server = getChannel().getServer();
         var context = server.getContext();
-        var digester = getDigester();
+        var digester = getConnection().getDigester();
         var type = getChannel().getSocketType();
 
         while (! server.isTerminating()) {

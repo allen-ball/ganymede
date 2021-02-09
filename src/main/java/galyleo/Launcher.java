@@ -2,7 +2,6 @@ package galyleo;
 
 import galyleo.connect.Connect;
 import galyleo.install.Install;
-import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;

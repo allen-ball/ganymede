@@ -1,3 +1,10 @@
+2021-02-09  Allen D. Ball  <ball@hcf.dev>
+
+	* Track Connections in the Server and associate a Connection with
+	each Dispatcher.  Implement connect_request/connect_reply and
+	comm_info_request/comm_info_reply (although comms are not yet
+	managed).
+
 2021-02-08  Allen D. Ball  <ball@hcf.dev>
 
 	* src/main/java/galyleo/server/Server.java:
