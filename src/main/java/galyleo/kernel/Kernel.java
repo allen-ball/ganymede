@@ -1,19 +1,18 @@
 package galyleo.kernel;
 
-import galyleo.shell.jshell.ExecutionEvents;
-import galyleo.shell.jshell.StaticImports;
-import java.nio.file.Paths;
-import java.util.stream.Stream;
-import org.springframework.boot.system.ApplicationHome;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import galyleo.server.Server;
 import galyleo.shell.Shell;
-import java.util.List;
+import galyleo.shell.jshell.ExecutionEvents;
+import galyleo.shell.jshell.StaticImports;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Objects;
+import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import jdk.jshell.JShell;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -22,11 +21,21 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.system.ApplicationHome;
+import org.springframework.boot.web.servlet.context.ServletWebServerInitializedEvent;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.event.EventListener;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import static java.lang.reflect.Modifier.isPublic;
 import static java.lang.reflect.Modifier.isStatic;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toSet;
 import static jdk.jshell.Snippet.Status.REJECTED;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
  * Galyleo Jupyter {@link Kernel}.
@@ -36,18 +45,29 @@ import static jdk.jshell.Snippet.Status.REJECTED;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@Named @Singleton
 @SpringBootApplication
+@RestController
+@RequestMapping(value = { "/kernel/v1/" },
+                consumes = APPLICATION_JSON_VALUE,
+                produces = APPLICATION_JSON_VALUE)
 @NoArgsConstructor @ToString @Log4j2
-public class Kernel extends Server implements ApplicationRunner {
-    @Value("${connection-file:}")
-    private List<String> connection_files = null;
-    @Value("${spark-home:}")
+public class Kernel extends Server implements ApplicationContextAware,
+                                              ApplicationRunner {
+    @Value("${JPY_PARENT_PID:#{-1}}")
+    private long jpy_parent_pid = -1;
+
+    @Value("${connection-file:#{null}}")
+    private String connection_file = null;
+
+    @Value("${spark-home:#{null}}")
     private String spark_home = null;
-    @Value("${hadoop-home:}")
+
+    @Value("${hadoop-home:#{null}}")
     private String hadoop_home = null;
 
     private final Shell shell = new Shell();
+    private ApplicationContext context = null;
+    private int port = -1;
 
     @PostConstruct
     public void init() throws Exception {
@@ -73,7 +93,37 @@ public class Kernel extends Server implements ApplicationRunner {
     }
 
     @PreDestroy
-    public void destroy() { shutdown(); }
+    public void destroy() {
+        super.shutdown();
+
+        try {
+            super.awaitTermination(15, SECONDS);
+        } catch (InterruptedException exception) {
+        }
+    }
+
+    @EventListener({ ServletWebServerInitializedEvent.class })
+    public void onApplicationEvent(ServletWebServerInitializedEvent event) {
+        port = event.getWebServer().getPort();
+    }
+
+    @Override
+    public void bind(String path) throws IOException {
+        super.bind(path);
+
+        var file = new File(path);
+        var node = (ObjectNode) OBJECT_MAPPER.readTree(file);
+
+        node.put("pid", ProcessHandle.current().pid());
+
+        if (port > 0) {
+            node.put("port", port);
+        }
+
+        OBJECT_MAPPER.writeValue(file, node);
+
+        file.deleteOnExit();
+    }
 
     @Override
     protected void restart() throws Exception {
@@ -136,17 +186,23 @@ public class Kernel extends Server implements ApplicationRunner {
     }
 
     @Override
+    public void shutdown() {
+        ((ConfigurableApplicationContext) context).close();
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext context) {
+        this.context = context;
+    }
+
+    @Override
     public void run(ApplicationArguments arguments) throws Exception {
-        if (connection_files != null && (! connection_files.isEmpty())) {
-            for (var path : connection_files) {
-                try {
-                    bind(path);
-                } catch (Exception exception) {
-                    log.warn("{}", exception);
-                }
+        try {
+            if (connection_file != null) {
+                bind(connection_file);
             }
-        } else {
-            throw new IllegalArgumentException("No connection file specified");
+        } catch (Exception exception) {
+            log.warn("{}", exception);
         }
     }
 }
