@@ -1,5 +1,8 @@
 2021-02-08  Allen D. Ball  <ball@hcf.dev>
 
+	* Changed Launcher, Install, Connect, and Kernel to implement
+	ApplicationRunner for command line argument processing.
+
 	* src/main/java/galyleo/kernel/Kernel.java:
 	Implement @RestController, ApplicationContextAware, and
 	ApplicationRunner (the last to parse command line arguments).

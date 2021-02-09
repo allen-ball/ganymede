@@ -39,7 +39,7 @@ public class Install implements ApplicationRunner {
     @Value("${env:}")
     private List<String> envvars = null;
     @Value("${copy-jar:true}")
-    private boolean copyJar = true;
+    private boolean copy_jar = true;
 
     @Override
     public void run(ApplicationArguments arguments) throws Exception {
@@ -89,7 +89,7 @@ public class Install implements ApplicationRunner {
             var argv = kernel.withArray("argv");
             var jar = jarPath.toAbsolutePath().toString();
 
-            if (copyJar) {
+            if (copy_jar) {
                 var name = "kernel.jar";
 
                 copy(jarPath.toFile(), kernelspec.resolve(name).toFile());
@@ -99,8 +99,7 @@ public class Install implements ApplicationRunner {
                 jar = Paths.get(prefix, "kernels", id, name).toString();
             }
 
-            Stream.of(java, "-Dmode=kernel", "-jar", jar,
-                      "--connection-file={connection_file}")
+            Stream.of(java, "-jar", jar, "--connection-file={connection_file}")
                 .map(Object::toString)
                 .forEach(t -> argv.add(t));
 
@@ -148,9 +147,13 @@ public class Install implements ApplicationRunner {
     }
 
     private String which(String command) throws Exception {
+        return getOutputAsString("which", command);
+    }
+
+    private String getOutputAsString(String... argv) throws Exception {
         var bytes = new byte[] { };
         var process =
-            new ProcessBuilder("which", command)
+            new ProcessBuilder(argv)
             .inheritIO()
             .redirectOutput(ProcessBuilder.Redirect.PIPE)
             .redirectError(ProcessBuilder.Redirect.DISCARD)
@@ -162,7 +165,7 @@ public class Install implements ApplicationRunner {
             var status = process.waitFor();
 
             if (status != 0) {
-                throw new IOException("Cannot locate '" + command + "'");
+                throw new IOException("Cannot read output of " + List.of(argv));
             }
         }
 

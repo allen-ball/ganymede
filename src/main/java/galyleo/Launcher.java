@@ -1,38 +1,34 @@
 package galyleo;
 
+import galyleo.connect.Connect;
 import galyleo.install.Install;
-import galyleo.kernel.Kernel;
-import java.util.Map;
 import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.boot.SpringApplication;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 
-import static java.util.stream.Collectors.toMap;
+import static org.springframework.boot.WebApplicationType.NONE;
 
 /**
- * Galyleo application launcher.
+ * Galyleo application launcher.  Starts {@link Connect}
+ * unless {@code --install} is specified in which case it dispatches to
+ * {@link Install}.
+ *
+ * {@injected.fields}
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
 @NoArgsConstructor @ToString @Log4j2
-public class Launcher {
+public class Launcher implements ApplicationRunner {
 
     /**
-     * Defined {@link #MODES}.  The {@link Launcher} should be invoked with
-     * {@code java -Dmode=<mode> ...} where mode is one of {@link MODES}
-     * keys.
-     *
-     * {@include}
-     */
-    protected static final Map<String,Class<?>> MODES =
-        Stream.of(Install.class, Kernel.class)
-        .collect(toMap(k -> k.getSimpleName().toLowerCase(), v -> v));
-
-    /**
-     * Standard {@link SpringApplication} {@code main(String[])}
+     * Standard {@link org.springframework.boot.SpringApplication}
+     * {@code main(String[])}
      * entry point.
      *
      * @param   argv            The command line argument vector.
@@ -41,15 +37,33 @@ public class Launcher {
      *                          {@link Exception}.
      */
     public static void main(String[] argv) throws Exception {
-        var mode = System.getProperty("mode", Kernel.class.getSimpleName());
-        var type = MODES.get(mode.toLowerCase());
+        new SpringApplicationBuilder(Launcher.class).web(NONE).run(argv);
+    }
 
-        if (type != null) {
-            var application = new SpringApplication(type);
+    @Value("${install:#{null}}")
+    private Boolean install = null;
 
-            application.run(argv);
+    @Value("${connection-file:#{null}}")
+    private String connection_file = null;
+
+    @Override
+    public void run(ApplicationArguments arguments) throws Exception {
+        if (install == null) {
+            install = arguments.getOptionNames().contains("install");
+        }
+
+        if (install ^ connection_file != null) {
+            Class<?> type = Connect.class;
+
+            if (install) {
+                type = Install.class;
+            }
+
+            new SpringApplicationBuilder(type)
+                .web(NONE)
+                .run(arguments.getSourceArgs());
         } else {
-            throw new IllegalArgumentException("Invalid mode: " + mode);
+            throw new IllegalArgumentException("Exactly one of '--install' or '--connection-file' must be specified");
         }
     }
 }

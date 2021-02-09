@@ -73,7 +73,9 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
      *                          parsed.
      */
     public void bind(String path) throws IOException {
-        bind(OBJECT_MAPPER.readTree(new File(path)));
+        var file = new File(path);
+
+        bind(OBJECT_MAPPER.readTree(file));
     }
 
     /**
@@ -170,6 +172,8 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
 
         private void shutdown(Dispatcher dispatcher, Message request, Message reply) throws Exception {
             var restart = request.content().at("/restart").asBoolean();
+
+            reply.content().put("restart", restart);
 
             if (restart) {
                 Server.this.restart();
@@ -353,7 +357,17 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
         }
 
         private void comm_info(Dispatcher dispatcher, Message request, Message reply) throws Exception {
-            throw new UnsupportedOperationException();
+            /*
+             * Empty reply
+             */
+            reply.content().with("comms");
+            /*
+             * Returned dictionary can be narrowed to target_name.
+             */
+            if (request.content().hasNonNull("target_name")) {
+                var target_name =
+                    request.content().at("/target_name").asText();
+            }
         }
     }
 }
