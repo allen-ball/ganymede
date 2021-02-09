@@ -1,5 +1,9 @@
 2021-02-08  Allen D. Ball  <ball@hcf.dev>
 
+	* src/main/java/galyleo/server/Server.java:
+	Parse kernel-ID from connection-file file name and maintain
+	kernel-ID/Connection map.
+
 	* src/main/java/galyleo/kernel/KernelRestController.java:
 	Initial writing (removed from Kernel).
 

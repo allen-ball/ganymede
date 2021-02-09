@@ -1,5 +1,6 @@
 package galyleo.server;
 
+import ball.annotation.CompileTimeCheck;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,8 +12,11 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -46,7 +50,13 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
         .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_VALUES)
         .enable(SerializationFeature.INDENT_OUTPUT);
 
+    @CompileTimeCheck
+    private static final Pattern CONNECTION_FILE_NAME_PATTERN =
+        Pattern.compile("(?i)^(kernel-|)(?<id>[^.]+)[.]json$");
+
     private final ZMQ.Context context = ZMQ.context(8);
+    private final ConcurrentSkipListMap<String,Connection> connections =
+        new ConcurrentSkipListMap<>();
     private final Channel.Heartbeat heartbeat = new Channel.Heartbeat(this);
     private final Channel.Control control = new Control();
     private final Channel.IOPub iopub = new Channel.IOPub(this);
@@ -74,26 +84,21 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
      */
     public void bind(String path) throws IOException {
         var file = new File(path);
-
-        bind(OBJECT_MAPPER.readTree(file));
-    }
-
-    /**
-     * Add a connection specified by a {@link JsonNode}.
-     *
-     * @param   node            The {@link JsonNode} descibing the
-     *                          {@link Connection}.
-     *
-     * @throws  IOException     If the {@link JsonNode} cannot be parsed or
-     *                          if the {@link Connection} cannot be
-     *                          established.
-     */
-    public void bind(JsonNode node) throws IOException {
+        var id =
+            Optional.of(file.getName())
+            .map(CONNECTION_FILE_NAME_PATTERN::matcher)
+            .filter(t -> t.matches())
+            .map(t -> t.group("id"))
+            .orElse(null);
+        var node = OBJECT_MAPPER.readTree(file);
         var connection = new Connection(node);
+
+        connections.put(id, connection);
 
         connection.connect(shell, control, iopub, stdin, heartbeat);
 
-        log.info("Listening to {}", connection);
+        log.info("Connected to {} {}",
+                 id, connection.getNode().toPrettyString());
     }
 
     /**
