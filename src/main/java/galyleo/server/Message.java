@@ -492,4 +492,16 @@ public class Message {
             socket.send(iterator.next(), iterator.hasNext() ? ZMQ.SNDMORE : 0);
         }
     }
+
+    @Override
+    public String toString() {
+        var node = new ObjectNode(JsonNodeFactory.instance);
+
+        node.set("header", header());
+        node.set("parentHeader", parentHeader());
+        node.set("metadata", metadata());
+        node.set("content", content());
+
+        return node.toPrettyString();
+    }
 }
