@@ -1,3 +1,7 @@
+2021-02-08  Allen D. Ball  <ball@hcf.dev>
+
+	* pom.xml: Added spring-boot-starter-web.
+
 2021-02-05  Allen D. Ball  <ball@hcf.dev>
 
 	* Analyze JARs added to the Shell's classpath to determine the
