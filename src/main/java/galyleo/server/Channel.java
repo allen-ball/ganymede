@@ -1,5 +1,6 @@
 package galyleo.server;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -185,8 +186,14 @@ public abstract class Channel {
 
                     method.setAccessible(true);
                     method.invoke(this, dispatcher, message, reply);
-                } catch (Exception exception) {
-                    reply.status(exception);
+                } catch (Throwable throwable) {
+                    if (throwable instanceof InvocationTargetException) {
+                        if (throwable.getCause() != null) {
+                            throwable = throwable.getCause();
+                        }
+                    }
+
+                    reply.status(throwable);
                 } finally {
                     send(dispatcher, socket, reply);
                 }
