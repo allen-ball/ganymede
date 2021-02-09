@@ -26,16 +26,14 @@ import org.springframework.boot.web.servlet.context.ServletWebServerInitializedE
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import static java.lang.reflect.Modifier.isPublic;
 import static java.lang.reflect.Modifier.isStatic;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toSet;
 import static jdk.jshell.Snippet.Status.REJECTED;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
  * Galyleo Jupyter {@link Kernel}.
@@ -46,10 +44,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  * @version $Revision$
  */
 @SpringBootApplication
-@RestController
-@RequestMapping(value = { "/kernel/v1/" },
-                consumes = APPLICATION_JSON_VALUE,
-                produces = APPLICATION_JSON_VALUE)
 @NoArgsConstructor @ToString @Log4j2
 public class Kernel extends Server implements ApplicationContextAware,
                                               ApplicationRunner {
@@ -93,18 +87,21 @@ public class Kernel extends Server implements ApplicationContextAware,
     }
 
     @PreDestroy
-    public void destroy() {
-        super.shutdown();
+    public void destroy() { super.shutdown(); }
 
-        try {
-            super.awaitTermination(15, SECONDS);
-        } catch (InterruptedException exception) {
-        }
+    @Override
+    public void setApplicationContext(ApplicationContext context) {
+        this.context = context;
     }
 
     @EventListener({ ServletWebServerInitializedEvent.class })
     public void onApplicationEvent(ServletWebServerInitializedEvent event) {
         port = event.getWebServer().getPort();
+    }
+
+    @EventListener({ ContextClosedEvent.class })
+    public void onApplicationEvent(ContextClosedEvent event) {
+        super.shutdown();
     }
 
     @Override
@@ -188,11 +185,6 @@ public class Kernel extends Server implements ApplicationContextAware,
     @Override
     public void shutdown() {
         ((ConfigurableApplicationContext) context).close();
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext context) {
-        this.context = context;
     }
 
     @Override

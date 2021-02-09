@@ -1,5 +1,8 @@
 2021-02-08  Allen D. Ball  <ball@hcf.dev>
 
+	* src/main/java/galyleo/kernel/KernelRestController.java:
+	Initial writing (removed from Kernel).
+
 	* Changed Launcher, Install, Connect, and Kernel to implement
 	ApplicationRunner for command line argument processing.
 
