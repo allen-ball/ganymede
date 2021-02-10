@@ -48,6 +48,11 @@ import static jdk.jshell.Snippet.Status.REJECTED;
 @NoArgsConstructor @ToString @Log4j2
 @MagicNames({ "java" })
 public class Shell implements AnnotatedMagic, AutoCloseable {
+    private static final String[] VMOPTIONS =
+        Stream.of("--add-opens", "java.base/jdk.internal.misc=ALL-UNNAMED",
+                  "-Dio.netty.tryReflectionSetAccessible=true")
+        .toArray(String[]::new);
+
     private final AtomicInteger restarts = new AtomicInteger(0);
     private JShell jshell = null;
     private InputStream in = null;
@@ -69,7 +74,10 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
             this.out = out;
             this.err = err;
 
-            jshell = JShell.builder().in(in).out(out).err(err).build();
+            jshell =
+                JShell.builder()
+                .remoteVMOptions(VMOPTIONS)
+                .in(in).out(out).err(err).build();
             classpath.keySet()
                 .forEach(t -> jshell.addToClasspath(t.toString()));
         }
