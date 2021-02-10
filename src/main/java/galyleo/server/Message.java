@@ -214,22 +214,7 @@ public class Message {
      *
      * @return  The reply {@link Message}.
      */
-    public Message reply() {
-        if (! isRequest()) {
-            throw new IllegalStateException("Source message is not a request");
-        }
-
-        var reply = new Message();
-
-        reply.envelope().addAll(envelope());
-        reply.msg_type(getMessageTypeAction() + "_reply");
-        reply.username(username());
-        reply.parentHeader().setAll(header());
-        reply.content().setAll(content(null, null));
-        reply.buffers().addAll(buffers());
-
-        return reply;
-    }
+    public Message reply() { return new Reply(this); }
 
     /**
      * Parameter to {@link Message#stream(Message.stream,String)}.
@@ -241,11 +226,8 @@ public class Message {
      * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#streams-stdout-stderr-etc stream}.
      */
     public Message stream(stream stream, String text) {
-        var message = new Message();
+        var message = new Event(getCallingMethodName(1), this);
 
-        message.msg_type(getCallingMethodName(1));
-        message.username(username());
-        message.parentHeader().setAll(header());
         message.content().put("name", stream.name());
         message.content().put("text", text);
 
@@ -257,11 +239,7 @@ public class Message {
      * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#code-inputs execute_input}.
      */
     public Message execute_input(String code, int execution_count) {
-        var message = new Message();
-
-        message.msg_type(getCallingMethodName(1));
-        message.username(username());
-        message.parentHeader().setAll(header());
+        var message = new Event(getCallingMethodName(1), this);
 
         message.content().put("code", code);
         message.content().put("execution_count", execution_count);
@@ -274,11 +252,7 @@ public class Message {
      * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#id6 execute_result}.
      */
     public Message execute_result(int execution_count, ObjectNode content) {
-        var message = new Message();
-
-        message.msg_type(getCallingMethodName(1));
-        message.username(username());
-        message.parentHeader().setAll(header());
+        var message = new Event(getCallingMethodName(1), this);
 
         message.content().put("execution_count", execution_count);
         message.content().setAll(content);
@@ -297,14 +271,7 @@ public class Message {
      * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#kernel-status status}.
      */
     public static Message status(status status, Message request) {
-        var message = new Message();
-
-        message.msg_type(getCallingMethodName(1));
-
-        if (request != null) {
-            message.username(request.username());
-            message.parentHeader().setAll(request.header());
-        }
+        var message = new Event(getCallingMethodName(1), request);
 
         message.content().put("execution_state", status.name());
 
@@ -530,5 +497,33 @@ public class Message {
         node.set("content", content());
 
         return node.toPrettyString();
+    }
+
+    private static class Event extends Message {
+        public Event(String msg_type, Message request) {
+            super();
+
+            if (msg_type != null) {
+                msg_type(msg_type);
+            }
+
+            if (request != null) {
+                parentHeader().setAll(request.header());
+            }
+        }
+    }
+
+    private static class Reply extends Event {
+        public Reply(Message request) {
+            super(request.getMessageTypeAction() + "_reply", request);
+
+            if (request.isRequest()) {
+                envelope().addAll(request.envelope());
+                content().setAll(content(null, null));
+                buffers().addAll(request.buffers());
+            } else {
+                throw new IllegalStateException("Source message is not a request");
+            }
+        }
     }
 }
