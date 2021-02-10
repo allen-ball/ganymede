@@ -1,6 +1,7 @@
 package galyleo.shell;
 
 import galyleo.dependency.Analyzer;
+import galyleo.server.Message;
 import galyleo.shell.magic.AnnotatedMagic;
 import galyleo.shell.magic.Magic;
 import galyleo.shell.magic.MagicNames;
@@ -317,6 +318,17 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
         }
 
         return string;
+    }
+
+    /**
+     * Method to determine code's {@link Message.completeness completeness}.
+     *
+     * @param   code            The code to execute.
+     *
+     * @return  The code's {@link Message.completeness completeness}.
+     */
+    public Message.completeness isComplete(String code) {
+        return Message.completeness.unknown;
     }
 
     /**

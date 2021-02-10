@@ -2,6 +2,7 @@ package galyleo.kernel;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import galyleo.server.Message;
 import galyleo.server.Server;
 import galyleo.shell.Shell;
 import galyleo.shell.jshell.ExecutionEvents;
@@ -169,6 +170,11 @@ public class Kernel extends Server implements ApplicationContextAware,
     @Override
     protected String evaluate(String expression) throws Exception {
         return shell.evaluate(expression);
+    }
+
+    @Override
+    protected Message.completeness isComplete(String code) throws Exception {
+        return shell.isComplete(code);
     }
 
     @Override

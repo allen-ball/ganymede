@@ -168,18 +168,43 @@ public class Message {
      *
      * @param   throwable       The {@link Throwable}.
      * @param   evalue          The expression value.
+     *
+     * @return  {@link.this} {@link Message} for chaining.
      */
-    public void status(Throwable throwable, String evalue) {
+    public Message status(Throwable throwable, String evalue) {
         content().setAll(content(throwable, evalue));
+
+        return this;
     }
 
     /**
      * Method to set status for a {@link Throwable}.
      *
      * @param   throwable       The {@link Throwable}.
+     *
+     * @return  {@link.this} {@link Message} for chaining.
      */
-    public void status(Throwable throwable) {
-        status(throwable, throwable.getMessage());
+    public Message status(Throwable throwable) {
+        return status(throwable, throwable.getMessage());
+    }
+
+    /**
+     * Parameter to {@link Message#status(Message.completeness)}.
+     */
+    public enum completeness { complete, incomplete, invalid, unknown };
+
+    /**
+     * Method to set status for a code {@link completeness completeness}
+     * test.
+     *
+     * @param   completeness    The {@link completeness}.
+     *
+     * @return  {@link.this} {@link Message} for chaining.
+     */
+    public Message status(completeness completeness) {
+        content().put("status", completeness.name());
+
+        return this;
     }
 
     /**
@@ -294,6 +319,8 @@ public class Message {
 
     /**
      * Set the {@link date()} value if not already set.
+     *
+     * @return  {@link.this} {@link Message} for chaining.
      */
     public Message timestamp() {
         if (date() == null) {

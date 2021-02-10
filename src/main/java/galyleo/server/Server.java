@@ -150,6 +150,16 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
     protected abstract String evaluate(String expression) throws Exception;
 
     /**
+     * Method to determine code's
+     * {@link Message.completeness completeness}.
+     *
+     * @param   code            The cell code to execute.
+     *
+     * @return  The {@link Message.completeness completeness}.
+     */
+    protected abstract Message.completeness isComplete(String code) throws Exception;
+
+    /**
      * Method to interrupt a kernel.
      */
     protected abstract void interrupt();
@@ -365,9 +375,9 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
         }
 
         private void is_complete(Dispatcher dispatcher, Message request, Message reply) throws Exception {
-            var code = request.content().at("/code");
+            var code = request.content().at("/code").asText();
 
-            reply.content().put("status", "unknown");
+            reply.status(isComplete(code));
         }
 
         @Deprecated(since = "5.1")
