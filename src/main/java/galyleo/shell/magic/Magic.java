@@ -178,8 +178,9 @@ public interface Magic {
      * Static method to send a request to be executed in the
      * {@link jdk.jshell.JShell} instance.  The
      * {@link #sendTo(Shell,String,String,String)} method packs the
-     * arguments and creates a {@link #receive(String,String,String)}
-     * expression which is evaluated in the {@link jdk.jshell.JShell}.
+     * arguments and creates a
+     * {@link #receive(ClassLoader,String,String,String)} expression which
+     * is evaluated in the {@link jdk.jshell.JShell}.
      *
      * @param   shell           The {@link Shell}.
      * @param   name            The magic name (key into {@link #MAP}).
@@ -194,8 +195,8 @@ public interface Magic {
     /**
      * Static method to receive a request in the {@link jdk.jshell.JShell}
      * instance.  The {@link #sendTo(Shell,String,String,String)} method
-     * packs the arguments and creates
-     * a {@link #receive(String,String,String)} expression which is
+     * packs the arguments and creates a {@link
+     * #receive(ClassLoader,String,String,String)} expression which is
      * evaluated in the {@link jdk.jshell.JShell}.
      *
      * @param   name            The magic name (key into {@link #MAP}).
