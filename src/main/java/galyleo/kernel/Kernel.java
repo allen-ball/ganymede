@@ -5,8 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import galyleo.server.Message;
 import galyleo.server.Server;
 import galyleo.shell.Shell;
-import galyleo.shell.jshell.ExecutionEvents;
-import galyleo.shell.jshell.StaticImports;
+import galyleo.shell.jshell.RemoteRuntime;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -22,7 +21,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.system.ApplicationHome;
 import org.springframework.boot.web.servlet.context.ServletWebServerInitializedEvent;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -30,8 +28,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
 
-import static java.lang.reflect.Modifier.isPublic;
-import static java.lang.reflect.Modifier.isStatic;
 import static java.util.stream.Collectors.toSet;
 import static jdk.jshell.Snippet.Status.REJECTED;
 
@@ -65,8 +61,6 @@ public class Kernel extends Server implements ApplicationContextAware,
 
     @PostConstruct
     public void init() throws Exception {
-        shell.addToClasspath(new ApplicationHome(getClass()).getSource());
-
         try {
             if (spark_home != null) {
                 shell.addJarsToClasspath(Paths.get(spark_home, "jars"));
@@ -126,31 +120,11 @@ public class Kernel extends Server implements ApplicationContextAware,
         super.restart();
 
         shell.restart(getIn(), getOut(), getErr());
-        initialize(shell.jshell());
 
         setSession(String.join("-",
                                Kernel.class.getCanonicalName(),
                                String.valueOf(ProcessHandle.current().pid()),
                                String.valueOf(shell.restarts())));
-    }
-
-    private void initialize(JShell jshell) throws Exception {
-        var analyzer = jshell.sourceCodeAnalysis();
-        var imports =
-            Stream.of(StaticImports.class.getDeclaredMethods())
-            .filter(t -> isPublic(t.getModifiers()) && isStatic(t.getModifiers()))
-            .map(t -> String.format("import static %s.%s;",
-                                    t.getDeclaringClass().getName(), t.getName()))
-            .map(t -> analyzer.analyzeCompletion(t))
-            .collect(toSet());
-
-        for (var analysis : imports) {
-            jshell.eval(analysis.source())
-                .stream()
-                .filter(t -> t.status().equals(REJECTED))
-                .forEach(t -> log.warn("{}: {}",
-                                       t.status(), t.snippet().source()));
-        }
     }
 
     @Override
@@ -160,9 +134,9 @@ public class Kernel extends Server implements ApplicationContextAware,
 
     @Override
     protected ArrayNode getExecutionEvents() {
-        var node = ExecutionEvents.get();
+        var node = RemoteRuntime.getExecutionEvents();
 
-        node.addAll(ExecutionEvents.get(shell));
+        node.addAll(RemoteRuntime.getExecutionEvents(shell));
 
         return node;
     }

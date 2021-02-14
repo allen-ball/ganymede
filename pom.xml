@@ -40,22 +40,12 @@
       <artifactId>ball-util</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.inject</groupId>
-      <artifactId>javax.inject</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-core</artifactId>
+      <artifactId>maven-artifact</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>ch.qos.logback</groupId>
-          <artifactId>logback-classic</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.zeromq</groupId>
@@ -106,12 +96,10 @@
           <filters>
             <filter>
               <artifact>*:*</artifact>
-              <excludes>
-                <exclude>META-INF/*.SF</exclude>
-                <exclude>META-INF/*.DSA</exclude>
-                <exclude>META-INF/*.RSA</exclude>
-                <exclude>**/module-info.class</exclude>
-              </excludes>
+              <excludes>META-INF/*.SF</excludes>
+              <excludes>META-INF/*.DSA</excludes>
+              <excludes>META-INF/*.RSA</excludes>
+              <excludes>**/module-info.class</excludes>
             </filter>
           </filters>
           <transformers>

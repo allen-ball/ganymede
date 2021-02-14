@@ -22,6 +22,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import jdk.jshell.JShell;
 import jdk.jshell.JShellException;
@@ -31,7 +32,11 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
+import org.springframework.boot.system.ApplicationHome;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.StreamUtils;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.disjoint;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
@@ -52,6 +57,8 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
         Stream.of("--add-opens", "java.base/jdk.internal.misc=ALL-UNNAMED",
                   "-Dio.netty.tryReflectionSetAccessible=true")
         .toArray(String[]::new);
+    private static final File KERNEL_JAR =
+        new ApplicationHome(Shell.class).getSource();
 
     private final AtomicInteger restarts = new AtomicInteger(0);
     private JShell jshell = null;
@@ -60,6 +67,20 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
     private PrintStream err = null;
     private final Analyzer analyzer = new Analyzer();
     private final Map<File,Set<Artifact>> classpath = new LinkedHashMap<>();
+    private final String bootstrap;
+
+    {
+        var resource = new ClassPathResource("bootstrap.jsh");
+
+        try (var in = resource.getInputStream()) {
+            bootstrap =
+                String.format(StreamUtils.copyToString(in, UTF_8),
+                              KERNEL_JAR.toURI().toURL());
+        } catch (Exception exception) {
+            throw new ExceptionInInitializerError(exception);
+        }
+    }
+
 
    /**
      * Method to start a {@link Shell}.
@@ -78,6 +99,24 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
                 JShell.builder()
                 .remoteVMOptions(VMOPTIONS)
                 .in(in).out(out).err(err).build();
+
+            for (var entry : parse(jshell, bootstrap).entrySet()) {
+                var info = entry.getValue();
+                var events = jshell.eval(info.source());
+                var reason =
+                    events.stream()
+                    .filter(t -> t.status().equals(REJECTED))
+                    .map(t -> String.format("%s: %s",
+                                            t.status(),
+                                            t.snippet().source().trim()))
+                    .findFirst().orElse(null);
+
+                if (reason != null) {
+                    log.warn(reason);
+                    break;
+                }
+            }
+
             classpath.keySet()
                 .forEach(t -> jshell.addToClasspath(t.toString()));
         }
@@ -165,21 +204,16 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
         addJarsToClasspath(Stream.of(paths).map(Paths::get).toArray(Path[]::new));
     }
 
-    /**
-     * Method to manage and add path(s) to the {@link JShell} instance.  See
-     * {@link JShell#addToClasspath(String)}.
-     *
-     * @param   files           The {@link File}s to add.
-     */
-    public void addToClasspath(File... files) {
+    private void addToClasspath(File... files) {
         for (var file : files) {
             file = file.getAbsoluteFile();
 
             if (! classpath.containsKey(file)) {
+/*
                 var artifacts = analyzer.getJarArtifacts(file);
 
                 if (artifacts.isEmpty()) {
-                    log.warn("{}: Cannot identify artifact", file);
+                    log.debug("{}: Cannot identify artifact", file);
                 }
 
                 var installed =
@@ -207,9 +241,10 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
 
                 if (artifacts.isEmpty() || (! updates.isEmpty())) {
                     addToClasspath(file, artifacts);
-                } else {
                     log.warn("{}: Skipping...", file);
                 }
+*/
+                addToClasspath(file, Set.of());
             }
         }
     }
@@ -380,7 +415,7 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
                     throw exception;
                 }
 
-                String reason =
+                var reason =
                     events.stream()
                     .filter(t -> t.status().equals(REJECTED))
                     .map(t -> String.format("%s: %s",

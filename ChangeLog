@@ -1,3 +1,17 @@
+2021-02-13  Allen D. Ball  <ball@hcf.dev>
+
+	* Create an isolated ClassLoader in the JShell instance to load
+	the galyleo-kernel.jar.
+
+	* src/main/resources/bootstrap.jsh:
+	Initial writing: Bootstrap galyleo-kernel.jar in JShell instance
+	and provide user methods (e.g., print(Object)) and kernel
+	implementation methods (e.g., Magic.receive()).
+
+	* src/main/java/galyleo/kernel/Kernel.java:
+	Load all JARS in ${spark-home}/jars and ${hadoop-home}/jars even
+	if duplicate groupId:artifactId are implemented.
+
 2021-02-10  Allen D. Ball  <ball@hcf.dev>
 
 	* src/main/java/galyleo/server/Server.java:

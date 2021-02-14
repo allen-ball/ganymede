@@ -1,4 +1,5 @@
 Manifest-Version: 1.0
+Multi-Release: true
 Built-By: @user.name@
 Build-Jdk: @java.version@
 

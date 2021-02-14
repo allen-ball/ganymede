@@ -187,8 +187,7 @@ public interface Magic {
      * @param   code            The remainder of the cell.
      */
     public static void sendTo(Shell shell, String name, String magic, String code) throws Exception {
-        shell.evaluate(String.format("%s.receive(\"%s\", \"%s\", \"%s\")",
-                                     Magic.class.getCanonicalName(),
+        shell.evaluate(String.format("__magic_receive(\"%s\", \"%s\", \"%s\")",
                                      name, encode(magic), encode(code)));
     }
 
@@ -203,11 +202,22 @@ public interface Magic {
      * @param   magic           The initial magic line.
      * @param   code            The remainder of the cell.
      */
-    public static void receive(String name, String magic, String code) throws Exception {
-        if (MAP.containsKey(name)) {
-            MAP.get(name).execute(decode(magic), decode(code));
+    public static void receive(ClassLoader __,
+                               String name, String magic, String code) throws Exception {
+        ServiceLoader<Magic> loader = ServiceLoader.load(Magic.class, __);
+
+        loader.reload();
+
+        Map<String,Magic> map =
+            loader.stream()
+            .map(ServiceLoader.Provider::get)
+            .flatMap(v -> Stream.of(v.getMagicNames()).map(k -> Map.entry(k, v)))
+            .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        if (map.containsKey(name)) {
+            map.get(name).execute(decode(magic), decode(code));
         } else {
-            throw new IllegalStateException("Magic " + name + " not found");
+            throw new IllegalStateException("Magic '" + name + "' not found");
         }
     }
 
