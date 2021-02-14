@@ -1,5 +1,6 @@
 package galyleo.shell;
 
+import java.util.ServiceLoader;
 import galyleo.dependency.Analyzer;
 import galyleo.server.Message;
 import galyleo.shell.magic.AnnotatedMagic;
@@ -61,6 +62,7 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
         new ApplicationHome(Shell.class).getSource();
 
     private final AtomicInteger restarts = new AtomicInteger(0);
+    private final Map<String,Magic> magic = new TreeMap<>();
     private JShell jshell = null;
     private InputStream in = null;
     private PrintStream out = null;
@@ -95,6 +97,16 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
             this.out = out;
             this.err = err;
 
+            magic.clear();
+
+            ServiceLoader<Magic> loader = ServiceLoader.load(Magic.class);
+
+            loader.reload();
+            loader.stream()
+                .map(ServiceLoader.Provider::get)
+                .flatMap(v -> Stream.of(v.getMagicNames()).map(k -> Map.entry(k, v)))
+                .forEach(t -> magic.putIfAbsent(t.getKey(), t.getValue()));
+
             jshell =
                 JShell.builder()
                 .remoteVMOptions(VMOPTIONS)
@@ -117,11 +129,11 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
                 }
             }
 
-            classpath.keySet()
-                .forEach(t -> jshell.addToClasspath(t.toString()));
+            Stream.of(getMagicNames()).forEach(t -> magic.put(t, this));
         }
 
-        Stream.of(getMagicNames()).forEach(t -> MAP.put(t, this));
+        classpath.keySet()
+            .forEach(t -> jshell.addToClasspath(t.toString()));
     }
 
     /**
@@ -145,7 +157,7 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
     @Override
     public void close() {
         synchronized (this) {
-            Stream.of(getMagicNames()).forEach(t -> MAP.remove(t));
+            Stream.of(getMagicNames()).forEach(t -> magic.remove(t));
 
             try (var jshell = jshell()) {
                 this.jshell = null;
@@ -298,17 +310,17 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
         try {
             if (Magic.isCellMagic(code)) {
                 var lines = code.split("\\R", 2);
-                var magic = lines[0];
+                var line0 = lines[0];
 
                 code = (lines.length > 1) ? lines[1] : "";
 
-                var argv = Magic.getCellMagicCommand(magic);
+                var argv = Magic.getCellMagicCommand(line0);
 
-                if (argv.length > 0 && MAP.containsKey(argv[0])) {
-                    MAP.get(argv[0])
-                        .execute(this, in, out, err, magic, code);
+                if (argv.length > 0 && magic.containsKey(argv[0])) {
+                    magic.get(argv[0])
+                        .execute(this, in, out, err, line0, code);
                 } else {
-                    throw new IllegalArgumentException(magic);
+                    throw new IllegalArgumentException(line0);
                 }
             } else {
                 execute(this, in, out, err, null, code);

@@ -5,8 +5,8 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.Base64;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.stream.IntStream;
@@ -30,15 +30,6 @@ public interface Magic {
      * Cell {@link Magic} indicator.
      */
     public static final String CELL = "%%";
-
-    /**
-     * The {@link Map} of {@link Magic} service providers.
-     */
-    public static final Map<String,Magic> MAP =
-        ServiceLoader.load(Magic.class).stream()
-        .map(ServiceLoader.Provider::get)
-        .flatMap(v -> Stream.of(v.getMagicNames()).map(k -> Map.entry(k, v)))
-        .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
 
     /**
      * See {@link #decode(String)}.
@@ -108,7 +99,7 @@ public interface Magic {
      *                          If the magic line can't be parsed.
      */
     public static String[] getCellMagicCommand(String code) {
-        var list = new ArrayList<String>();
+        var list = new LinkedList<String>();
 
         try (var reader = new StringReader(code)) {
             var tokenizer = new StreamTokenizer(reader);

@@ -1,3 +1,7 @@
+2021-02-14  Allen D. Ball  <ball@hcf.dev>
+
+	* Reload Magic service providers on Shell (re)start.
+
 2021-02-13  Allen D. Ball  <ball@hcf.dev>
 
 	* Create an isolated ClassLoader in the JShell instance to load
