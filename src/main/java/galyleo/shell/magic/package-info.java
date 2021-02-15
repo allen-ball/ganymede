@@ -1,5 +1,5 @@
 /**
- * Magic implementation classes.
+ * {@link Magic} service provider classes.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$

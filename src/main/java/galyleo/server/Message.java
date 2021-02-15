@@ -435,30 +435,14 @@ public class Message {
 
     /**
      * Method to create {@link #execute_result(int,ObjectNode)}
-     * {@link Message} content.
+     * {@link Message} {@code mime-bundle}.
      *
      * @param   object          The {@link Object} to encode.
      *
-     * @return  The {@link Message} content.
+     * @return  The {@link Message} {@code mime-bundle}.
      */
-    public static ObjectNode content(Object object) {
-        var node = OBJECT_MAPPER.createObjectNode();
-        var data = node.with("data");
-        var metadata = node.with("metadata");
-
-        if (object instanceof JsonNode) {
-            var type = "application/json";
-
-            data.set(type, (JsonNode) object);
-            metadata.with(type);
-        }
-
-        var type = "text/plain";
-
-        data.put(type, String.valueOf(object));
-        metadata.with(type);
-
-        return node;
+    public static ObjectNode mime_bundle(Object object) {
+        return Renderer.render(object);
     }
 
     private static String getCallingMethodName(int skip) {

@@ -25,7 +25,7 @@ public abstract class RemoteRuntime {
      */
     public static void print(Object object) {
         try {
-            json.add(Message.content(object));
+            json.add(Message.mime_bundle(object));
         } catch (Exception exception) {
             System.out.println(object);
             exception.printStackTrace(System.err);

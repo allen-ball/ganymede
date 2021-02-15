@@ -105,7 +105,7 @@ public class Install implements ApplicationRunner {
 
             Stream.of(java, "-jar", jar, "--connection-file={connection_file}")
                 .map(Object::toString)
-                .forEach(t -> argv.add(t));
+                .forEach(argv::add);
 
             kernel.put("display_name", display_name);
 

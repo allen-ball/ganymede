@@ -67,9 +67,9 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
     private InputStream in = null;
     private PrintStream out = null;
     private PrintStream err = null;
+    private final String bootstrap;
     private final Analyzer analyzer = new Analyzer();
     private final Map<File,Set<Artifact>> classpath = new LinkedHashMap<>();
-    private final String bootstrap;
 
     {
         var resource = new ClassPathResource("bootstrap.jsh");
