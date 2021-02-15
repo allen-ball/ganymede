@@ -9,19 +9,19 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * {@link Imports} {@link Magic}.  See {@link jdk.jshell.JShell#imports()}.
+ * {@link Snippets} {@link Magic}.  See {@link jdk.jshell.JShell#snippets()}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
 @ServiceProviderFor({ Magic.class })
 @NoArgsConstructor @ToString @Log4j2
-public class Imports extends JShell {
+public class Snippets extends JShell {
     @Override
     public void execute(Shell shell,
                         InputStream in, PrintStream out, PrintStream err,
                         String magic, String code) throws Exception {
-        shell.jshell().imports()
+        shell.jshell().snippets()
             .forEach(t -> out.println(t.source()));
     }
 }

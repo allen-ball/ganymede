@@ -174,7 +174,7 @@ public interface Magic {
      * is evaluated in the {@link jdk.jshell.JShell}.
      *
      * @param   shell           The {@link Shell}.
-     * @param   name            The magic name (key into {@link #MAP}).
+     * @param   name            The magic name.
      * @param   magic           The initial magic line.
      * @param   code            The remainder of the cell.
      */
@@ -190,7 +190,7 @@ public interface Magic {
      * #receive(ClassLoader,String,String,String)} expression which is
      * evaluated in the {@link jdk.jshell.JShell}.
      *
-     * @param   name            The magic name (key into {@link #MAP}).
+     * @param   name            The magic name.
      * @param   magic           The initial magic line.
      * @param   code            The remainder of the cell.
      */
