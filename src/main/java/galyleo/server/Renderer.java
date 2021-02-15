@@ -1,14 +1,13 @@
 package galyleo.server;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.ServiceConfigurationError;
+import java.util.ServiceLoader;
 import java.util.stream.Stream;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import static galyleo.server.Server.OBJECT_MAPPER;
-import static lombok.AccessLevel.PRIVATE;
 
 /**
  * {@link Message#mime_bundle(Object)} output {@link Renderer}.
@@ -16,54 +15,66 @@ import static lombok.AccessLevel.PRIVATE;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@NoArgsConstructor(access = PRIVATE)
-public abstract class Renderer {
-    private static final String DATA = "data";
-    private static final String METADATA = "metadata";
+public interface Renderer {
+    public static final String DATA = "data";
+    public static final String METADATA = "metadata";
+
+    /**
+     * Method to get the mime-type {@link.this} {@link Renderer} provides.
+     *
+     * @return  The {@code mime-type}.
+     */
+    public String getMimeType();
+
+    /**
+     * Method to get the {@link Class type} {@link.this} {@link Renderer} provides.
+     *
+     * @return  The array of {@link Class type}.
+     */
+    public Class<?> getForType();
+
+    /**
+     * Method to render an {@link Object} to a {@code mime-bundle}.
+     *
+     * @param   bundle          The {@link Message} {@code mime-bundle}.
+     * @param   object          The {@link Object} to render (assignable to
+     *                          {@link #getForType()}.
+     */
+    public void renderTo(ObjectNode bundle, Object object);
 
     /**
      * Method to render an {@link Object} to
      * {@link Message#execute_result(int,ObjectNode)}.
      *
+     * @param   __              The {@link ClassLoader}.
      * @param   object          The {@link Object} to encode.
      *
      * @return  The {@link Message} {@code mime-bundle}.
      */
-    public static ObjectNode render(Object object) {
-        ObjectNode bundle = OBJECT_MAPPER.createObjectNode();
+    public static ObjectNode render(ClassLoader __, Object object) {
+        var list = new ArrayList<Renderer>();
+        var loader = ServiceLoader.load(Renderer.class, __);
 
-        if (object instanceof Map) {
-            render(OBJECT_MAPPER.valueToTree(object), bundle);
+        loader.reload();
+
+        var iterator = loader.stream().iterator();
+
+        while (iterator.hasNext()) {
+            try {
+                list.add(iterator.next().get());
+            } catch (ServiceConfigurationError error) {
+            }
         }
 
-        if (object instanceof JsonNode) {
-            render((JsonNode) object, bundle);
-        }
+        var bundle = OBJECT_MAPPER.createObjectNode();
+        var type = (object != null) ? object.getClass() : null;
 
-        if (object instanceof String) {
-            render((String) object, bundle);
+        for (var renderer : list) {
+            if (renderer.getForType().isAssignableFrom(type)) {
+                renderer.renderTo(bundle, object);
+            }
         }
-
-        render(String.valueOf(object), bundle);
 
         return bundle;
-    }
-
-    private static void render(JsonNode node, ObjectNode bundle) {
-        var type = "application/json";
-
-        if (! bundle.with(DATA).has(type)) {
-            bundle.with(DATA).set(type, node);
-            bundle.with(METADATA).with(type)
-                .put("expanded", true);
-        }
-    }
-
-    private static void render(String string, ObjectNode bundle) {
-        var type = "text/plain";
-
-        if (! bundle.with(DATA).has(type)) {
-            bundle.with(DATA).put(type, string);
-        }
     }
 }
