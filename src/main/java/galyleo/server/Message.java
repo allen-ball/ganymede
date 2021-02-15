@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 import lombok.Data;
@@ -442,7 +443,27 @@ public class Message {
      * @return  The {@link Message} {@code mime-bundle}.
      */
     public static ObjectNode mime_bundle(Object object) {
-        return Renderer.render(object);
+        var bundle = OBJECT_MAPPER.createObjectNode();
+
+        if (object instanceof Map) {
+            new galyleo.server.renderer.MapRenderer()
+                .renderTo(bundle, object);
+        }
+
+        if (object instanceof JsonNode) {
+            new galyleo.server.renderer.JsonNodeRenderer()
+                .renderTo(bundle, object);
+        }
+
+        if (object instanceof String) {
+            new galyleo.server.renderer.StringRenderer()
+                .renderTo(bundle, object);
+        }
+
+        new galyleo.server.renderer.ObjectRenderer()
+            .renderTo(bundle, object);
+
+        return bundle;
     }
 
     private static String getCallingMethodName(int skip) {
