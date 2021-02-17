@@ -4,25 +4,52 @@
  * Processed as a String format:
  *
  *      1$      galyleo-kernel JAR URL
+ *      2$      RemoteRuntime Class Name
  */
-var __ = new java.net.URLClassLoader(new java.net.URL[] { new java.net.URL("%1$s") });
+var __ =
+    new Object() {
+        private final ClassLoader loader;
 
-public void __magic_receive(String name, String magic, String code) {
-    try {
-        Class.forName("galyleo.shell.magic.Magic", true, __)
-            .getMethod("receive", ClassLoader.class, String.class, String.class, String.class)
-            .invoke(null, __, name, magic, code);
-    } catch (Throwable throwable) {
-        throwable.printStackTrace(System.err);
-    }
-}
+        {
+            try {
+                var url = new java.net.URL("%1$s");
 
-public void print(Object object) {
-    try {
-        Class.forName("galyleo.shell.jshell.RemoteRuntime", true, __)
-            .getMethod("print", Object.class)
-            .invoke(null, object);
-    } catch (Throwable throwable) {
-        throwable.printStackTrace(System.err);
-    }
-}
+                loader = new java.net.URLClassLoader(new java.net.URL[] { url });
+            } catch (Exception exception) {
+                throw new ExceptionInInitializerError(exception);
+            }
+        }
+
+        public ClassLoader getClassLoader() { return loader; }
+
+        public Class<?> getClassForName(String name) throws Exception {
+            return Class.forName(name, true, getClassLoader());
+        }
+
+        public Object invokeStaticMethod(String type, String method,
+                                         Class<?>[] parameters, Object... arguments) {
+            Object object = null;
+
+            try {
+                object =
+                    getClassForName(type)
+                    .getDeclaredMethod(method, parameters)
+                    .invoke(null, arguments);
+            } catch (Throwable throwable) {
+                throwable.printStackTrace(System.err);
+            }
+
+            return object;
+        }
+
+        public Object invokeStaticMethod(String type, String method) {
+            return invokeStaticMethod(type, method,
+                                      new Class<?>[] { }, new Object[] { });
+        }
+
+        public void print(Object object) {
+            invokeStaticMethod("%2$s", "print", new Class<?>[] { Object.class }, object);
+        }
+    };
+
+public void print(Object object) { __.print(object); }

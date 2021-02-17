@@ -1,3 +1,9 @@
+2021-02-17  Allen D. Ball  <ball@hcf.dev>
+
+	* src/main/resources/bootstrap.jsh:
+	Create __ class with invokeStaticMethod() to simplify calls from
+	the JShell client.
+
 2021-02-14  Allen D. Ball  <ball@hcf.dev>
 
 	* Added (trivial) Magic implementations for JShell methods.

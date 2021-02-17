@@ -1,8 +1,8 @@
 package galyleo.shell;
 
-import java.util.ServiceLoader;
 import galyleo.dependency.Analyzer;
 import galyleo.server.Message;
+import galyleo.shell.jshell.RemoteRuntime;
 import galyleo.shell.magic.AnnotatedMagic;
 import galyleo.shell.magic.Magic;
 import galyleo.shell.magic.MagicNames;
@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,6 +40,7 @@ import org.springframework.util.StreamUtils;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.disjoint;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static jdk.jshell.Snippet.Status.REJECTED;
@@ -62,12 +64,12 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
         new ApplicationHome(Shell.class).getSource();
 
     private final AtomicInteger restarts = new AtomicInteger(0);
+    private final String bootstrap;
     private final Map<String,Magic> magic = new TreeMap<>();
     private JShell jshell = null;
     private InputStream in = null;
     private PrintStream out = null;
     private PrintStream err = null;
-    private final String bootstrap;
     private final Analyzer analyzer = new Analyzer();
     private final Map<File,Set<Artifact>> classpath = new LinkedHashMap<>();
 
@@ -77,14 +79,14 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
         try (var in = resource.getInputStream()) {
             bootstrap =
                 String.format(StreamUtils.copyToString(in, UTF_8),
-                              KERNEL_JAR.toURI().toURL());
+                              KERNEL_JAR.toURI().toURL(),
+                              RemoteRuntime.class.getName());
         } catch (Exception exception) {
             throw new ExceptionInInitializerError(exception);
         }
     }
 
-
-   /**
+    /**
      * Method to start a {@link Shell}.
      *
      * @param   in              The {@code in} {@link InputStream}.
@@ -99,18 +101,11 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
 
             magic.clear();
 
-            ServiceLoader<Magic> loader = ServiceLoader.load(Magic.class);
-
-            loader.reload();
-            loader.stream()
-                .map(ServiceLoader.Provider::get)
-                .flatMap(v -> Stream.of(v.getMagicNames()).map(k -> Map.entry(k, v)))
-                .forEach(t -> magic.putIfAbsent(t.getKey(), t.getValue()));
-
-            jshell =
+            var jshell =
                 JShell.builder()
                 .remoteVMOptions(VMOPTIONS)
                 .in(in).out(out).err(err).build();
+            var analyzer = jshell.sourceCodeAnalysis();
 
             for (var entry : parse(jshell, bootstrap).entrySet()) {
                 var info = entry.getValue();
@@ -118,9 +113,14 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
                 var reason =
                     events.stream()
                     .filter(t -> t.status().equals(REJECTED))
-                    .map(t -> String.format("%s: %s",
-                                            t.status(),
-                                            t.snippet().source().trim()))
+                    .map(t -> jshell.diagnostics(t.snippet())
+                              .map(String::valueOf)
+                              .collect(joining("\n",
+                                               String.format("%s\n%s\n%s\n",
+                                                             t.status(),
+                                                             t.snippet().kind(),
+                                                             t.snippet().source()),
+                                               "")))
                     .findFirst().orElse(null);
 
                 if (reason != null) {
@@ -129,11 +129,21 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
                 }
             }
 
-            Stream.of(getMagicNames()).forEach(t -> magic.put(t, this));
-        }
+            ServiceLoader<Magic> loader = ServiceLoader.load(Magic.class);
 
-        classpath.keySet()
-            .forEach(t -> jshell.addToClasspath(t.toString()));
+            loader.reload();
+            loader.stream()
+                .map(ServiceLoader.Provider::get)
+                .flatMap(v -> Stream.of(v.getMagicNames()).map(k -> Map.entry(k, v)))
+                .forEach(t -> magic.putIfAbsent(t.getKey(), t.getValue()));
+
+            Stream.of(getMagicNames()).forEach(t -> magic.put(t, this));
+
+            classpath.keySet()
+                .forEach(t -> jshell.addToClasspath(t.toString()));
+
+            this.jshell = jshell;
+        }
     }
 
     /**

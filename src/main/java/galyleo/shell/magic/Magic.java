@@ -170,7 +170,7 @@ public interface Magic {
      * {@link jdk.jshell.JShell} instance.  The
      * {@link #sendTo(Shell,String,String,String)} method packs the
      * arguments and creates a
-     * {@link #receive(ClassLoader,String,String,String)} expression which
+     * {@link #receive(String,String,String)} expression which
      * is evaluated in the {@link jdk.jshell.JShell}.
      *
      * @param   shell           The {@link Shell}.
@@ -179,24 +179,28 @@ public interface Magic {
      * @param   code            The remainder of the cell.
      */
     public static void sendTo(Shell shell, String name, String magic, String code) throws Exception {
-        shell.evaluate(String.format("__magic_receive(\"%s\", \"%s\", \"%s\")",
-                                     name, encode(magic), encode(code)));
+        var expression =
+            String.format("__.invokeStaticMethod(\"%s\", \"%s\", new Class<?>[] { String.class, String.class, String.class }, \"%s\", \"%s\", \"%s\")",
+                          Magic.class.getName(), "receive",
+                          name, encode(magic), encode(code));
+
+        shell.evaluate(expression);
     }
 
     /**
      * Static method to receive a request in the {@link jdk.jshell.JShell}
      * instance.  The {@link #sendTo(Shell,String,String,String)} method
-     * packs the arguments and creates a {@link
-     * #receive(ClassLoader,String,String,String)} expression which is
-     * evaluated in the {@link jdk.jshell.JShell}.
+     * packs the arguments and creates a
+     * {@link #receive(String,String,String)} expression which is evaluated
+     * in the {@link jdk.jshell.JShell}.
      *
      * @param   name            The magic name.
      * @param   magic           The initial magic line.
      * @param   code            The remainder of the cell.
      */
-    public static void receive(ClassLoader __,
-                               String name, String magic, String code) throws Exception {
-        ServiceLoader<Magic> loader = ServiceLoader.load(Magic.class, __);
+    public static void receive(String name, String magic, String code) throws Exception {
+        ServiceLoader<Magic> loader =
+            ServiceLoader.load(Magic.class, Magic.class.getClassLoader());
 
         loader.reload();
 

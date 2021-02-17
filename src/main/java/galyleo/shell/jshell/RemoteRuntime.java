@@ -54,7 +54,7 @@ public abstract class RemoteRuntime {
 
         try {
             var expression =
-                String.format("Class.forName(\"%s\", true, __).getMethod(\"getExecutionEventsAsString\", null).invoke(null, null)",
+                String.format("__.invokeStaticMethod(\"%s\", \"getExecutionEventsAsString\")",
                               RemoteRuntime.class.getName());
             var content = shell.evaluate(expression);
 
