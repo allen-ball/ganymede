@@ -54,8 +54,9 @@ public abstract class RemoteRuntime {
 
         try {
             var expression =
-                String.format("__.invokeStaticMethod(\"%s\", \"getExecutionEventsAsString\")",
-                              RemoteRuntime.class.getName());
+                String.format("__.invokeStaticMethod(\"%s\", \"%s\")",
+                              RemoteRuntime.class.getName(),
+                              "getExecutionEventsAsString");
             var content = shell.evaluate(expression);
 
             node = (ArrayNode) OBJECT_MAPPER.readTree(content);
