@@ -64,7 +64,6 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
 
     private Locale locale = null;       /* TBD: Query Notebook server */
     private final AtomicInteger restarts = new AtomicInteger(0);
-    private final String bootstrap;
     private final Map<String,Magic> magic = new TreeMap<>();
     private JShell jshell = null;
     private InputStream in = null;
@@ -72,19 +71,6 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
     private PrintStream err = null;
     private final Analyzer analyzer = new Analyzer();
     private final Map<File,Set<Artifact>> classpath = new LinkedHashMap<>();
-
-    {
-        var resource = new ClassPathResource("bootstrap.jsh");
-
-        try (var in = resource.getInputStream()) {
-            bootstrap =
-                String.format(StreamUtils.copyToString(in, UTF_8),
-                              KERNEL_JAR.toURI().toURL(),
-                              RemoteRuntime.class.getName());
-        } catch (Exception exception) {
-            throw new ExceptionInInitializerError(exception);
-        }
-    }
 
     /**
      * Method to start a {@link Shell}.
@@ -105,15 +91,23 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
                 JShell.builder()
                 .remoteVMOptions(VMOPTIONS)
                 .in(in).out(out).err(err).build();
-            var logger =
-                IoBuilder.forLogger(log)
-                .setLevel(WARN)
-                .buildPrintStream();
 
             try {
-                execute(jshell,
-                        InputStream.nullInputStream(), logger, logger,
-                        null, bootstrap);
+                var logIn =
+                    IoBuilder.forLogger(log)
+                    .setLevel(WARN)
+                    .filter(InputStream.nullInputStream())
+                    .buildInputStream();
+                var logOut =
+                    IoBuilder.forLogger(log)
+                    .setLevel(WARN)
+                    .buildPrintStream();
+                var bootstrap =
+                    String.format(getResourceAsString("bootstrap.jsh"),
+                                  KERNEL_JAR.toURI().toURL(),
+                                  RemoteRuntime.class.getName());
+
+                execute(jshell, logIn, logOut, logOut, null, bootstrap);
             } catch (Exception exception) {
                 log.warn("{}", exception, exception);
             }
@@ -133,6 +127,17 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
 
             this.jshell = jshell;
         }
+    }
+
+    private String getResourceAsString(String name) throws Exception {
+        String string = null;
+        var resource = new ClassPathResource(name);
+
+        try (var in = resource.getInputStream()) {
+            string = StreamUtils.copyToString(in, UTF_8);
+        }
+
+        return string;
     }
 
     /**
