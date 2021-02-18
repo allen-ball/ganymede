@@ -39,8 +39,15 @@ public class RendererMap extends TreeMap<Class<?>,Renderer> {
      * @return  {@link.this}
      */
     public RendererMap reload() {
-        map.reload().values().stream()
-            .forEach(t -> putIfAbsent(t.getForType(), t));
+        Iterable<Renderer> renderers =
+            () -> map.reload().values().stream().iterator();
+
+        for (Renderer renderer : renderers) {
+            try {
+                putIfAbsent(renderer.getForType(), renderer);
+            } catch (TypeNotPresentException exception) {
+            }
+        }
 
         return this;
     }
