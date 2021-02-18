@@ -13,7 +13,7 @@ import lombok.ToString;
  * @version $Revision$
  */
 @ServiceProviderFor({ Renderer.class })
-@MimeType("text/plain") @ForType(String.class)
+@ForType(Object.class)
 @NoArgsConstructor @ToString
 public class ObjectRenderer extends StringRenderer {
     @Override

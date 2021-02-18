@@ -443,27 +443,7 @@ public class Message {
      * @return  The {@link Message} {@code mime-bundle}.
      */
     public static ObjectNode mime_bundle(Object object) {
-        var bundle = OBJECT_MAPPER.createObjectNode();
-
-        if (object instanceof Map) {
-            new galyleo.server.renderer.MapRenderer()
-                .renderTo(bundle, object);
-        }
-
-        if (object instanceof JsonNode) {
-            new galyleo.server.renderer.JsonNodeRenderer()
-                .renderTo(bundle, object);
-        }
-
-        if (object instanceof String) {
-            new galyleo.server.renderer.StringRenderer()
-                .renderTo(bundle, object);
-        }
-
-        new galyleo.server.renderer.ObjectRenderer()
-            .renderTo(bundle, object);
-
-        return bundle;
+        return Renderer.render(object);
     }
 
     private static String getCallingMethodName(int skip) {

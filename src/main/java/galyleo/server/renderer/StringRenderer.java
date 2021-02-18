@@ -13,13 +13,15 @@ import lombok.ToString;
  * @version $Revision$
  */
 @ServiceProviderFor({ Renderer.class })
-@MimeType("text/plain") @ForType(String.class)
+@ForType(String.class)
 @NoArgsConstructor @ToString
 public class StringRenderer implements AnnotatedRenderer {
+    private static final String MIME_TYPE = "text/plain";
+
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
-        if (! bundle.with(DATA).has(getMimeType())) {
-            bundle.with(DATA).put(getMimeType(), (String) object);
+        if (! bundle.with(DATA).has(MIME_TYPE)) {
+            bundle.with(DATA).put(MIME_TYPE, (String) object);
         }
     }
 }

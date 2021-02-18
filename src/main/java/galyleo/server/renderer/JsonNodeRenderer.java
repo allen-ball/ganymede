@@ -14,14 +14,16 @@ import lombok.ToString;
  * @version $Revision$
  */
 @ServiceProviderFor({ Renderer.class })
-@MimeType("application/json") @ForType(JsonNode.class)
+@ForType(JsonNode.class)
 @NoArgsConstructor @ToString
 public class JsonNodeRenderer implements AnnotatedRenderer {
+    private static final String MIME_TYPE = "application/json";
+
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
-        if (! bundle.with(DATA).has(getMimeType())) {
-            bundle.with(DATA).set(getMimeType(), (JsonNode) object);
-            bundle.with(METADATA).with(getMimeType())
+        if (! bundle.with(DATA).has(MIME_TYPE)) {
+            bundle.with(DATA).set(MIME_TYPE, (JsonNode) object);
+            bundle.with(METADATA).with(MIME_TYPE)
                 .put("expanded", true);
         }
     }

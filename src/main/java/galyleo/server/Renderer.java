@@ -1,11 +1,6 @@
 package galyleo.server;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.ServiceConfigurationError;
-import java.util.ServiceLoader;
-import java.util.stream.Stream;
 
 import static galyleo.server.Server.OBJECT_MAPPER;
 
@@ -20,14 +15,8 @@ public interface Renderer {
     public static final String METADATA = "metadata";
 
     /**
-     * Method to get the mime-type {@link.this} {@link Renderer} provides.
-     *
-     * @return  The {@code mime-type}.
-     */
-    public String getMimeType();
-
-    /**
-     * Method to get the {@link Class type} {@link.this} {@link Renderer} provides.
+     * Method to get the {@link Class type} {@link.this} {@link Renderer}
+     * provides.
      *
      * @return  The array of {@link Class type}.
      */
@@ -46,34 +35,17 @@ public interface Renderer {
      * Method to render an {@link Object} to
      * {@link Message#execute_result(int,ObjectNode)}.
      *
-     * @param   __              The {@link ClassLoader}.
      * @param   object          The {@link Object} to encode.
      *
      * @return  The {@link Message} {@code mime-bundle}.
      */
-    public static ObjectNode render(ClassLoader __, Object object) {
-        var list = new ArrayList<Renderer>();
-        var loader = ServiceLoader.load(Renderer.class, __);
-
-        loader.reload();
-
-        var iterator = loader.stream().iterator();
-
-        while (iterator.hasNext()) {
-            try {
-                list.add(iterator.next().get());
-            } catch (ServiceConfigurationError error) {
-            }
-        }
-
+    public static ObjectNode render(Object object) {
         var bundle = OBJECT_MAPPER.createObjectNode();
         var type = (object != null) ? object.getClass() : null;
 
-        for (var renderer : list) {
-            if (renderer.getForType().isAssignableFrom(type)) {
-                renderer.renderTo(bundle, object);
-            }
-        }
+        new RendererMap().entrySet().stream()
+            .filter(t -> t.getKey().isAssignableFrom(type))
+            .forEach(t -> t.getValue().renderTo(bundle, object));
 
         return bundle;
     }
