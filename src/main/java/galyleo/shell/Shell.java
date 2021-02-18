@@ -32,6 +32,7 @@ import jdk.jshell.SourceCodeAnalysis;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.io.IoBuilder;
 import org.apache.maven.artifact.Artifact;
 import org.springframework.boot.system.ApplicationHome;
 import org.springframework.core.io.ClassPathResource;
@@ -41,6 +42,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
 import static jdk.jshell.Snippet.Status.REJECTED;
+import static org.apache.logging.log4j.Level.WARN;
 
 /**
  * Galyleo {@link Shell}.
@@ -103,38 +105,17 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
                 JShell.builder()
                 .remoteVMOptions(VMOPTIONS)
                 .in(in).out(out).err(err).build();
+            var logger =
+                IoBuilder.forLogger(log)
+                .setLevel(WARN)
+                .buildPrintStream();
 
-            for (var entry : parse(jshell, bootstrap).entrySet()) {
-                var info = entry.getValue();
-                var events = jshell.eval(info.source());
-                var exception =
-                    events.stream()
-                    .map(t -> t.exception())
-                    .filter(Objects::nonNull)
-                    .findFirst().orElse(null);
-
-                if (exception != null) {
-                    log.warn("{}", exception, exception);
-                    break;
-                }
-
-                var reason =
-                    events.stream()
-                    .filter(t -> t.status().equals(REJECTED))
-                    .map(t -> jshell.diagnostics(t.snippet())
-                              .map(u -> u.getMessage(null))
-                              .collect(joining("\n",
-                                               String.format("%s %s\n%s\n",
-                                                             t.status(),
-                                                             t.snippet().kind(),
-                                                             t.snippet().source()),
-                                               "")))
-                    .findFirst().orElse(null);
-
-                if (reason != null) {
-                    log.warn(reason);
-                    break;
-                }
+            try {
+                execute(jshell,
+                        InputStream.nullInputStream(), logger, logger,
+                        null, bootstrap);
+            } catch (Exception exception) {
+                log.warn("{}", exception, exception);
             }
 
             ServiceLoader<Magic> loader = ServiceLoader.load(Magic.class);
@@ -392,8 +373,13 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
     public void execute(Shell shell,
                         InputStream in, PrintStream out, PrintStream err,
                         String magic, String code) throws Exception {
+        execute(shell.jshell(), in, out, err, magic, code);
+    }
+
+    private void execute(JShell jshell,
+                         InputStream in, PrintStream out, PrintStream err,
+                         String magic, String code) throws Exception {
         try {
-            var jshell = shell.jshell();
             var iterator = parse(jshell, code).entrySet().iterator();
 
             while (iterator.hasNext()) {
