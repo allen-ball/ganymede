@@ -1,5 +1,5 @@
 /**
- * {@link Magic} service provider classes.
+ * {@link galyleo.shell.Magic} service provider classes.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$

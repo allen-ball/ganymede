@@ -1,12 +1,13 @@
 package galyleo.shell.magic;
 
 import ball.annotation.ServiceProviderFor;
+import galyleo.shell.Magic;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * {@link Ruby} {@link Script} {@link Magic}.
+ * {@link Ruby} {@link Script} {@link galyleo.shell.Magic}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$

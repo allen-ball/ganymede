@@ -1,6 +1,5 @@
-package galyleo.shell.magic;
+package galyleo.shell;
 
-import galyleo.shell.Shell;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.StreamTokenizer;
@@ -8,7 +7,6 @@ import java.io.StringReader;
 import java.util.Base64;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -199,16 +197,7 @@ public interface Magic {
      * @param   code            The remainder of the cell.
      */
     public static void receive(String name, String magic, String code) throws Exception {
-        ServiceLoader<Magic> loader =
-            ServiceLoader.load(Magic.class, Magic.class.getClassLoader());
-
-        loader.reload();
-
-        Map<String,Magic> map =
-            loader.stream()
-            .map(ServiceLoader.Provider::get)
-            .flatMap(v -> Stream.of(v.getMagicNames()).map(k -> Map.entry(k, v)))
-            .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+        var map = new MagicMap();
 
         if (map.containsKey(name)) {
             map.get(name).execute(decode(magic), decode(code));

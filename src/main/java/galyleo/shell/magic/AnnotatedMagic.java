@@ -1,7 +1,9 @@
 package galyleo.shell.magic;
 
+import galyleo.shell.Magic;
+
 /**
- * {@link Magic} annotation services.
+ * {@link galyleo.shell.Magic} annotation services.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$

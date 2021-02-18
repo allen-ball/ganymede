@@ -1,6 +1,7 @@
 package galyleo.shell.magic;
 
 import ball.annotation.ServiceProviderFor;
+import galyleo.shell.Magic;
 import galyleo.shell.Shell;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -9,7 +10,8 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * {@link Snippets} {@link Magic}.  See {@link jdk.jshell.JShell#snippets()}.
+ * {@link Snippets} {@link galyleo.shell.Magic}.  See
+ * {@link jdk.jshell.JShell#snippets()}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$

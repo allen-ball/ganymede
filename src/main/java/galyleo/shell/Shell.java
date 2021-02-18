@@ -4,7 +4,6 @@ import galyleo.dependency.Analyzer;
 import galyleo.server.Message;
 import galyleo.shell.jshell.RemoteRuntime;
 import galyleo.shell.magic.AnnotatedMagic;
-import galyleo.shell.magic.Magic;
 import galyleo.shell.magic.MagicNames;
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +20,6 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -64,7 +62,7 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
 
     private Locale locale = null;       /* TBD: Query Notebook server */
     private final AtomicInteger restarts = new AtomicInteger(0);
-    private final Map<String,Magic> magic = new TreeMap<>();
+    private final MagicMap magic = new MagicMap();
     private JShell jshell = null;
     private InputStream in = null;
     private PrintStream out = null;
@@ -86,6 +84,7 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
             this.err = err;
 
             magic.clear();
+            magic.reload();
 
             var jshell =
                 JShell.builder()
@@ -111,14 +110,6 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
             } catch (Exception exception) {
                 log.warn("{}", exception, exception);
             }
-
-            ServiceLoader<Magic> loader = ServiceLoader.load(Magic.class);
-
-            loader.reload();
-            loader.stream()
-                .map(ServiceLoader.Provider::get)
-                .flatMap(v -> Stream.of(v.getMagicNames()).map(k -> Map.entry(k, v)))
-                .forEach(t -> magic.putIfAbsent(t.getKey(), t.getValue()));
 
             Stream.of(getMagicNames()).forEach(t -> magic.put(t, this));
 

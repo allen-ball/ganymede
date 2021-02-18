@@ -1,6 +1,7 @@
 package galyleo.shell.magic;
 
 import ball.annotation.ServiceProviderFor;
+import galyleo.shell.Magic;
 import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -10,7 +11,7 @@ import static java.lang.ProcessBuilder.Redirect.PIPE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * {@link Script} {@link Magic}.
+ * {@link Script} {@link galyleo.shell.Magic}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
