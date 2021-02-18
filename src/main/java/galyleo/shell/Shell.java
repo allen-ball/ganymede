@@ -18,13 +18,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import jdk.jshell.JShell;
 import jdk.jshell.JShellException;
@@ -33,15 +33,12 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.ArtifactUtils;
 import org.springframework.boot.system.ApplicationHome;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StreamUtils;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.disjoint;
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static jdk.jshell.Snippet.Status.REJECTED;
 
@@ -63,6 +60,7 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
     private static final File KERNEL_JAR =
         new ApplicationHome(Shell.class).getSource();
 
+    private Locale locale = null;       /* TBD: Query Notebook server */
     private final AtomicInteger restarts = new AtomicInteger(0);
     private final String bootstrap;
     private final Map<String,Magic> magic = new TreeMap<>();
@@ -105,18 +103,28 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
                 JShell.builder()
                 .remoteVMOptions(VMOPTIONS)
                 .in(in).out(out).err(err).build();
-            var analyzer = jshell.sourceCodeAnalysis();
 
             for (var entry : parse(jshell, bootstrap).entrySet()) {
                 var info = entry.getValue();
                 var events = jshell.eval(info.source());
+                var exception =
+                    events.stream()
+                    .map(t -> t.exception())
+                    .filter(Objects::nonNull)
+                    .findFirst().orElse(null);
+
+                if (exception != null) {
+                    log.warn("{}", exception, exception);
+                    break;
+                }
+
                 var reason =
                     events.stream()
                     .filter(t -> t.status().equals(REJECTED))
                     .map(t -> jshell.diagnostics(t.snippet())
-                              .map(String::valueOf)
+                              .map(u -> u.getMessage(null))
                               .collect(joining("\n",
-                                               String.format("%s\n%s\n%s\n",
+                                               String.format("%s %s\n%s\n",
                                                              t.status(),
                                                              t.snippet().kind(),
                                                              t.snippet().source()),
@@ -231,42 +239,7 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
             file = file.getAbsoluteFile();
 
             if (! classpath.containsKey(file)) {
-/*
-                var artifacts = analyzer.getJarArtifacts(file);
-
-                if (artifacts.isEmpty()) {
-                    log.debug("{}: Cannot identify artifact", file);
-                }
-
-                var installed =
-                    classpath.entrySet().stream()
-                    .flatMap(t -> t.getValue().stream().map(u -> Map.entry(u, t.getKey())))
-                    .map(t -> Map.entry(ArtifactUtils.versionlessKey(t.getKey()), t.getValue()))
-                    .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (t, u) -> t));
-                var updates =
-                    artifacts.stream()
-                    .map(t -> ArtifactUtils.versionlessKey(t))
-                    .collect(toSet());
-
-                if (! disjoint(installed.keySet(), updates)) {
-                    log.warn("{}:", file);
-
-                    for (var key : updates) {
-                        if (installed.containsKey(key)) {
-                            log.warn("    {} provided by {}",
-                                     key, installed.get(key));
-                        }
-                    }
-                }
-
-                updates.removeAll(installed.keySet());
-
-                if (artifacts.isEmpty() || (! updates.isEmpty())) {
-                    addToClasspath(file, artifacts);
-                    log.warn("{}: Skipping...", file);
-                }
-*/
-                addToClasspath(file, Set.of());
+                addToClasspath(file, analyzer.getJarArtifacts(file));
             }
         }
     }
@@ -434,19 +407,26 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
                     .findFirst().orElse(null);
 
                 if (exception != null) {
-                    throw exception;
+                    exception.printStackTrace(err);
+                    break;
                 }
 
                 var reason =
                     events.stream()
                     .filter(t -> t.status().equals(REJECTED))
-                    .map(t -> String.format("%s: %s",
-                                            t.status(),
-                                            t.snippet().source().trim()))
+                    .map(t -> jshell.diagnostics(t.snippet())
+                              .map(u -> u.getMessage(locale))
+                              .collect(joining("\n",
+                                               String.format("%s %s\n%s\n",
+                                                             t.status(),
+                                                             t.snippet().kind(),
+                                                             t.snippet().source()),
+                                               "")))
                     .findFirst().orElse(null);
 
                 if (reason != null) {
-                    throw new Exception(reason);
+                    err.println(reason);
+                    break;
                 }
 
                 if (! iterator.hasNext()) {
@@ -455,7 +435,6 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
 
                         switch (event.snippet().kind()) {
                         case EXPRESSION:
-                        case VAR:
                             out.println(event.value());
                             break;
 
