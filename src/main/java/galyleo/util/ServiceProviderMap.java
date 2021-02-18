@@ -1,8 +1,11 @@
 package galyleo.util;
 
 import java.util.Comparator;
+import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.TreeMap;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * {@link ServiceLoader Service} {@link java.util.Map}.
@@ -38,9 +41,18 @@ public class ServiceProviderMap<T> extends TreeMap<Class<? extends T>,T> {
      */
     public ServiceProviderMap<T> reload() {
         loader.reload();
-        loader.stream()
+
+        var providers =
+            loader.stream()
             .filter(t -> (! containsKey(t.type())))
-            .forEach(t -> put(t.type(), t.get()));
+            .collect(toList());
+
+        for (var provider : providers) {
+            try {
+                put(provider.type(), provider.get());
+            } catch (ServiceConfigurationError error) {
+            }
+        }
 
         return this;
     }
