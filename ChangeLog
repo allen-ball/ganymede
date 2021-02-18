@@ -1,5 +1,9 @@
 2021-02-17  Allen D. Ball  <ball@hcf.dev>
 
+	* src/main/java/galyleo/shell/MagicMap.java,
+	src/main/java/galyleo/util/ServiceProviderMap.java:
+	Initial writing.
+
 	* src/main/java/galyleo/shell/Shell.java:
 	In addToClasspath(String), analyze JARs for likely Maven
 	artifacts.
