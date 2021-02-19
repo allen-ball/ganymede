@@ -206,7 +206,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
             if (restart) {
                 Server.this.restart();
             } else {
-                submit(() -> getServer().shutdown());
+                Server.this.shutdown();
             }
         }
 
