@@ -28,6 +28,7 @@ import jdk.jshell.JShell;
 import jdk.jshell.JShellException;
 import jdk.jshell.SourceCodeAnalysis;
 import lombok.NoArgsConstructor;
+import lombok.Synchronized;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.io.IoBuilder;
@@ -71,22 +72,15 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
     private final Map<File,Set<Artifact>> classpath = new LinkedHashMap<>();
 
     /**
-     * Method to start a {@link Shell}.
+     * Accessor to the {@link JShell} instance (created and initialized on
+     * first call).
      *
-     * @param   in              The {@code in} {@link InputStream}.
-     * @param   out             The {@code out} {@link PrintStream}.
-     * @param   err             The {@code err} {@link PrintStream}.
+     * @return  The {@link JShell} instance.
      */
-    public void start(InputStream in, PrintStream out, PrintStream err) {
-        synchronized (this) {
-            this.in = in;
-            this.out = out;
-            this.err = err;
-
-            magic.clear();
-            magic.reload();
-
-            var jshell =
+    @Synchronized
+    public JShell jshell() {
+        if (jshell == null) {
+            jshell =
                 JShell.builder()
                 .remoteVMOptions(VMOPTIONS)
                 .in(in).out(out).err(err).build();
@@ -111,13 +105,11 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
                 log.warn("{}", exception, exception);
             }
 
-            Stream.of(getMagicNames()).forEach(t -> magic.put(t, this));
-
             classpath.keySet()
                 .forEach(t -> jshell.addToClasspath(t.toString()));
-
-            this.jshell = jshell;
         }
+
+        return jshell;
     }
 
     private String getResourceAsString(String name) throws Exception {
@@ -132,44 +124,54 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
     }
 
     /**
+     * Method to start a {@link Shell}.
+     *
+     * @param   in              The {@code in} {@link InputStream}.
+     * @param   out             The {@code out} {@link PrintStream}.
+     * @param   err             The {@code err} {@link PrintStream}.
+     */
+    @Synchronized
+    public void start(InputStream in, PrintStream out, PrintStream err) {
+        this.in = in;
+        this.out = out;
+        this.err = err;
+
+        magic.clear();
+        magic.reload();
+
+        Stream.of(getMagicNames()).forEach(t -> magic.put(t, this));
+    }
+
+    /**
      * Method to restart a {@link Shell}.
      *
      * @param   in              The {@code in} {@link InputStream}.
      * @param   out             The {@code out} {@link PrintStream}.
      * @param   err             The {@code err} {@link PrintStream}.
      */
+    @Synchronized
     public void restart(InputStream in, PrintStream out, PrintStream err) {
-        synchronized (this) {
-            stop();
-            close();
-            start(in, out, err);
-        }
+        stop();
+        close();
+        start(in, out, err);
     }
 
     /**
      * Method to close (terminate) a {@link Shell}.
      */
     @Override
+    @Synchronized
     public void close() {
-        synchronized (this) {
-            Stream.of(getMagicNames()).forEach(t -> magic.remove(t));
+        Stream.of(getMagicNames()).forEach(t -> magic.remove(t));
 
-            try (var jshell = jshell()) {
-                this.jshell = null;
+        try (var jshell = this.jshell) {
+            this.jshell = null;
 
-                if (jshell != null) {
-                    restarts.incrementAndGet();
-                }
+            if (jshell != null) {
+                restarts.incrementAndGet();
             }
         }
     }
-
-    /**
-     * Accessor to the active {@link JShell} instance.
-     *
-     * @return  The {@link JShell} instance.
-     */
-    public JShell jshell() { return jshell; }
 
     /**
      * Method to search for and add jars to the {@link JShell} instance
@@ -249,10 +251,11 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
      * @param   collection      The {@link Collection} of {@link Artifact}s
      *                          this {@link File} represents.
      */
+    @Synchronized
     protected void addToClasspath(File file, Collection<Artifact> collection) {
         if (! classpath.containsKey(file)) {
             if (classpath.put(file, collection.stream().collect(toSet())) == null) {
-                var jshell = jshell();
+                var jshell = this.jshell;
 
                 if (jshell != null) {
                     jshell.addToClasspath(file.toString());
@@ -301,6 +304,7 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
      *
      * @return  The result of evaluating the expression.
      */
+    @Synchronized
     public String evaluate(String expression) throws Exception {
         var jshell = jshell();
         var analyzer = jshell.sourceCodeAnalysis();
@@ -349,8 +353,9 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
     /**
      * Method to stop (interrupt) a {@link Shell}.
      */
+    @Synchronized
     public void stop() {
-        var jshell = jshell();
+        var jshell = this.jshell;
 
         if (jshell != null) {
             jshell.stop();
@@ -366,6 +371,7 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
     public int restarts() { return restarts.intValue(); }
 
     @Override
+    @Synchronized
     public void execute(Shell shell,
                         InputStream in, PrintStream out, PrintStream err,
                         String magic, String code) throws Exception {

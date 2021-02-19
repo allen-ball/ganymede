@@ -14,7 +14,9 @@ var __ =
             try {
                 var url = new java.net.URL("%1$s");
 
-                loader = new java.net.URLClassLoader(new java.net.URL[] { url });
+                loader =
+                    new java.net.URLClassLoader(new java.net.URL[] { url },
+                                                getClass().getClassLoader());
             } catch (Exception exception) {
                 throw new ExceptionInInitializerError(exception);
             }
