@@ -1,5 +1,8 @@
 2021-02-19  Allen D. Ball  <ball@hcf.dev>
 
+	* src/main/java/galyleo/install/Install.java:
+	Define ${maven.repo.local} if installing into sysPrefix.
+
 	* src/main/java/galyleo/shell/Shell.java:
 	Delay starting the JShell instance until need to add classpath to
 	be updated.  In bootstrap.jsh, explicitly link parent ClassLoader.

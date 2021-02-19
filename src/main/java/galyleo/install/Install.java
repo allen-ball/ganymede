@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
@@ -53,6 +54,7 @@ public class Install implements ApplicationRunner {
             }
         }
 
+        var sysProperties = new LinkedHashMap<String,Object>();
         var tmp = Files.createTempDirectory(getClass().getPackage().getName() + "-");
 
         try {
@@ -81,6 +83,21 @@ public class Install implements ApplicationRunner {
              */
             var runtime_dir = getOutputAsString(jupyter, "--runtime-dir");
             /*
+             * Maven local repository
+             */
+            if (sysPrefix) {
+                var repository =
+                    Paths.get(paths.at("/data").get(1).asText(), "repository");
+
+                sysProperties.put("maven.repo.local", repository);
+
+                try {
+                    Files.createDirectories(repository);
+                } catch (Exception exception) {
+                    log.warn("{}: Could not create", repository, exception);
+                }
+            }
+            /*
              * kernelspec
              */
             var kernelspec = tmp.resolve(id);
@@ -103,7 +120,11 @@ public class Install implements ApplicationRunner {
                 jar = Paths.get(prefix, "kernels", id, name).toString();
             }
 
-            Stream.of(java, "-jar", jar, "--connection-file={connection_file}")
+            argv.add(java);
+            sysProperties.entrySet().stream()
+                .map(t -> "-D" + t)
+                .forEach(argv::add);
+            Stream.of("-jar", jar, "--connection-file={connection_file}")
                 .map(Object::toString)
                 .forEach(argv::add);
 
