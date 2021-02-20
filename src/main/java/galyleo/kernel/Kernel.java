@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import galyleo.server.Message;
 import galyleo.server.Server;
 import galyleo.shell.Shell;
-import galyleo.shell.jshell.RemoteRuntime;
+import galyleo.shell.jshell.CellMethods;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -134,9 +134,9 @@ public class Kernel extends Server implements ApplicationContextAware,
 
     @Override
     protected ArrayNode getExecutionEvents() {
-        var node = RemoteRuntime.getExecutionEvents();
+        var node = CellMethods.getExecutionEvents();
 
-        node.addAll(RemoteRuntime.getExecutionEvents(shell));
+        node.addAll(CellMethods.getExecutionEvents(shell));
 
         return node;
     }

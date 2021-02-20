@@ -47,6 +47,13 @@ public interface Magic {
     public String[] getMagicNames();
 
     /**
+     * Method to the Description of {@link.this} {@link Magic}.
+     *
+     * @return  The description.
+     */
+    public String getDescription();
+
+    /**
      * Entry-point method.  Executed in the {@link galyleo.shell.Shell}.
      *
      * @param   shell           The {@link Shell}.

@@ -13,6 +13,7 @@ import lombok.extern.log4j.Log4j2;
  * @version $Revision$
  */
 @ServiceProviderFor({ Magic.class })
+@Description("Execute script with 'ruby' command")
 @NoArgsConstructor @ToString @Log4j2
 public class Ruby extends Script {
     @Override

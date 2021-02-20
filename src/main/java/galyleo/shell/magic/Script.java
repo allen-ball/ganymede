@@ -17,7 +17,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @version $Revision$
  */
 @ServiceProviderFor({ Magic.class })
-@MagicNames({ "script", "!" })
+@MagicNames({ "!", "script" })
+@Description("Execute script with the argument command")
 @NoArgsConstructor @ToString @Log4j2
 public class Script implements AnnotatedMagic {
     @Override

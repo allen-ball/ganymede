@@ -1,5 +1,7 @@
 2021-02-19  Allen D. Ball  <ball@hcf.dev>
 
+	* Added "magics" Magic.
+
 	* src/main/java/galyleo/install/Install.java:
 	Define ${maven.repo.local} if installing into sysPrefix.
 

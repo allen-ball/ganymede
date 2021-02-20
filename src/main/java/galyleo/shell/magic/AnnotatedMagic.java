@@ -20,4 +20,16 @@ public interface AnnotatedMagic extends Magic {
 
         return value;
     }
+
+    @Override
+    default String getDescription() {
+        Description annotation = getClass().getAnnotation(Description.class);
+        String value = (annotation != null) ? annotation.value() : null;
+
+        if (value == null) {
+            value = "Description not available";
+        }
+
+        return value;
+    }
 }

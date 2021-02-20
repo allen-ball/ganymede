@@ -259,7 +259,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
 
             language_info.put("name", "java");
             language_info.put("version", System.getProperty("java.version"));
-            language_info.put("mimetype", "text/plain");
+            language_info.put("mimetype", "text/x-java");
             language_info.put("file_extension", ".java");
 
             content.set("language_info", language_info);

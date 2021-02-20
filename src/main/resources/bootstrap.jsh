@@ -4,7 +4,7 @@
  * Processed as a String format:
  *
  *      1$      galyleo-kernel JAR URL
- *      2$      RemoteRuntime Class Name
+ *      2$      CellMethods Class Name
  */
 var __ =
     new Object() {

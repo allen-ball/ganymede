@@ -17,6 +17,7 @@ import lombok.extern.log4j.Log4j2;
  * @version $Revision$
  */
 @ServiceProviderFor({ Magic.class })
+@Description("Print JShell snippets")
 @NoArgsConstructor @ToString @Log4j2
 public class Snippets extends JShell {
     @Override

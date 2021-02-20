@@ -2,8 +2,9 @@ package galyleo.shell;
 
 import galyleo.dependency.Analyzer;
 import galyleo.server.Message;
-import galyleo.shell.jshell.RemoteRuntime;
+import galyleo.shell.jshell.CellMethods;
 import galyleo.shell.magic.AnnotatedMagic;
+import galyleo.shell.magic.Description;
 import galyleo.shell.magic.MagicNames;
 import java.io.File;
 import java.io.IOException;
@@ -52,7 +53,7 @@ import static org.apache.logging.log4j.Level.WARN;
  * @version $Revision$
  */
 @NoArgsConstructor @ToString @Log4j2
-@MagicNames({ "java" })
+@MagicNames({ "java" }) @Description("Execute code in Java REPL")
 public class Shell implements AnnotatedMagic, AutoCloseable {
     private static final String[] VMOPTIONS =
         Stream.of("--add-opens", "java.base/jdk.internal.misc=ALL-UNNAMED",
@@ -63,65 +64,13 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
 
     private Locale locale = null;       /* TBD: Query Notebook server */
     private final AtomicInteger restarts = new AtomicInteger(0);
-    private final MagicMap magic = new MagicMap();
+    private final MagicMap magics = new MagicMap();
     private JShell jshell = null;
     private InputStream in = null;
     private PrintStream out = null;
     private PrintStream err = null;
     private final Analyzer analyzer = new Analyzer();
     private final Map<File,Set<Artifact>> classpath = new LinkedHashMap<>();
-
-    /**
-     * Accessor to the {@link JShell} instance (created and initialized on
-     * first call).
-     *
-     * @return  The {@link JShell} instance.
-     */
-    @Synchronized
-    public JShell jshell() {
-        if (jshell == null) {
-            jshell =
-                JShell.builder()
-                .remoteVMOptions(VMOPTIONS)
-                .in(in).out(out).err(err).build();
-
-            try {
-                var logIn =
-                    IoBuilder.forLogger(log)
-                    .setLevel(WARN)
-                    .filter(InputStream.nullInputStream())
-                    .buildInputStream();
-                var logOut =
-                    IoBuilder.forLogger(log)
-                    .setLevel(WARN)
-                    .buildPrintStream();
-                var bootstrap =
-                    String.format(getResourceAsString("bootstrap.jsh"),
-                                  KERNEL_JAR.toURI().toURL(),
-                                  RemoteRuntime.class.getName());
-
-                execute(jshell, logIn, logOut, logOut, null, bootstrap);
-            } catch (Exception exception) {
-                log.warn("{}", exception, exception);
-            }
-
-            classpath.keySet()
-                .forEach(t -> jshell.addToClasspath(t.toString()));
-        }
-
-        return jshell;
-    }
-
-    private String getResourceAsString(String name) throws Exception {
-        String string = null;
-        var resource = new ClassPathResource(name);
-
-        try (var in = resource.getInputStream()) {
-            string = StreamUtils.copyToString(in, UTF_8);
-        }
-
-        return string;
-    }
 
     /**
      * Method to start a {@link Shell}.
@@ -136,10 +85,10 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
         this.out = out;
         this.err = err;
 
-        magic.clear();
-        magic.reload();
+        magics.clear();
+        magics.reload();
 
-        Stream.of(getMagicNames()).forEach(t -> magic.put(t, this));
+        Stream.of(getMagicNames()).forEach(t -> magics.put(t, this));
     }
 
     /**
@@ -162,7 +111,7 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
     @Override
     @Synchronized
     public void close() {
-        Stream.of(getMagicNames()).forEach(t -> magic.remove(t));
+        Stream.of(getMagicNames()).forEach(t -> magics.remove(t));
 
         try (var jshell = this.jshell) {
             this.jshell = null;
@@ -172,6 +121,13 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
             }
         }
     }
+
+    /**
+     * Method to get the {@link Map} of configured {@link Magic}s.
+     *
+     * @return  The {@link Map} of configured {@link Magic}s.
+     */
+    public Map<String,Magic> magics() { return magics; }
 
     /**
      * Method to search for and add jars to the {@link JShell} instance
@@ -265,6 +221,58 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
     }
 
     /**
+     * Accessor to the {@link JShell} instance (created and initialized on
+     * first call).
+     *
+     * @return  The {@link JShell} instance.
+     */
+    @Synchronized
+    public JShell jshell() {
+        if (jshell == null) {
+            jshell =
+                JShell.builder()
+                .remoteVMOptions(VMOPTIONS)
+                .in(in).out(out).err(err).build();
+
+            try {
+                var logIn =
+                    IoBuilder.forLogger(log)
+                    .setLevel(WARN)
+                    .filter(InputStream.nullInputStream())
+                    .buildInputStream();
+                var logOut =
+                    IoBuilder.forLogger(log)
+                    .setLevel(WARN)
+                    .buildPrintStream();
+                var bootstrap =
+                    String.format(getResourceAsString("bootstrap.jsh"),
+                                  KERNEL_JAR.toURI().toURL(),
+                                  CellMethods.class.getName());
+
+                execute(jshell, logIn, logOut, logOut, null, bootstrap);
+            } catch (Exception exception) {
+                log.warn("{}", exception, exception);
+            }
+
+            classpath.keySet()
+                .forEach(t -> jshell.addToClasspath(t.toString()));
+        }
+
+        return jshell;
+    }
+
+    private String getResourceAsString(String name) throws Exception {
+        String string = null;
+        var resource = new ClassPathResource(name);
+
+        try (var in = resource.getInputStream()) {
+            string = StreamUtils.copyToString(in, UTF_8);
+        }
+
+        return string;
+    }
+
+    /**
      * Method to execute code (typically a cell's contents).
      *
      * @param   code            The code to execute.
@@ -279,8 +287,8 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
 
                 var argv = Magic.getCellMagicCommand(line0);
 
-                if (argv.length > 0 && magic.containsKey(argv[0])) {
-                    magic.get(argv[0])
+                if (argv.length > 0 && magics.containsKey(argv[0])) {
+                    magics.get(argv[0])
                         .execute(this, in, out, err, line0, code);
                 } else {
                     throw new IllegalArgumentException(line0);

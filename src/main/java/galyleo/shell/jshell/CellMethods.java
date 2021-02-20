@@ -9,14 +9,13 @@ import static galyleo.server.Server.OBJECT_MAPPER;
 import static lombok.AccessLevel.PRIVATE;
 
 /**
- * {@link galyleo.shell.Shell} remote method implementations and JSON event
- * channel.
+ * Methods available in Notebook cells.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
 @NoArgsConstructor(access = PRIVATE)
-public abstract class RemoteRuntime {
+public abstract class CellMethods {
 
     /**
      * Method to print from a Notebook cell.
@@ -55,7 +54,7 @@ public abstract class RemoteRuntime {
         try {
             var expression =
                 String.format("__.invokeStaticMethod(\"%s\", \"%s\")",
-                              RemoteRuntime.class.getName(),
+                              CellMethods.class.getName(),
                               "getExecutionEventsAsString");
             var content = shell.evaluate(expression);
 
