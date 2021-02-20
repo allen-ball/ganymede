@@ -193,6 +193,12 @@ public interface Magic {
     }
 
     /**
+     * Static {@link MagicMap} instance used by
+     * {@link #receive(String,String,String)}.
+     */
+    public static MagicMap MAP = new MagicMap();
+
+    /**
      * Static method to receive a request in the {@link jdk.jshell.JShell}
      * instance.  The {@link #sendTo(Shell,String,String,String)} method
      * packs the arguments and creates a
@@ -204,10 +210,10 @@ public interface Magic {
      * @param   code            The remainder of the cell.
      */
     public static void receive(String name, String magic, String code) throws Exception {
-        var map = new MagicMap();
+        MAP.reload();
 
-        if (map.containsKey(name)) {
-            map.get(name).execute(decode(magic), decode(code));
+        if (MAP.containsKey(name)) {
+            MAP.get(name).execute(decode(magic), decode(code));
         } else {
             throw new IllegalStateException("Magic '" + name + "' not found");
         }
