@@ -14,7 +14,7 @@
   <parent>
     <groupId>ball</groupId>
     <artifactId>parent</artifactId>
-    <version>20210218.0</version>
+    <version>20210220-SNAPSHOT</version>
     <relativePath/>
   </parent>
   <repositories>
