@@ -49,6 +49,10 @@ public class Magics implements AnnotatedMagic {
     private static final Comparator<List<String>> COMPARATOR =
         Comparator.comparing(t -> t.toString());
 
+    /**
+     * Customized {@link Output Output} for {@link Magics}
+     * {@link RendererImpl Renderer}.
+     */
     public static class Output extends TreeMap<List<String>,String> {
         private static final long serialVersionUID = -2609872192564130449L;
 
@@ -65,8 +69,7 @@ public class Magics implements AnnotatedMagic {
     }
 
     /**
-     * Customized {@link Renderer} for {@link Magics}
-     * {@link Magics.Output Output}.
+     * Customized {@link Renderer} for {@link Magics} {@link Output Output}.
      */
     @ServiceProviderFor({ Renderer.class })
     @ForType(Output.class)
