@@ -320,15 +320,15 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
                 err.reset();
 
                 if (! silent) {
+                    var count = execution_count.intValue();
                     var iterator = events.iterator();
 
                     while (iterator.hasNext()) {
-                        try {
-                            var execute_result =
-                                request.execute_result(execution_count.intValue(),
-                                                       (ObjectNode) iterator.next());
+                        var content = (ObjectNode) iterator.next();
 
-                            iopub.pub(execute_result);
+                        try {
+                            /* iopub.pub(request.display_data(content)); */
+                            iopub.pub(request.execute_result(count, content));
                         } catch (Exception exception) {
                             log.warn("{}", exception);
                         }

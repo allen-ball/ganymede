@@ -262,6 +262,18 @@ public class Message {
     }
 
     /**
+     * See
+     * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#display-data display_data}.
+     */
+    public Message display_data(ObjectNode content) {
+        var message = new Event(getCallingMethodName(1), this);
+
+        message.content().setAll(content);
+
+        return message;
+    }
+
+    /**
      * Parameter to {@link Message#status(Message.status)} and
      * {@link Message#status(Message.status,Message)}.
      */
