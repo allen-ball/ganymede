@@ -33,7 +33,7 @@ import static java.util.stream.Collectors.toMap;
 @ServiceProviderFor({ Magic.class })
 @Description("Lists available cell magics")
 @NoArgsConstructor @ToString @Log4j2
-public class Magics implements AnnotatedMagic {
+public class Magics extends AbstractMagic {
     @Override
     public void execute(Shell shell,
                         InputStream in, PrintStream out, PrintStream err,

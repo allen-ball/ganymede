@@ -12,7 +12,7 @@ import static lombok.AccessLevel.PROTECTED;
  * @version $Revision$
  */
 @NoArgsConstructor(access = PROTECTED)
-public abstract class JShell implements AnnotatedMagic {
+public abstract class JShell extends AbstractMagic {
     @Override
     public void execute(String magic, String code) throws Exception {
         throw new IllegalArgumentException(magic);

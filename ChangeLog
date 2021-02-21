@@ -1,5 +1,8 @@
 2021-02-21  Allen D. Ball  <ball@hcf.dev>
 
+	* src/main/java/galyleo/shell/magic/AbstractMagic.java:
+	Initial writing: Provides common PropertyPlaceholderHelper.
+
 	* src/main/java/galyleo/shell/Shell.java:
 	Propagate kernel VM "-D" arguments to the JShell VM options.
 

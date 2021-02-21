@@ -19,7 +19,7 @@ import lombok.extern.log4j.Log4j2;
 @ServiceProviderFor({ Magic.class })
 @Description("Print JShell types")
 @NoArgsConstructor @ToString @Log4j2
-public class Types implements AnnotatedMagic {
+public class Types extends AbstractMagic {
     @Override
     public void execute(Shell shell,
                         InputStream in, PrintStream out, PrintStream err,

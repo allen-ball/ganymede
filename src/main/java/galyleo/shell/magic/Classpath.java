@@ -9,7 +9,6 @@ import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.util.PropertyPlaceholderHelper;
 
 /**
  * {@link Classpath} {@link galyleo.shell.Magic}.  See
@@ -24,15 +23,13 @@ import org.springframework.util.PropertyPlaceholderHelper;
 public class Classpath extends JShell {
     private static final String SEPARATOR = System.getProperty("path.separator");
 
-    private final PropertyPlaceholderHelper helper = new PropertyPlaceholderHelper("${", "}", ":", true);
-
     @Override
     public void execute(Shell shell,
                         InputStream in, PrintStream out, PrintStream err,
                         String magic, String code) throws Exception {
         if (! code.isBlank()) {
             var classpath =
-                helper.replacePlaceholders(code, System.getProperties())
+                HELPER.replacePlaceholders(code, System.getProperties())
                 .lines()
                 .filter(t -> (! t.isBlank()))
                 .map(String::strip)

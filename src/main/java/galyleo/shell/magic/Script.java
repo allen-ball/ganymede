@@ -20,7 +20,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @MagicNames({ "!", "script" })
 @Description("Execute script with the argument command")
 @NoArgsConstructor @ToString @Log4j2
-public class Script implements AnnotatedMagic {
+public class Script extends AbstractMagic {
     @Override
     public void execute(String magic, String code) throws Exception {
         var argv =

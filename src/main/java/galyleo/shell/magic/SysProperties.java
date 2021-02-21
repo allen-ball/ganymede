@@ -8,7 +8,6 @@ import java.util.Properties;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.util.PropertyPlaceholderHelper;
 
 /**
  * {@link SysProperties} {@link galyleo.shell.Magic}.
@@ -19,9 +18,7 @@ import org.springframework.util.PropertyPlaceholderHelper;
 @ServiceProviderFor({ Magic.class })
 @Description("Add/Update or print System properties")
 @NoArgsConstructor @ToString @Log4j2
-public class SysProperties implements AnnotatedMagic {
-    private final PropertyPlaceholderHelper helper = new PropertyPlaceholderHelper("${", "}", ":", true);
-
+public class SysProperties extends AbstractMagic {
     @Override
     public void execute(String magic, String code) throws Exception {
         if (! code.isBlank()) {
@@ -39,7 +36,7 @@ public class SysProperties implements AnnotatedMagic {
                     for (var key : in.keySet()) {
                         if (key instanceof String) {
                             var string = (String) key;
-                            var value = helper.replacePlaceholders(in.getProperty(string), out);
+                            var value = HELPER.replacePlaceholders(in.getProperty(string), out);
 
                             changed |= (! Objects.equals(value, out.put(string, value)));
                         }
