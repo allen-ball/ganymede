@@ -19,7 +19,7 @@ import org.springframework.util.PropertyPlaceholderHelper;
  * @version $Revision$
  */
 @ServiceProviderFor({ Magic.class })
-@Description("Add to JShell classpath")
+@Description("Add to or print JShell classpath")
 @NoArgsConstructor @ToString @Log4j2
 public class Classpath extends JShell {
     private static final String SEPARATOR = System.getProperty("path.separator");
@@ -30,16 +30,20 @@ public class Classpath extends JShell {
     public void execute(Shell shell,
                         InputStream in, PrintStream out, PrintStream err,
                         String magic, String code) throws Exception {
-        var classpath =
-            code.lines()
-            .filter(t -> (! t.isBlank()))
-            .map(String::strip)
-            .flatMap(t -> Stream.of(t.split(SEPARATOR)))
-            .filter(t -> (! t.isBlank()))
-            .map(String::strip)
-            .map(t -> helper.replacePlaceholders(t, System.getProperties()))
-            .toArray(String[]::new);
+        if (! code.isBlank()) {
+            var classpath =
+                code.lines()
+                .filter(t -> (! t.isBlank()))
+                .map(String::strip)
+                .flatMap(t -> Stream.of(t.split(SEPARATOR)))
+                .filter(t -> (! t.isBlank()))
+                .map(String::strip)
+                .map(t -> helper.replacePlaceholders(t, System.getProperties()))
+                .toArray(String[]::new);
 
-        shell.addToClasspath(classpath);
+            shell.addToClasspath(classpath);
+        } else {
+            shell.classpath().stream().forEach(out::println);
+        }
     }
 }
