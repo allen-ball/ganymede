@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -236,9 +237,19 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
     @Synchronized
     public JShell jshell() {
         if (jshell == null) {
+            var definitions =
+                Stream.of(ProcessHandle.current().info().arguments())
+                .flatMap(Optional::stream)
+                .flatMap(Stream::of)
+                .takeWhile(t -> (! Objects.equals(t, "-jar")))
+                .filter(t -> t.startsWith("-D"));
+            var vmoptions =
+                Stream.concat(Stream.of(VMOPTIONS), definitions)
+                .toArray(String[]::new);
+
             jshell =
                 JShell.builder()
-                .remoteVMOptions(VMOPTIONS)
+                .remoteVMOptions(vmoptions)
                 .in(in).out(out).err(err).build();
 
             try {
