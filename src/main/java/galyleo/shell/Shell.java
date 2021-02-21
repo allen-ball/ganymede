@@ -130,6 +130,13 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
     public Map<String,Magic> magics() { return magics; }
 
     /**
+     * Method to get the current {@link JShell} classpath.
+     *
+     * @return  The {@link Set} of {@link File}s.
+     */
+    public Set<File> classpath() { return classpath.keySet(); }
+
+    /**
      * Method to search for and add jars to the {@link JShell} instance
      * {@code classpath}.  See {@link #addToClasspath(String...)}.
      *
