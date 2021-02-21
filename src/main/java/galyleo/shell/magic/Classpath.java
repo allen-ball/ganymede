@@ -32,13 +32,13 @@ public class Classpath extends JShell {
                         String magic, String code) throws Exception {
         if (! code.isBlank()) {
             var classpath =
-                code.lines()
+                helper.replacePlaceholders(code, System.getProperties())
+                .lines()
                 .filter(t -> (! t.isBlank()))
                 .map(String::strip)
                 .flatMap(t -> Stream.of(t.split(SEPARATOR)))
                 .filter(t -> (! t.isBlank()))
                 .map(String::strip)
-                .map(t -> helper.replacePlaceholders(t, System.getProperties()))
                 .toArray(String[]::new);
 
             shell.addToClasspath(classpath);
