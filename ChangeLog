@@ -1,5 +1,8 @@
 2021-02-20  Allen D. Ball  <ball@hcf.dev>
 
+	* src/main/java/galyleo/shell/magic/Classpath.java:
+	Initial writing.
+
 	* src/main/java/galyleo/shell/Magic.java:
 	Provide static MagicMap member for receive(String,String,String)
 	method.
