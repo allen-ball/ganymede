@@ -124,6 +124,18 @@ public class POM {
          */
         public Dependency(String gav) { this(gav.split(":")); }
 
+        /**
+         * Construct from "{@code groupId}", "{@code artifactId}", and
+         * "{@code version}".
+         *
+         * @param       g       The "{@code groupId}" {@link String}.
+         * @param       a       The "{@code artifactId}" {@link String}.
+         * @param       v       The "{@code version}" {@link String}.
+         */
+        public Dependency(String g, String a, String v) {
+            this(new String[] { g, a, v });
+        }
+
         private Dependency(String[] argv) {
             super((argv.length > 0) ? argv[0] : "unknown",
                   (argv.length > 1) ? argv[1] : "unknown",

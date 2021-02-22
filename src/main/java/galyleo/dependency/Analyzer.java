@@ -5,10 +5,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
@@ -17,7 +17,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
 
 import static java.util.stream.Collectors.toMap;
 import static org.apache.maven.artifact.ArtifactUtils.versionlessKey;
@@ -83,10 +82,7 @@ public class Analyzer {
 
                     properties.load(in);
 
-                    var artifact =
-                        new ArtifactImpl(properties.getProperty("groupId"),
-                                         properties.getProperty("artifactId"),
-                                         properties.getProperty("version"));
+                    var artifact = artifact(properties, "groupId", "artifactId", "version");
 
                     if (! entry.getValue().equals(versionlessKey(artifact))) {
                         log.warn("{} does not specify {}",
@@ -122,20 +118,13 @@ public class Analyzer {
         return set;
     }
 
-    private Artifact artifact(Attributes attributes,
-                              String g, String a, String v) {
-        return artifact(attributes.getValue(g),
-                        attributes.getValue(a),
-                        attributes.getValue(v));
+    private Artifact artifact(Map<?,?> map, String g, String a, String v) {
+        return artifact(Objects.toString(map.get(g), null),
+                        Objects.toString(map.get(a), null),
+                        Objects.toString(map.get(v), null));
     }
 
     private Artifact artifact(String g, String a, String v) {
-        return (g != null && a != null && v != null) ? new ArtifactImpl(g, a, v) : null;
-    }
-
-    private class ArtifactImpl extends DefaultArtifact {
-        public ArtifactImpl(String g, String a, String v) {
-            super(g, a, v, "runtime", "jar", "", null);
-        }
+        return (g != null && a != null && v != null) ? new POM.Dependency(g, a, v) : null;
     }
 }
