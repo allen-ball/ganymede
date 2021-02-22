@@ -1,6 +1,7 @@
 package galyleo.shell;
 
-import galyleo.dependency.Analyzer;
+import galyleo.dependency.POM;
+import galyleo.dependency.Resolver;
 import galyleo.server.Message;
 import galyleo.shell.jshell.CellMethods;
 import galyleo.shell.magic.AnnotatedMagic;
@@ -70,7 +71,7 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
     private InputStream in = null;
     private PrintStream out = null;
     private PrintStream err = null;
-    private final Analyzer analyzer = new Analyzer();
+    private final Resolver resolver = new Resolver();
     private final Map<File,Set<Artifact>> classpath = new LinkedHashMap<>();
 
     /**
@@ -138,6 +139,16 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
     public Set<File> classpath() { return classpath.keySet(); }
 
     /**
+     * Method to call
+     * {@link Resolver#resolve(Shell,POM,PrintStream,PrintStream)}.
+     *
+     * @param   pom             The {@link POM} to merge.
+     */
+    public void resolve(POM pom) {
+        resolver.resolve(this, pom, out, err);
+    }
+
+    /**
      * Method to search for and add jars to the {@link JShell} instance
      * {@code classpath}.  See {@link #addToClasspath(String...)}.
      *
@@ -182,7 +193,7 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
             file = file.getAbsoluteFile();
 
             if (! classpath.containsKey(file)) {
-                addToClasspath(file, analyzer.getJarArtifacts(file));
+                addToClasspath(file, resolver.getJarArtifacts(file));
             }
         }
     }
