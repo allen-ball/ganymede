@@ -1,7 +1,10 @@
 2021-02-21  Allen D. Ball  <ball@hcf.dev>
 
-	* src/main/java/galyleo/dependency/Resolver.java:
-	Interim check-in.
+	* src/main/java/galyleo/dependency/POM.java,
+	src/main/java/galyleo/dependency/Resolver.java,
+	src/main/java/galyleo/shell/magic/POM.java:
+	Interim check-in: Merge POM values and display current POM if no
+	POM is supplied.
 
 	* src/main/java/galyleo/shell/magic/AbstractMagic.java:
 	Initial writing: Provides common PropertyPlaceholderHelper.

@@ -2,6 +2,7 @@ package galyleo.dependency;
 
 import galyleo.shell.Shell;
 import java.io.PrintStream;
+import java.util.Objects;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
@@ -19,6 +20,9 @@ import org.eclipse.aether.transport.classpath.ClasspathTransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.eclipse.aether.transport.http.HttpTransporterFactory;
 
+import static java.util.stream.Collectors.toSet;
+import static org.apache.maven.artifact.ArtifactUtils.versionlessKey;
+
 /**
  * Dependency {@link Resolver}.
  *
@@ -33,8 +37,6 @@ public class Resolver extends Analyzer {
         new DefaultSettingsBuilderFactory().newInstance();
 
     private final POM pom;
-    private final DefaultServiceLocator locator =
-        MavenRepositorySystemUtils.newServiceLocator();
 
     {
         try {
@@ -42,36 +44,14 @@ public class Resolver extends Analyzer {
         } catch (Exception exception) {
             throw new ExceptionInInitializerError(exception);
         }
-/*
-        locator.setErrorHandler(new AntServiceLocatorErrorHandler(project));
-        locator.setServices(Logger.class, new AntLogger(project));
-*/
-        locator.setServices(ModelBuilder.class, MODEL_BUILDER);
-        locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
-        locator.addService(TransporterFactory.class, FileTransporterFactory.class);
-        locator.addService(TransporterFactory.class, HttpTransporterFactory.class);
-        locator.addService(TransporterFactory.class, ClasspathTransporterFactory.class);
-/*
-        DefaultSettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
-
-        request.setUserSettingsFile(getUserSettings());
-        request.setGlobalSettingsFile(getGlobalSettings());
-        request.setSystemProperties(getSystemProperties());
-        request.setUserProperties(getUserProperties());
-
-        try {
-            settings = SETTINGS_BUILDER.build(request).getEffectiveSettings();
-        } catch (SettingsBuildingException exception) {
-            log.warn("Could not process settings.xml: {}",
-                     exception.getMessage(), exception);
-        }
-
-        SettingsDecryptionResult result =
-            SETTINGS_DECRYPTER.decrypt(new DefaultSettingsDecryptionRequest(settings));
-        settings.setServers(result.getServers());
-        settings.setProxies(result.getProxies());
-*/
     }
+
+    /**
+     * Method to get the current {@link POM}.
+     *
+     * @return  The current {@link POM}.
+     */
+    public POM pom() { return pom; }
 
     /**
      * Merge the argument {@link POM} and resolve any dependencies.
@@ -82,11 +62,70 @@ public class Resolver extends Analyzer {
      * @param   err             The {@code stderr} {@link PrintStream}.
      */
     public void resolve(Shell shell, POM pom, PrintStream out, PrintStream err) {
-try {
-    this.pom.writeTo(out);
-    pom.writeTo(out);
-} catch (Exception exception) {
-    exception.printStackTrace(err);
-}
+        try {
+            merge(pom);
+
+            var locator = MavenRepositorySystemUtils.newServiceLocator();
+/*
+            locator.setErrorHandler(new AntServiceLocatorErrorHandler(project));
+            locator.setServices(Logger.class, new AntLogger(project));
+*/
+            locator.setServices(ModelBuilder.class, MODEL_BUILDER);
+            locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
+            locator.addService(TransporterFactory.class, FileTransporterFactory.class);
+            locator.addService(TransporterFactory.class, HttpTransporterFactory.class);
+            locator.addService(TransporterFactory.class, ClasspathTransporterFactory.class);
+/*
+            DefaultSettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
+
+            request.setUserSettingsFile(getUserSettings());
+            request.setGlobalSettingsFile(getGlobalSettings());
+            request.setSystemProperties(getSystemProperties());
+            request.setUserProperties(getUserProperties());
+
+            try {
+                settings = SETTINGS_BUILDER.build(request).getEffectiveSettings();
+            } catch (SettingsBuildingException exception) {
+                log.warn("Could not process settings.xml: {}",
+                         exception.getMessage(), exception);
+            }
+
+            SettingsDecryptionResult result =
+                SETTINGS_DECRYPTER.decrypt(new DefaultSettingsDecryptionRequest(settings));
+            settings.setServers(result.getServers());
+            settings.setProxies(result.getProxies());
+*/
+        } catch (Exception exception) {
+            exception.printStackTrace(err);
+        }
+    }
+
+    private void merge(POM update) {
+        if (update.getLocalRepository() != null) {
+            pom.setLocalRepository(update.getLocalRepository());
+        }
+
+        var ids =
+            update.getRepositories().stream()
+            .map(t -> t.getId())
+            .filter(Objects::nonNull)
+            .collect(toSet());
+        var urls =
+            update.getRepositories().stream()
+            .map(t -> t.getUrl())
+            .filter(Objects::nonNull)
+            .collect(toSet());
+
+        pom.getRepositories()
+            .removeIf(t -> ids.contains(t.getId()) || urls.contains(t.getUrl()));
+        pom.getRepositories().addAll(update.getRepositories());
+
+        var keys =
+            update.getDependencies().stream()
+            .map(t -> versionlessKey(t))
+            .collect(toSet());
+
+        pom.getDependencies().removeIf(t -> keys.contains(versionlessKey(t)));
+        pom.getDependencies().addAll(update.getDependencies());
     }
 }

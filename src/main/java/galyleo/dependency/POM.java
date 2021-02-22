@@ -1,16 +1,17 @@
 package galyleo.dependency;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -18,6 +19,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
+import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.settings.Repository;
 
 import static java.util.stream.Collectors.joining;
@@ -70,8 +73,8 @@ public class POM {
     }
 
     private String localRepository = null;
-    private List<Dependency> dependencies = List.of();
-    private List<Repository> repositories = List.of();
+    private List<Dependency> dependencies = new ArrayList<>();
+    private List<Repository> repositories = new ArrayList<>();
 
     /**
      * Method to write {@link.this} {@link POM}'s YAML representation.
@@ -86,24 +89,32 @@ public class POM {
     }
 
     /**
-     * {@link POM} {@link Dependency Dependency}.
+     * {@link POM} {@link Dependency Dependency} {@link JsonSerialize}
+     * annotation argument type.
+     */
+    @JsonPropertyOrder({ "groupId", "artifactId", "version", "type" })
+    public static interface SerializedDependency {
+        public String getGroupId();
+        public String getArtifactId();
+        public String getVersion();
+        public String getScope();
+        public String getType();
+        public String getClassifier();
+    }
+
+    /**
+     * {@link POM} {@link Dependency Dependency}
+     * {@link DefaultArtifact Artifact}.
      *
      * {@bean.info}
      */
-    @JsonPropertyOrder({ "groupId", "artifactId", "version", "type" })
-    @Data
-    public static class Dependency {
-        private String artifactId = "unknown";
-        private String groupId = "unknown";
-        private String version = null;
-        private String scope = null;
-        private String type = null;
-        private String classifier = null;
+    @JsonSerialize(as = SerializedDependency.class)
+    public static class Dependency extends DefaultArtifact implements SerializedDependency {
 
         /**
          * No-argument constructor.
          */
-        public Dependency() { }
+        public Dependency() { this(new String[] { }); }
 
         /**
          * G-A-V constructor.
@@ -113,25 +124,17 @@ public class POM {
          */
         public Dependency(String gav) { this(gav.split(":")); }
 
-        private Dependency(String[] strings) {
-            this();
-
-            setGroupId(strings[0]);
-            setArtifactId(strings[1]);
-            setVersion((strings.length > 2) ? strings[2] : /* LATEST_VERSION */ null);
-            setScope((strings.length > 3) ? strings[3] : /* "runtime" */ null);
-            setType((strings.length > 4) ? strings[4] : /* "jar" */ null);
-            setClassifier((strings.length > 5) ? strings[5] : null);
+        private Dependency(String[] argv) {
+            super((argv.length > 0) ? argv[0] : "unknown",
+                  (argv.length > 1) ? argv[1] : "unknown",
+                  (argv.length > 2) ? argv[2] : LATEST_VERSION,
+                  (argv.length > 3) ? argv[3] : /* "runtime" */ "",
+                  (argv.length > 4) ? argv[4] : /* "jar" */ "",
+                  (argv.length > 5) ? argv[5] : "",
+                  null);
         }
 
         @Override
-        public String toString() {
-            var string =
-                Stream.of(artifactId, groupId, version, type)
-                .filter(Objects::nonNull)
-                .collect(joining(":"));
-
-            return string;
-        }
+        public String toString() { return ArtifactUtils.key(this); }
     }
 }

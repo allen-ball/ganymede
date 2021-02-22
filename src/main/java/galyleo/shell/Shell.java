@@ -139,6 +139,13 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
     public Set<File> classpath() { return classpath.keySet(); }
 
     /**
+     * Method to get the current {@link POM}.
+     *
+     * @return  The current {@link POM}.
+     */
+    public POM pom() { return resolver.pom(); }
+
+    /**
      * Method to call
      * {@link Resolver#resolve(Shell,POM,PrintStream,PrintStream)}.
      *

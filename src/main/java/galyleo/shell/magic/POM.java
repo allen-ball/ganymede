@@ -26,7 +26,11 @@ public class POM extends JShell {
                         InputStream in, PrintStream out, PrintStream err,
                         String magic, String code) throws Exception {
         try {
-            shell.resolve(galyleo.dependency.POM.parse(code));
+            if (! code.isBlank()) {
+                shell.resolve(galyleo.dependency.POM.parse(code));
+            } else {
+                shell.pom().writeTo(out);
+            }
         } catch (JsonProcessingException exception) {
             err.println(exception.getMessage());
         } catch (Exception exception) {
