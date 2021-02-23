@@ -1,14 +1,14 @@
 package galyleo.dependency;
 
-import galyleo.dependency.aether.NotebookRepositoryListener;
-import galyleo.dependency.aether.NotebookTransferListener;
 import galyleo.dependency.aether.POMDependencyList;
 import galyleo.dependency.aether.POMRemoteRepositoryList;
 import galyleo.shell.Shell;
 import java.io.File;
 import java.io.PrintStream;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -19,6 +19,7 @@ import lombok.Synchronized;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.eclipse.aether.AbstractRepositoryListener;
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.RepositorySystem;
@@ -29,14 +30,20 @@ import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
 import org.eclipse.aether.impl.DefaultServiceLocator;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.LocalRepositoryManager;
+import org.eclipse.aether.repository.WorkspaceReader;
+import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.transport.TransporterFactory;
+import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transport.classpath.ClasspathTransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.eclipse.aether.transport.http.HttpTransporterFactory;
+import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.filter.DependencyFilterUtils;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Dependency {@link Resolver}.
@@ -45,10 +52,9 @@ import org.eclipse.aether.util.filter.DependencyFilterUtils;
  * @version $Revision$
  */
 @NoArgsConstructor @ToString @Log4j2
-public class Resolver extends Analyzer {
+public class Resolver extends Analyzer implements WorkspaceReader {
     private final POM pom;
     private RepositorySystem system = null;
-    private RepositorySystemSession session = null;
     private final Map<File,Set<Artifact>> classpath = new LinkedHashMap<>();
 
     {
@@ -82,7 +88,9 @@ public class Resolver extends Analyzer {
         var key = file.getAbsoluteFile();
 
         if (! classpath.containsKey(key)) {
-            classpath.put(key, getJarArtifacts(key));
+            classpath
+                .computeIfAbsent(file, k -> new LinkedHashSet<>())
+                .addAll(getJarArtifacts(key));
         }
     }
 
@@ -93,38 +101,61 @@ public class Resolver extends Analyzer {
      * @param   pom             The {@link POM} to merge.
      * @param   out             The {@code stdout} {@link PrintStream}.
      * @param   err             The {@code stderr} {@link PrintStream}.
+     *
+     * @return  The {@link List} of {@link File}s added to the
+     *          {@link #classpath()}.
      */
-    public void resolve(Shell shell, POM pom, PrintStream out, PrintStream err) {
-        try {
-            boolean modified = pom().merge(pom);
+    public List<File> resolve(Shell shell, POM pom, PrintStream out, PrintStream err) {
+        var list = new ArrayList<File>();
 
-            if (modified) {
-                session = null;
-            }
+        try {
+            pom().merge(pom);
 
             var results =
-                getRepositorySystem()
-                .resolveDependencies(getRepositorySystemSession(),
-                                     dependencyRequest());
-results.getArtifactResults().stream().forEach(out::println);
+                system().resolveDependencies(session(), dependencyRequest());
+
+            for (var result : results.getArtifactResults()) {
+                var artifact = result.getArtifact();
+
+                if (result.isResolved()) {
+                    var file = artifact.getFile().getAbsoluteFile();
+
+                    if (! classpath.containsKey(file)) {
+                        list.add(file);
+                    }
+
+                    classpath
+                        .computeIfAbsent(file, k -> new LinkedHashSet<>())
+                        .add(artifact);
+                }
+
+                if (result.isMissing()) {
+                    err.println(artifact + " missing");
+                }
+
+                if (! result.getExceptions().isEmpty()) {
+                    err.println("--- " + artifact + " ---");
+
+                    result.getExceptions().stream()
+                        .forEach(t -> t.printStackTrace(err));
+                }
+            }
         } catch (Exception exception) {
             exception.printStackTrace(err);
         }
+
+        return list;
     }
 
     @Synchronized
-    private RepositorySystem getRepositorySystem() {
+    private RepositorySystem system() {
         if (system == null) {
             var locator = MavenRepositorySystemUtils.newServiceLocator();
 
-            locator.addService(RepositoryConnectorFactory.class,
-                               BasicRepositoryConnectorFactory.class);
-            locator.addService(TransporterFactory.class,
-                               FileTransporterFactory.class);
-            locator.addService(TransporterFactory.class,
-                               HttpTransporterFactory.class);
-            locator.addService(TransporterFactory.class,
-                               ClasspathTransporterFactory.class);
+            locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
+            locator.addService(TransporterFactory.class, FileTransporterFactory.class);
+            locator.addService(TransporterFactory.class, HttpTransporterFactory.class);
+            locator.addService(TransporterFactory.class, ClasspathTransporterFactory.class);
             /* locator.setServices(Logger.class, log); */
             locator
                 .setErrorHandler(new DefaultServiceLocator.ErrorHandler() {
@@ -142,7 +173,7 @@ results.getArtifactResults().stream().forEach(out::println);
     }
 
     @Synchronized
-    private RepositorySystemSession getRepositorySystemSession() {
+    private RepositorySystemSession session() {
         var session = MavenRepositorySystemUtils.newSession();
         var properties = new LinkedHashMap<Object,Object>();
 
@@ -170,8 +201,9 @@ results.getArtifactResults().stream().forEach(out::println);
          */
         session.setCache(new DefaultRepositoryCache());
         session.setLocalRepositoryManager(getLocalRepositoryManager(session));
-        session.setTransferListener(new NotebookTransferListener());
-        session.setRepositoryListener(new NotebookRepositoryListener());
+        session.setRepositoryListener(new RepositoryListener());
+        session.setTransferListener(new TransferListener());
+        session.setWorkspaceReader(this);
 
         return session;
     }
@@ -186,7 +218,7 @@ results.getArtifactResults().stream().forEach(out::println);
             .orElse(Paths.get(System.getProperty("user.home"), ".m2", "repository"));
         var repository = new LocalRepository(path.toFile());
 
-        return getRepositorySystem().newLocalRepositoryManager(session, repository);
+        return system().newLocalRepositoryManager(session, repository);
     }
 
     private DependencyRequest dependencyRequest() {
@@ -202,5 +234,43 @@ results.getArtifactResults().stream().forEach(out::println);
         return new CollectRequest(new POMDependencyList(pom(), scope),
                                   List.of(),
                                   new POMRemoteRepositoryList(pom()));
+    }
+
+    @Override
+    public WorkspaceRepository getRepository() {
+        return new WorkspaceRepository(getClass().getPackage().getName());
+    }
+
+    @Override
+    public File findArtifact(Artifact artifact) {
+        var id = ArtifactIdUtils.toId(artifact);
+        var file =
+            classpath.entrySet().stream()
+            .flatMap(t -> t.getValue().stream().map(u -> Map.entry(t.getKey(), u)))
+            .filter(t -> Objects.equals(id, ArtifactIdUtils.toId(t.getValue())))
+            .map(t -> t.getKey())
+            .findFirst().orElse(null);
+
+        return file;
+    }
+
+    @Override
+    public List<String> findVersions(Artifact artifact) {
+        var list =
+            classpath.values().stream()
+            .flatMap(Set::stream)
+            .filter(t -> ArtifactIdUtils.equalsVersionlessId(artifact, t))
+            .map(Artifact::getVersion)
+            .collect(toList());
+
+        return list;
+    }
+
+    @NoArgsConstructor @ToString
+    private class RepositoryListener extends AbstractRepositoryListener {
+    }
+
+    @NoArgsConstructor @ToString
+    private class TransferListener extends AbstractTransferListener {
     }
 }

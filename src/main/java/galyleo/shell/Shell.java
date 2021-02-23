@@ -137,7 +137,17 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
      * @param   pom             The {@link POM} to merge.
      */
     public void resolve(POM pom) {
-        resolver().resolve(this, pom, out, err);
+        var list = resolver().resolve(this, pom, out, err);
+
+        for (var file : list) {
+            var jshell = this.jshell;
+
+            if (jshell != null) {
+                jshell.addToClasspath(file.toString());
+            } else {
+                break;
+            }
+        }
     }
 
     /**

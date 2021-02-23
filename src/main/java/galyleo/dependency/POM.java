@@ -87,19 +87,12 @@ public class POM {
      * Method to merge a {@link POM} into {@link.this} {@link POM}.
      *
      * @param   that            The {@link POM} to merge.
-     *
-     * @return  {@code true} if this {@link POM} was modified; {@code false}
-     *          otherwise.
      */
-    public boolean merge(POM that) {
-        var modified = false;
+    public void merge(POM that) {
+        update(this, that, POM::getLocalRepository, this::setLocalRepository);
+        update(this, that, POM::getInteractiveMode, this::setInteractiveMode);
+        update(this, that, POM::getOffline, this::setOffline);
 
-        modified |= update(this, that, POM::getLocalRepository, this::setLocalRepository);
-        modified |= update(this, that, POM::getInteractiveMode, this::setInteractiveMode);
-        modified |= update(this, that, POM::getOffline, this::setOffline);
-        /*
-         * TBD: Need to complete modified tests.
-         */
         var ids =
             that.getRepositories().stream()
             .map(t -> t.getId())
@@ -123,8 +116,6 @@ public class POM {
         this.getDependencies()
             .removeIf(t -> keys.contains(versionlessKey(t)));
         this.getDependencies().addAll(that.getDependencies());
-
-        return modified;
     }
 
     private <T,U> boolean update(T left, T right, Function<T,U> get, Consumer<U> set) {

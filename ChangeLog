@@ -1,5 +1,9 @@
 2021-02-23  Allen D. Ball  <ball@hcf.dev>
 
+	* src/main/java/galyleo/shell/Shell.java:
+	In resolve(POM), update the JShell classpath with newly resolved
+	files.
+
 	* src/main/java/galyleo/dependency/Resolver.java:
 	Provide classpath management.
 
