@@ -3,6 +3,7 @@ package galyleo.shell.magic;
 import ball.annotation.ServiceProviderFor;
 import galyleo.shell.Magic;
 import galyleo.shell.Shell;
+import java.io.File;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.stream.Stream;
@@ -36,11 +37,13 @@ public class Classpath extends JShell {
                 .flatMap(t -> Stream.of(t.split(SEPARATOR)))
                 .filter(t -> (! t.isBlank()))
                 .map(String::strip)
-                .toArray(String[]::new);
+                .map(File::new)
+                .toArray(File[]::new);
 
             shell.addToClasspath(classpath);
         } else {
-            shell.classpath().stream().forEach(out::println);
+            shell.resolver().classpath()
+                .stream().forEach(out::println);
         }
     }
 }

@@ -29,7 +29,7 @@ public class POM extends JShell {
             if (! code.isBlank()) {
                 shell.resolve(galyleo.dependency.POM.parse(code));
             } else {
-                shell.pom().writeTo(out);
+                shell.resolver().pom().writeTo(out);
             }
         } catch (JsonProcessingException exception) {
             err.println(exception.getMessage());

@@ -5,11 +5,14 @@ import galyleo.dependency.aether.NotebookTransferListener;
 import galyleo.dependency.aether.POMDependencyList;
 import galyleo.dependency.aether.POMRemoteRepositoryList;
 import galyleo.shell.Shell;
+import java.io.File;
 import java.io.PrintStream;
 import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
 import lombok.Synchronized;
@@ -20,6 +23,7 @@ import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
 import org.eclipse.aether.impl.DefaultServiceLocator;
@@ -45,6 +49,7 @@ public class Resolver extends Analyzer {
     private final POM pom;
     private RepositorySystem system = null;
     private RepositorySystemSession session = null;
+    private final Map<File,Set<Artifact>> classpath = new LinkedHashMap<>();
 
     {
         try {
@@ -60,6 +65,26 @@ public class Resolver extends Analyzer {
      * @return  The current {@link POM}.
      */
     public POM pom() { return pom; }
+
+    /**
+     * Method to get the current classpath.
+     *
+     * @return  The {@link Set} of {@link File}s.
+     */
+    public Set<File> classpath() { return classpath.keySet(); }
+
+    /**
+     * Method to add a {@link File} to the {@link #classpath()}.
+     *
+     * @param   file            The {@link File}.
+     */
+    public void addToClasspath(File file) {
+        var key = file.getAbsoluteFile();
+
+        if (! classpath.containsKey(key)) {
+            classpath.put(key, getJarArtifacts(key));
+        }
+    }
 
     /**
      * Merge the argument {@link POM} and resolve any dependencies.

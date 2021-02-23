@@ -63,7 +63,7 @@ public class Kernel extends Server implements ApplicationContextAware,
     public void init() throws Exception {
         try {
             if (spark_home != null) {
-                shell.addJarsToClasspath(Paths.get(spark_home, "jars"));
+                shell.addJarsToClasspath(Paths.get(spark_home, "jars").toFile());
             }
         } catch (Exception exception) {
             log.warn("{}: {}", spark_home, exception);
@@ -71,7 +71,7 @@ public class Kernel extends Server implements ApplicationContextAware,
 
         try {
             if (hadoop_home != null && (! Objects.equals(hadoop_home, spark_home))) {
-                shell.addJarsToClasspath(Paths.get(hadoop_home, "jars"));
+                shell.addJarsToClasspath(Paths.get(hadoop_home, "jars").toFile());
             }
         } catch (Exception exception) {
             log.warn("{}: {}", hadoop_home, exception);
