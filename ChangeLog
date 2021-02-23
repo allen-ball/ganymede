@@ -1,3 +1,8 @@
+2021-02-23  Allen D. Ball  <ball@hcf.dev>
+
+	* src/main/java/galyleo/dependency/Analyzer.java:
+	Use org.eclipse.aether.artifact.Artifact.
+
 2021-02-22  Allen D. Ball  <ball@hcf.dev>
 
 	* Interim check-in: Integrated Apache Maven Artifact Resolver.

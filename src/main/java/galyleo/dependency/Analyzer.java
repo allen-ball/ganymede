@@ -11,15 +11,16 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
-import org.apache.maven.artifact.Artifact;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
 
-import static java.util.stream.Collectors.toMap;
-import static org.apache.maven.artifact.ArtifactUtils.versionlessKey;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Dependency {@link Analyzer}.
@@ -30,7 +31,7 @@ import static org.apache.maven.artifact.ArtifactUtils.versionlessKey;
 @NoArgsConstructor @ToString @Log4j2
 public class Analyzer {
     @CompileTimeCheck
-    private static final Pattern POM_PROPERTIES_ENTRY_PATTERN =
+    private static final Pattern POM_PROPERTIES =
         Pattern.compile("(?i)^META-INF/maven/(?<g>[^/]+)/(?<a>[^/]+)/pom.properties$");
 
     /**
@@ -42,11 +43,48 @@ public class Analyzer {
      * @return  The {@link Set} of implemented {@link Artifact}s.
      */
     public Set<Artifact> getJarArtifacts(File file) {
-        var set = Set.<Artifact>of();
+        var set = new LinkedHashSet<Artifact>();
 
         if (! file.isDirectory()) {
             try (var jar = new JarFile(file)) {
-                set = getJarArtifacts(jar);
+                var list =
+                    jar.stream()
+                    .map(JarEntry::getName)
+                    .map(POM_PROPERTIES::matcher)
+                    .filter(Matcher::matches)
+                    .filter(t -> (! Objects.equals(t.group("a"), "unused")))
+                    .collect(toList());
+
+                for (var matcher : list) {
+                    try (var in = jar.getInputStream(jar.getJarEntry(matcher.group()))) {
+                        var properties = new Properties();
+
+                        properties.load(in);
+
+                        if (Objects.equals(matcher.group("g"), properties.get("groupId"))
+                            && Objects.equals(matcher.group("a"), properties.get("artifactId"))) {
+                            var artifact =
+                                artifact(matcher.group("g"), matcher.group("a"),
+                                         properties.getProperty("version"), file);
+
+                            set.add(artifact);
+                        } else {
+                            log.warn("{} does not specify {}:{}",
+                                     jar.getName() + "!/" + matcher.group(),
+                                     matcher.group("g"), matcher.group("a"));
+                        }
+                    } catch (IOException exception) {
+                        log.warn("{}", jar.getName() + "!/" + matcher.group(), exception);
+                    }
+
+                    if (set.isEmpty()) {
+                        var artifact = getManifestArtifact(file, jar.getManifest());
+
+                        if (artifact != null) {
+                            set.add(artifact);
+                        }
+                    }
+                }
             } catch (Exception exception) {
                 log.warn("{}", file, exception);
             }
@@ -55,76 +93,28 @@ public class Analyzer {
         return set;
     }
 
-    /**
-     * Get the Maven {@link Artifact}s the argument JAR implements.  Returns
-     * an empty {@link Set} if no {@code pom.properties} are found.
-     *
-     * @param   jar             The {@link JarFile}.
-     *
-     * @return  The {@link Set} of implemented {@link Artifact}s.
-     */
-    public Set<Artifact> getJarArtifacts(JarFile jar) {
-        var set = new LinkedHashSet<Artifact>();
+    private DefaultArtifact getManifestArtifact(File file, Manifest manifest) {
+        var coordinates =
+            List.of(List.of("Bundle-SymbolicName", "Bundle-Name", "Bundle-Version"),
+                    List.of("Implementation-Vendor-Id", "Implementation-Title", "Implementation-Version"),
+                    List.of("Implementation-Vendor", "Implementation-Title", "Implementation-Version"))
+            .stream()
+            .map(t -> t.stream()
+                       .map(u -> manifest.getMainAttributes().get(u))
+                       .filter(Objects::nonNull)
+                       .map(Object::toString)
+                       .collect(toList()))
+            .filter(t -> t.size() == 3)
+            .findFirst().orElse(null);
 
-        try {
-            var map =
-                jar.stream()
-                .map(JarEntry::getName)
-                .map(POM_PROPERTIES_ENTRY_PATTERN::matcher)
-                .filter(Matcher::matches)
-                .filter(t -> (! Objects.equals(t.group("a"), "unused")))
-                .collect(toMap(k -> k.group(),
-                               v -> versionlessKey(v.group("g"), v.group("a"))));
-
-            for (var entry : map.entrySet()) {
-                try (var in = jar.getInputStream(jar.getJarEntry(entry.getKey()))) {
-                    var properties = new Properties();
-
-                    properties.load(in);
-
-                    var artifact = artifact(properties, "groupId", "artifactId", "version");
-
-                    if (! entry.getValue().equals(versionlessKey(artifact))) {
-                        log.warn("{} does not specify {}",
-                                 jar.getName() + "!/" + entry.getKey(), entry.getValue());
-                    }
-
-                    set.add(artifact);
-                } catch (IOException exception) {
-                    log.warn("{}", jar.getName() + "!/" + entry.getKey(), exception);
-                }
-
-                if (set.isEmpty()) {
-                    var manifest = jar.getManifest();
-                    var artifact =
-                        List.of(List.of("Bundle-SymbolicName", "Bundle-Name", "Bundle-Version"),
-                                List.of("Implementation-Vendor-Id", "Implementation-Title", "Implementation-Version"),
-                                List.of("Implementation-Vendor", "Implementation-Title", "Implementation-Version"))
-                        .stream()
-                        .map(t -> artifact(manifest.getMainAttributes(),
-                                           t.get(0), t.get(1), t.get(2)))
-                        .filter(Objects::nonNull)
-                        .findFirst().orElse(null);
-
-                    if (artifact != null) {
-                        set.add(artifact);
-                    }
-                }
-            }
-        } catch (Exception exception) {
-            log.warn("{}", jar.getName(), exception);
-        }
-
-        return set;
+        return (coordinates != null) ? artifact(coordinates, file) : null;
     }
 
-    private Artifact artifact(Map<?,?> map, String g, String a, String v) {
-        return artifact(Objects.toString(map.get(g), null),
-                        Objects.toString(map.get(a), null),
-                        Objects.toString(map.get(v), null));
+    private DefaultArtifact artifact(String g, String a, String v, File file) {
+        return new DefaultArtifact(g, a, null, "jar", v, Map.of(), file);
     }
 
-    private Artifact artifact(String g, String a, String v) {
-        return (g != null && a != null && v != null) ? new POM.Dependency(g, a, v) : null;
+    private DefaultArtifact artifact(List<String> coordinates, File file) {
+        return artifact(coordinates.get(0), coordinates.get(2), coordinates.get(3), file);
     }
 }

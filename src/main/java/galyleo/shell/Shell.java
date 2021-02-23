@@ -35,7 +35,7 @@ import lombok.Synchronized;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.io.IoBuilder;
-import org.apache.maven.artifact.Artifact;
+import org.eclipse.aether.artifact.Artifact;
 import org.springframework.boot.system.ApplicationHome;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StreamUtils;

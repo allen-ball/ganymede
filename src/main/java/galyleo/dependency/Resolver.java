@@ -81,8 +81,7 @@ public class Resolver extends Analyzer {
                 getRepositorySystem()
                 .resolveDependencies(getRepositorySystemSession(),
                                      dependencyRequest());
-
-            results.getArtifactResults().stream().forEach(out::println);
+results.getArtifactResults().stream().forEach(out::println);
         } catch (Exception exception) {
             exception.printStackTrace(err);
         }
@@ -93,17 +92,22 @@ public class Resolver extends Analyzer {
         if (system == null) {
             var locator = MavenRepositorySystemUtils.newServiceLocator();
 
-            locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
-            locator.addService(TransporterFactory.class, FileTransporterFactory.class);
-            locator.addService(TransporterFactory.class, HttpTransporterFactory.class);
-            locator.addService(TransporterFactory.class, ClasspathTransporterFactory.class);
+            locator.addService(RepositoryConnectorFactory.class,
+                               BasicRepositoryConnectorFactory.class);
+            locator.addService(TransporterFactory.class,
+                               FileTransporterFactory.class);
+            locator.addService(TransporterFactory.class,
+                               HttpTransporterFactory.class);
+            locator.addService(TransporterFactory.class,
+                               ClasspathTransporterFactory.class);
             /* locator.setServices(Logger.class, log); */
-            locator.setErrorHandler(new DefaultServiceLocator.ErrorHandler() {
-                    @Override
-                    public void serviceCreationFailed(Class<?> type, Class<?> impl, Throwable exception) {
-                        log.error("Service creation failed for {} with implementation {}",
-                                  type, impl, exception);
-                    }
+            locator
+                .setErrorHandler(new DefaultServiceLocator.ErrorHandler() {
+                        @Override
+                        public void serviceCreationFailed(Class<?> type, Class<?> impl, Throwable exception) {
+                            log.error("Service creation failed for {} with implementation {}",
+                                      type, impl, exception);
+                        }
                 });
 
             system = locator.getService(RepositorySystem.class);
