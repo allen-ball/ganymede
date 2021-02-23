@@ -1,13 +1,11 @@
+2021-02-22  Allen D. Ball  <ball@hcf.dev>
+
+	* Interim check-in: Integrated Apache Maven Artifact Resolver.
+
 2021-02-21  Allen D. Ball  <ball@hcf.dev>
 
 	* src/main/java/galyleo/dependency/Analyzer.java:
 	Refactored to use POM.Dependency for Artifact implementation.
-
-	* src/main/java/galyleo/dependency/POM.java,
-	src/main/java/galyleo/dependency/Resolver.java,
-	src/main/java/galyleo/shell/magic/POM.java:
-	Interim check-in: Merge POM values and display current POM if no
-	POM is supplied.
 
 	* src/main/java/galyleo/shell/magic/AbstractMagic.java:
 	Initial writing: Provides common PropertyPlaceholderHelper.

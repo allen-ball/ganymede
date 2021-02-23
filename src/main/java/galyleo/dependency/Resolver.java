@@ -1,27 +1,38 @@
 package galyleo.dependency;
 
+import galyleo.dependency.aether.NotebookRepositoryListener;
+import galyleo.dependency.aether.NotebookTransferListener;
+import galyleo.dependency.aether.POMDependencyList;
+import galyleo.dependency.aether.POMRemoteRepositoryList;
 import galyleo.shell.Shell;
 import java.io.PrintStream;
+import java.nio.file.Paths;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
+import lombok.Synchronized;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
-import org.apache.maven.model.building.DefaultModelBuilderFactory;
-import org.apache.maven.model.building.ModelBuilder;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
-import org.apache.maven.settings.building.DefaultSettingsBuilderFactory;
-import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
-import org.apache.maven.settings.building.SettingsBuilder;
+import org.eclipse.aether.ConfigurationProperties;
+import org.eclipse.aether.DefaultRepositoryCache;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
 import org.eclipse.aether.impl.DefaultServiceLocator;
+import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.LocalRepositoryManager;
+import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.transport.classpath.ClasspathTransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.eclipse.aether.transport.http.HttpTransporterFactory;
-
-import static java.util.stream.Collectors.toSet;
-import static org.apache.maven.artifact.ArtifactUtils.versionlessKey;
+import org.eclipse.aether.util.artifact.JavaScopes;
+import org.eclipse.aether.util.filter.DependencyFilterUtils;
 
 /**
  * Dependency {@link Resolver}.
@@ -31,12 +42,9 @@ import static org.apache.maven.artifact.ArtifactUtils.versionlessKey;
  */
 @NoArgsConstructor @ToString @Log4j2
 public class Resolver extends Analyzer {
-    private static final ModelBuilder MODEL_BUILDER =
-        new DefaultModelBuilderFactory().newInstance();
-    private static final SettingsBuilder SETTINGS_BUILDER =
-        new DefaultSettingsBuilderFactory().newInstance();
-
     private final POM pom;
+    private RepositorySystem system = null;
+    private RepositorySystemSession session = null;
 
     {
         try {
@@ -63,69 +71,107 @@ public class Resolver extends Analyzer {
      */
     public void resolve(Shell shell, POM pom, PrintStream out, PrintStream err) {
         try {
-            merge(pom);
+            boolean modified = pom().merge(pom);
 
-            var locator = MavenRepositorySystemUtils.newServiceLocator();
-/*
-            locator.setErrorHandler(new AntServiceLocatorErrorHandler(project));
-            locator.setServices(Logger.class, new AntLogger(project));
-*/
-            locator.setServices(ModelBuilder.class, MODEL_BUILDER);
-            locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
-            locator.addService(TransporterFactory.class, FileTransporterFactory.class);
-            locator.addService(TransporterFactory.class, HttpTransporterFactory.class);
-            locator.addService(TransporterFactory.class, ClasspathTransporterFactory.class);
-/*
-            DefaultSettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
-
-            request.setUserSettingsFile(getUserSettings());
-            request.setGlobalSettingsFile(getGlobalSettings());
-            request.setSystemProperties(getSystemProperties());
-            request.setUserProperties(getUserProperties());
-
-            try {
-                settings = SETTINGS_BUILDER.build(request).getEffectiveSettings();
-            } catch (SettingsBuildingException exception) {
-                log.warn("Could not process settings.xml: {}",
-                         exception.getMessage(), exception);
+            if (modified) {
+                session = null;
             }
 
-            SettingsDecryptionResult result =
-                SETTINGS_DECRYPTER.decrypt(new DefaultSettingsDecryptionRequest(settings));
-            settings.setServers(result.getServers());
-            settings.setProxies(result.getProxies());
-*/
+            var results =
+                getRepositorySystem()
+                .resolveDependencies(getRepositorySystemSession(),
+                                     dependencyRequest());
+
+            results.getArtifactResults().stream().forEach(out::println);
         } catch (Exception exception) {
             exception.printStackTrace(err);
         }
     }
 
-    private void merge(POM update) {
-        if (update.getLocalRepository() != null) {
-            pom.setLocalRepository(update.getLocalRepository());
+    @Synchronized
+    private RepositorySystem getRepositorySystem() {
+        if (system == null) {
+            var locator = MavenRepositorySystemUtils.newServiceLocator();
+
+            locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
+            locator.addService(TransporterFactory.class, FileTransporterFactory.class);
+            locator.addService(TransporterFactory.class, HttpTransporterFactory.class);
+            locator.addService(TransporterFactory.class, ClasspathTransporterFactory.class);
+            /* locator.setServices(Logger.class, log); */
+            locator.setErrorHandler(new DefaultServiceLocator.ErrorHandler() {
+                    @Override
+                    public void serviceCreationFailed(Class<?> type, Class<?> impl, Throwable exception) {
+                        log.error("Service creation failed for {} with implementation {}",
+                                  type, impl, exception);
+                    }
+                });
+
+            system = locator.getService(RepositorySystem.class);
         }
 
-        var ids =
-            update.getRepositories().stream()
-            .map(t -> t.getId())
+        return system;
+    }
+
+    @Synchronized
+    private RepositorySystemSession getRepositorySystemSession() {
+        var session = MavenRepositorySystemUtils.newSession();
+        var properties = new LinkedHashMap<Object,Object>();
+
+        properties.put(ConfigurationProperties.USER_AGENT,
+                       String.format("Galyleo/(Java %s; %s)",
+                                     System.getProperty("java.version"),
+                                     System.getProperty("os.version")));
+        /*
+         * properties.putAll((Map<?,?>) project.getProperties());
+         */
+        /*
+         * ${settings.servers}
+         * AntRepoSys: processServerConfiguration(properties);
+         */
+        session.setConfigProperties(properties);
+        session.setOffline(Objects.requireNonNullElse(pom().getOffline(), false));
+        /*
+         * AntRepoSys: session.setUserProperties(project.getUserProperties());
+         */
+        /*
+         * ${settings.servers}, ${settings.mirrors}
+         * session.setProxySelector(getProxySelector());
+         * session.setMirrorSelector(getMirrorSelector());
+         * session.setAuthenticationSelector(getAuthSelector());
+         */
+        session.setCache(new DefaultRepositoryCache());
+        session.setLocalRepositoryManager(getLocalRepositoryManager(session));
+        session.setTransferListener(new NotebookTransferListener());
+        session.setRepositoryListener(new NotebookRepositoryListener());
+
+        return session;
+    }
+
+    private LocalRepositoryManager getLocalRepositoryManager(RepositorySystemSession session) {
+        var path =
+            Stream.of(pom().getLocalRepository(),
+                      System.getProperty("maven.repo.local"))
             .filter(Objects::nonNull)
-            .collect(toSet());
-        var urls =
-            update.getRepositories().stream()
-            .map(t -> t.getUrl())
-            .filter(Objects::nonNull)
-            .collect(toSet());
+            .map(Paths::get)
+            .findFirst()
+            .orElse(Paths.get(System.getProperty("user.home"), ".m2", "repository"));
+        var repository = new LocalRepository(path.toFile());
 
-        pom.getRepositories()
-            .removeIf(t -> ids.contains(t.getId()) || urls.contains(t.getUrl()));
-        pom.getRepositories().addAll(update.getRepositories());
+        return getRepositorySystem().newLocalRepositoryManager(session, repository);
+    }
 
-        var keys =
-            update.getDependencies().stream()
-            .map(t -> versionlessKey(t))
-            .collect(toSet());
+    private DependencyRequest dependencyRequest() {
+        var scope = JavaScopes.RUNTIME;
+        var filter = DependencyFilterUtils.classpathFilter(scope);
 
-        pom.getDependencies().removeIf(t -> keys.contains(versionlessKey(t)));
-        pom.getDependencies().addAll(update.getDependencies());
+        return new DependencyRequest(collectRequest(), filter);
+    }
+
+    private CollectRequest collectRequest() {
+        var scope = JavaScopes.RUNTIME;
+
+        return new CollectRequest(new POMDependencyList(pom(), scope),
+                                  List.of(),
+                                  new POMRemoteRepositoryList(pom()));
     }
 }

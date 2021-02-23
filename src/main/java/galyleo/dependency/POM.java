@@ -11,9 +11,11 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,6 +26,8 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.settings.Repository;
 
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toSet;
+import static org.apache.maven.artifact.ArtifactUtils.versionlessKey;
 
 /**
  * Target class for YAML representation of POM elements.
@@ -33,7 +37,8 @@ import static java.util.stream.Collectors.joining;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@JsonPropertyOrder({ "localRepository", "repositories", "dependencies" })
+@JsonPropertyOrder({ "localRepository", "interactiveMode", "offline",
+                     "repositories", "dependencies" })
 @Data @NoArgsConstructor @ToString @Log4j2
 public class POM {
     private static final YAMLFactory YAML_FACTORY =
@@ -73,8 +78,65 @@ public class POM {
     }
 
     private String localRepository = null;
-    private List<Dependency> dependencies = new ArrayList<>();
-    private List<Repository> repositories = new ArrayList<>();
+    private Boolean interactiveMode = null;
+    private Boolean offline = null;
+    private Set<Repository> repositories = new LinkedHashSet<>();
+    private Set<Dependency> dependencies = new LinkedHashSet<>();
+
+    /**
+     * Method to merge a {@link POM} into {@link.this} {@link POM}.
+     *
+     * @param   that            The {@link POM} to merge.
+     *
+     * @return  {@code true} if this {@link POM} was modified; {@code false}
+     *          otherwise.
+     */
+    public boolean merge(POM that) {
+        var modified = false;
+
+        modified |= update(this, that, POM::getLocalRepository, this::setLocalRepository);
+        modified |= update(this, that, POM::getInteractiveMode, this::setInteractiveMode);
+        modified |= update(this, that, POM::getOffline, this::setOffline);
+        /*
+         * TBD: Need to complete modified tests.
+         */
+        var ids =
+            that.getRepositories().stream()
+            .map(t -> t.getId())
+            .filter(Objects::nonNull)
+            .collect(toSet());
+        var urls =
+            that.getRepositories().stream()
+            .map(t -> t.getUrl())
+            .filter(Objects::nonNull)
+            .collect(toSet());
+
+        this.getRepositories()
+            .removeIf(t -> ids.contains(t.getId()) || urls.contains(t.getUrl()));
+        this.getRepositories().addAll(that.getRepositories());
+
+        var keys =
+            that.getDependencies().stream()
+            .map(t -> versionlessKey(t))
+            .collect(toSet());
+
+        this.getDependencies()
+            .removeIf(t -> keys.contains(versionlessKey(t)));
+        this.getDependencies().addAll(that.getDependencies());
+
+        return modified;
+    }
+
+    private <T,U> boolean update(T left, T right, Function<T,U> get, Consumer<U> set) {
+        var value = get.apply(right);
+        var modified = (value != null && (! Objects.equals(get.apply(left), value)));
+
+        if (modified) {
+            set.accept(value);
+        }
+
+        return modified;
+    }
 
     /**
      * Method to write {@link.this} {@link POM}'s YAML representation.
@@ -86,20 +148,6 @@ public class POM {
      */
     public void writeTo(OutputStream out) throws IOException {
         OBJECT_MAPPER.writeValue(out, this);
-    }
-
-    /**
-     * {@link POM} {@link Dependency Dependency} {@link JsonSerialize}
-     * annotation argument type.
-     */
-    @JsonPropertyOrder({ "groupId", "artifactId", "version", "type" })
-    public static interface SerializedDependency {
-        public String getGroupId();
-        public String getArtifactId();
-        public String getVersion();
-        public String getScope();
-        public String getType();
-        public String getClassifier();
     }
 
     /**
@@ -140,13 +188,27 @@ public class POM {
             super((argv.length > 0) ? argv[0] : "unknown",
                   (argv.length > 1) ? argv[1] : "unknown",
                   (argv.length > 2) ? argv[2] : LATEST_VERSION,
-                  (argv.length > 3) ? argv[3] : /* "runtime" */ "",
-                  (argv.length > 4) ? argv[4] : /* "jar" */ "",
+                  (argv.length > 3) ? argv[3] : "runtime",
+                  (argv.length > 4) ? argv[4] : "jar",
                   (argv.length > 5) ? argv[5] : "",
                   null);
         }
 
         @Override
         public String toString() { return ArtifactUtils.key(this); }
+    }
+
+    /**
+     * {@link POM} {@link Dependency Dependency} {@link JsonSerialize}
+     * annotation argument type.
+     */
+    @JsonPropertyOrder({ "groupId", "artifactId", "version", "type" })
+    public static interface SerializedDependency {
+        String getGroupId();
+        String getArtifactId();
+        String getVersion();
+        String getScope();
+        String getType();
+        String getClassifier();
     }
 }
