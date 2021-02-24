@@ -3,5 +3,7 @@
 repositories:
   - id: central
     name: Central Maven Repository
-    url: https://repo1.maven.org/maven2
     layout: default
+    url: https://repo1.maven.org/maven2
+    snapshots:
+      enabled: false

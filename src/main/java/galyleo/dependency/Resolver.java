@@ -32,6 +32,7 @@ import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.resolution.DependencyRequest;
+import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.transfer.AbstractTransferListener;
@@ -107,39 +108,51 @@ public class Resolver extends Analyzer implements WorkspaceReader {
     public List<File> resolve(Shell shell, POM pom, PrintStream out, PrintStream err) {
         var added = new ArrayList<File>();
 
-        try {
-            pom().merge(pom);
+        pom().merge(pom);
 
-            var results =
-                system().resolveDependencies(session(), dependencyRequest());
+        var system = system();
+        var session = session();
+        var repositories = pom().getRepositories().stream().collect(toList());
+        var scope = JavaScopes.RUNTIME;
+        var filter = DependencyFilterUtils.classpathFilter(scope);
+        var iterator = pom().getDependencies().iterator();
 
-            for (var result : results.getArtifactResults()) {
-                var artifact = result.getArtifact();
+        while (iterator.hasNext()) {
+            var dependency = iterator.next();
 
-                if (result.isResolved()) {
-                    var file = artifact.getFile().getAbsoluteFile();
+            try {
+                var request = new DependencyRequest(new CollectRequest(dependency, repositories), filter);
 
-                    if (! classpath.containsKey(file)) {
-                        added.add(file);
+                for (var result :
+                         system.resolveDependencies(session, request)
+                         .getArtifactResults()) {
+                    var artifact = result.getArtifact();
+
+                    if (result.isResolved()) {
+                        var file = artifact.getFile().getAbsoluteFile();
+
+                        if (! classpath.containsKey(file)) {
+                            added.add(file);
+                        }
+
+                        classpath
+                            .computeIfAbsent(file, k -> new LinkedHashSet<>())
+                            .add(artifact);
                     }
 
-                    classpath
-                        .computeIfAbsent(file, k -> new LinkedHashSet<>())
-                        .add(artifact);
+                    if (result.isMissing()) {
+                        result.getExceptions().stream()
+                            .forEach(t -> err.println(t.getMessage()));
+                    }
                 }
-
-                if (result.isMissing()) {
-                    /*
-                     * TBD -- Not working
-                     */
-                    pom().getDependencies()
-                        .removeIf(t -> ArtifactIdUtils.equalsVersionlessId(t.getArtifact(), artifact));
-                    result.getExceptions().stream()
-                        .forEach(t -> t.printStackTrace(err));
-                }
+                continue;
+            } catch (DependencyResolutionException exception) {
+                err.println(exception.getMessage());
+            } catch (Exception exception) {
+                exception.printStackTrace(err);
             }
-        } catch (Exception exception) {
-            exception.printStackTrace(err);
+
+            iterator.remove();
         }
 
         return added;
@@ -217,20 +230,6 @@ public class Resolver extends Analyzer implements WorkspaceReader {
         var repository = new LocalRepository(path.toFile());
 
         return system().newLocalRepositoryManager(session, repository);
-    }
-
-    private DependencyRequest dependencyRequest() {
-        var scope = JavaScopes.RUNTIME;
-        var filter = DependencyFilterUtils.classpathFilter(scope);
-
-        return new DependencyRequest(collectRequest(), filter);
-    }
-
-    private CollectRequest collectRequest() {
-        var dependencies = pom().getDependencies().stream().collect(toList());
-        var repositories = pom().getRepositories().stream().collect(toList());
-
-        return new CollectRequest(dependencies, List.of(), repositories);
     }
 
     @Override

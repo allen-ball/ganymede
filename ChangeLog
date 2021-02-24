@@ -1,3 +1,8 @@
+2021-02-24  Allen D. Ball  <ball@hcf.dev>
+
+	* src/main/java/galyleo/dependency/Resolver.java:
+	Added working dependency resolution.
+
 2021-02-23  Allen D. Ball  <ball@hcf.dev>
 
 	* src/main/java/galyleo/dependency/POM.java:

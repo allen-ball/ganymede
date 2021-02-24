@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -36,7 +37,9 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.RepositoryPolicy;
+import org.eclipse.aether.util.artifact.JavaScopes;
 
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
 import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toVersionlessId;
 
@@ -191,16 +194,19 @@ public class POM {
                                         asText(node, "version"),
                                         Map.of(), (File) null);
             } else {
-                /* groupId:artifactId[:type[:classifier]]:version */
                 var strings = node.asText().split(":");
-
+                /*
+                 * groupId:artifactId[:type[:classifier]]:version
+                 */
                 artifact =
                     new DefaultArtifact(strings[0], strings[1],
-                                        null, "jar", strings[2],
+                                        (strings.length > 4) ? strings[3] : null,
+                                        (strings.length > 3) ? strings[2] : "jar",
+                                        (strings.length > 2) ? strings[strings.length - 1] : null,
                                         Map.of(), (File) null);
             }
 
-            return new Dependency(artifact, asText(node, "scope", "runtime"));
+            return new Dependency(artifact, asText(node, "scope", JavaScopes.RUNTIME));
         }
     }
 
@@ -214,7 +220,16 @@ public class POM {
         public void serialize(Dependency value, JsonGenerator generator,
                               SerializerProvider provider) throws IOException,
                                                                   JsonProcessingException {
-            generator.writeString(value.getArtifact().toString());
+            var artifact = value.getArtifact();
+            var string =
+                Stream.of(artifact.getGroupId(), artifact.getArtifactId(),
+                          artifact.getExtension(), artifact.getClassifier(),
+                          artifact.getVersion())
+                .filter(Objects::nonNull)
+                .filter(t -> (! t.isBlank()))
+                .collect(joining(":"));
+
+            generator.writeString(string);
         }
     }
 
@@ -235,11 +250,17 @@ public class POM {
                                              asText(node, "url"));
 
             if (node.has("releases")) {
-                builder.setReleasePolicy(parser.getCodec().treeToValue(node.get("releases"), RepositoryPolicy.class));
+                var policy =
+                    parser.getCodec().treeToValue(node.get("releases"), RepositoryPolicy.class);
+
+                builder.setReleasePolicy(policy);
             }
 
             if (node.has("snapshots")) {
-                builder.setReleasePolicy(parser.getCodec().treeToValue(node.get("snapshots"), RepositoryPolicy.class));
+                var policy =
+                    parser.getCodec().treeToValue(node.get("snapshots"), RepositoryPolicy.class);
+
+                builder.setSnapshotPolicy(policy);
             }
 
             return builder.build();
@@ -281,8 +302,8 @@ public class POM {
             JsonNode node = parser.getCodec().readTree(parser);
 
             return new RepositoryPolicy(node.has("enabled") ? node.get("enabled").asBoolean() : true,
-                                        asText(node, "updatePolicy", "daily"),
-                                        asText(node, "checksumPolicy", "warn"));
+                                        asText(node, "updatePolicy", RepositoryPolicy.UPDATE_POLICY_DAILY),
+                                        asText(node, "checksumPolicy", RepositoryPolicy.CHECKSUM_POLICY_WARN));
         }
     }
 }
