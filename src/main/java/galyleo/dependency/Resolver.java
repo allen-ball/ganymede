@@ -1,7 +1,5 @@
 package galyleo.dependency;
 
-import galyleo.dependency.aether.POMDependencyList;
-import galyleo.dependency.aether.POMRemoteRepositoryList;
 import galyleo.shell.Shell;
 import java.io.File;
 import java.io.PrintStream;
@@ -27,6 +25,7 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
+import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.impl.DefaultServiceLocator;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.LocalRepositoryManager;
@@ -106,7 +105,7 @@ public class Resolver extends Analyzer implements WorkspaceReader {
      *          {@link #classpath()}.
      */
     public List<File> resolve(Shell shell, POM pom, PrintStream out, PrintStream err) {
-        var list = new ArrayList<File>();
+        var added = new ArrayList<File>();
 
         try {
             pom().merge(pom);
@@ -121,7 +120,7 @@ public class Resolver extends Analyzer implements WorkspaceReader {
                     var file = artifact.getFile().getAbsoluteFile();
 
                     if (! classpath.containsKey(file)) {
-                        list.add(file);
+                        added.add(file);
                     }
 
                     classpath
@@ -131,6 +130,8 @@ public class Resolver extends Analyzer implements WorkspaceReader {
 
                 if (result.isMissing()) {
                     err.println(artifact + " missing");
+                    pom().getDependencies()
+                        .removeIf(t -> Objects.equals(t.getArtifact(), artifact));
                 }
 
                 if (! result.getExceptions().isEmpty()) {
@@ -144,7 +145,7 @@ public class Resolver extends Analyzer implements WorkspaceReader {
             exception.printStackTrace(err);
         }
 
-        return list;
+        return added;
     }
 
     @Synchronized
@@ -229,11 +230,10 @@ public class Resolver extends Analyzer implements WorkspaceReader {
     }
 
     private CollectRequest collectRequest() {
-        var scope = JavaScopes.RUNTIME;
+        var dependencies = pom().getDependencies().stream().collect(toList());
+        var repositories = pom().getRepositories().stream().collect(toList());
 
-        return new CollectRequest(new POMDependencyList(pom(), scope),
-                                  List.of(),
-                                  new POMRemoteRepositoryList(pom()));
+        return new CollectRequest(dependencies, List.of(), repositories);
     }
 
     @Override
