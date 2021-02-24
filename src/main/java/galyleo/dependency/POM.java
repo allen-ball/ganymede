@@ -20,6 +20,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -34,6 +35,7 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.repository.RepositoryPolicy;
 
 import static java.util.stream.Collectors.toSet;
 import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toVersionlessId;
@@ -57,7 +59,9 @@ public class POM {
         new SimpleModule()
         .addDeserializer(Dependency.class, new DependencyDeserializer())
         .addSerializer(Dependency.class, new DependencySerializer())
-        .addDeserializer(RemoteRepository.class, new RemoteRepositoryDeserializer());
+        .addDeserializer(RemoteRepository.class, new RemoteRepositoryDeserializer())
+        .addSerializer(RemoteRepository.class, new RemoteRepositorySerializer())
+        .addDeserializer(RepositoryPolicy.class, new RepositoryPolicyDeserializer());
     private static final ObjectMapper OBJECT_MAPPER =
         new ObjectMapper(YAML_FACTORY)
         .registerModule(MODULE)
@@ -70,7 +74,7 @@ public class POM {
      *
      * @return  The parsed {@link POM}.
      */
-    public static POM getDefault() throws Exception {
+    public static POM getDefault() throws IOException {
         POM pom = null;
         var resource = POM.class.getSimpleName() + ".yaml";
 
@@ -167,6 +171,7 @@ public class POM {
 
     @ToString
     private static class DependencyDeserializer extends StdDeserializer<Dependency> {
+        private static final long serialVersionUID = -1L;
 
         public DependencyDeserializer() { super(Dependency.class); }
 
@@ -186,6 +191,7 @@ public class POM {
                                         asText(node, "version"),
                                         Map.of(), (File) null);
             } else {
+                /* groupId:artifactId[:type[:classifier]]:version */
                 var strings = node.asText().split(":");
 
                 artifact =
@@ -200,6 +206,7 @@ public class POM {
 
     @ToString
     private static class DependencySerializer extends StdSerializer<Dependency> {
+        private static final long serialVersionUID = -1L;
 
         public DependencySerializer() { super(Dependency.class); }
 
@@ -213,6 +220,7 @@ public class POM {
 
     @ToString
     private static class RemoteRepositoryDeserializer extends StdDeserializer<RemoteRepository> {
+        private static final long serialVersionUID = -1L;
 
         public RemoteRepositoryDeserializer() { super(RemoteRepository.class); }
 
@@ -223,22 +231,58 @@ public class POM {
             JsonNode node = parser.getCodec().readTree(parser);
             var builder =
                 new RemoteRepository.Builder(asText(node, "id"),
-                                             asText(node, "layout"),
+                                             asText(node, "layout", "default"),
                                              asText(node, "url"));
 
             if (node.has("releases")) {
-                /*
-                 * TBD
-                 */
+                builder.setReleasePolicy(parser.getCodec().treeToValue(node.get("releases"), RepositoryPolicy.class));
             }
 
             if (node.has("snapshots")) {
-                /*
-                 * TBD
-                 */
+                builder.setReleasePolicy(parser.getCodec().treeToValue(node.get("snapshots"), RepositoryPolicy.class));
             }
 
             return builder.build();
+        }
+    }
+
+    @ToString
+    private static class RemoteRepositorySerializer extends StdSerializer<RemoteRepository> {
+        private static final long serialVersionUID = -1L;
+
+        public RemoteRepositorySerializer() { super(RemoteRepository.class); }
+
+        @Override
+        public void serialize(RemoteRepository value, JsonGenerator generator,
+                              SerializerProvider provider) throws IOException,
+                                                                  JsonProcessingException {
+            var map = new LinkedHashMap<String,Object>();
+
+            map.put("id", value.getId());
+            map.put("layout", value.getContentType());
+            map.put("url", value.getUrl());
+            map.put("releases", value.getPolicy(false));
+            map.put("snapshots", value.getPolicy(true));
+
+            generator.writeObject(map);
+        }
+    }
+
+    @ToString
+    private static class RepositoryPolicyDeserializer extends StdDeserializer<RepositoryPolicy> {
+        private static final long serialVersionUID = -1L;
+
+        public RepositoryPolicyDeserializer() { super(RepositoryPolicy.class); }
+
+        @Override
+        public RepositoryPolicy deserialize(JsonParser parser,
+                                            DeserializationContext context) throws IOException,
+                                                                                   JsonProcessingException {
+            JsonNode node = parser.getCodec().readTree(parser);
+
+            return new RepositoryPolicy(node.has("enabled") ? node.get("enabled").asBoolean() : true,
+                                        asText(node, "updatePolicy", "daily"),
+                                        asText(node, "checksumPolicy", "warn"));
         }
     }
 }

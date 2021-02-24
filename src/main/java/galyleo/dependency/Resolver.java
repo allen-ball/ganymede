@@ -129,14 +129,11 @@ public class Resolver extends Analyzer implements WorkspaceReader {
                 }
 
                 if (result.isMissing()) {
-                    err.println(artifact + " missing");
+                    /*
+                     * TBD -- Not working
+                     */
                     pom().getDependencies()
-                        .removeIf(t -> Objects.equals(t.getArtifact(), artifact));
-                }
-
-                if (! result.getExceptions().isEmpty()) {
-                    err.println("--- " + artifact + " ---");
-
+                        .removeIf(t -> ArtifactIdUtils.equalsVersionlessId(t.getArtifact(), artifact));
                     result.getExceptions().stream()
                         .forEach(t -> t.printStackTrace(err));
                 }
