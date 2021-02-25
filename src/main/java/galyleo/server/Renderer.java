@@ -1,6 +1,7 @@
 package galyleo.server;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Base64;
 
 import static galyleo.server.Server.OBJECT_MAPPER;
 
@@ -13,6 +14,11 @@ import static galyleo.server.Server.OBJECT_MAPPER;
 public interface Renderer {
     public static final String DATA = "data";
     public static final String METADATA = "metadata";
+
+    /**
+     * {@link Base64.Encoder} instance.
+     */
+    public static final Base64.Encoder BASE64_ENCODER = Base64.getEncoder();
 
     /**
      * Method to get the {@link Class type} {@link.this} {@link Renderer}

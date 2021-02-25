@@ -52,7 +52,8 @@ import static org.apache.logging.log4j.Level.WARN;
 public class Shell implements AnnotatedMagic, AutoCloseable {
     private static final String[] VMOPTIONS =
         Stream.of("--add-opens", "java.base/jdk.internal.misc=ALL-UNNAMED",
-                  "-Dio.netty.tryReflectionSetAccessible=true")
+                  "-Dio.netty.tryReflectionSetAccessible=true",
+                  "-Djava.awt.headless=true")
         .toArray(String[]::new);
     private static final File KERNEL_JAR =
         new ApplicationHome(Shell.class).getSource();

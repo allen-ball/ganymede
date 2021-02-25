@@ -88,12 +88,24 @@
       <artifactId>maven-resolver-transport-http</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.jfree</groupId>
+      <artifactId>jfreechart</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.knowm.xchart</groupId>
+      <artifactId>xchart</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
     <dependency>
       <groupId>org.zeromq</groupId>
       <artifactId>jeromq</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>tech.tablesaw</groupId>
+      <artifactId>tablesaw-jsplot</artifactId>
     </dependency>
   </dependencies>
   <build>
@@ -134,6 +146,9 @@
           <artifactSet>
             <excludes>
               <exclude>ball:ball-util</exclude>
+              <exclude>org.jfree:*</exclude>
+              <exclude>org.knowm.xchart:*</exclude>
+              <exclude>tech.tablesaw:*</exclude>
             </excludes>
           </artifactSet>
           <createDependencyReducedPom>true</createDependencyReducedPom>
