@@ -32,12 +32,12 @@ public interface Magic {
     /**
      * See {@link #decode(String)}.
      */
-    public static final Base64.Decoder DECODER = Base64.getDecoder();
+    public static final Base64.Decoder BASE64_DECODER = Base64.getDecoder();
 
     /**
      * See {@link #encode(String)}.
      */
-    public static final Base64.Encoder ENCODER = Base64.getEncoder();
+    public static final Base64.Encoder BASE64_ENCODER = Base64.getEncoder();
 
     /**
      * Method to get the names associated with {@link.this} {@link Magic}.
@@ -227,7 +227,7 @@ public interface Magic {
      * @return  The decoded {@link String}.
      */
     public static String decode(String string) {
-        return new String(DECODER.decode(string), UTF_8);
+        return new String(BASE64_DECODER.decode(string), UTF_8);
     }
 
     /**
@@ -238,6 +238,6 @@ public interface Magic {
      * @return  The encoded {@link String}.
      */
     public static String encode(String string) {
-        return ENCODER.encodeToString(((string != null) ? string : "").getBytes(UTF_8));
+        return BASE64_ENCODER.encodeToString(((string != null) ? string : "").getBytes(UTF_8));
     }
 }
