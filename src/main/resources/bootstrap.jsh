@@ -3,7 +3,7 @@
  *
  * Processed as a String format:
  *
- *      1$      galyleo-kernel JAR URL
+ *      1$      ganymede-kernel JAR URL
  *      2$      CellMethods Class Name
  */
 var __ =

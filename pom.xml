@@ -5,10 +5,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <name>Galyleo</name>
+  <name>Ganymede</name>
   <description>Jupyter Java Kernel</description>
-  <groupId>galyleo</groupId>
-  <artifactId>galyleo-kernel</artifactId>
+  <groupId>ganymede</groupId>
+  <artifactId>ganymede-kernel</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   <parent>
@@ -28,7 +28,7 @@
   <inceptionYear>2021</inceptionYear>
   <properties>
     <jse.target>11</jse.target>
-    <start-class>galyleo.Launcher</start-class>
+    <start-class>ganymede.Launcher</start-class>
   </properties>
   <dependencies verbose="true">
     <dependency>
