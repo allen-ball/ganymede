@@ -104,7 +104,7 @@ public class Kernel extends Server implements ApplicationContextAware,
 
     /**
      * REST method to capture print MIME bundles from a sub-process.  See
-     * {@link RestClient#print(JsonNode)}.
+     * {@link Client#print(JsonNode)}.
      *
      * @param   bundle          The MIME bundle {@link ObjectNode}.
      */

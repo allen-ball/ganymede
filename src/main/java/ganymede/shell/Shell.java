@@ -2,8 +2,8 @@ package ganymede.shell;
 
 import ganymede.dependency.POM;
 import ganymede.dependency.Resolver;
+import ganymede.kernel.Client;
 import ganymede.kernel.Kernel;
-import ganymede.kernel.RestClient;
 import ganymede.server.Message;
 import ganymede.shell.jshell.CellMethods;
 import ganymede.shell.magic.AnnotatedMagic;
@@ -234,7 +234,7 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
 
             Collections.addAll(options, definitions);
             Collections.addAll(options, VMOPTIONS);
-            options.add("-D" + Map.entry(RestClient.KERNEL_PORT_PROPERTY, kernel.getPort()));
+            options.add("-D" + Map.entry(Client.KERNEL_PORT_PROPERTY, kernel.getPort()));
 
             jshell =
                 JShell.builder()

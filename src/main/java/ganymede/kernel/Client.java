@@ -19,7 +19,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  * @version $Revision$
  */
 @NoArgsConstructor @ToString @Log4j2
-public class RestClient {
+public class Client {
 
     /**
      * The name of the {@link System} property containing

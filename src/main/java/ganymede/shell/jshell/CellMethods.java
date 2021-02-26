@@ -1,8 +1,7 @@
 package ganymede.shell.jshell;
 
-import ganymede.kernel.RestClient;
+import ganymede.kernel.Client;
 import ganymede.server.Message;
-import ganymede.shell.Shell;
 import lombok.NoArgsConstructor;
 
 import static lombok.AccessLevel.PRIVATE;
@@ -23,7 +22,7 @@ public abstract class CellMethods {
      */
     public static void print(Object object) {
         try {
-            new RestClient().print(Message.mime_bundle(object));
+            new Client().print(Message.mime_bundle(object));
         } catch (Exception exception) {
             System.out.println(object);
             exception.printStackTrace(System.err);
