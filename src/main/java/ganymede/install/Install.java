@@ -18,6 +18,7 @@ import org.springframework.boot.system.ApplicationHome;
 
 import static ganymede.server.Server.OBJECT_MAPPER;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.joining;
 import static org.springframework.util.FileCopyUtils.copy;
 import static org.springframework.util.FileCopyUtils.copyToByteArray;
 import static org.springframework.util.FileSystemUtils.deleteRecursively;
@@ -33,9 +34,13 @@ import static org.springframework.util.FileSystemUtils.deleteRecursively;
 @SpringBootApplication
 @NoArgsConstructor @ToString @Log4j2
 public class Install implements ApplicationRunner {
-    @Value("${id:ganymede-${project.version}-java-${java.version}}")
+    @Value("${id-prefix:}")
+    private String prefix = null;
+    @Value("${id:ganymede-${project.version}-java-${java.specification.version}}")
     private String id = null;
-    @Value("${display-name:Ganymede ${project.version} (Java ${java.version})}")
+    @Value("${id-suffix:}")
+    private String suffix = null;
+    @Value("${display-name:Ganymede ${project.version} (Java ${java.specification.version})}")
     private String display_name = null;
     @Value("${env:}")
     private List<String> envvars = null;
@@ -44,6 +49,12 @@ public class Install implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments arguments) throws Exception {
+        id =
+            Stream.of(prefix, id, suffix)
+            .map(String::strip)
+            .filter(t -> (! t.isEmpty()))
+            .collect(joining("-"));
+
         var sysPrefix = false;
 
         for (var argument : arguments.getSourceArgs()) {
