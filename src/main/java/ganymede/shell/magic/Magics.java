@@ -2,6 +2,7 @@ package ganymede.shell.magic;
 
 import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import ganymede.server.Message;
 import ganymede.server.Renderer;
 import ganymede.server.renderer.ForType;
 import ganymede.server.renderer.StringRenderer;
@@ -19,7 +20,6 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 import static ganymede.server.Server.OBJECT_MAPPER;
-import static ganymede.shell.jshell.CellMethods.print;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toMap;
 
@@ -38,7 +38,8 @@ public class Magics extends AbstractMagic {
     public void execute(Shell shell,
                         InputStream in, PrintStream out, PrintStream err,
                         String magic, String code) throws Exception {
-        print(new Output(shell));
+        shell.kernel()
+            .print(Message.mime_bundle(new Output(shell)));
     }
 
     @Override

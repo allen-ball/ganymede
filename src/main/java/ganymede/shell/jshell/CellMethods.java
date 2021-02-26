@@ -1,11 +1,10 @@
 package ganymede.shell.jshell;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import ganymede.kernel.RestClient;
 import ganymede.server.Message;
 import ganymede.shell.Shell;
 import lombok.NoArgsConstructor;
 
-import static ganymede.server.Server.OBJECT_MAPPER;
 import static lombok.AccessLevel.PRIVATE;
 
 /**
@@ -24,44 +23,10 @@ public abstract class CellMethods {
      */
     public static void print(Object object) {
         try {
-            json.add(Message.mime_bundle(object));
+            new RestClient().print(Message.mime_bundle(object));
         } catch (Exception exception) {
             System.out.println(object);
             exception.printStackTrace(System.err);
         }
-    }
-
-    /**
-     * Collected output.
-     */
-    public static ArrayNode json = OBJECT_MAPPER.createArrayNode();
-
-    public static ArrayNode getExecutionEvents() {
-        var node = json;
-
-        json = OBJECT_MAPPER.createArrayNode();
-
-        return node;
-    }
-
-    public static String getExecutionEventsAsString() {
-        return getExecutionEvents().toPrettyString();
-    }
-
-    public static ArrayNode getExecutionEvents(Shell shell) {
-        var node = OBJECT_MAPPER.createArrayNode();
-
-        try {
-            var expression =
-                String.format("__.invokeStaticMethod(\"%s\", \"%s\")",
-                              CellMethods.class.getName(),
-                              "getExecutionEventsAsString");
-            var content = shell.evaluate(expression);
-
-            node = (ArrayNode) OBJECT_MAPPER.readTree(content);
-        } catch (Exception exception) {
-        }
-
-        return node;
     }
 }

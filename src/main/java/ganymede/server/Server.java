@@ -132,13 +132,13 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
     protected abstract void execute(String code) throws Exception;
 
     /**
-     * Method to get an {@link ArrayNode} of accumulated events from the
-     * {@link Shell} (and {@link jdk.jshell.JShell}) from last
-     * {@link #execute(String)} call.
+     * Method to get an {@link ArrayNode} of accumulated MIME bundles from
+     * the {@link ganymede.shell.Shell} (and {@link jdk.jshell.JShell}) from
+     * last {@link #execute(String)} call.
      *
      * @return  The {@link ArrayNode}.
      */
-    protected abstract ArrayNode getExecutionEvents();
+    protected abstract ArrayNode getMIMEBundles();
 
     /**
      * Method to evaluate an expression.
@@ -312,7 +312,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
                     }
                 }
 
-                var events = getExecutionEvents();
+                var bundles = getMIMEBundles();
                 var stdout = out.toString();
                 var stderr = err.toString();
 
@@ -321,14 +321,14 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
 
                 if (! silent) {
                     var count = execution_count.intValue();
-                    var iterator = events.iterator();
+                    var iterator = bundles.iterator();
 
                     while (iterator.hasNext()) {
-                        var content = (ObjectNode) iterator.next();
+                        var bundle = (ObjectNode) iterator.next();
 
                         try {
-                            /* iopub.pub(request.display_data(content)); */
-                            iopub.pub(request.execute_result(count, content));
+                            /* iopub.pub(request.display_data(bundle)); */
+                            iopub.pub(request.execute_result(count, bundle));
                         } catch (Exception exception) {
                             log.warn("{}", exception);
                         }

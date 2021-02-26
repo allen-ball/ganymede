@@ -27,9 +27,16 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import static java.util.stream.Collectors.toSet;
 import static jdk.jshell.Snippet.Status.REJECTED;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 /**
  * Ganymede Jupyter {@link Kernel}.
@@ -40,6 +47,10 @@ import static jdk.jshell.Snippet.Status.REJECTED;
  * @version $Revision$
  */
 @SpringBootApplication
+@RestController
+@RequestMapping(value = { "/" },
+                consumes = APPLICATION_JSON_VALUE,
+                produces = APPLICATION_JSON_VALUE)
 @NoArgsConstructor @ToString @Log4j2
 public class Kernel extends Server implements ApplicationContextAware,
                                               ApplicationRunner {
@@ -55,9 +66,17 @@ public class Kernel extends Server implements ApplicationContextAware,
     @Value("${hadoop-home:#{null}}")
     private String hadoop_home = null;
 
-    private final Shell shell = new Shell();
+    private final Shell shell = new Shell(this);
     private ApplicationContext context = null;
     private int port = -1;
+    private ArrayNode bundles = OBJECT_MAPPER.createArrayNode();
+
+    /**
+     * Method to get the {@link Kernel} REST server port.
+     *
+     * @return  The port.
+     */
+    public int getPort() { return port; }
 
     @PostConstruct
     public void init() throws Exception {
@@ -82,6 +101,19 @@ public class Kernel extends Server implements ApplicationContextAware,
 
     @PreDestroy
     public void destroy() { super.shutdown(); }
+
+    /**
+     * REST method to capture print MIME bundles from a sub-process.  See
+     * {@link RestClient#print(JsonNode)}.
+     *
+     * @param   bundle          The MIME bundle {@link ObjectNode}.
+     */
+    @RequestMapping(method = { POST }, value = { "print" })
+    public ResponseEntity<String> print(@RequestBody ObjectNode bundle) {
+        bundles.add(bundle);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
     @Override
     public void setApplicationContext(ApplicationContext context) {
@@ -133,10 +165,10 @@ public class Kernel extends Server implements ApplicationContextAware,
     }
 
     @Override
-    protected ArrayNode getExecutionEvents() {
-        var node = CellMethods.getExecutionEvents();
+    protected ArrayNode getMIMEBundles() {
+        var node = bundles;
 
-        node.addAll(CellMethods.getExecutionEvents(shell));
+        bundles = OBJECT_MAPPER.createArrayNode();
 
         return node;
     }

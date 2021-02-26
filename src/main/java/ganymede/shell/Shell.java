@@ -2,6 +2,8 @@ package ganymede.shell;
 
 import ganymede.dependency.POM;
 import ganymede.dependency.Resolver;
+import ganymede.kernel.Kernel;
+import ganymede.kernel.RestClient;
 import ganymede.server.Message;
 import ganymede.shell.jshell.CellMethods;
 import ganymede.shell.magic.AnnotatedMagic;
@@ -15,6 +17,8 @@ import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.nio.file.DirectoryIteratorException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -25,7 +29,6 @@ import java.util.stream.Stream;
 import jdk.jshell.JShell;
 import jdk.jshell.JShellException;
 import jdk.jshell.SourceCodeAnalysis;
-import lombok.NoArgsConstructor;
 import lombok.Synchronized;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
@@ -47,7 +50,7 @@ import static org.apache.logging.log4j.Level.WARN;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@NoArgsConstructor @ToString @Log4j2
+@ToString @Log4j2
 @MagicNames({ "java" }) @Description("Execute code in Java REPL")
 public class Shell implements AnnotatedMagic, AutoCloseable {
     private static final String[] VMOPTIONS =
@@ -58,6 +61,7 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
     private static final File KERNEL_JAR =
         new ApplicationHome(Shell.class).getSource();
 
+    private final Kernel kernel;
     private Locale locale = null;       /* TBD: Query Notebook server */
     private final AtomicInteger restarts = new AtomicInteger(0);
     private final MagicMap magics = new MagicMap();
@@ -66,6 +70,15 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
     private PrintStream out = null;
     private PrintStream err = null;
     private final Resolver resolver = new Resolver();
+
+    /**
+     * Sole constructor.
+     *
+     * @param   kernel          The {@link Kernel}.
+     */
+    public Shell(Kernel kernel) {
+        this.kernel = Objects.requireNonNull(kernel);
+    }
 
     /**
      * Method to start a {@link Shell}.
@@ -116,6 +129,13 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
             }
         }
     }
+
+    /**
+     * Method to get the {@link Kernel}.
+     *
+     * @return  The {@link Kernel}.
+     */
+    public Kernel kernel() { return kernel; }
 
     /**
      * Method to get the {@link Map} of configured {@link Magic}s.
@@ -203,19 +223,22 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
     @Synchronized
     public JShell jshell() {
         if (jshell == null) {
+            var options = new ArrayList<String>();
             var definitions =
                 Stream.of(ProcessHandle.current().info().arguments())
                 .flatMap(Optional::stream)
                 .flatMap(Stream::of)
                 .takeWhile(t -> (! Objects.equals(t, "-jar")))
-                .filter(t -> t.startsWith("-D"));
-            var vmoptions =
-                Stream.concat(Stream.of(VMOPTIONS), definitions)
+                .filter(t -> t.startsWith("-D"))
                 .toArray(String[]::new);
+
+            Collections.addAll(options, definitions);
+            Collections.addAll(options, VMOPTIONS);
+            options.add("-D" + Map.entry(RestClient.KERNEL_PORT_PROPERTY, kernel.getPort()));
 
             jshell =
                 JShell.builder()
-                .remoteVMOptions(vmoptions)
+                .remoteVMOptions(options.toArray(new String[] { }))
                 .in(in).out(out).err(err).build();
 
             try {
