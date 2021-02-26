@@ -1,5 +1,8 @@
 2021-02-25  Allen D. Ball  <ball@hcf.dev>
 
+	* src/main/java/ganymede/connect/Connect.java:
+	Always start the Kernel @RestController.
+
 	* Re-branded as Ganymede.
 
 2021-02-24  Allen D. Ball  <ball@hcf.dev>

@@ -13,8 +13,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
 import static ganymede.server.Server.OBJECT_MAPPER;
-import static org.springframework.boot.WebApplicationType.NONE;
-import static org.springframework.boot.WebApplicationType.SERVLET;
 
 /**
  * Ganymede Jupyter {@link ganymede.kernel.Kernel} {@link Connect} CLI.
@@ -36,15 +34,8 @@ public class Connect implements ApplicationRunner {
     @Value("${connection-file:#{null}}")
     private String connection_file = null;
 
-    @Value("${start-web-server:#{null}}")
-    private Boolean start_web_server = null;
-
     @Override
     public void run(ApplicationArguments arguments) throws Exception {
-        if (start_web_server == null) {
-            start_web_server = arguments.getOptionNames().contains("start-web-server");
-        }
-
         try {
             var file = new File(connection_file);
             var node = OBJECT_MAPPER.readTree(file);
@@ -58,7 +49,6 @@ public class Connect implements ApplicationRunner {
 
             if (! isAlive) {
                 new SpringApplicationBuilder(Kernel.class)
-                    .web(start_web_server ? SERVLET : NONE)
                     .run(arguments.getSourceArgs());
             } else {
                 log.warn("Kernel already running");
