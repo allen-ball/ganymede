@@ -42,7 +42,7 @@ public class Client {
         var body = bundle.toPrettyString();
         var request =
             HttpRequest.newBuilder()
-            .uri(uri.resolve("print"))
+            .uri(uri.resolve("kernel/print"))
             .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
             .POST(HttpRequest.BodyPublishers.ofString(body))
             .build();

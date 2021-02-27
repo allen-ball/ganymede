@@ -108,7 +108,7 @@ public class Kernel extends Server implements ApplicationContextAware,
      *
      * @param   bundle          The MIME bundle {@link ObjectNode}.
      */
-    @RequestMapping(method = { POST }, value = { "print" })
+    @RequestMapping(method = { POST }, value = { "kernel/print" })
     public ResponseEntity<String> print(@RequestBody ObjectNode bundle) {
         bundles.add(bundle);
 

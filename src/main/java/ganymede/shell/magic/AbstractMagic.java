@@ -1,7 +1,6 @@
 package ganymede.shell.magic;
 
 import ganymede.server.Message;
-import ganymede.shell.Shell;
 import lombok.NoArgsConstructor;
 import org.springframework.util.PropertyPlaceholderHelper;
 
