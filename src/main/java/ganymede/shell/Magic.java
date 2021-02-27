@@ -1,5 +1,6 @@
 package ganymede.shell;
 
+import ganymede.server.Message;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.StreamTokenizer;
@@ -9,6 +10,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import lombok.Data;
 
 import static java.io.StreamTokenizer.TT_EOF;
 import static java.io.StreamTokenizer.TT_EOL;
@@ -55,28 +57,40 @@ public interface Magic {
 
     /**
      * Entry-point method.  Executed in the {@link ganymede.shell.Shell}.
+     * Default implementation sends to the {@link #execute(String,String)}
+     * method in the {@link jdk.jshell.JShell} instance.
      *
      * @param   shell           The {@link Shell}.
      * @param   in              The {@code in} {@link InputStream}.
      * @param   out             The {@code out} {@link PrintStream}.
      * @param   err             The {@code err} {@link PrintStream}.
-     * @param   magic           The initial magic line.
+     * @param   line0           The initial magic line.
      * @param   code            The remainder of the cell.
      */
     default void execute(Shell shell,
                          InputStream in, PrintStream out, PrintStream err,
-                         String magic, String code) throws Exception {
-        sendTo(shell, getMagicNames()[0], magic, code);
+                         String line0, String code) throws Exception {
+        sendTo(shell, getMagicNames()[0], line0, code);
     }
+
+    /**
+     * Method to determine code's {@link Message.completeness completeness}.
+     *
+     * @param   line0           The initial magic line.
+     * @param   code            The code to execute.
+     *
+     * @return  The code's {@link Message.completeness completeness}.
+     */
+    public Message.completeness isComplete(String line0, String code);
 
     /**
      * Implementation method.  Executed in the {@link jdk.jshell.JShell}
      * instance.
      *
-     * @param   magic           The initial magic line.
+     * @param   line0           The initial magic line.
      * @param   code            The remainder of the cell.
      */
-    public void execute(String magic, String code) throws Exception;
+    public void execute(String line0, String code) throws Exception;
 
     /**
      * Method to determine if the code is cell magic (starts with
@@ -180,14 +194,14 @@ public interface Magic {
      *
      * @param   shell           The {@link Shell}.
      * @param   name            The magic name.
-     * @param   magic           The initial magic line.
+     * @param   line0           The initial magic line.
      * @param   code            The remainder of the cell.
      */
-    public static void sendTo(Shell shell, String name, String magic, String code) throws Exception {
+    public static void sendTo(Shell shell, String name, String line0, String code) throws Exception {
         var expression =
             String.format("__.invokeStaticMethod(\"%s\", \"%s\", new Class<?>[] { String.class, String.class, String.class }, \"%s\", \"%s\", \"%s\")",
                           Magic.class.getName(), "receive",
-                          name, encode(magic), encode(code));
+                          name, encode(line0), encode(code));
 
         shell.evaluate(expression);
     }
@@ -206,14 +220,14 @@ public interface Magic {
      * in the {@link jdk.jshell.JShell}.
      *
      * @param   name            The magic name.
-     * @param   magic           The initial magic line.
+     * @param   line0           The initial magic line.
      * @param   code            The remainder of the cell.
      */
-    public static void receive(String name, String magic, String code) throws Exception {
+    public static void receive(String name, String line0, String code) throws Exception {
         MAP.reload();
 
         if (MAP.containsKey(name)) {
-            MAP.get(name).execute(decode(magic), decode(code));
+            MAP.get(name).execute(decode(line0), decode(code));
         } else {
             throw new IllegalStateException("Magic '" + name + "' not found");
         }
@@ -239,5 +253,63 @@ public interface Magic {
      */
     public static String encode(String string) {
         return BASE64_ENCODER.encodeToString(((string != null) ? string : "").getBytes(UTF_8));
+    }
+
+    /**
+     * {@link Magic} {@link Application Application} instance to parse code,
+     * find {@link Magic}, and execute.
+     *
+     * {@bean.info}
+     */
+    @Data
+    public static class Application {
+        private final String line0;
+        private final String code;
+        private final String[] argv;
+
+        /**
+         * Sole public constructor.
+         *
+         * @param       code    The complete cell code.
+         */
+        public Application(String code) {
+            this(isCellMagic(code) ? code.split("\\R", 2)[0] : null, code);
+        }
+
+        private Application(String line0, String code) {
+            this.line0 = line0;
+            this.code = (line0 != null) ? code.substring(line0.length()) : code;
+            this.argv = (line0 != null) ? getCellMagicCommand(line0) : new String[] { };
+        }
+
+        /**
+         * Method to determine if the code has a "magic" line.
+         *
+         * @return      {@code true} or {@code false}.
+         */
+        public boolean hasMagicLine() { return (line0 != null); }
+
+        /**
+         * Method to get the specified {@link Magic} name.
+         *
+         * @return      The specified {@link Magic} name; {@code null} if
+         *              none is specified.
+         */
+        public String getMagicName() {
+            return (argv.length > 0) ? argv[0] : null;
+        }
+
+        /**
+         * Method to invoke the {@link Magic}.
+         *
+         * @param       magic   The {@link Magic} to apply.
+         * @param       shell   The {@link Shell}.
+         * @param       in      The {@code in} {@link InputStream}.
+         * @param       out     The {@code out} {@link PrintStream}.
+         * @param       err     The {@code err} {@link PrintStream}.
+         */
+        public void apply(Magic magic, Shell shell, InputStream in, PrintStream out, PrintStream err) throws Exception {
+            magic.execute(shell, in, out, err, getLine0(), getCode());
+        }
     }
 }

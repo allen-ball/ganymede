@@ -23,12 +23,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import jdk.jshell.JShell;
 import jdk.jshell.JShellException;
 import jdk.jshell.SourceCodeAnalysis;
+import lombok.NoArgsConstructor;
 import lombok.Synchronized;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
@@ -51,8 +53,7 @@ import static org.apache.logging.log4j.Level.WARN;
  * @version $Revision$
  */
 @ToString @Log4j2
-@MagicNames({ "java" }) @Description("Execute code in Java REPL")
-public class Shell implements AnnotatedMagic, AutoCloseable {
+public class Shell implements AutoCloseable {
     private static final String[] VMOPTIONS =
         Stream.of("--add-opens", "java.base/jdk.internal.misc=ALL-UNNAMED",
                   "-Dio.netty.tryReflectionSetAccessible=true",
@@ -65,6 +66,7 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
     private Locale locale = null;       /* TBD: Query Notebook server */
     private final AtomicInteger restarts = new AtomicInteger(0);
     private final MagicMap magics = new MagicMap();
+    private final Java java = new Java();
     private JShell jshell = null;
     private InputStream in = null;
     private PrintStream out = null;
@@ -96,7 +98,7 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
         magics.clear();
         magics.reload();
 
-        Stream.of(getMagicNames()).forEach(t -> magics.put(t, this));
+        Stream.of(java.getMagicNames()).forEach(t -> magics.put(t, java));
     }
 
     /**
@@ -108,9 +110,12 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
      */
     @Synchronized
     public void restart(InputStream in, PrintStream out, PrintStream err) {
-        stop();
+        /* stop(); */
         close();
-        start(in, out, err);
+
+        if (! kernel().isTerminating()) {
+            start(in, out, err);
+        }
     }
 
     /**
@@ -119,7 +124,7 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
     @Override
     @Synchronized
     public void close() {
-        Stream.of(getMagicNames()).forEach(t -> magics.remove(t));
+        Stream.of(java.getMagicNames()).forEach(t -> magics.remove(t));
 
         try (var jshell = this.jshell) {
             this.jshell = null;
@@ -236,33 +241,35 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
             Collections.addAll(options, VMOPTIONS);
             options.add("-D" + Map.entry(Client.KERNEL_PORT_PROPERTY, kernel.getPort()));
 
-            jshell =
-                JShell.builder()
-                .remoteVMOptions(options.toArray(new String[] { }))
-                .in(in).out(out).err(err).build();
+            if (! kernel.isTerminating()) {
+                jshell =
+                    JShell.builder()
+                    .remoteVMOptions(options.toArray(new String[] { }))
+                    .in(in).out(out).err(err).build();
 
-            try {
-                var logIn =
-                    IoBuilder.forLogger(log)
-                    .setLevel(WARN)
-                    .filter(InputStream.nullInputStream())
-                    .buildInputStream();
-                var logOut =
-                    IoBuilder.forLogger(log)
-                    .setLevel(WARN)
-                    .buildPrintStream();
-                var bootstrap =
-                    String.format(getResourceAsString("bootstrap.jsh"),
-                                  KERNEL_JAR.toURI().toURL(),
-                                  CellMethods.class.getName());
+                try {
+                    var logIn =
+                        IoBuilder.forLogger(log)
+                        .setLevel(WARN)
+                        .filter(InputStream.nullInputStream())
+                        .buildInputStream();
+                    var logOut =
+                        IoBuilder.forLogger(log)
+                        .setLevel(WARN)
+                        .buildPrintStream();
+                    var bootstrap =
+                        String.format(getResourceAsString("bootstrap.jsh"),
+                                      KERNEL_JAR.toURI().toURL(),
+                                      CellMethods.class.getName());
 
-                execute(jshell, logIn, logOut, logOut, null, bootstrap);
-            } catch (Exception exception) {
-                log.warn("{}", exception, exception);
+                    java.execute(jshell, logIn, logOut, logOut, bootstrap);
+                } catch (Exception exception) {
+                    log.warn("{}", exception, exception);
+                }
+
+                resolver().classpath()
+                    .forEach(t -> jshell.addToClasspath(t.toString()));
             }
-
-            resolver().classpath()
-                .forEach(t -> jshell.addToClasspath(t.toString()));
         }
 
         return jshell;
@@ -286,23 +293,16 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
      */
     public void execute(String code) throws Exception {
         try {
-            if (Magic.isCellMagic(code)) {
-                var lines = code.split("\\R", 2);
-                var line0 = lines[0];
+            var application = new Magic.Application(code);
+            var name = application.getMagicName();
 
-                code = (lines.length > 1) ? lines[1] : "";
-
-                var argv = Magic.getCellMagicCommand(line0);
-
-                if (argv.length > 0 && magics.containsKey(argv[0])) {
-                    magics.get(argv[0])
-                        .execute(this, in, out, err, line0, code);
-                } else {
-                    throw new IllegalArgumentException(line0);
-                }
-            } else {
-                execute(this, in, out, err, null, code);
+            if (name != null && (! magics.containsKey(name))) {
+                throw new IllegalArgumentException(application.getLine0());
             }
+
+            var magic = (name != null) ? magics.get(name) : java;
+
+            application.apply(magic, this, in, out, err);
         } catch (JShellException exception) {
             exception.printStackTrace(err);
             throw exception;
@@ -321,15 +321,21 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
      */
     @Synchronized
     public String evaluate(String expression) throws Exception {
+        var result = "";
         var jshell = jshell();
-        var analyzer = jshell.sourceCodeAnalysis();
-        var info = analyzer.analyzeCompletion(expression);
 
-        if (! info.completeness().isComplete()) {
-            throw new IllegalArgumentException(expression);
+        if (jshell != null) {
+            var analyzer = jshell.sourceCodeAnalysis();
+            var info = analyzer.analyzeCompletion(expression);
+
+            if (! info.completeness().isComplete()) {
+                throw new IllegalArgumentException(expression);
+            }
+
+            result = unescape(jshell.eval(info.source()).get(0).value());
         }
 
-        return unescape(jshell.eval(info.source()).get(0).value());
+        return result;
     }
 
     /**
@@ -362,7 +368,20 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
      * @return  The code's {@link Message.completeness completeness}.
      */
     public Message.completeness isComplete(String code) {
-        return Message.completeness.unknown;
+        var completeness = Message.completeness.unknown;
+        var application = new Magic.Application(code);
+        var name = application.getMagicName();
+
+        if (name == null || magics.containsKey(name)) {
+            var magic = (name != null) ? magics.get(name) : java;
+
+            completeness =
+                magic.isComplete(application.getLine0(), application.getCode());
+        } else {
+            completeness = Message.completeness.invalid;
+        }
+
+        return completeness;
     }
 
     /**
@@ -385,75 +404,7 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
      */
     public int restarts() { return restarts.intValue(); }
 
-    @Override
-    @Synchronized
-    public void execute(Shell shell,
-                        InputStream in, PrintStream out, PrintStream err,
-                        String magic, String code) throws Exception {
-        execute(shell.jshell(), in, out, err, magic, code);
-    }
-
-    private void execute(JShell jshell,
-                         InputStream in, PrintStream out, PrintStream err,
-                         String magic, String code) throws Exception {
-        try {
-            var iterator = parse(jshell, code).entrySet().iterator();
-
-            while (iterator.hasNext()) {
-                var entry = iterator.next();
-                var info = entry.getValue();
-                var events = jshell.eval(info.source());
-                var exception =
-                    events.stream()
-                    .map(t -> t.exception())
-                    .filter(Objects::nonNull)
-                    .findFirst().orElse(null);
-
-                if (exception != null) {
-                    exception.printStackTrace(err);
-                    break;
-                }
-
-                var reason =
-                    events.stream()
-                    .filter(t -> t.status().equals(REJECTED))
-                    .map(t -> jshell.diagnostics(t.snippet())
-                              .map(u -> u.getMessage(locale))
-                              .collect(joining("\n",
-                                               String.format("%s %s\n%s\n",
-                                                             t.status(),
-                                                             t.snippet().kind(),
-                                                             t.snippet().source()),
-                                               "")))
-                    .findFirst().orElse(null);
-
-                if (reason != null) {
-                    err.println(reason);
-                    break;
-                }
-
-                if (! iterator.hasNext()) {
-                    if (! events.isEmpty()) {
-                        var event = events.get(events.size() - 1);
-
-                        switch (event.snippet().kind()) {
-                        case EXPRESSION:
-                            out.println(event.value());
-                            break;
-
-                        default:
-                            break;
-                        }
-                    }
-                }
-            }
-        } finally {
-            out.flush();
-            err.flush();
-        }
-    }
-
-    private Map<Integer,SourceCodeAnalysis.CompletionInfo> parse(JShell jshell, String code) {
+    private SortedMap<Integer,SourceCodeAnalysis.CompletionInfo> parse(JShell jshell, String code) {
         var map = new TreeMap<Integer,SourceCodeAnalysis.CompletionInfo>();
         var analyzer = jshell.sourceCodeAnalysis();
         var offset = 0;
@@ -471,8 +422,121 @@ public class Shell implements AnnotatedMagic, AutoCloseable {
         return map;
     }
 
-    @Override
-    public void execute(String magic, String code) throws Exception {
-        throw new IllegalStateException();
+    @MagicNames({ "java" })
+    @Description("Execute code in Java REPL")
+    @NoArgsConstructor @ToString
+    private class Java implements AnnotatedMagic {
+        @Override
+        public void execute(Shell shell,
+                            InputStream in, PrintStream out, PrintStream err,
+                            String line0, String code) throws Exception {
+            execute(shell.jshell(), in, out, err, code);
+        }
+
+        @Override
+        public Message.completeness isComplete(String line0, String code) {
+            var completeness = Message.completeness.unknown;
+
+            if (! code.isBlank()) {
+                var jshell = Shell.this.jshell;
+
+                if (jshell != null) {
+                    var map = parse(jshell, code);
+
+                    if (! map.isEmpty()) {
+                        var info = map.get(map.lastKey());
+
+                        if (info.completeness().isComplete()) {
+                            completeness = Message.completeness.complete;
+                        } else {
+                            switch (info.completeness()) {
+                            case CONSIDERED_INCOMPLETE:
+                            case DEFINITELY_INCOMPLETE:
+                                completeness = Message.completeness.incomplete;
+                                break;
+
+                            case UNKNOWN:
+                                completeness = Message.completeness.invalid;
+                                break;
+
+                            default:
+                                break;
+                            }
+                        }
+                    } else {
+                        completeness = Message.completeness.invalid;
+                    }
+                }
+            } else {
+                completeness = Message.completeness.incomplete;
+            }
+
+            return completeness;
+        }
+
+        @Override
+        public void execute(String line0, String code) throws Exception {
+            throw new IllegalStateException();
+        }
+
+        protected void execute(JShell jshell,
+                               InputStream in, PrintStream out, PrintStream err,
+                               String code) throws Exception {
+            try {
+                var iterator = parse(jshell, code).entrySet().iterator();
+
+                while (iterator.hasNext()) {
+                    var entry = iterator.next();
+                    var info = entry.getValue();
+                    var events = jshell.eval(info.source());
+                    var exception =
+                        events.stream()
+                        .map(t -> t.exception())
+                        .filter(Objects::nonNull)
+                        .findFirst().orElse(null);
+
+                    if (exception != null) {
+                        exception.printStackTrace(err);
+                        break;
+                    }
+
+                    var reason =
+                        events.stream()
+                        .filter(t -> t.status().equals(REJECTED))
+                        .map(t -> jshell.diagnostics(t.snippet())
+                             .map(u -> u.getMessage(locale))
+                             .collect(joining("\n",
+                                              String.format("%s %s\n%s\n",
+                                                            t.status(),
+                                                            t.snippet().kind(),
+                                                            t.snippet().source()),
+                                              "")))
+                        .findFirst().orElse(null);
+
+                    if (reason != null) {
+                        err.println(reason);
+                        break;
+                    }
+
+                    if (! iterator.hasNext()) {
+                        if (! events.isEmpty()) {
+                            var event = events.get(events.size() - 1);
+
+                            switch (event.snippet().kind()) {
+                            case EXPRESSION:
+                                out.println(event.value());
+                                break;
+
+                            default:
+                                break;
+                            }
+                        }
+                    }
+                }
+            } finally {
+                out.flush();
+                err.flush();
+            }
+        }
     }
 }

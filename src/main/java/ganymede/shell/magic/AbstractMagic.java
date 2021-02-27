@@ -1,5 +1,7 @@
 package ganymede.shell.magic;
 
+import ganymede.server.Message;
+import ganymede.shell.Shell;
 import lombok.NoArgsConstructor;
 import org.springframework.util.PropertyPlaceholderHelper;
 
@@ -19,4 +21,9 @@ public abstract class AbstractMagic implements AnnotatedMagic {
      */
     protected static final PropertyPlaceholderHelper HELPER =
         new PropertyPlaceholderHelper("${", "}", ":", true);
+
+    @Override
+    public Message.completeness isComplete(String line0, String code) {
+        return Message.completeness.complete;
+    }
 }
