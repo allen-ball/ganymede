@@ -28,16 +28,64 @@
   <inceptionYear>2021</inceptionYear>
   <properties>
     <jse.target>11</jse.target>
+    <tablesaw.version>0.38.2</tablesaw.version>
     <start-class>ganymede.Launcher</start-class>
   </properties>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jfree</groupId>
+        <artifactId>jfreechart</artifactId>
+        <version>1.5.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.knowm.xchart</groupId>
+        <artifactId>xchart</artifactId>
+        <version>3.8.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.zeromq</groupId>
+        <artifactId>jeromq</artifactId>
+        <version>0.5.2</version>
+      </dependency>
+      <dependency>
+        <groupId>tech.tablesaw</groupId>
+        <artifactId>tablesaw-core</artifactId>
+        <version>${tablesaw.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>tech.tablesaw</groupId>
+        <artifactId>tablesaw-excel</artifactId>
+        <version>${tablesaw.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>tech.tablesaw</groupId>
+        <artifactId>tablesaw-html</artifactId>
+        <version>${tablesaw.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>tech.tablesaw</groupId>
+        <artifactId>tablesaw-json</artifactId>
+        <version>${tablesaw.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>tech.tablesaw</groupId>
+        <artifactId>tablesaw-jsplot</artifactId>
+        <version>${tablesaw.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies verbose="true">
     <dependency>
       <groupId>ball</groupId>
       <artifactId>ball-java-jar</artifactId>
+      <version>${ball-java-jar.version}</version>
     </dependency>
     <dependency>
       <groupId>ball</groupId>
       <artifactId>ball-util</artifactId>
+      <version>${ball-util.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
@@ -90,10 +138,12 @@
     <dependency>
       <groupId>org.jfree</groupId>
       <artifactId>jfreechart</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.knowm.xchart</groupId>
       <artifactId>xchart</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -106,6 +156,7 @@
     <dependency>
       <groupId>tech.tablesaw</groupId>
       <artifactId>tablesaw-jsplot</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   <build>
@@ -143,14 +194,6 @@
           </execution>
         </executions>
         <configuration>
-          <artifactSet>
-            <excludes>
-              <exclude>ball:ball-util</exclude>
-              <exclude>org.jfree:*</exclude>
-              <exclude>org.knowm.xchart:*</exclude>
-              <exclude>tech.tablesaw:*</exclude>
-            </excludes>
-          </artifactSet>
           <createDependencyReducedPom>true</createDependencyReducedPom>
           <filters>
             <filter>
