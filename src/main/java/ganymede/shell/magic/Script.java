@@ -3,6 +3,7 @@ package ganymede.shell.magic;
 import ball.annotation.ServiceProviderFor;
 import ganymede.shell.Magic;
 import java.util.stream.Stream;
+import javax.script.Bindings;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
@@ -22,7 +23,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @NoArgsConstructor @ToString @Log4j2
 public class Script extends AbstractMagic {
     @Override
-    public void execute(String magic, String code) throws Exception {
+    public void execute(Bindings bindings,
+                        String magic, String code) throws Exception {
         var argv =
             Stream.of(Magic.getCellMagicCommand(magic))
             .skip(1)

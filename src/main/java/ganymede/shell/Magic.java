@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import javax.script.Bindings;
 import lombok.Data;
 
 import static java.io.StreamTokenizer.TT_EOF;
@@ -57,8 +58,9 @@ public interface Magic {
 
     /**
      * Entry-point method.  Executed in the {@link ganymede.shell.Shell}.
-     * Default implementation sends to the {@link #execute(String,String)}
-     * method in the {@link jdk.jshell.JShell} instance.
+     * Default implementation sends to the
+     * {@link #execute(Bindings,String,String)} method in the
+     * {@link jdk.jshell.JShell} instance.
      *
      * @param   shell           The {@link Shell}.
      * @param   in              The {@code in} {@link InputStream}.
@@ -87,10 +89,13 @@ public interface Magic {
      * Implementation method.  Executed in the {@link jdk.jshell.JShell}
      * instance.
      *
+     * @param   bindings        The {@link jdk.jshell.JShell}
+     *                          {@link Bindings}.
      * @param   line0           The initial magic line.
      * @param   code            The remainder of the cell.
      */
-    public void execute(String line0, String code) throws Exception;
+    public void execute(Bindings bindings,
+                        String line0, String code) throws Exception;
 
     /**
      * Method to determine if the code is cell magic (starts with
@@ -189,8 +194,8 @@ public interface Magic {
      * {@link jdk.jshell.JShell} instance.  The
      * {@link #sendTo(Shell,String,String,String)} method packs the
      * arguments and creates a
-     * {@link #receive(String,String,String)} expression which
-     * is evaluated in the {@link jdk.jshell.JShell}.
+     * {@link #receive(String,Bindings,String,String)} expression which is
+     * evaluated in the {@link jdk.jshell.JShell}.
      *
      * @param   shell           The {@link Shell}.
      * @param   name            The magic name.
@@ -199,7 +204,7 @@ public interface Magic {
      */
     public static void sendTo(Shell shell, String name, String line0, String code) throws Exception {
         var expression =
-            String.format("__.invokeStaticMethod(\"%s\", \"%s\", new Class<?>[] { String.class, String.class, String.class }, \"%s\", \"%s\", \"%s\")",
+            String.format("__.invokeStaticMethod(\"%s\", \"%s\", new Class<?>[] { String.class, javax.script.Bindings.class, String.class, String.class }, \"%s\", __.bindings, \"%s\", \"%s\")",
                           Magic.class.getName(), "receive",
                           name, encode(line0), encode(code));
 
@@ -208,7 +213,7 @@ public interface Magic {
 
     /**
      * Static {@link MagicMap} instance used by
-     * {@link #receive(String,String,String)}.
+     * {@link #receive(String,Bindings,String,String)}.
      */
     public static MagicMap MAP = new MagicMap();
 
@@ -216,18 +221,21 @@ public interface Magic {
      * Static method to receive a request in the {@link jdk.jshell.JShell}
      * instance.  The {@link #sendTo(Shell,String,String,String)} method
      * packs the arguments and creates a
-     * {@link #receive(String,String,String)} expression which is evaluated
-     * in the {@link jdk.jshell.JShell}.
+     * {@link #receive(String,Bindings,String,String)} expression which is
+     * evaluated in the {@link jdk.jshell.JShell}.
      *
      * @param   name            The magic name.
+     * @param   bindings        The {@link jdk.jshell.JShell}
+     *                          {@link Bindings}.
      * @param   line0           The initial magic line.
      * @param   code            The remainder of the cell.
      */
-    public static void receive(String name, String line0, String code) throws Exception {
+    public static void receive(String name, Bindings bindings,
+                               String line0, String code) throws Exception {
         MAP.reload();
 
         if (MAP.containsKey(name)) {
-            MAP.get(name).execute(decode(line0), decode(code));
+            MAP.get(name).execute(bindings, decode(line0), decode(code));
         } else {
             throw new IllegalStateException("Magic '" + name + "' not found");
         }

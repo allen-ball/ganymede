@@ -1,5 +1,6 @@
 package ganymede.shell.magic;
 
+import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import lombok.NoArgsConstructor;
@@ -33,17 +34,22 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic {
      *          {@code null} otherwise.
      */
     @Synchronized
-    public ScriptEngine engine() {
+    protected ScriptEngine engine(Bindings bindings) {
         if (engine == null) {
-            engine = new ScriptEngineManager().getEngineByExtension(getExtension());
+            var manager = new ScriptEngineManager();
+
+            manager.setBindings(bindings);
+
+            engine = manager.getEngineByExtension(getExtension());
         }
 
         return engine;
     }
 
     @Override
-    public void execute(String magic, String code) throws Exception {
-        var engine = engine();
+    public void execute(Bindings bindings,
+                        String magic, String code) throws Exception {
+        var engine = engine(bindings);
 
         if (engine != null) {
             engine.eval(code);

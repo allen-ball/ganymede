@@ -27,6 +27,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
+import javax.script.Bindings;
 import jdk.jshell.JShell;
 import jdk.jshell.JShellException;
 import jdk.jshell.SourceCodeAnalysis;
@@ -41,7 +42,9 @@ import org.springframework.util.StreamUtils;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toSet;
 import static jdk.jshell.Snippet.Status.REJECTED;
+import static jdk.jshell.Snippet.SubKind.TEMP_VAR_EXPRESSION_SUBKIND;
 import static org.apache.logging.log4j.Level.WARN;
 
 /**
@@ -293,6 +296,30 @@ public class Shell implements AutoCloseable {
      */
     public void execute(String code) throws Exception {
         try {
+            var jshell = this.jshell;
+
+            if (jshell != null) {
+                var variables =
+                    jshell.variables()
+                    .filter(t -> (! t.subKind().equals(TEMP_VAR_EXPRESSION_SUBKIND)))
+                    .filter(t -> (! t.name().equals("__")))
+                    .map(t -> t.name())
+                    .collect(toSet());
+
+                var analyzer = jshell.sourceCodeAnalysis();
+
+                for (var variable : variables) {
+                    var expression = String.format("__.bindings.put(\"%1$s\", %1$s)", variable);
+                    var info = analyzer.analyzeCompletion(expression);
+                    var result = unescape(jshell.eval(info.source()).get(0).value());
+                }
+
+                var expression =
+                    String.format("__.bindings.keySet().retainAll(java.util.List.of(\"%1$s\".split(\",\")))", String.join(",", variables));
+                var info = analyzer.analyzeCompletion(expression);
+                var result = unescape(jshell.eval(info.source()).get(0).value());
+            }
+
             var application = new Magic.Application(code);
             var name = application.getMagicName();
 
@@ -475,7 +502,8 @@ public class Shell implements AutoCloseable {
         }
 
         @Override
-        public void execute(String line0, String code) throws Exception {
+        public void execute(Bindings bindings,
+                            String line0, String code) throws Exception {
             throw new IllegalStateException();
         }
 

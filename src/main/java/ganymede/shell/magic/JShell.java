@@ -1,5 +1,6 @@
 package ganymede.shell.magic;
 
+import javax.script.Bindings;
 import lombok.NoArgsConstructor;
 
 import static lombok.AccessLevel.PROTECTED;
@@ -14,7 +15,8 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 public abstract class JShell extends AbstractMagic {
     @Override
-    public void execute(String magic, String code) throws Exception {
+    public void execute(Bindings bindings,
+                        String magic, String code) throws Exception {
         throw new IllegalArgumentException(magic);
     }
 }

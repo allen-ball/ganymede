@@ -13,14 +13,16 @@ var __ =
         {
             try {
                 var url = new java.net.URL("%1$s");
+                var urls = new java.net.URL[] { url };
 
-                loader =
-                    new java.net.URLClassLoader(new java.net.URL[] { url },
-                                                getClass().getClassLoader());
+                loader = new java.net.URLClassLoader(urls, getClass().getClassLoader());
             } catch (Exception exception) {
                 throw new ExceptionInInitializerError(exception);
             }
         }
+
+        public final javax.script.Bindings bindings =
+            new javax.script.SimpleBindings(new java.util.concurrent.ConcurrentSkipListMap<>());
 
         public ClassLoader getClassLoader() { return loader; }
 

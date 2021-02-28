@@ -1,3 +1,10 @@
+2021-02-28  Allen D. Ball  <ball@hcf.dev>
+
+	* Added Bindings parameter to
+	Magic.execute(Bindings,String,String) interface.  In
+	Shell.execute(String) method, synchronize __.bindings (defined in
+	the JShell instance) with JShell.variables().
+
 2021-02-26  Allen D. Ball  <ball@hcf.dev>
 
 	* Added Magic.isComplete(String,String) interface method and
