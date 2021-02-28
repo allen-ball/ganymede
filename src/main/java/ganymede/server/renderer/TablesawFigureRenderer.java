@@ -32,11 +32,12 @@ public class TablesawFigureRenderer extends StringRenderer {
             var context = figure.getContext();
             var id = UUID.randomUUID().toString().replaceAll("-", "");
             /*
+             * https://github.com/plotly/plotly.js
              * https://stackoverflow.com/questions/54654434/how-to-embed-tablesaw-graph-in-jupyter-notebook-with-ijava-kernel
              */
             buffer.println(figure.asJavascript(id));
             buffer.format("<div id=\"%s\"></div>\n", id);
-            buffer.format("<script>require(['https://cdn.plot.ly/plotly-1.44.4.min.js'], Plotly => {\n");
+            buffer.format("<script>require(['https://cdn.plot.ly/plotly-latest.min.js'], Plotly => {\n");
             buffer.format("    var target_%s = document.getElementById('%s');\n", id, id);
             buffer.format("    %s\n", context.get("figure"));
             buffer.format("    %s\n", context.get("plotFunction"));
