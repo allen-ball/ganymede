@@ -38,15 +38,15 @@ public class Magics extends AbstractMagic {
     @Override
     public void execute(Shell shell,
                         InputStream in, PrintStream out, PrintStream err,
-                        String magic, String code) throws Exception {
+                        String line0, String code) throws Exception {
         shell.kernel()
             .print(Message.mime_bundle(new Output(shell)));
     }
 
     @Override
     public void execute(Bindings bindings,
-                        String magic, String code) throws Exception {
-        throw new IllegalArgumentException(magic);
+                        String line0, String code) throws Exception {
+        throw new IllegalArgumentException(line0);
     }
 
     private static final Comparator<List<String>> COMPARATOR =

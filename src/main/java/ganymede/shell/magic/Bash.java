@@ -19,15 +19,15 @@ import lombok.extern.log4j.Log4j2;
 public class Bash extends Script {
     @Override
     public void execute(Bindings bindings,
-                        String magic, String code) throws Exception {
+                        String line0, String code) throws Exception {
         try {
             super.execute(bindings,
                           String.format("%s%s %s",
                                         CELL, super.getMagicNames()[0],
-                                        magic.substring(CELL.length())),
+                                        line0.substring(CELL.length())),
                           code);
         } catch (IllegalArgumentException exception) {
-            throw new IllegalArgumentException(magic);
+            throw new IllegalArgumentException(line0);
         }
     }
 }

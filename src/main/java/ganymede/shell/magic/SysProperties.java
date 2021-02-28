@@ -22,7 +22,7 @@ import lombok.extern.log4j.Log4j2;
 public class SysProperties extends AbstractMagic {
     @Override
     public void execute(Bindings bindings,
-                        String magic, String code) throws Exception {
+                        String line0, String code) throws Exception {
         if (! code.isBlank()) {
             try (var reader = new StringReader(code)) {
                 var in = new Properties(System.getProperties());

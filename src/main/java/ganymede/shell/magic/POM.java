@@ -24,7 +24,7 @@ public class POM extends JShell {
     @Override
     public void execute(Shell shell,
                         InputStream in, PrintStream out, PrintStream err,
-                        String magic, String code) throws Exception {
+                        String line0, String code) throws Exception {
         try {
             if (! code.isBlank()) {
                 shell.resolve(ganymede.dependency.POM.parse(code));

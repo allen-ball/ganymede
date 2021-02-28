@@ -48,7 +48,7 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic {
 
     @Override
     public void execute(Bindings bindings,
-                        String magic, String code) throws Exception {
+                        String line0, String code) throws Exception {
         var engine = engine(bindings);
 
         if (engine != null) {

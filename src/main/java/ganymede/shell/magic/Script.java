@@ -24,9 +24,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class Script extends AbstractMagic {
     @Override
     public void execute(Bindings bindings,
-                        String magic, String code) throws Exception {
+                        String line0, String code) throws Exception {
         var argv =
-            Stream.of(Magic.getCellMagicCommand(magic))
+            Stream.of(Magic.getCellMagicCommand(line0))
             .skip(1)
             .toArray(String[]::new);
 

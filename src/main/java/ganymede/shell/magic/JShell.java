@@ -16,7 +16,7 @@ import static lombok.AccessLevel.PROTECTED;
 public abstract class JShell extends AbstractMagic {
     @Override
     public void execute(Bindings bindings,
-                        String magic, String code) throws Exception {
-        throw new IllegalArgumentException(magic);
+                        String line0, String code) throws Exception {
+        throw new IllegalArgumentException(line0);
     }
 }

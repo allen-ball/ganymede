@@ -23,7 +23,7 @@ public class Variables extends JShell {
     @Override
     public void execute(Shell shell,
                         InputStream in, PrintStream out, PrintStream err,
-                        String magic, String code) throws Exception {
+                        String line0, String code) throws Exception {
         shell.jshell().variables()
             .forEach(t -> out.println(t.source()));
     }
