@@ -281,12 +281,16 @@ public interface Magic {
          * @param       code    The complete cell code.
          */
         public Application(String code) {
-            this(isCellMagic(code) ? code.split("\\R", 2)[0] : null, code);
+            this(isCellMagic(code) ? code.split("\\R", 2) : new String[] { null, code });
+        }
+
+        private Application(String[] lines) {
+            this(lines[0], (lines.length > 1) ? lines[1] : "");
         }
 
         private Application(String line0, String code) {
             this.line0 = line0;
-            this.code = (line0 != null) ? code.substring(line0.length()) : code;
+            this.code = code;
             this.argv = (line0 != null) ? getCellMagicCommand(line0) : new String[] { };
         }
 
