@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import tech.tablesaw.plotly.components.Figure;
 
+import static org.springframework.util.MimeTypeUtils.TEXT_HTML_VALUE;
+
 /**
  * {@link.uri https://github.com/jtablesaw/tablesaw target=newtab Tablesaw}
  * {@link.uri https://github.com/plotly target=newtab Plot.ly}
@@ -22,11 +24,9 @@ import tech.tablesaw.plotly.components.Figure;
 @ForType(Figure.class)
 @NoArgsConstructor @ToString
 public class TablesawFigureRenderer extends StringRenderer {
-    private static final String MIME_TYPE = "text/html";
-
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
-        if (! bundle.with(DATA).has(MIME_TYPE)) {
+        if (! bundle.with(DATA).has(TEXT_HTML_VALUE)) {
             var buffer = new PrintStreamBuffer();
             var figure = (Figure) object;
             var context = figure.getContext();
@@ -34,6 +34,17 @@ public class TablesawFigureRenderer extends StringRenderer {
             /*
              * https://github.com/plotly/plotly.js
              * https://stackoverflow.com/questions/54654434/how-to-embed-tablesaw-graph-in-jupyter-notebook-with-ijava-kernel
+
+%%thymeleaf html
+[(${figure.asJavascript(id)})]
+<div th:id="${id}"></div>
+<script th:inline="javascript">
+  require(['https://cdn.plot.ly/plotly-latest.min.js'], Plotly => {
+    var target_[(${id})] = document.getElementById([[${id}]]);
+    [(${figure.context.get('figure')})]
+    [(${figure.context.get('plotFunction')})]
+  })
+</script>
              */
             buffer.println(figure.asJavascript(id));
             buffer.format("<div id=\"%s\"></div>\n", id);
@@ -43,7 +54,7 @@ public class TablesawFigureRenderer extends StringRenderer {
             buffer.format("    %s\n", context.get("plotFunction"));
             buffer.format("})</script>\n");
 
-            bundle.with(DATA).put(MIME_TYPE, buffer.toString());
+            bundle.with(DATA).put(TEXT_HTML_VALUE, buffer.toString());
         }
     }
 }

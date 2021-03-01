@@ -19,6 +19,9 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.StringTemplateResolver;
 
 import static ganymede.shell.jshell.CellMethods.print;
+import static org.springframework.util.MimeTypeUtils.TEXT_HTML_VALUE;
+import static org.springframework.util.MimeTypeUtils.TEXT_PLAIN_VALUE;
+import static org.springframework.util.MimeTypeUtils.TEXT_XML_VALUE;
 
 /**
  * Thymeleaf template {@link ganymede.shell.Magic}.
@@ -36,8 +39,8 @@ public class Thymeleaf extends AbstractMagic {
     public void execute(Bindings bindings,
                         String line0, String code) throws Exception {
         try {
-            var argv = Magic.getCellMagicCommand(line0);
             var resolver = new StringTemplateResolver();
+            var argv = Magic.getCellMagicCommand(line0);
             var mode = StringTemplateResolver.DEFAULT_TEMPLATE_MODE;
 
             if (argv.length > 1) {
@@ -81,7 +84,7 @@ public class Thymeleaf extends AbstractMagic {
         @Override
         public void renderTo(ObjectNode bundle, Object object) {
             var output = (Output) object;
-            var mimeType = "text/plain";
+            var mimeType = TEXT_PLAIN_VALUE;
 
             switch (output.getTemplateMode()) {
             case CSS:
@@ -93,7 +96,7 @@ public class Thymeleaf extends AbstractMagic {
             case LEGACYHTML5:
             case VALIDXHTML:
             case XHTML:
-                mimeType = "text/html";
+                mimeType = TEXT_HTML_VALUE;
                 break;
 
             case JAVASCRIPT:
@@ -102,7 +105,7 @@ public class Thymeleaf extends AbstractMagic {
 
             case VALIDXML:
             case XML:
-                mimeType = "text/xml";
+                mimeType = TEXT_XML_VALUE;
                 break;
 
             default:
@@ -114,9 +117,9 @@ public class Thymeleaf extends AbstractMagic {
                     .put(mimeType, output.getOutput());
             }
 
-            if (! bundle.with(DATA).has("text/plain")) {
+            if (! bundle.with(DATA).has(TEXT_PLAIN_VALUE)) {
                 bundle.with(DATA)
-                    .put("text/plain", String.format("[%s]", mimeType));
+                    .put(TEXT_PLAIN_VALUE, String.format("[%s]", mimeType));
             }
         }
     }

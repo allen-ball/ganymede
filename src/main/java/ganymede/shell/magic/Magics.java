@@ -23,6 +23,7 @@ import lombok.extern.log4j.Log4j2;
 import static ganymede.server.Server.OBJECT_MAPPER;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toMap;
+import static org.springframework.util.MimeTypeUtils.TEXT_HTML_VALUE;
 
 /**
  * {@link Magics} {@link ganymede.shell.Magic}: List configured
@@ -78,13 +79,11 @@ public class Magics extends AbstractMagic {
     @ForType(Output.class)
     @NoArgsConstructor @ToString
     public static class RendererImpl extends StringRenderer {
-        private static final String MIME_TYPE = "text/html";
-
         @Override
         public void renderTo(ObjectNode bundle, Object object) {
             var output = (Output) object;
 
-            if (! bundle.with(DATA).has(MIME_TYPE)) {
+            if (! bundle.with(DATA).has(TEXT_HTML_VALUE)) {
                 try (var writer = new StringWriter()) {
                     var out = new PrintWriter(writer);
 
@@ -98,7 +97,7 @@ public class Magics extends AbstractMagic {
                                                  t.getValue()));
                     out.println("</table>");
 
-                    bundle.with(DATA).put(MIME_TYPE, writer.toString());
+                    bundle.with(DATA).put(TEXT_HTML_VALUE, writer.toString());
                 } catch (Exception exception) {
                     throw new IllegalStateException(exception);
                 }

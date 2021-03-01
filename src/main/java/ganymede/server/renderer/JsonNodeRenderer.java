@@ -7,6 +7,8 @@ import ganymede.server.Renderer;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+
 /**
  * {@link JsonNode} {@link Renderer} service provider.
  *
@@ -17,13 +19,12 @@ import lombok.ToString;
 @ForType(JsonNode.class)
 @NoArgsConstructor @ToString
 public class JsonNodeRenderer implements AnnotatedRenderer {
-    private static final String MIME_TYPE = "application/json";
-
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
-        if (! bundle.with(DATA).has(MIME_TYPE)) {
-            bundle.with(DATA).set(MIME_TYPE, (JsonNode) object);
-            bundle.with(METADATA).with(MIME_TYPE)
+        if (! bundle.with(DATA).has(APPLICATION_JSON_VALUE)) {
+            bundle.with(DATA)
+                .set(APPLICATION_JSON_VALUE, (JsonNode) object);
+            bundle.with(METADATA).with(APPLICATION_JSON_VALUE)
                 .put("expanded", true);
         }
     }
