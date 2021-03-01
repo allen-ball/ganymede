@@ -150,6 +150,10 @@
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.thymeleaf</groupId>
+      <artifactId>thymeleaf</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.zeromq</groupId>
       <artifactId>jeromq</artifactId>
     </dependency>
