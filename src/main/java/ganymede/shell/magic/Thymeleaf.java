@@ -23,6 +23,8 @@ import static ganymede.shell.jshell.CellMethods.print;
 /**
  * Thymeleaf template {@link ganymede.shell.Magic}.
  *
+ * @see TemplateEngine
+ *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
@@ -42,7 +44,12 @@ public class Thymeleaf extends AbstractMagic {
                 mode = TemplateMode.valueOf(argv[1].toUpperCase());
             }
 
+            resolver.setTemplateMode(mode);
+
             var engine = new TemplateEngine();
+
+            engine.setTemplateResolver(resolver);
+
             var context = new Context(null, bindings);
             var output = engine.process(code, context);
 
