@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.io.PrintStreamBuffer;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,11 +15,13 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j2;
 import org.zeromq.ZMQ;
+import org.zeromq.util.ZData;
 
 import static ganymede.server.Server.OBJECT_MAPPER;
 import static java.time.ZoneOffset.UTC;
 import static java.time.ZonedDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
+import static java.util.stream.Collectors.joining;
 import static lombok.AccessLevel.PRIVATE;
 
 /**
@@ -371,7 +372,7 @@ public class Message {
     public static Message receive(ZMQ.Socket socket, byte[] frame, HMACDigester digester) {
         var envelope = new LinkedList<byte[]>();
 
-        while (! Arrays.equals(frame, DELIMITER)) {
+        while (! new ZData(DELIMITER).equals(frame)) {
             envelope.add(frame);
 
             frame = socket.recv();
@@ -493,14 +494,17 @@ public class Message {
 
     @Override
     public String toString() {
-        var node = new ObjectNode(JsonNodeFactory.instance);
+        var string =
+            Stream.of(envelope().stream().map(ZData::new),
+                      Stream.of(DELIMITER_STRING, "DIGEST"),
+                      Stream.of(header(), parentHeader(), metadata(), content())
+                      .map(t -> t.toPrettyString()),
+                      buffers().stream().map(ZData::new))
+            .flatMap(t -> t)
+            .map(Object::toString)
+            .collect(joining("\n"));
 
-        node.set("header", header());
-        node.set("parentHeader", parentHeader());
-        node.set("metadata", metadata());
-        node.set("content", content());
-
-        return node.toPrettyString();
+        return string;
     }
 
     private static class Event extends Message {
