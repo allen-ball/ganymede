@@ -1,3 +1,8 @@
+2021-03-01  Allen D. Ball  <ball@hcf.dev>
+
+	* src/main/java/ganymede/server/Message.java:
+	Added execute_result(execution_count,String) method.
+
 2021-02-28  Allen D. Ball  <ball@hcf.dev>
 
 	* Added %%thymeleaf Magic.

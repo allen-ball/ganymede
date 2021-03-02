@@ -18,11 +18,9 @@ import lombok.extern.log4j.Log4j2;
 import org.zeromq.ZMQ;
 
 import static ganymede.server.Server.OBJECT_MAPPER;
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.ZoneOffset.UTC;
 import static java.time.ZonedDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
-import static java.util.stream.Collectors.toList;
 import static lombok.AccessLevel.PRIVATE;
 
 /**
@@ -35,7 +33,7 @@ import static lombok.AccessLevel.PRIVATE;
 @NoArgsConstructor(access = PRIVATE) @Data @Accessors(fluent = true) @Log4j2
 public class Message {
     private static final String DELIMITER_STRING = "<IDS|MSG>";
-    private static final byte[] DELIMITER = DELIMITER_STRING.getBytes(UTF_8);
+    private static final byte[] DELIMITER = DELIMITER_STRING.getBytes(ZMQ.CHARSET);
 
     private static final StackWalker WALKER = StackWalker.getInstance();
 
@@ -263,6 +261,14 @@ public class Message {
 
     /**
      * See
+     * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#id6 execute_result}.
+     */
+    public Message execute_result(int execution_count, String stdout) {
+        return execute_result(execution_count, mime_bundle(stdout));
+    }
+
+    /**
+     * See
      * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#display-data display_data}.
      */
     public Message display_data(ObjectNode content) {
@@ -317,8 +323,9 @@ public class Message {
      *                          {@code null}).
      */
     public List<byte[]> serialize(HMACDigester digester) {
-        var frames = envelope().stream().collect(toList());
+        var frames = new LinkedList<byte[]>();
 
+        frames.addAll(envelope());
         frames.add(DELIMITER);
 
         var header = serialize(header());
@@ -333,7 +340,7 @@ public class Message {
         }
 
         Collections.addAll(frames,
-                           digest.getBytes(UTF_8),
+                           digest.getBytes(ZMQ.CHARSET),
                            header, parentHeader, metadata, content);
 
         frames.addAll(buffers());
@@ -350,7 +357,7 @@ public class Message {
             log.warn("{}", exception);
         }
 
-        return string.getBytes(UTF_8);
+        return string.getBytes(ZMQ.CHARSET);
     }
 
     /**
@@ -382,7 +389,7 @@ public class Message {
         }
 
         if (digester != null) {
-            if (! digester.verify(new String(signature, UTF_8),
+            if (! digester.verify(new String(signature, ZMQ.CHARSET),
                                   header, parentHeader, metadata, content)) {
                 throw new SecurityException("Invalid signature");
             }
@@ -404,7 +411,7 @@ public class Message {
         ObjectNode value = null;
 
         try {
-            value = (ObjectNode) OBJECT_MAPPER.readTree(new String(bytes, UTF_8));
+            value = (ObjectNode) OBJECT_MAPPER.readTree(new String(bytes, ZMQ.CHARSET));
         } catch (Exception exception) {
             log.warn("{}", exception);
         }
