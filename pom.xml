@@ -28,6 +28,7 @@
   <inceptionYear>2021</inceptionYear>
   <properties>
     <jse.target>11</jse.target>
+    <jackson-bom.version>2.10.0</jackson-bom.version>
     <tablesaw.version>0.38.2</tablesaw.version>
     <start-class>ganymede.Launcher</start-class>
   </properties>
