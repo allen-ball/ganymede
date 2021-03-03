@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.server.Message;
 import ganymede.server.Server;
 import ganymede.shell.Shell;
-import ganymede.shell.jshell.CellMethods;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
