@@ -33,6 +33,7 @@ public class TablesawFigureRenderer extends StringRenderer {
             var id = UUID.randomUUID().toString().replaceAll("-", "");
             /*
              * https://github.com/plotly/plotly.js
+             * https://images.plot.ly/plotly-documentation/images/plotly_js_cheat_sheet.pdf
              * https://stackoverflow.com/questions/54654434/how-to-embed-tablesaw-graph-in-jupyter-notebook-with-ijava-kernel
 
 %%thymeleaf html
