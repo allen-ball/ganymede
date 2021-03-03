@@ -53,6 +53,13 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @NoArgsConstructor @ToString @Log4j2
 public class Kernel extends Server implements ApplicationContextAware,
                                               ApplicationRunner {
+
+    /**
+     * The name of the {@link System} property containing the
+     * {@link Kernel}'s REST server port.
+     */
+    public static final String PORT_PROPERTY = "kernel.port";
+
     @Value("${JPY_PARENT_PID:#{-1}}")
     private long jpy_parent_pid = -1;
 

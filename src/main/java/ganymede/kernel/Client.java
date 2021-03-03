@@ -20,16 +20,9 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  */
 @NoArgsConstructor @ToString @Log4j2
 public class Client {
-
-    /**
-     * The name of the {@link System} property containing
-     * the {@link ganymede.kernel.Kernel}'s REST server port.
-     */
-    public static final String KERNEL_PORT_PROPERTY = "kernel.port";
-
     private static final String TEMPLATE = "http://localhost:%d/";
 
-    private final int port = Integer.decode(System.getProperty(KERNEL_PORT_PROPERTY));
+    private final int port = Integer.decode(System.getProperty(Kernel.PORT_PROPERTY));
     private final URI uri = URI.create(String.format(TEMPLATE, port));
 
     /**
