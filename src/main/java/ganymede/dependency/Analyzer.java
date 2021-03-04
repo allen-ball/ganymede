@@ -9,9 +9,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.NoArgsConstructor;
@@ -42,11 +42,13 @@ public class Analyzer {
      *
      * @return  The {@link Set} of implemented {@link Artifact}s.
      */
-    public Set<Artifact> getJarArtifacts(File file) {
+    public Set<Artifact> getJarArtifactSet(File file) {
         var set = new LinkedHashSet<Artifact>();
 
         if (! file.isDirectory()) {
             try (var jar = new JarFile(file)) {
+                var manifest = jar.getManifest();
+                var attributes = (manifest != null) ? manifest.getMainAttributes() : null;
                 var list =
                     jar.stream()
                     .map(JarEntry::getName)
@@ -76,9 +78,11 @@ public class Analyzer {
                     } catch (IOException exception) {
                         log.warn("{}", jar.getName() + "!/" + matcher.group(), exception);
                     }
+                }
 
-                    if (set.isEmpty()) {
-                        var artifact = getManifestArtifact(file, jar.getManifest());
+                if (set.isEmpty()) {
+                    if (attributes != null) {
+                        var artifact = getArtifactFrom(attributes, file);
 
                         if (artifact != null) {
                             set.add(artifact);
@@ -93,14 +97,16 @@ public class Analyzer {
         return set;
     }
 
-    private DefaultArtifact getManifestArtifact(File file, Manifest manifest) {
+    private static final List<List<String>> CANDIDATES =
+        List.of(List.of("Bundle-SymbolicName", "Bundle-Name", "Bundle-Version"),
+                List.of("Implementation-Vendor-Id", "Implementation-Title", "Implementation-Version"),
+                List.of("Implementation-Vendor", "Implementation-Title", "Implementation-Version"));
+
+    private DefaultArtifact getArtifactFrom(Attributes attributes, File file) {
         var coordinates =
-            List.of(List.of("Bundle-SymbolicName", "Bundle-Name", "Bundle-Version"),
-                    List.of("Implementation-Vendor-Id", "Implementation-Title", "Implementation-Version"),
-                    List.of("Implementation-Vendor", "Implementation-Title", "Implementation-Version"))
-            .stream()
+            CANDIDATES.stream()
             .map(t -> t.stream()
-                       .map(u -> manifest.getMainAttributes().get(u))
+                       .map(attributes::getValue)
                        .filter(Objects::nonNull)
                        .map(Object::toString)
                        .collect(toList()))
@@ -115,6 +121,6 @@ public class Analyzer {
     }
 
     private DefaultArtifact artifact(List<String> coordinates, File file) {
-        return artifact(coordinates.get(0), coordinates.get(2), coordinates.get(3), file);
+        return artifact(coordinates.get(0), coordinates.get(1), coordinates.get(2), file);
     }
 }

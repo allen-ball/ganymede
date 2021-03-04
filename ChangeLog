@@ -1,3 +1,8 @@
+2021-03-04  Allen D. Ball  <ball@hcf.dev>
+
+	* src/main/java/ganymede/dependency/Analyzer.java:
+	Fixed bug in getArtifactFrom(Attributes,File).
+
 2021-03-01  Allen D. Ball  <ball@hcf.dev>
 
 	* src/main/java/ganymede/server/Message.java:
