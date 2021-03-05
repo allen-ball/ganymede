@@ -1,4 +1,4 @@
-package ganymede.shell.jshell;
+package ganymede.notebook;
 
 import ganymede.kernel.Client;
 import ganymede.server.Message;
@@ -13,7 +13,7 @@ import static lombok.AccessLevel.PRIVATE;
  * @version $Revision$
  */
 @NoArgsConstructor(access = PRIVATE)
-public abstract class CellMethods {
+public abstract class NotebookMethods {
 
     /**
      * Method to print from a Notebook cell.

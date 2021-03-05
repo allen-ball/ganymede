@@ -1,11 +1,10 @@
 /**
- * {@link ganymede.shell.Shell} {@link jdk.jshell.JShell} Notebook run-time
- * classes.
+ * Ganymede Notebook Runtime classes.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
 @Manifest.Section
-package ganymede.shell.jshell;
+package ganymede.notebook;
 
 import ball.annotation.Manifest;
