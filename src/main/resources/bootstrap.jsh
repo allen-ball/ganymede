@@ -1,59 +1,6 @@
 /*
  * $Id$
- *
- * Processed as a String format:
- *
- *      1$      ganymede-kernel JAR URL
- *      2$      CellMethods Class Name
  */
-var __ =
-    new Object() {
-        private final ClassLoader loader;
-
-        {
-            try {
-                var url = new java.net.URL("%1$s");
-                var urls = new java.net.URL[] { url };
-
-                loader = new java.net.URLClassLoader(urls, getClass().getClassLoader());
-            } catch (Exception exception) {
-                throw new ExceptionInInitializerError(exception);
-            }
-        }
-
-        public final javax.script.Bindings bindings =
-            new javax.script.SimpleBindings(new java.util.concurrent.ConcurrentSkipListMap<>());
-
-        public ClassLoader getClassLoader() { return loader; }
-
-        public Class<?> getClassForName(String name) throws Exception {
-            return Class.forName(name, true, getClassLoader());
-        }
-
-        public Object invokeStaticMethod(String type, String method,
-                                         Class<?>[] parameters, Object... arguments) {
-            Object object = null;
-
-            try {
-                object =
-                    getClassForName(type)
-                    .getDeclaredMethod(method, parameters)
-                    .invoke(null, arguments);
-            } catch (Throwable throwable) {
-                throwable.printStackTrace(System.err);
-            }
-
-            return object;
-        }
-
-        public Object invokeStaticMethod(String type, String method) {
-            return invokeStaticMethod(type, method,
-                                      new Class<?>[] { }, new Object[] { });
-        }
-
-        public void print(Object object) {
-            invokeStaticMethod("%2$s", "print", new Class<?>[] { Object.class }, object);
-        }
-    };
+var __ = ganymede.notebook.Notebook.newNotebookContext();
 
 public void print(Object object) { __.print(object); }

@@ -18,7 +18,7 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.StringTemplateResolver;
 
-import static ganymede.shell.jshell.CellMethods.print;
+import static ganymede.notebook.NotebookMethods.print;
 import static org.springframework.util.MimeTypeUtils.TEXT_HTML_VALUE;
 import static org.springframework.util.MimeTypeUtils.TEXT_PLAIN_VALUE;
 import static org.springframework.util.MimeTypeUtils.TEXT_XML_VALUE;
