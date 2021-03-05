@@ -48,7 +48,11 @@ public class Connect implements ApplicationRunner {
                 .orElse(false);
 
             if (! isAlive) {
-                new SpringApplicationBuilder(Kernel.class)
+                var type = Kernel.class;
+                var profile = type.getSimpleName().toLowerCase();
+
+                new SpringApplicationBuilder(type)
+                    .profiles(profile)
                     .run(arguments.getSourceArgs());
             } else {
                 log.warn("Kernel already running");

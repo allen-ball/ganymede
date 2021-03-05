@@ -35,13 +35,17 @@ import static org.springframework.util.FileSystemUtils.deleteRecursively;
 @NoArgsConstructor @ToString @Log4j2
 public class Install implements ApplicationRunner {
     @Value("${id-prefix:}")
-    private String prefix = null;
+    private String id_prefix = null;
     @Value("${id:ganymede-${project.version}-java-${java.specification.version}}")
     private String id = null;
     @Value("${id-suffix:}")
-    private String suffix = null;
+    private String id_suffix = null;
+    @Value("${display-name-prefix:}")
+    private String display_name_prefix = null;
     @Value("${display-name:Ganymede ${project.version} (Java ${java.specification.version})}")
     private String display_name = null;
+    @Value("${display-name-suffix:}")
+    private String display_name_suffix = null;
     @Value("${env:}")
     private List<String> envvars = null;
     @Value("${copy-jar:true}")
@@ -50,10 +54,16 @@ public class Install implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments arguments) throws Exception {
         id =
-            Stream.of(prefix, id, suffix)
+            Stream.of(id_prefix, id, id_suffix)
             .map(String::strip)
             .filter(t -> (! t.isEmpty()))
             .collect(joining("-"));
+
+        display_name =
+            Stream.of(display_name_prefix, display_name, display_name_suffix)
+            .map(String::strip)
+            .filter(t -> (! t.isEmpty()))
+            .collect(joining(" "));
 
         var sysPrefix = false;
 

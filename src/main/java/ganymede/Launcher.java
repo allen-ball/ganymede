@@ -58,8 +58,10 @@ public class Launcher implements ApplicationRunner {
                 type = Install.class;
             }
 
+            var profile = type.getSimpleName().toLowerCase();
+
             new SpringApplicationBuilder(type)
-                .web(NONE)
+                .profiles(profile)
                 .run(arguments.getSourceArgs());
         } else {
             throw new IllegalArgumentException("Exactly one of '--install' or '--connection-file' must be specified");

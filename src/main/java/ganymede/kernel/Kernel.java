@@ -7,12 +7,13 @@ import ganymede.server.Server;
 import ganymede.shell.Shell;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Objects;
+import java.util.LinkedList;
+import java.util.Optional;
 import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import jdk.jshell.JShell;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
@@ -32,8 +33,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static java.util.stream.Collectors.toSet;
-import static jdk.jshell.Snippet.Status.REJECTED;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -86,23 +85,33 @@ public class Kernel extends Server implements ApplicationContextAware,
 
     @PostConstruct
     public void init() throws Exception {
-        try {
-            if (spark_home != null) {
-                shell.addJarsToClasspath(Paths.get(spark_home, "jars").toFile());
-            }
-        } catch (Exception exception) {
-            log.warn("{}: {}", spark_home, exception);
-        }
+        var jars =
+            Stream.of(Optional.ofNullable(spark_home),
+                      Optional.ofNullable(hadoop_home))
+            .flatMap(Optional::stream)
+            .distinct()
+            .map(t -> Paths.get(t, "jars").toFile())
+            .flatMap(this::getJarFilesIn)
+            .toArray(File[]::new);
 
-        try {
-            if (hadoop_home != null && (! Objects.equals(hadoop_home, spark_home))) {
-                shell.addJarsToClasspath(Paths.get(hadoop_home, "jars").toFile());
-            }
-        } catch (Exception exception) {
-            log.warn("{}: {}", hadoop_home, exception);
-        }
+        shell.addToClasspath(jars);
 
         restart();
+    }
+
+    private Stream<File> getJarFilesIn(File parent) {
+        var list = new LinkedList<File>();
+
+        try (var stream =
+                 Files.newDirectoryStream(parent.toPath(), "*.jar")) {
+            for (var entry : stream) {
+                list.add(entry.toFile());
+            }
+        } catch (Exception exception) {
+            log.warn("{}: {}", parent, exception);
+        }
+
+        return list.stream();
     }
 
     @PreDestroy
