@@ -29,7 +29,7 @@ public class Classpath extends JShell {
                         InputStream in, PrintStream out, PrintStream err,
                         String line0, String code) throws Exception {
         if (! code.isBlank()) {
-            var classpath =
+            var files =
                 HELPER.replacePlaceholders(code, System.getProperties())
                 .lines()
                 .filter(t -> (! t.isBlank()))
@@ -40,7 +40,7 @@ public class Classpath extends JShell {
                 .map(File::new)
                 .toArray(File[]::new);
 
-            shell.addToClasspath(classpath);
+            shell.addToClasspath(files);
         } else {
             shell.resolver().classpath()
                 .stream().forEach(out::println);

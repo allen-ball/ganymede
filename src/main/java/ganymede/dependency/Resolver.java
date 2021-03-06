@@ -7,10 +7,12 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
 import lombok.Synchronized;
@@ -42,8 +44,11 @@ import org.eclipse.aether.transport.http.HttpTransporterFactory;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.filter.DependencyFilterUtils;
+import org.springframework.boot.system.ApplicationHome;
 
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 /**
  * Dependency {@link Resolver}.
@@ -52,14 +57,20 @@ import static java.util.stream.Collectors.toList;
  * @version $Revision$
  */
 @NoArgsConstructor @ToString @Log4j2
-public class Resolver extends Analyzer implements WorkspaceReader {
+public class Resolver extends Analyzer {
     private final POM pom;
+    private final Set<File> classpath = new LinkedHashSet<>();
+    private final RepositoryImpl repository = new RepositoryImpl();
     private RepositorySystem system = null;
-    private final Map<File,Set<Artifact>> classpath = new LinkedHashMap<>();
 
     {
         try {
             pom = POM.getDefault();
+
+            classpath.add(new ApplicationHome(getClass()).getSource());
+            classpath.stream()
+                .flatMap(t -> getJarArtifactSet(t).stream())
+                .forEach(repository::resolve);
         } catch (Exception exception) {
             throw new ExceptionInInitializerError(exception);
         }
@@ -77,36 +88,53 @@ public class Resolver extends Analyzer implements WorkspaceReader {
      *
      * @return  The {@link Set} of {@link File}s.
      */
-    public Set<File> classpath() { return classpath.keySet(); }
+    public Set<File> classpath() { return classpath; }
 
     /**
-     * Method to add a {@link File} to the {@link #classpath()}.
+     * Method to add a {@link File}(s) to the {@link #classpath()}.
      *
-     * @param   file            The {@link File}.
+     * @param   files           The {@link File}(s).
+     *
+     * @return  The {@link List} of {@link File}s added to the
+     *          {@link #classpath()}.
      */
-    public void addToClasspath(File file) {
-        var key = file.getAbsoluteFile();
+    public List<File> addToClasspath(File... files) {
+        var list = new LinkedList<File>();
 
-        if (! classpath.containsKey(key)) {
-            classpath
-                .computeIfAbsent(file, k -> new LinkedHashSet<>())
-                .addAll(getJarArtifacts(key));
+        for (var file : files) {
+            file = file.getAbsoluteFile();
+
+            var artifacts = getJarArtifactSet(file);
+
+            if (! artifacts.isEmpty()) {
+                for (var artifact : artifacts) {
+                    if (classpath.add(artifact.getFile())) {
+                        list.add(artifact.getFile());
+                    }
+                }
+            } else {
+                if (classpath.add(file)) {
+                    list.add(file);
+                }
+            }
         }
+
+        return list;
     }
 
     /**
      * Merge the argument {@link POM} and resolve any dependencies.
      *
      * @param   shell           The {@link Shell}.
-     * @param   pom             The {@link POM} to merge.
      * @param   out             The {@code stdout} {@link PrintStream}.
      * @param   err             The {@code stderr} {@link PrintStream}.
+     * @param   pom             The {@link POM} to merge.
      *
      * @return  The {@link List} of {@link File}s added to the
      *          {@link #classpath()}.
      */
-    public List<File> resolve(Shell shell, POM pom, PrintStream out, PrintStream err) {
-        var added = new ArrayList<File>();
+    public List<File> resolve(Shell shell, PrintStream out, PrintStream err, POM pom) {
+        var files = new ArrayList<File>();
 
         pom().merge(pom);
 
@@ -126,18 +154,13 @@ public class Resolver extends Analyzer implements WorkspaceReader {
                 for (var result :
                          system.resolveDependencies(session, request)
                          .getArtifactResults()) {
-                    var artifact = result.getArtifact();
-
                     if (result.isResolved()) {
-                        var file = artifact.getFile().getAbsoluteFile();
+                        var artifact = result.getArtifact();
+                        var file = artifact.getFile();
 
-                        if (! classpath.containsKey(file)) {
-                            added.add(file);
+                        if (classpath.add(file)) {
+                            files.add(file);
                         }
-
-                        classpath
-                            .computeIfAbsent(file, k -> new LinkedHashSet<>())
-                            .add(artifact);
                     }
 
                     if (result.isMissing()) {
@@ -155,7 +178,7 @@ public class Resolver extends Analyzer implements WorkspaceReader {
             iterator.remove();
         }
 
-        return added;
+        return files;
     }
 
     @Synchronized
@@ -214,7 +237,7 @@ public class Resolver extends Analyzer implements WorkspaceReader {
         session.setLocalRepositoryManager(getLocalRepositoryManager(session));
         session.setRepositoryListener(new RepositoryListener());
         session.setTransferListener(new TransferListener());
-        session.setWorkspaceReader(this);
+        session.setWorkspaceReader(repository);
 
         return session;
     }
@@ -232,34 +255,58 @@ public class Resolver extends Analyzer implements WorkspaceReader {
         return system().newLocalRepositoryManager(session, repository);
     }
 
-    @Override
-    public WorkspaceRepository getRepository() {
-        return new WorkspaceRepository(getClass().getPackage().getName());
-    }
+    @NoArgsConstructor
+    private class RepositoryImpl extends TreeMap<String,Artifact> implements WorkspaceReader {
+        private static final long serialVersionUID = -1L;
 
-    @Override
-    public File findArtifact(Artifact artifact) {
-        var id = ArtifactIdUtils.toId(artifact);
-        var file =
-            classpath.entrySet().stream()
-            .flatMap(t -> t.getValue().stream().map(u -> Map.entry(t.getKey(), u)))
-            .filter(t -> Objects.equals(id, ArtifactIdUtils.toId(t.getValue())))
-            .map(t -> t.getKey())
-            .findFirst().orElse(null);
+        public Set<Artifact> resolve(Set<Artifact> set) {
+            var resolved =
+                set.stream()
+                .map(this::resolve)
+                .collect(toCollection(LinkedHashSet::new));
 
-        return file;
-    }
+            return resolved;
+        }
 
-    @Override
-    public List<String> findVersions(Artifact artifact) {
-        var list =
-            classpath.values().stream()
-            .flatMap(Set::stream)
-            .filter(t -> ArtifactIdUtils.equalsVersionlessId(artifact, t))
-            .map(Artifact::getVersion)
-            .collect(toList());
+        public Artifact resolve(Artifact artifact) {
+            if (artifact.getFile() == null) {
+                throw new IllegalArgumentException();
+            }
 
-        return list;
+            return computeIfAbsent(ArtifactIdUtils.toId(artifact), k -> artifact);
+        }
+
+        public Stream<Artifact> getArtifactsOn(Set<File> classpath) {
+            return values().stream().filter(t -> classpath.contains(t.getFile()));
+        }
+
+        @Override
+        public WorkspaceRepository getRepository() {
+            return new WorkspaceRepository(getClass().getPackage().getName());
+        }
+
+        @Override
+        public File findArtifact(Artifact artifact) {
+            var id = ArtifactIdUtils.toId(artifact);
+            var file =
+                values().stream()
+                .filter(t -> Objects.equals(id, ArtifactIdUtils.toId(t)))
+                .map(Artifact::getFile)
+                .findFirst().orElse(null);
+
+            return file;
+        }
+
+        @Override
+        public List<String> findVersions(Artifact artifact) {
+            var list =
+                values().stream()
+                .filter(t -> ArtifactIdUtils.equalsVersionlessId(artifact, t))
+                .map(Artifact::getVersion)
+                .collect(toList());
+
+            return list;
+        }
     }
 
     @NoArgsConstructor @ToString

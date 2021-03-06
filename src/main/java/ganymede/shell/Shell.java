@@ -5,7 +5,6 @@ import ganymede.dependency.Resolver;
 import ganymede.kernel.Client;
 import ganymede.kernel.Kernel;
 import ganymede.server.Message;
-import ganymede.shell.jshell.CellMethods;
 import ganymede.shell.magic.AnnotatedMagic;
 import ganymede.shell.magic.Description;
 import ganymede.shell.magic.MagicNames;
@@ -15,8 +14,6 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
-import java.nio.file.DirectoryIteratorException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
@@ -36,7 +33,6 @@ import lombok.Synchronized;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.io.IoBuilder;
-import org.springframework.boot.system.ApplicationHome;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StreamUtils;
 
@@ -62,8 +58,6 @@ public class Shell implements AutoCloseable {
                   "-Dio.netty.tryReflectionSetAccessible=true",
                   "-Djava.awt.headless=true")
         .toArray(String[]::new);
-    private static final File KERNEL_JAR =
-        new ApplicationHome(Shell.class).getSource();
 
     private final Kernel kernel;
     private Locale locale = null;       /* TBD: Query Notebook server */
@@ -161,40 +155,18 @@ public class Shell implements AutoCloseable {
 
     /**
      * Method to call
-     * {@link Resolver#resolve(Shell,POM,PrintStream,PrintStream)}.
+     * {@link Resolver#resolve(Shell,PrintStream,PrintStream,POM)}.
      *
      * @param   pom             The {@link POM} to merge.
      */
     public void resolve(POM pom) {
-        var list = resolver().resolve(this, pom, out, err);
-
-        for (var file : list) {
+        for (var file : resolver().resolve(this, out, err, pom)) {
             var jshell = this.jshell;
 
             if (jshell != null) {
                 jshell.addToClasspath(file.toString());
             } else {
                 break;
-            }
-        }
-    }
-
-    /**
-     * Method to search for and add jars to the {@link JShell} instance
-     * {@code classpath}.  See {@link #addToClasspath(File...)}.
-     *
-     * @param   files           The directories ({@link File}s) to search.
-     */
-    public void addJarsToClasspath(File... files) throws IOException {
-        for (var file : files) {
-            var path = file.toPath().toAbsolutePath();
-
-            try (var stream = Files.newDirectoryStream(path, "*.jar")) {
-                for (var entry : stream) {
-                    addToClasspath(entry.toFile());
-                }
-            } catch (DirectoryIteratorException exception) {
-                throw exception.getCause();
             }
         }
     }
@@ -207,17 +179,13 @@ public class Shell implements AutoCloseable {
      */
     @Synchronized
     public void addToClasspath(File... files) {
-        for (var file : files) {
-            file = file.getAbsoluteFile();
+        for (var file : resolver.addToClasspath(files)) {
+            var jshell = this.jshell;
 
-            if (! resolver().classpath().contains(file)) {
-                resolver().addToClasspath(file);
-
-                var jshell = this.jshell;
-
-                if (jshell != null) {
-                    jshell.addToClasspath(file.toString());
-                }
+            if (jshell != null) {
+                jshell.addToClasspath(file.toString());
+            } else {
+                break;
             }
         }
     }
@@ -242,15 +210,18 @@ public class Shell implements AutoCloseable {
 
             Collections.addAll(options, definitions);
             Collections.addAll(options, VMOPTIONS);
-            options.add("-D" + Map.entry(Client.KERNEL_PORT_PROPERTY, kernel.getPort()));
+            options.add("-D" + Map.entry(Kernel.PORT_PROPERTY, kernel.getPort()));
 
             if (! kernel.isTerminating()) {
-                jshell =
-                    JShell.builder()
-                    .remoteVMOptions(options.toArray(new String[] { }))
-                    .in(in).out(out).err(err).build();
-
                 try {
+                    jshell =
+                        JShell.builder()
+                        .remoteVMOptions(options.toArray(new String[] { }))
+                        .in(in).out(out).err(err).build();
+
+                    resolver().classpath()
+                        .forEach(t -> jshell.addToClasspath(t.toString()));
+
                     var logIn =
                         IoBuilder.forLogger(log)
                         .setLevel(WARN)
@@ -260,18 +231,12 @@ public class Shell implements AutoCloseable {
                         IoBuilder.forLogger(log)
                         .setLevel(WARN)
                         .buildPrintStream();
-                    var bootstrap =
-                        String.format(getResourceAsString("bootstrap.jsh"),
-                                      KERNEL_JAR.toURI().toURL(),
-                                      CellMethods.class.getName());
+                    var bootstrap = getResourceAsString("bootstrap.jsh");
 
                     java.execute(jshell, logIn, logOut, logOut, bootstrap);
                 } catch (Exception exception) {
                     log.warn("{}", exception, exception);
                 }
-
-                resolver().classpath()
-                    .forEach(t -> jshell.addToClasspath(t.toString()));
             }
         }
 
