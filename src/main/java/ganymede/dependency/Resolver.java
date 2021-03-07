@@ -69,7 +69,7 @@ public class Resolver extends Analyzer {
 
             classpath.add(new ApplicationHome(getClass()).getSource());
             classpath.stream()
-                .flatMap(t -> getJarArtifactSet(t).stream())
+                .flatMap(t -> getShadedArtifactSet(t).stream())
                 .forEach(repository::resolve);
         } catch (Exception exception) {
             throw new ExceptionInInitializerError(exception);
@@ -104,7 +104,7 @@ public class Resolver extends Analyzer {
         for (var file : files) {
             file = file.getAbsoluteFile();
 
-            var artifacts = getJarArtifactSet(file);
+            var artifacts = getShadedArtifactSet(file);
 
             if (! artifacts.isEmpty()) {
                 for (var artifact : artifacts) {
