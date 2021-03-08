@@ -20,6 +20,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.context.ServletWebServerInitializedEvent;
 import org.springframework.context.ApplicationContext;
@@ -208,9 +209,7 @@ public class Kernel extends Server implements ApplicationContextAware,
     }
 
     @Override
-    public void shutdown() {
-        ((ConfigurableApplicationContext) context).close();
-    }
+    public void shutdown() { SpringApplication.exit(context, () -> 0); }
 
     @Override
     public void run(ApplicationArguments arguments) throws Exception {
