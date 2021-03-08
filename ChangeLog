@@ -1,5 +1,7 @@
 2021-03-07  Allen D. Ball  <ball@hcf.dev>
 
+	* src/main/java/ganymede/shell/magic/HTML.java: Initial writing.
+
 	* src/main/java/ganymede/dependency/Resolver.java:
 	Quietly enforce only one SLF4J binding is added to the classpath.
 

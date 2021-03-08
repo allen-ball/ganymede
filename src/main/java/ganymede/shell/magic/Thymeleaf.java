@@ -24,7 +24,7 @@ import static org.springframework.util.MimeTypeUtils.TEXT_PLAIN_VALUE;
 import static org.springframework.util.MimeTypeUtils.TEXT_XML_VALUE;
 
 /**
- * Thymeleaf template {@link ganymede.shell.Magic}.
+ * {@link Thymeleaf} template {@link ganymede.shell.Magic}.
  *
  * @see TemplateEngine
  *
@@ -38,9 +38,13 @@ public class Thymeleaf extends AbstractMagic {
     @Override
     public void execute(Bindings bindings,
                         String line0, String code) throws Exception {
+        execute(bindings, Magic.getCellMagicCommand(line0), code);
+    }
+
+    protected void execute(Bindings bindings,
+                           String[] argv, String code) throws Exception {
         try {
             var resolver = new StringTemplateResolver();
-            var argv = Magic.getCellMagicCommand(line0);
             var mode = StringTemplateResolver.DEFAULT_TEMPLATE_MODE;
 
             if (argv.length > 1) {
@@ -61,6 +65,7 @@ public class Thymeleaf extends AbstractMagic {
             exception.printStackTrace(System.err);
         }
     }
+
     /**
      * Customized {@link Output Output} for {@link Thymeleaf}
      * {@link RendererImpl Renderer}.
