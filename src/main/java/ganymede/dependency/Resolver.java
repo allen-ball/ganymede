@@ -58,6 +58,10 @@ import static java.util.stream.Collectors.toSet;
  */
 @NoArgsConstructor @ToString @Log4j2
 public class Resolver extends Analyzer {
+    private static final Set<String> SLF4J_BINDINGS =
+        Set.of("ch.qos.logback:logback-classic:jar",
+               "org.slf4j:slf4j-log4j12:jar");
+
     private final POM pom;
     private final Set<File> classpath = new LinkedHashSet<>();
     private final RepositoryImpl repository = new RepositoryImpl();
@@ -91,7 +95,23 @@ public class Resolver extends Analyzer {
     public Set<File> classpath() { return classpath; }
 
     /**
-     * Method to add a {@link File}(s) to the {@link #classpath()}.
+     * Method to add a {@link File}(s) to the repository
+     * ({@link WorkspaceReader}).
+     *
+     * @param   files           The {@link File}(s).
+     */
+    public void addToRepository(File... files) {
+        Stream.of(files)
+            .map(File::getAbsoluteFile)
+            .map(this::getShadedArtifactSet)
+            .forEach(repository::resolve);
+    }
+
+    /**
+     * Method to add a {@link File}(s) to the {@link #classpath()}.  May
+     * quietly ignores requests to add {@link File}s that violate internal
+     * heuristics (e.g.,
+     * {@link.uri http://www.slf4j.org/codes.html#multiple_bindings target=newtab multiple SLF4J bindings}).
      *
      * @param   files           The {@link File}(s).
      *
@@ -108,8 +128,22 @@ public class Resolver extends Analyzer {
 
             if (! artifacts.isEmpty()) {
                 for (var artifact : artifacts) {
-                    if (classpath.add(artifact.getFile())) {
-                        list.add(artifact.getFile());
+                    var ignore = false;
+                    var id = ArtifactIdUtils.toVersionlessId(artifact);
+
+                    if (! ignore) {
+                        if (SLF4J_BINDINGS.contains(id)) {
+                            ignore =
+                                repository.getArtifactsOn(classpath)
+                                .map(ArtifactIdUtils::toVersionlessId)
+                                .anyMatch(t -> SLF4J_BINDINGS.contains(t));
+                        }
+                    }
+
+                    if (! ignore) {
+                        if (classpath.add(artifact.getFile())) {
+                            list.add(artifact.getFile());
+                        }
                     }
                 }
             } else {

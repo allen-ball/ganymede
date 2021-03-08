@@ -73,7 +73,6 @@ public class Analyzer {
                         .map(JarEntry::getName)
                         .map(POM_PROPERTIES::matcher)
                         .filter(Matcher::matches)
-                        // .filter(t -> (! Objects.equals(t.group("a"), "unused")))
                         .collect(toList());
 
                     for (var matcher : list) {
