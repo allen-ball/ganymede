@@ -35,6 +35,11 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>org.apache.spark</groupId>
+        <artifactId>spark-sql_2.12</artifactId>
+        <version>3.1.1</version>
+      </dependency>
+      <dependency>
         <groupId>org.jfree</groupId>
         <artifactId>jfreechart</artifactId>
         <version>1.5.3</version>
@@ -86,6 +91,11 @@
       <groupId>ball</groupId>
       <artifactId>ball-util</artifactId>
       <version>${ball-util.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-sql_2.12</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -239,6 +249,9 @@
             </transformer>
             <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
             <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+              <resource>META-INF/sisu/javax.inject.Named</resource>
+            </transformer>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
               <resource>META-INF/spring.handlers</resource>
             </transformer>
             <transformer implementation="org.springframework.boot.maven.PropertiesMergingResourceTransformer">
@@ -246,6 +259,9 @@
             </transformer>
             <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
               <resource>META-INF/spring.schemas</resource>
+            </transformer>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+              <resource>META-INF/spring.tooling</resource>
             </transformer>
           </transformers>
         </configuration>
