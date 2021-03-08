@@ -109,7 +109,7 @@ public class Resolver extends Analyzer {
 
     /**
      * Method to add a {@link File}(s) to the {@link #classpath()}.  May
-     * quietly ignores requests to add {@link File}s that violate internal
+     * quietly ignore requests to add {@link File}s that violate internal
      * heuristics (e.g.,
      * {@link.uri http://www.slf4j.org/codes.html#multiple_bindings target=newtab multiple SLF4J bindings}).
      *
