@@ -23,7 +23,7 @@ import static org.springframework.util.MimeTypeUtils.TEXT_HTML_VALUE;
 @ServiceProviderFor({ Renderer.class })
 @ForType(Figure.class)
 @NoArgsConstructor @ToString
-public class TablesawFigureRenderer extends StringRenderer {
+public class TablesawPlotlyFigureRenderer extends StringRenderer {
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
         if (! bundle.with(DATA).has(TEXT_HTML_VALUE)) {
@@ -36,7 +36,7 @@ public class TablesawFigureRenderer extends StringRenderer {
              * https://images.plot.ly/plotly-documentation/images/plotly_js_cheat_sheet.pdf
              * https://stackoverflow.com/questions/54654434/how-to-embed-tablesaw-graph-in-jupyter-notebook-with-ijava-kernel
 
-%%thymeleaf html
+%%html
 [(${figure.asJavascript(id)})]
 <div th:id="${id}"></div>
 <script th:inline="javascript">

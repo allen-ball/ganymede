@@ -1,0 +1,38 @@
+<!--/* $Id$ */-->
+<div th:with="count = ${dataset.count()}">
+  <style scoped>
+    .dataframe tbody tr th:only-of-type {
+      vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+      vertical-align: top;
+    }
+
+    .dataframe thead th {
+      text-align: right;
+    }
+  </style>
+  <table border="1" class="dataframe">
+    <thead th:if="${dataset.columns() != null}">
+      <tr style="text-align: right;">
+        <th th:text="''"/>
+        <th th:each="column : ${dataset.columns()}" th:text="${column}"/>
+      </tr>
+    </thead>
+    <tbody th:with="head = ${dataset.head((count > view) ? (view / 2) : count)}">
+      <tr th:each="row : ${head}">
+        <th th:text="${rowStat.index}"/>
+        <td th:each="i: ${#numbers.sequence(0, row.size() - 1)}" th:text="${row.apply(i)}"/>
+      </tr>
+      <th:block th:with="tail = ${dataset.tail((count > head.length) ? (view - head.length) : 0)}">
+        <tr th:if="${tail.length > 0}"><th>...</th></tr>
+        <tr th:each="row : ${tail}">
+          <th th:text="${count - tail.length + rowStat.index}"/>
+          <td th:each="i: ${#numbers.sequence(0, row.size() - 1)}" th:text="${row.apply(i)}"/>
+        </tr>
+      </th:block>
+    </tbody>
+  </table>
+  <p>[(${count})] rows</p>
+</div>

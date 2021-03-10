@@ -9,8 +9,6 @@ import javax.imageio.ImageIO;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import static ganymede.server.Server.OBJECT_MAPPER;
-
 /**
  * Abstract image {@link Renderer} base class.  See {@link ImageIO}.
  *
