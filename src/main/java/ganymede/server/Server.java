@@ -268,6 +268,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
         }
 
         private void execute(Dispatcher dispatcher, Message request, Message reply) throws Exception {
+            var cellId = request.metadata().at("/cellId").asText();
             var code = request.content().at("/code").asText();
             var silent = request.content().at("/silent").asBoolean();
             var store_history = request.content().at("/store_history").asBoolean();
@@ -321,16 +322,30 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
 
                 if (! silent) {
                     var count = execution_count.intValue();
-                    var iterator = bundles.iterator();
 
-                    while (iterator.hasNext()) {
-                        var bundle = (ObjectNode) iterator.next();
+                    if (! bundles.isEmpty()) {
+                        var iterator = bundles.iterator();
 
-                        try {
-                            /* iopub.pub(request.display_data(bundle)); */
-                            iopub.pub(request.execute_result(count, bundle));
-                        } catch (Exception exception) {
-                            log.warn("{}", exception);
+                        while (iterator.hasNext()) {
+                            var bundle = (ObjectNode) iterator.next();
+
+                            try {
+                                /* iopub.pub(request.display_data(bundle)); */
+                                iopub.pub(request.execute_result(count, bundle));
+                            } catch (Exception exception) {
+                                log.warn("{}", exception);
+                            }
+                        }
+                    } else {
+                        if (! stdout.isEmpty()) {
+                            try {
+                                /* iopub.pub(request.display_data(stdout)); */
+                                iopub.pub(request.execute_result(count, stdout));
+                            } catch (Exception exception) {
+                                log.warn("{}", exception);
+                            } finally {
+                                stdout = "";
+                            }
                         }
                     }
 
