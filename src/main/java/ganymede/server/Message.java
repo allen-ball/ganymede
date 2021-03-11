@@ -281,6 +281,14 @@ public class Message {
     }
 
     /**
+     * See
+     * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#display-data display_data}.
+     */
+    public Message display_data(String stdout) {
+        return display_data(mime_bundle(stdout));
+    }
+
+    /**
      * Parameter to {@link Message#status(Message.status)} and
      * {@link Message#status(Message.status,Message)}.
      */
