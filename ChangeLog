@@ -1,3 +1,8 @@
+2021-03-12  Allen D. Ball  <ball@hcf.dev>
+
+	* src/main/java/ganymede/server/Message.java:
+	Add topic to Pub message envelopes (trivially msg_type).
+
 2021-03-10  Allen D. Ball  <ball@hcf.dev>
 
 	* src/main/java/ganymede/server/renderer/AbstractThymeleafHTMLRenderer.java:

@@ -226,7 +226,7 @@ public class Message {
      * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#streams-stdout-stderr-etc stream}.
      */
     public Message stream(stream stream, String text) {
-        var message = new Event(getCallingMethodName(1), this);
+        var message = new Pub(getCallingMethodName(1), this);
 
         message.content().put("name", stream.name());
         message.content().put("text", text);
@@ -239,7 +239,7 @@ public class Message {
      * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#code-inputs execute_input}.
      */
     public Message execute_input(String code, int execution_count) {
-        var message = new Event(getCallingMethodName(1), this);
+        var message = new Pub(getCallingMethodName(1), this);
 
         message.content().put("code", code);
         message.content().put("execution_count", execution_count);
@@ -252,7 +252,7 @@ public class Message {
      * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#id6 execute_result}.
      */
     public Message execute_result(int execution_count, ObjectNode content) {
-        var message = new Event(getCallingMethodName(1), this);
+        var message = new Pub(getCallingMethodName(1), this);
 
         message.content().put("execution_count", execution_count);
         message.content().setAll(content);
@@ -273,7 +273,7 @@ public class Message {
      * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#display-data display_data}.
      */
     public Message display_data(ObjectNode content) {
-        var message = new Event(getCallingMethodName(1), this);
+        var message = new Pub(getCallingMethodName(1), this);
 
         message.content().setAll(content);
 
@@ -299,7 +299,7 @@ public class Message {
      * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#kernel-status status}.
      */
     public static Message status(status status, Message request) {
-        var message = new Event(getCallingMethodName(1), request);
+        var message = new Pub(getCallingMethodName(1), request);
 
         message.content().put("execution_state", status.name());
 
@@ -515,8 +515,8 @@ public class Message {
         return string;
     }
 
-    private static class Event extends Message {
-        public Event(String msg_type, Message request) {
+    private static abstract class Child extends Message {
+        protected Child(String msg_type, Message request) {
             super();
 
             if (msg_type != null) {
@@ -529,7 +529,7 @@ public class Message {
         }
     }
 
-    private static class Reply extends Event {
+    private static class Reply extends Child {
         public Reply(Message request) {
             super(request.getMessageTypeAction() + "_reply", request);
 
@@ -540,6 +540,16 @@ public class Message {
             } else {
                 throw new IllegalStateException("Source message is not a request");
             }
+        }
+    }
+
+    private static class Pub extends Child {
+        public Pub(String msg_type, Message request) {
+            super(msg_type, request);
+
+            var topic = msg_type;
+
+            envelope().add(topic.getBytes(ZMQ.CHARSET));
         }
     }
 }

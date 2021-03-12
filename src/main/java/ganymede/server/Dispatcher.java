@@ -77,7 +77,7 @@ public class Dispatcher implements Runnable {
         var type = getChannel().getSocketType();
 
         while (! server.isTerminating()) {
-            try (ZMQ.Socket socket = context.socket(type)) {
+            try (var socket = context.socket(type)) {
                 if (socket.bind(getAddress())) {
                     log.info("Bound {} {}", type, address);
                 } else {
@@ -87,7 +87,7 @@ public class Dispatcher implements Runnable {
                 switch (type) {
                 case REP:
                 case ROUTER:
-                    try (ZMQ.Poller poller = context.poller(1)) {
+                    try (var poller = context.poller(1)) {
                         poller.register(socket, ZMQ.Poller.POLLIN);
 
                         while (! server.isTerminating()) {
@@ -106,7 +106,7 @@ public class Dispatcher implements Runnable {
 
                 case PUB:
                     while (! server.isTerminating()) {
-                        Message message = outgoing.poll(100, MILLISECONDS);
+                        var message = outgoing.poll(100, MILLISECONDS);
 
                         if (message != null) {
                             dispatch(socket, message);

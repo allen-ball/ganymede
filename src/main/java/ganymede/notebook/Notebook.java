@@ -6,9 +6,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
-import static org.springframework.boot.Banner.Mode.OFF;
-import static org.springframework.boot.WebApplicationType.NONE;
-
 /**
  * {@link Notebook} Spring launcher.
  *

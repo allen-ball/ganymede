@@ -330,8 +330,8 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
                             var bundle = (ObjectNode) iterator.next();
 
                             try {
-                                /* iopub.pub(request.display_data(bundle)); */
                                 iopub.pub(request.execute_result(count, bundle));
+                                /* iopub.pub(request.display_data(bundle)); */
                             } catch (Exception exception) {
                                 log.warn("{}", exception);
                             }
@@ -339,8 +339,8 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
                     } else {
                         if (! stdout.isEmpty()) {
                             try {
-                                /* iopub.pub(request.display_data(stdout)); */
                                 iopub.pub(request.execute_result(count, stdout));
+                                /* iopub.pub(request.display_data(stdout)); */
                             } catch (Exception exception) {
                                 log.warn("{}", exception);
                             } finally {
