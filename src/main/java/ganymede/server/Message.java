@@ -276,6 +276,7 @@ public class Message {
         var message = new Pub(getCallingMethodName(1), this);
 
         message.content().setAll(content);
+        message.content().with("transient");
 
         return message;
     }
@@ -496,7 +497,9 @@ public class Message {
         var iterator = list.iterator();
 
         while (iterator.hasNext()) {
-            socket.send(iterator.next(), iterator.hasNext() ? ZMQ.SNDMORE : 0);
+            var frame = iterator.next();
+
+            socket.send(frame, iterator.hasNext() ? ZMQ.SNDMORE : 0);
         }
     }
 
