@@ -1,3 +1,9 @@
+2021-03-14  Allen D. Ball  <ball@hcf.dev>
+
+	* src/main/java/ganymede/kernel/Kernel.java,
+	src/main/java/ganymede/server/Server.java:
+	Define and implement getKernelInfo() method.
+
 2021-03-12  Allen D. Ball  <ball@hcf.dev>
 
 	* src/main/java/ganymede/server/Message.java:

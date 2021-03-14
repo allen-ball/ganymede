@@ -125,6 +125,15 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
     }
 
     /**
+     * Method to get {@link.this} {@link Server}'s {@code kernel_info_reply}
+     * content.
+     *
+     * @return  The {@link ObjectNode} containing the {@link Message}
+     *          content.
+     */
+    protected abstract ObjectNode getKernelInfo();
+
+    /**
      * Method to execute code (cell's contents).
      *
      * @param   code            The cell code to execute.
@@ -249,22 +258,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
         }
 
         private void kernel_info(Dispatcher dispatcher, Message request, Message reply) throws Exception {
-            var content = reply.content();
-
-            content.put("protocol_version", PROTOCOL_VERSION);
-            content.put("implementation", "ganymede");
-            content.put("implementation_version", "1.0.0");
-
-            var language_info = content.with("language_info");
-
-            language_info.put("name", "java");
-            language_info.put("version", System.getProperty("java.version"));
-            language_info.put("mimetype", "text/x-java");
-            language_info.put("file_extension", ".java");
-
-            content.set("language_info", language_info);
-
-            var help_links = content.with("help_links");
+            reply.content().setAll(getKernelInfo());
         }
 
         private void execute(Dispatcher dispatcher, Message request, Message reply) throws Exception {

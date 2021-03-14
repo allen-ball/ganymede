@@ -71,6 +71,9 @@ public class Kernel extends Server implements ApplicationContextAware,
     @Value("${hadoop-home:#{null}}")
     private String hadoop_home = null;
 
+    @Value("${project.version}")
+    private String project_version = null;
+
     private final Shell shell = new Shell(this);
     private ApplicationContext context = null;
     private int port = -1;
@@ -172,6 +175,26 @@ public class Kernel extends Server implements ApplicationContextAware,
                                Kernel.class.getCanonicalName(),
                                String.valueOf(ProcessHandle.current().pid()),
                                String.valueOf(shell.restarts())));
+    }
+
+    @Override
+    protected ObjectNode getKernelInfo() {
+        var content = OBJECT_MAPPER.createObjectNode();
+
+        content.put("protocol_version", PROTOCOL_VERSION);
+        content.put("implementation", "ganymede");
+        content.put("implementation_version", project_version);
+
+        var language_info = content.with("language_info");
+
+        language_info.put("name", "java");
+        language_info.put("version", System.getProperty("java.specification.version"));
+        language_info.put("mimetype", "text/x-java");
+        language_info.put("file_extension", ".java");
+
+        var help_links = content.with("help_links");
+
+        return content;
     }
 
     @Override
