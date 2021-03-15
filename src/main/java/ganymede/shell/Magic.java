@@ -50,7 +50,7 @@ public interface Magic {
     public String[] getMagicNames();
 
     /**
-     * Method to the Description of {@link.this} {@link Magic}.
+     * Method to get the description of {@link.this} {@link Magic}.
      *
      * @return  The description.
      */
