@@ -1,0 +1,7 @@
+<!--/* $Id$ */-->
+<div th:with="href = ${session.sparkContext().uiWebUrl().get()}">
+  <a th:href="${href}" th:target="_newtab">
+    [(${session.conf().get('spark.master')})]
+    [(${session.conf().get('spark.app.name')})]
+  </a>
+</div>

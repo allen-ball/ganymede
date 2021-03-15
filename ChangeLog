@@ -1,5 +1,8 @@
 2021-03-14  Allen D. Ball  <ball@hcf.dev>
 
+	* src/main/java/ganymede/server/renderer/SparkSessionRenderer.java:
+	Initial writing.
+
 	* src/main/java/ganymede/kernel/Kernel.java,
 	src/main/java/ganymede/server/Server.java:
 	Define and implement getKernelInfo() method.
