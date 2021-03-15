@@ -54,7 +54,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
         Pattern.compile("(?i)^(kernel-|)(?<id>[^.]+)[.]json$");
 
     private final ZMQ.Context context = ZMQ.context(8);
-    private final ConcurrentSkipListMap<String,Connection> connections =
+    private final ConcurrentSkipListMap<String,Connection> connectionMap =
         new ConcurrentSkipListMap<>();
     private final Channel.Heartbeat heartbeat = new Channel.Heartbeat(this);
     private final Channel.Control control = new Control();
@@ -65,7 +65,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
     private InputStream in = null;
     private PrintStreamBuffer out = null;
     private PrintStreamBuffer err = null;
-    private String session = null;
+    private String sessionId = null;
 
     /**
      * Sole constructor.
@@ -83,30 +83,30 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
      */
     public void bind(String path) throws IOException {
         var file = new File(path);
-        var id =
+        var kernelId =
             Optional.of(file.getName())
             .map(CONNECTION_FILE_NAME_PATTERN::matcher)
             .filter(t -> t.matches())
             .map(t -> t.group("id"))
             .orElse(null);
 
-        bind(id, file);
+        bind(kernelId, file);
     }
 
     /**
      * Add a connection specified by a {@link Connection} {@link File}.
      *
-     * @param   id              The kernel ID.
+     * @param   kernelId        The kernel ID.
      * @param   file            The {@link Connection} {@link File}.
      *
      * @throws  IOException     If the {@link File} cannot be opened or
      *                          parsed.
      */
-    protected void bind(String id, File file) throws IOException {
+    protected void bind(String kernelId, File file) throws IOException {
         var node = OBJECT_MAPPER.readTree(file);
-        var connection = new Connection(id, (ObjectNode) node);
+        var connection = new Connection(kernelId, (ObjectNode) node);
 
-        connections.put(connection.getId(), connection);
+        connectionMap.put(connection.getId(), connection);
 
         connection.connect(shell, control, iopub, stdin, heartbeat);
 
@@ -188,7 +188,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
         }
 
         if (message.session() == null) {
-            message.session(getSession());
+            message.session(getSessionId());
         }
 
         return message.timestamp();
