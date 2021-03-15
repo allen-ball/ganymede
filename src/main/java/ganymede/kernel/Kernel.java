@@ -81,7 +81,7 @@ public class Kernel extends Server implements ApplicationContextAware,
     private final Shell shell = new Shell(this);
     private ApplicationContext context = null;
     private int port = -1;
-    private ObjectNode nbserver = OBJECT_MAPPER.createObjectNode();
+    private JupyterRestClient client = null;
     private ArrayNode bundles = OBJECT_MAPPER.createArrayNode();
 
     /**
@@ -99,7 +99,7 @@ public class Kernel extends Server implements ApplicationContextAware,
             try (var stream = Files.newDirectoryStream(Paths.get(runtime_dir), glob)) {
                 var path = stream.iterator().next();
 
-                nbserver = (ObjectNode) OBJECT_MAPPER.readTree(path.toFile());
+                client = new JupyterRestClient(OBJECT_MAPPER.readTree(path.toFile()));
             } catch (NoSuchElementException exception) {
                 log.warn("{}: No match found for '{}'", runtime_dir, glob);
             } catch (Exception exception) {
@@ -141,7 +141,7 @@ public class Kernel extends Server implements ApplicationContextAware,
 
     /**
      * REST method to capture print MIME bundles from a sub-process.  See
-     * {@link Client#print(JsonNode)}.
+     * {@link KernelRestClient#print(JsonNode)}.
      *
      * @param   bundle          The MIME bundle {@link ObjectNode}.
      */
@@ -168,8 +168,8 @@ public class Kernel extends Server implements ApplicationContextAware,
     }
 
     @Override
-    protected void bind(String id, File file) throws IOException {
-        super.bind(id, file);
+    protected void bind(String kernelId, File file) throws IOException {
+        super.bind(kernelId, file);
 
         var node = (ObjectNode) OBJECT_MAPPER.readTree(file);
 
@@ -182,6 +182,17 @@ public class Kernel extends Server implements ApplicationContextAware,
         OBJECT_MAPPER.writeValue(file, node);
 
         file.deleteOnExit();
+/*
+        try {
+            for (var session : client.getSessions()) {
+                if (kernelId.equals(session.at("/kernel/id").asText())) {
+                    setSessionId(session.at("/id").asText());
+                }
+            }
+        } catch (Exception exception) {
+            log.warn("{}", exception);
+        }
+*/
     }
 
     @Override
@@ -190,10 +201,10 @@ public class Kernel extends Server implements ApplicationContextAware,
 
         shell.restart(getIn(), getOut(), getErr());
 
-        setSession(String.join("-",
-                               Kernel.class.getCanonicalName(),
-                               String.valueOf(ProcessHandle.current().pid()),
-                               String.valueOf(shell.restarts())));
+        setSessionId(String.join("-",
+                                 Kernel.class.getCanonicalName(),
+                                 String.valueOf(ProcessHandle.current().pid()),
+                                 String.valueOf(shell.restarts())));
     }
 
     @Override

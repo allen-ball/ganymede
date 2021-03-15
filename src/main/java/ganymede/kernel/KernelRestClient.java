@@ -19,11 +19,12 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  * @version $Revision$
  */
 @NoArgsConstructor @ToString @Log4j2
-public class Client {
+public class KernelRestClient {
     private static final String TEMPLATE = "http://localhost:%d/";
 
     private final int port = Integer.decode(System.getProperty(Kernel.PORT_PROPERTY));
     private final URI uri = URI.create(String.format(TEMPLATE, port));
+    private final HttpClient client = HttpClient.newHttpClient();
 
     /**
      * See {@link Kernel#print(ObjectNode)}.
@@ -31,7 +32,6 @@ public class Client {
      * @param   bundle          The MIME bundle {@link JsonNode}.
      */
     public void print(JsonNode bundle) throws Exception {
-        var client = HttpClient.newHttpClient();
         var body = bundle.toPrettyString();
         var request =
             HttpRequest.newBuilder()

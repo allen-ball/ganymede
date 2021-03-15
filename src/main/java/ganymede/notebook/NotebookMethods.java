@@ -1,6 +1,6 @@
 package ganymede.notebook;
 
-import ganymede.kernel.Client;
+import ganymede.kernel.KernelRestClient;
 import ganymede.server.Message;
 import lombok.NoArgsConstructor;
 
@@ -22,7 +22,7 @@ public abstract class NotebookMethods {
      */
     public static void print(Object object) {
         try {
-            new Client().print(Message.mime_bundle(object));
+            new KernelRestClient().print(Message.mime_bundle(object));
         } catch (Exception exception) {
             System.out.println(object);
             exception.printStackTrace(System.err);

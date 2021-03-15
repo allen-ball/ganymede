@@ -2,7 +2,6 @@ package ganymede.shell;
 
 import ganymede.dependency.POM;
 import ganymede.dependency.Resolver;
-import ganymede.kernel.Client;
 import ganymede.kernel.Kernel;
 import ganymede.server.Message;
 import ganymede.shell.magic.AnnotatedMagic;
