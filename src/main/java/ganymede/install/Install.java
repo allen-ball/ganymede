@@ -145,7 +145,9 @@ public class Install implements ApplicationRunner {
             sysProperties.entrySet().stream()
                 .map(t -> "-D" + t)
                 .forEach(argv::add);
-            Stream.of("-jar", jar, "--connection-file={connection_file}")
+            Stream.of("-jar", jar,
+                      "--runtime-dir=" + runtime_dir,
+                      "--connection-file={connection_file}")
                 .map(Object::toString)
                 .forEach(argv::add);
 

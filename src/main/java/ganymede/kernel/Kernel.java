@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
@@ -62,6 +63,9 @@ public class Kernel extends Server implements ApplicationContextAware,
     @Value("${JPY_PARENT_PID:#{-1}}")
     private long jpy_parent_pid = -1;
 
+    @Value("${runtime-dir:#{null}}")
+    private String runtime_dir = null;
+
     @Value("${connection-file:#{null}}")
     private String connection_file = null;
 
@@ -77,6 +81,7 @@ public class Kernel extends Server implements ApplicationContextAware,
     private final Shell shell = new Shell(this);
     private ApplicationContext context = null;
     private int port = -1;
+    private ObjectNode nbserver = OBJECT_MAPPER.createObjectNode();
     private ArrayNode bundles = OBJECT_MAPPER.createArrayNode();
 
     /**
@@ -88,6 +93,20 @@ public class Kernel extends Server implements ApplicationContextAware,
 
     @PostConstruct
     public void init() throws Exception {
+        if (runtime_dir != null) {
+            var glob = String.format("{nb,jp}server-%d.json", jpy_parent_pid);
+
+            try (var stream = Files.newDirectoryStream(Paths.get(runtime_dir), glob)) {
+                var path = stream.iterator().next();
+
+                nbserver = (ObjectNode) OBJECT_MAPPER.readTree(path.toFile());
+            } catch (NoSuchElementException exception) {
+                log.warn("{}: No match found for '{}'", runtime_dir, glob);
+            } catch (Exception exception) {
+                log.warn("{}: {}", runtime_dir, exception);
+            }
+        }
+
         var jars =
             Stream.of(Optional.ofNullable(spark_home),
                       Optional.ofNullable(hadoop_home))
