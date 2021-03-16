@@ -11,7 +11,11 @@ import lombok.extern.log4j.Log4j2;
 import static lombok.AccessLevel.PROTECTED;
 
 /**
- * Abstract {@link ScriptEngine} {@link ganymede.shell.Magic} base class.
+ * Abstract
+ * {@link.uri https://www.jcp.org/en/jsr/detail?id=223 target=newtab JSR 223}
+ * {@link ScriptEngine} {@link ganymede.shell.Magic} base class.
+ *
+ * @see ScriptEngineManager
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
@@ -36,11 +40,19 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic {
     @Synchronized
     protected ScriptEngine engine(Bindings bindings) {
         if (engine == null) {
-            var manager = new ScriptEngineManager();
+            var manager = new ScriptEngineManager(getClass().getClassLoader());
 
             manager.setBindings(bindings);
 
             engine = manager.getEngineByExtension(getExtension());
+
+            if (engine == null) {
+                engine =
+                    manager.getEngineFactories().stream()
+                    .filter(t -> t.getExtensions().contains(getExtension()))
+                    .map(t -> t.getScriptEngine())
+                    .findFirst().orElse(null);
+            }
         }
 
         return engine;
