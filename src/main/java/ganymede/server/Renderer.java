@@ -47,7 +47,7 @@ public interface Renderer {
      */
     public static ObjectNode render(Object object) {
         var bundle = OBJECT_MAPPER.createObjectNode();
-        var type = (object != null) ? object.getClass() : null;
+        var type = (object != null) ? object.getClass() : Object.class;
 
         new RendererMap().entrySet().stream()
             .filter(t -> t.getKey().isAssignableFrom(type))
