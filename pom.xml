@@ -29,6 +29,9 @@
   <properties>
     <jse.target>11</jse.target>
     <jackson-bom.version>2.10.0</jackson-bom.version>
+    <scala.compat.version>2.12</scala.compat.version>
+    <scala.version>${scala.compat.version}.10</scala.version>
+    <spark.version>3.1.1</spark.version>
     <tablesaw.version>0.38.2</tablesaw.version>
     <start-class>ganymede.Launcher</start-class>
   </properties>
@@ -36,8 +39,8 @@
     <dependencies>
       <dependency>
         <groupId>org.apache.spark</groupId>
-        <artifactId>spark-sql_2.12</artifactId>
-        <version>3.1.1</version>
+        <artifactId>spark-sql_${scala.compat.version}</artifactId>
+        <version>${spark.version}</version>
       </dependency>
       <dependency>
         <groupId>org.jfree</groupId>
@@ -138,8 +141,18 @@
       <artifactId>maven-resolver-transport-http</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-compiler</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.apache.spark</groupId>
-      <artifactId>spark-sql_2.12</artifactId>
+      <artifactId>spark-sql_${scala.compat.version}</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
