@@ -8,10 +8,9 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import scala.tools.nsc.Settings;
 import scala.tools.nsc.interpreter.IMain;
-import scala.tools.nsc.settings.MutableSettings;
 
 /**
- * {@link Scala} {@link ganymede.shell.Magic}.
+ * {@link Scala} {@link Magic}.
  *
  * @see IMain
  *
