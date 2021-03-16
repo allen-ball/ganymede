@@ -17,6 +17,17 @@ import static lombok.AccessLevel.PROTECTED;
  */
 @NoArgsConstructor(access = PROTECTED) @ToString @Log4j2
 public abstract class AbstractPropertiesMagic extends AbstractMagic {
+
+    /**
+     * Method to convert the cell {@code code} to a {@link Properties}
+     * instance.
+     *
+     * @param   code            The code to parse.
+     *
+     * @return  The {@link Properties}.
+     *
+     * @see #HELPER
+     */
     protected Properties compile(String code) throws Exception {
         try (var reader = new StringReader(code)) {
             var in = new Properties(System.getProperties());
