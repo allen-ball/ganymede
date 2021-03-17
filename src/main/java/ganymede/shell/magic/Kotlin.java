@@ -9,8 +9,6 @@ import lombok.extern.log4j.Log4j2;
 /**
  * {@link Kotlin} {@link ganymede.shell.Magic}.
  *
- * @see org.jetbrains.kotlin.script.jsr223.KotlinJsr223JvmLocalScriptEngineFactory
- *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
