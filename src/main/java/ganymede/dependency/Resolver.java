@@ -58,9 +58,12 @@ import static java.util.stream.Collectors.toSet;
  */
 @NoArgsConstructor @ToString @Log4j2
 public class Resolver extends Analyzer {
+    private static final Set<String> LOGGING_IGNORE =
+        Set.of("commons-logging:commons-logging:jar");
+    private static final Set<String> JCL_BRIDGES =
+        Set.of("org.slf4j:jcl-over-slf4j:jar", "org.springframework:spring-jcl:jar");
     private static final Set<String> SLF4J_BINDINGS =
-        Set.of("ch.qos.logback:logback-classic:jar",
-               "org.slf4j:slf4j-log4j12:jar");
+        Set.of("org.slf4j:slf4j-log4j12:jar", "ch.qos.logback:logback-classic:jar");
 
     private final POM pom;
     private final Set<File> classpath = new LinkedHashSet<>();
@@ -128,15 +131,30 @@ public class Resolver extends Analyzer {
 
             if (! artifacts.isEmpty()) {
                 for (var artifact : artifacts) {
+                    artifact = repository.resolve(artifact);
+
                     var ignore = false;
                     var id = ArtifactIdUtils.toVersionlessId(artifact);
 
                     if (! ignore) {
+                        ignore |= LOGGING_IGNORE.contains(id);
+                    }
+
+                    if (! ignore) {
                         if (SLF4J_BINDINGS.contains(id)) {
-                            ignore =
+                            ignore |=
                                 repository.getArtifactsOn(classpath)
                                 .map(ArtifactIdUtils::toVersionlessId)
                                 .anyMatch(t -> SLF4J_BINDINGS.contains(t));
+                        }
+                    }
+
+                    if (! ignore) {
+                        if (JCL_BRIDGES.contains(id)) {
+                            ignore |=
+                                repository.getArtifactsOn(classpath)
+                                .map(ArtifactIdUtils::toVersionlessId)
+                                .anyMatch(t -> JCL_BRIDGES.contains(t));
                         }
                     }
 
@@ -189,11 +207,24 @@ public class Resolver extends Analyzer {
                          system.resolveDependencies(session, request)
                          .getArtifactResults()) {
                     if (result.isResolved()) {
-                        var artifact = result.getArtifact();
+                        var artifact = repository.resolve(result.getArtifact());
                         var file = artifact.getFile();
 
-                        if (classpath.add(file)) {
-                            files.add(file);
+                        if (! classpath.contains(file)) {
+                            var installed =
+                                repository.getArtifactsOn(classpath)
+                                .filter(t -> ArtifactIdUtils.equalsVersionlessId(artifact, t))
+                                .findFirst().orElse(artifact);
+
+                            if (artifact.equals(installed)) {
+                                if (classpath.add(file)) {
+                                    files.add(file);
+                                }
+                            } else {
+                                log.debug("Ignored resolved artifact {}", artifact);
+                                log.debug("    for {} @ {}",
+                                          installed.getVersion(), installed.getFile());
+                            }
                         }
                     }
 
