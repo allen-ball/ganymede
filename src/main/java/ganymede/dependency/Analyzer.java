@@ -4,6 +4,7 @@ import ball.annotation.CompileTimeCheck;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
@@ -33,7 +35,7 @@ import static java.util.stream.Collectors.toList;
  */
 @NoArgsConstructor @ToString @Log4j2
 public class Analyzer {
-    private static final String SHADED_ARTIFACTS = "META-INF/shaded-artifacts";
+    private static final String SHADED_DEPENDENCIES = "META-INF/shaded.dependencies";
 
     @CompileTimeCheck
     private static final Pattern POM_PROPERTIES =
@@ -54,16 +56,12 @@ public class Analyzer {
         if (! file.isDirectory()) {
             try (var jar = new JarFile(file)) {
                 var manifest = jar.getManifest();
-                var entry = jar.getJarEntry(SHADED_ARTIFACTS);
+                var entry = jar.getJarEntry(SHADED_DEPENDENCIES);
 
                 if (entry != null) {
                     try (var in = jar.getInputStream(entry)) {
-                        new BufferedReader(new InputStreamReader(in, UTF_8))
-                            .lines()
-                            .map(String::strip)
-                            .map(t -> t.split(":"))
-                            .filter(t -> t.length > 3)
-                            .map(t -> new DefaultArtifact(t[0], t[1], null, t[2], t[3], Map.of(), file))
+                        parse(in)
+                            .map(t -> t.setFile(file))
                             .forEach(set::add);
                     }
                 } else {
@@ -114,6 +112,26 @@ public class Analyzer {
         }
 
         return set;
+    }
+
+    /**
+     * Method to convert an {@link InputStream} to a {@link Stream} of
+     * {@link DefaultArtifact}s.
+     *
+     * @param   in              The {@link InputStream}.
+     *
+     * @return  The {@link Stream} of {@link DefaultArtifact}s.
+     */
+    protected Stream<DefaultArtifact> parse(InputStream in) {
+        var stream =
+            new BufferedReader(new InputStreamReader(in, UTF_8))
+            .lines()
+            .map(String::strip)
+            .map(t -> t.split(":"))
+            .filter(t -> t.length > 3)
+            .map(t -> new DefaultArtifact(t[0], t[1], null, t[2], t[3]));
+
+        return stream;
     }
 
     private static final List<List<String>> CANDIDATES =

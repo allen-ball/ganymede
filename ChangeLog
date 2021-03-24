@@ -1,3 +1,8 @@
+2021-03-24  Allen D. Ball  <ball@hcf.dev>
+
+	* src/main/java/ganymede/dependency/Analyzer.java:
+	Added parse(InputStream) method.
+
 2021-03-21  Allen D. Ball  <ball@hcf.dev>
 
 	* src/generate-dependencies-resources.bash: Initial writing.
