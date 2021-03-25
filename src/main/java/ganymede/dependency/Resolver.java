@@ -3,6 +3,7 @@ package ganymede.dependency;
 import ganymede.shell.Shell;
 import java.io.File;
 import java.io.PrintStream;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -25,6 +26,7 @@ import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
 import org.eclipse.aether.graph.Dependency;
@@ -64,6 +66,8 @@ public class Resolver extends Analyzer {
         Set.of("org.slf4j:jcl-over-slf4j:jar", "org.springframework:spring-jcl:jar");
     private static final Set<String> SLF4J_BINDINGS =
         Set.of("org.slf4j:slf4j-log4j12:jar", "ch.qos.logback:logback-classic:jar");
+
+    private static final String DEPENDENCIES_FORMAT = "/META-INF/%s.dependencies";
 
     private final POM pom;
     private final Set<File> classpath = new LinkedHashSet<>();
@@ -127,48 +131,131 @@ public class Resolver extends Analyzer {
         for (var file : files) {
             file = file.getAbsoluteFile();
 
-            var artifacts = getShadedArtifactSet(file);
+            var artifacts =
+                getShadedArtifactSet(file).stream()
+                .map(repository::resolve)
+                .collect(toSet());
 
             if (! artifacts.isEmpty()) {
-                for (var artifact : artifacts) {
-                    artifact = repository.resolve(artifact);
+                var array = artifacts.toArray(new Artifact[] { });
 
-                    var ignore = false;
-                    var id = ArtifactIdUtils.toVersionlessId(artifact);
-
-                    if (! ignore) {
-                        ignore |= LOGGING_IGNORE.contains(id);
-                    }
-
-                    if (! ignore) {
-                        if (SLF4J_BINDINGS.contains(id)) {
-                            ignore |=
-                                repository.getArtifactsOn(classpath)
-                                .map(ArtifactIdUtils::toVersionlessId)
-                                .anyMatch(t -> SLF4J_BINDINGS.contains(t));
-                        }
-                    }
-
-                    if (! ignore) {
-                        if (JCL_BRIDGES.contains(id)) {
-                            ignore |=
-                                repository.getArtifactsOn(classpath)
-                                .map(ArtifactIdUtils::toVersionlessId)
-                                .anyMatch(t -> JCL_BRIDGES.contains(t));
-                        }
-                    }
-
-                    if (! ignore) {
-                        if (classpath.add(artifact.getFile())) {
-                            list.add(artifact.getFile());
-                        }
-                    }
-                }
+                list.addAll(addToClasspath(array));
             } else {
                 if (classpath.add(file)) {
                     list.add(file);
                 }
             }
+        }
+
+        return list;
+    }
+
+    /**
+     * Method to add a {@link Artifact}(s) to the {@link #classpath()}.
+     * May quietly ignore requests to add {@link Artifact}s that violate
+     * internal heuristics (e.g.,
+     * {@link.uri http://www.slf4j.org/codes.html#multiple_bindings target=newtab multiple SLF4J bindings}).
+     *
+     * @param   artifacts       The {@link Artifact}(s).
+     *
+     * @return  The {@link List} of {@link File}s added to the
+     *          {@link #classpath()}.
+     */
+    public List<File> addToClasspath(Artifact... artifacts) {
+        var list = new LinkedList<File>();
+        var resolved =
+            Stream.of(artifacts)
+            .map(repository::resolve)
+            .collect(toList());
+
+        for (var artifact : resolved) {
+            var ignore = false;
+            var id = ArtifactIdUtils.toVersionlessId(artifact);
+
+            if (! ignore) {
+                ignore |= LOGGING_IGNORE.contains(id);
+            }
+
+            if (! ignore) {
+                if (SLF4J_BINDINGS.contains(id)) {
+                    ignore |=
+                        repository.getArtifactsOn(classpath)
+                        .map(ArtifactIdUtils::toVersionlessId)
+                        .anyMatch(t -> SLF4J_BINDINGS.contains(t));
+                }
+            }
+
+            if (! ignore) {
+                if (JCL_BRIDGES.contains(id)) {
+                    ignore |=
+                        repository.getArtifactsOn(classpath)
+                        .map(ArtifactIdUtils::toVersionlessId)
+                        .anyMatch(t -> JCL_BRIDGES.contains(t));
+                }
+            }
+
+            if (! ignore) {
+                if (! classpath.contains(artifact.getFile())) {
+                    var installed =
+                        repository.getArtifactsOn(classpath)
+                        .filter(t -> ArtifactIdUtils.equalsVersionlessId(artifact, t))
+                        .findFirst().orElse(null);
+
+                    if (installed == null) {
+                        if (classpath.add(artifact.getFile())) {
+                            list.add(artifact.getFile());
+                        }
+                    } else {
+                        log.debug("Ignored resolved artifact {}", artifact);
+                        log.debug("    for {} @ {}",
+                                  installed.getVersion(), installed.getFile());
+                    }
+                }
+            }
+        }
+
+        return list;
+    }
+
+    /**
+     * Method to add known dependencies found within a parent directory to
+     * the {@link #classpath()}.  An artifact
+     * {@code artifactId-version.packaging} is a known artifact if there is
+     * {@code META-INF/artifactId-version.packaging.dependencies} file on
+     * the classpath which contains the artifact's dependencies.
+     *
+     * @param   parent          The parent {@link File} to analyze.
+     *
+     * @return  The {@link List} of {@link File}s added to the
+     *          {@link #classpath()}.
+     */
+    public List<File> addKnownDependenciesToClasspath(File parent) {
+        var list = new LinkedList<File>();
+
+        try (var stream = Files.newDirectoryStream(parent.toPath(), "*.jar")) {
+            for (var entry : stream) {
+                var resource = String.format(DEPENDENCIES_FORMAT, entry.getFileName());
+
+                try (var in = getClass().getResourceAsStream(resource)) {
+                    if (in != null) {
+                        var artifacts =
+                            parse(in)
+                            .map(t -> t.setFile(new File(parent,
+                                                         t.getArtifactId()
+                                                         + "-" + t.getVersion()
+                                                         + "." + t.getExtension())
+                                                .getAbsoluteFile()))
+                            .filter(t -> t.getFile().exists())
+                            .toArray(Artifact[]::new);
+
+                        list.addAll(addToClasspath(artifacts));
+                    }
+                } catch (Exception exception) {
+                    log.warn("Could not read {}", resource, exception);
+                }
+            }
+        } catch (Exception exception) {
+            log.warn("{}: {}", parent, exception);
         }
 
         return list;
@@ -214,9 +301,9 @@ public class Resolver extends Analyzer {
                             var installed =
                                 repository.getArtifactsOn(classpath)
                                 .filter(t -> ArtifactIdUtils.equalsVersionlessId(artifact, t))
-                                .findFirst().orElse(artifact);
+                                .findFirst().orElse(null);
 
-                            if (artifact.equals(installed)) {
+                            if (installed == null) {
                                 if (classpath.add(file)) {
                                     files.add(file);
                                 }

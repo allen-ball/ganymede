@@ -72,9 +72,6 @@ public class Kernel extends Server implements ApplicationContextAware,
     @Value("${spark-home:#{null}}")
     private String spark_home = null;
 
-    @Value("${hadoop-home:#{null}}")
-    private String hadoop_home = null;
-
     @Value("${project.version}")
     private String project_version = null;
 
@@ -107,33 +104,13 @@ public class Kernel extends Server implements ApplicationContextAware,
             }
         }
 
-        var jars =
-            Stream.of(Optional.ofNullable(spark_home),
-                      Optional.ofNullable(hadoop_home))
-            .flatMap(Optional::stream)
-            .distinct()
-            .map(t -> Paths.get(t, "jars").toFile())
-            .flatMap(this::getJarFilesIn)
-            .toArray(File[]::new);
+        if (spark_home != null) {
+            var parent = Paths.get(spark_home, "jars").toFile();
 
-        shell.addToClasspath(jars);
-
-        restart();
-    }
-
-    private Stream<File> getJarFilesIn(File parent) {
-        var list = new LinkedList<File>();
-
-        try (var stream =
-                 Files.newDirectoryStream(parent.toPath(), "*.jar")) {
-            for (var entry : stream) {
-                list.add(entry.toFile());
-            }
-        } catch (Exception exception) {
-            log.warn("{}: {}", parent, exception);
+            shell.addKnownDependenciesToClasspath(parent);
         }
 
-        return list.stream();
+        restart();
     }
 
     @PreDestroy

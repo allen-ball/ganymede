@@ -15,7 +15,7 @@
     <groupId>ball</groupId>
     <artifactId>parent</artifactId>
     <version>20210220-SNAPSHOT</version>
-    <relativePath/>
+    <relativePath>../ball/parent/pom.xml</relativePath>
   </parent>
   <repositories>
     <repository>
@@ -28,18 +28,78 @@
   <inceptionYear>2021</inceptionYear>
   <properties>
     <jse.target>11</jse.target>
-    <jackson-bom.version>2.10.0</jackson-bom.version>
-    <scala.compat.version>2.12</scala.compat.version>
-    <scala.version>${scala.compat.version}.10</scala.version>
-    <spark.version>3.1.1</spark.version>
-    <tablesaw.version>0.38.2</tablesaw.version>
     <start-class>ganymede.Launcher</start-class>
+    <ball-java-jar.version>1.0.0.20210218</ball-java-jar.version>
+    <ball-util.version>6.1.0.20210218</ball-util.version>
+    <resolverVersion>1.6.2</resolverVersion>
+    <!-- Spark 3.1.1 -->
+    <spark.version>3.1.1</spark.version>
+    <jackson-bom.version>2.10.5.20201202</jackson-bom.version>
+    <scala.binary.version>2.12</scala.binary.version>
+    <scala.version>${scala.binary.version}.10</scala.version>
+    <!-- Optional -->
+    <tablesaw.version>0.38.2</tablesaw.version>
   </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>ball</groupId>
+        <artifactId>ball-java-jar</artifactId>
+        <version>${ball-java-jar.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>ball</groupId>
+        <artifactId>ball-util</artifactId>
+        <version>${ball-util.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.resolver</groupId>
+        <artifactId>maven-resolver-api</artifactId>
+        <version>${resolverVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.resolver</groupId>
+        <artifactId>maven-resolver-spi</artifactId>
+        <version>${resolverVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.resolver</groupId>
+        <artifactId>maven-resolver-util</artifactId>
+        <version>${resolverVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.resolver</groupId>
+        <artifactId>maven-resolver-impl</artifactId>
+        <version>${resolverVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.resolver</groupId>
+        <artifactId>maven-resolver-connector-basic</artifactId>
+        <version>${resolverVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.resolver</groupId>
+        <artifactId>maven-resolver-transport-classpath</artifactId>
+        <version>${resolverVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.resolver</groupId>
+        <artifactId>maven-resolver-transport-file</artifactId>
+        <version>${resolverVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.resolver</groupId>
+        <artifactId>maven-resolver-transport-http</artifactId>
+        <version>${resolverVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.resolver</groupId>
+        <artifactId>maven-resolver-transport-wagon</artifactId>
+        <version>${resolverVersion}</version>
+      </dependency>
+      <dependency>
         <groupId>org.apache.spark</groupId>
-        <artifactId>spark-sql_${scala.compat.version}</artifactId>
+        <artifactId>spark-sql_${scala.binary.version}</artifactId>
         <version>${spark.version}</version>
       </dependency>
       <dependency>
@@ -51,6 +111,16 @@
         <groupId>org.knowm.xchart</groupId>
         <artifactId>xchart</artifactId>
         <version>3.8.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.scala-lang</groupId>
+        <artifactId>scala-compiler</artifactId>
+        <version>${scala.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.scala-lang</groupId>
+        <artifactId>scala-library</artifactId>
+        <version>${scala.version}</version>
       </dependency>
       <dependency>
         <groupId>org.zeromq</groupId>
@@ -88,13 +158,6 @@
     <dependency>
       <groupId>ball</groupId>
       <artifactId>ball-java-jar</artifactId>
-      <version>${ball-java-jar.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>ball</groupId>
-      <artifactId>ball-util</artifactId>
-      <version>${ball-util.version}</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
@@ -125,30 +188,37 @@
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-api</artifactId>
+      <version>${resolverVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-impl</artifactId>
+      <version>${resolverVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-util</artifactId>
+      <version>${resolverVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-connector-basic</artifactId>
+      <version>${resolverVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-transport-classpath</artifactId>
+      <version>${resolverVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-transport-file</artifactId>
+      <version>${resolverVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-transport-http</artifactId>
+      <version>${resolverVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
@@ -160,18 +230,51 @@
       <version>${kotlin.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.scala-lang</groupId>
-      <artifactId>scala-compiler</artifactId>
-      <scope>provided</scope>
+      <groupId>org.spark-project.spark</groupId>
+      <artifactId>unused</artifactId>
+      <version>1.0.0</version>
     </dependency>
     <dependency>
-      <groupId>org.scala-lang</groupId>
-      <artifactId>scala-library</artifactId>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-jcl</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-tomcat</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jetty</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.thymeleaf</groupId>
+      <artifactId>thymeleaf</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.zeromq</groupId>
+      <artifactId>jeromq</artifactId>
+    </dependency>
+    <!-- Required for compilation and users must add to classpath at runtime -->
+    <dependency>
+      <groupId>ball</groupId>
+      <artifactId>ball-util</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.spark</groupId>
-      <artifactId>spark-sql_${scala.compat.version}</artifactId>
+      <artifactId>spark-sql_${scala.binary.version}</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -185,20 +288,30 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-compiler</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.thymeleaf</groupId>
-      <artifactId>thymeleaf</artifactId>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.zeromq</groupId>
-      <artifactId>jeromq</artifactId>
+      <groupId>tech.tablesaw</groupId>
+      <artifactId>tablesaw-core</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>tech.tablesaw</groupId>
       <artifactId>tablesaw-jsplot</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <!-- Always excluded -->
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.17</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
@@ -223,13 +336,13 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
-            <id>META-INF/shaded-artifacts</id>
+            <id>META-INF/shaded.dependencies</id>
             <phase>generate-sources</phase>
             <goals>
               <goal>tree</goal>
             </goals>
             <configuration>
-              <outputFile>${project.build.outputDirectory}/META-INF/shaded-artifacts</outputFile>
+              <outputFile>${project.build.outputDirectory}/META-INF/shaded.dependencies</outputFile>
               <outputScope>false</outputScope>
               <scope>runtime</scope>
               <tokens>whitespace</tokens>

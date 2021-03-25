@@ -171,14 +171,34 @@ public class Shell implements AutoCloseable {
     }
 
     /**
-     * Method to add resolved a paths to the {@link JShell} instance.  See
+     * Method to add resolved paths to the {@link JShell} instance.  See
      * {@link JShell#addToClasspath(String)}.
      *
-     * @param   files           The {@link File} to add.
+     * @param   files           The {@link File}s to add.
      */
     @Synchronized
     public void addToClasspath(File... files) {
         for (var file : resolver.addToClasspath(files)) {
+            var jshell = this.jshell;
+
+            if (jshell != null) {
+                jshell.addToClasspath(file.toString());
+            } else {
+                break;
+            }
+        }
+    }
+
+    /**
+     * Method to add known dependencies found within a parent directory to
+     * the {@link Resolver#classpath()}.  See
+     * {@link Resolver#addKnownDependenciesToClasspath(File)}.
+     *
+     * @param   parent          The parent {@link File} to analyze.
+     */
+    @Synchronized
+    public void addKnownDependenciesToClasspath(File parent) {
+        for (var file : resolver.addKnownDependenciesToClasspath(parent)) {
             var jshell = this.jshell;
 
             if (jshell != null) {
