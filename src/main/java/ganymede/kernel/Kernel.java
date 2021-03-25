@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 /**
@@ -115,6 +117,16 @@ public class Kernel extends Server implements ApplicationContextAware,
 
     @PreDestroy
     public void destroy() { super.shutdown(); }
+
+    /**
+     * REST method to retrieve the current {@link Shell#classpath()}.
+     */
+    @RequestMapping(method = { GET }, value = { "kernel/classpath" })
+    public ResponseEntity<String> classpath() throws Exception {
+        var json = OBJECT_MAPPER.writeValueAsString(shell.classpath());
+
+        return new ResponseEntity<>(json, HttpStatus.OK);
+    }
 
     /**
      * REST method to capture print MIME bundles from a sub-process.  See

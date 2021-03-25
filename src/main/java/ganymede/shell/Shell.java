@@ -19,6 +19,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -55,7 +56,8 @@ public class Shell implements AutoCloseable {
     private static final String[] VMOPTIONS =
         Stream.of("--add-opens", "java.base/jdk.internal.misc=ALL-UNNAMED",
                   "-Dio.netty.tryReflectionSetAccessible=true",
-                  "-Djava.awt.headless=true")
+                  "-Djava.awt.headless=true",
+                  "-Dscala.usejavacp=true")
         .toArray(String[]::new);
 
     private final Kernel kernel;
@@ -208,6 +210,14 @@ public class Shell implements AutoCloseable {
             }
         }
     }
+
+    /**
+     * Method to get the current classpath.  See
+     * {@link Resolver#classpath()}.
+     *
+     * @return  The {@link Set} of {@link File}s.
+     */
+    public Set<File> classpath() { return resolver.classpath(); }
 
     /**
      * Accessor to the {@link JShell} instance (created and initialized on
