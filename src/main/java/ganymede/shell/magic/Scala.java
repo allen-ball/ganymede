@@ -1,11 +1,14 @@
 package ganymede.shell.magic;
 
 import ball.annotation.ServiceProviderFor;
+import ganymede.kernel.KernelRestClient;
 import ganymede.shell.Magic;
+import java.util.List;
 import javax.script.Bindings;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
+import scala.collection.JavaConversions;
 import scala.tools.nsc.Settings;
 import scala.tools.nsc.interpreter.IMain;
 
@@ -28,25 +31,42 @@ public class Scala extends AbstractMagic {
      *
      * tickles https://github.com/scala/bug/issues/11754.
      */
-    private IMain interpreter = null;
+    private IMain engine = null;
 
-    private IMain interpreter(Bindings bindings) {
-        if (interpreter == null) {
-            var settings = new Settings();
+    private IMain engine() {
+        if (engine == null) {
+            try {
+                var settings = new Settings();
 
-            settings.usejavacp().value_$eq(true);
+                settings.usejavacp().value_$eq(true);
 
-            interpreter = new IMain(settings);
+                new KernelRestClient().classpath().stream()
+                    .forEach(t -> settings.classpath().append(t));
+
+                engine = new IMain(settings);
+                engine.initializeSynchronous();
+            } catch (Exception exception) {
+                exception.printStackTrace(System.err);
+            }
         }
 
-        return interpreter;
+        return engine;
     }
 
     @Override
     public void execute(Bindings bindings,
                         String line0, String code) throws Exception {
-        var interpreter = interpreter(bindings);
+        var engine = engine();
+        var modifiers = JavaConversions.asScalaBuffer(List.<String>of()).toList();
 
-        interpreter.interpret(code);
+        for (var entry : bindings.entrySet()) {
+            var key = entry.getKey();
+            var value = entry.getValue();
+            var type = (value != null) ? value.getClass() : Object.class;
+
+            engine.bind(key, type.getName(), value, modifiers);
+        }
+
+        engine.interpret(code);
     }
 }
