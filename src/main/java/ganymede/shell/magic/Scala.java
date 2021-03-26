@@ -38,7 +38,6 @@ public class Scala extends AbstractScriptEngineMagic {
              */
             try {
                 var manager = new ScriptEngineManager(getClass().getClassLoader());
-
                 var factory =
                     (Scripted.Factory)
                     manager.getEngineFactories().stream()
