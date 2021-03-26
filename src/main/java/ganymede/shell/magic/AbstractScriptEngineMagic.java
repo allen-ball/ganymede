@@ -1,13 +1,17 @@
 package ganymede.shell.magic;
 
+import java.util.concurrent.ConcurrentSkipListMap;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.script.SimpleBindings;
+import javax.script.SimpleScriptContext;
 import lombok.NoArgsConstructor;
-import lombok.Synchronized;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
+import static javax.script.ScriptContext.ENGINE_SCOPE;
+import static javax.script.ScriptContext.GLOBAL_SCOPE;
 import static lombok.AccessLevel.PROTECTED;
 
 /**
@@ -22,7 +26,15 @@ import static lombok.AccessLevel.PROTECTED;
  */
 @NoArgsConstructor(access = PROTECTED) @ToString @Log4j2
 public abstract class AbstractScriptEngineMagic extends AbstractMagic {
-    private ScriptEngine engine = null;
+    protected static final SimpleScriptContext CONTEXT = new SimpleScriptContext();
+
+    static {
+        var bindings = new SimpleBindings(new ConcurrentSkipListMap<>());
+
+        CONTEXT.setBindings(bindings, ENGINE_SCOPE);
+    }
+
+    protected ScriptEngine engine = null;
 
     /**
      * Method to get the script extension.
@@ -37,12 +49,9 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic {
      * @return  The {@link ScriptEngine} if it can be instantiated;
      *          {@code null} otherwise.
      */
-    @Synchronized
-    protected ScriptEngine engine(Bindings bindings) {
+    protected ScriptEngine engine() {
         if (engine == null) {
             var manager = new ScriptEngineManager(getClass().getClassLoader());
-
-            manager.setBindings(bindings);
 
             engine = manager.getEngineByExtension(getExtension());
 
@@ -61,10 +70,12 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic {
     @Override
     public void execute(Bindings bindings,
                         String line0, String code) throws Exception {
-        var engine = engine(bindings);
+        var engine = engine();
 
         if (engine != null) {
-            engine.eval(code);
+            CONTEXT.setBindings(bindings, GLOBAL_SCOPE);
+
+            engine.eval(code, CONTEXT);
         } else {
             System.err.format("No %s REPL available\n", getMagicNames()[0]);
         }
