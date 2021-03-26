@@ -52,6 +52,7 @@ public class Scala extends AbstractScriptEngineMagic {
                     .forEach(t -> settings.classpath().append(t));
 
                 engine = new Scripted(factory, settings, Scripted.apply$default$3());
+            } catch (NoClassDefFoundError exception) {
             } catch (Exception exception) {
                 exception.printStackTrace(System.err);
             }
