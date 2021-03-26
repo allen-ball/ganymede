@@ -56,8 +56,7 @@ public class Shell implements AutoCloseable {
     private static final String[] VMOPTIONS =
         Stream.of("--add-opens", "java.base/jdk.internal.misc=ALL-UNNAMED",
                   "-Dio.netty.tryReflectionSetAccessible=true",
-                  "-Djava.awt.headless=true",
-                  "-Dscala.usejavacp=true")
+                  "-Djava.awt.headless=true")
         .toArray(String[]::new);
 
     private final Kernel kernel;
