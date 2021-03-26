@@ -1,11 +1,8 @@
 package ganymede.shell.magic;
 
-import java.util.concurrent.ConcurrentSkipListMap;
-import javax.script.Bindings;
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import javax.script.SimpleBindings;
-import javax.script.SimpleScriptContext;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
@@ -26,14 +23,6 @@ import static lombok.AccessLevel.PROTECTED;
  */
 @NoArgsConstructor(access = PROTECTED) @ToString @Log4j2
 public abstract class AbstractScriptEngineMagic extends AbstractMagic {
-    protected static final SimpleScriptContext CONTEXT = new SimpleScriptContext();
-
-    static {
-        var bindings = new SimpleBindings(new ConcurrentSkipListMap<>());
-
-        CONTEXT.setBindings(bindings, ENGINE_SCOPE);
-    }
-
     protected ScriptEngine engine = null;
 
     /**
@@ -68,14 +57,12 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic {
     }
 
     @Override
-    public void execute(Bindings bindings,
+    public void execute(ScriptContext context,
                         String line0, String code) throws Exception {
         var engine = engine();
 
         if (engine != null) {
-            CONTEXT.setBindings(bindings, GLOBAL_SCOPE);
-
-            engine.eval(code, CONTEXT);
+            engine.eval(code, context);
         } else {
             System.err.format("No %s REPL available\n", getMagicNames()[0]);
         }

@@ -1,3 +1,8 @@
+2021-03-26  Allen D. Ball  <ball@hcf.dev>
+
+	* Maintain shared ScriptContext in NotebookContext (__) and
+	refactor Magic accordingly.
+
 2021-03-25  Allen D. Ball  <ball@hcf.dev>
 
 	* Added GET /kernel/classpath REST method.

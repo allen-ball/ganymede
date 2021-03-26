@@ -24,7 +24,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
-import javax.script.Bindings;
+import javax.script.ScriptContext;
 import jdk.jshell.JShell;
 import jdk.jshell.JShellException;
 import jdk.jshell.SourceCodeAnalysis;
@@ -302,13 +302,13 @@ public class Shell implements AutoCloseable {
                 var analyzer = jshell.sourceCodeAnalysis();
 
                 for (var variable : variables) {
-                    var expression = String.format("__.bindings.put(\"%1$s\", %1$s)", variable);
+                    var expression = String.format("__.context.getBindings(javax.script.ScriptContext.GLOBAL_SCOPE).put(\"%1$s\", %1$s)", variable);
                     var info = analyzer.analyzeCompletion(expression);
                     var result = unescape(jshell.eval(info.source()).get(0).value());
                 }
 
                 var expression =
-                    String.format("__.bindings.keySet().retainAll(java.util.List.of(\"%1$s\".split(\",\")))", String.join(",", variables));
+                    String.format("__.context.getBindings(javax.script.ScriptContext.GLOBAL_SCOPE).keySet().retainAll(java.util.List.of(\"%1$s\".split(\",\")))", String.join(",", variables));
                 var info = analyzer.analyzeCompletion(expression);
                 var result = unescape(jshell.eval(info.source()).get(0).value());
             }
@@ -495,7 +495,7 @@ public class Shell implements AutoCloseable {
         }
 
         @Override
-        public void execute(Bindings bindings,
+        public void execute(ScriptContext context,
                             String line0, String code) throws Exception {
             throw new IllegalStateException();
         }

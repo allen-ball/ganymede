@@ -8,7 +8,7 @@ import ganymede.server.renderer.AnnotatedRenderer;
 import ganymede.server.renderer.ForType;
 import ganymede.shell.Magic;
 import java.util.stream.Stream;
-import javax.script.Bindings;
+import javax.script.ScriptContext;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -19,6 +19,7 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.StringTemplateResolver;
 
 import static ganymede.notebook.NotebookMethods.print;
+import static javax.script.ScriptContext.GLOBAL_SCOPE;
 import static org.springframework.util.MimeTypeUtils.TEXT_HTML_VALUE;
 import static org.springframework.util.MimeTypeUtils.TEXT_PLAIN_VALUE;
 import static org.springframework.util.MimeTypeUtils.TEXT_XML_VALUE;
@@ -36,12 +37,12 @@ import static org.springframework.util.MimeTypeUtils.TEXT_XML_VALUE;
 @NoArgsConstructor @ToString @Log4j2
 public class Thymeleaf extends AbstractMagic {
     @Override
-    public void execute(Bindings bindings,
+    public void execute(ScriptContext context,
                         String line0, String code) throws Exception {
-        execute(bindings, Magic.getCellMagicCommand(line0), code);
+        execute(context, Magic.getCellMagicCommand(line0), code);
     }
 
-    protected void execute(Bindings bindings,
+    protected void execute(ScriptContext context,
                            String[] argv, String code) throws Exception {
         try {
             var resolver = new StringTemplateResolver();
@@ -57,8 +58,8 @@ public class Thymeleaf extends AbstractMagic {
 
             engine.setTemplateResolver(resolver);
 
-            var context = new Context(null, bindings);
-            var output = engine.process(code, context);
+            var icontext = new Context(null, context.getBindings(GLOBAL_SCOPE));
+            var output = engine.process(code, icontext);
 
             print(new Output(resolver.getTemplateMode(), output));
         } catch (Exception exception) {

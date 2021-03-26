@@ -2,7 +2,7 @@ package ganymede.shell.magic;
 
 import ball.annotation.ServiceProviderFor;
 import ganymede.shell.Magic;
-import javax.script.Bindings;
+import javax.script.ScriptContext;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
@@ -18,7 +18,7 @@ import lombok.extern.log4j.Log4j2;
 @NoArgsConstructor @ToString @Log4j2
 public class SysProperties extends AbstractPropertiesMagic {
     @Override
-    public void execute(Bindings bindings,
+    public void execute(ScriptContext context,
                         String line0, String code) throws Exception {
         if (! code.isBlank()) {
             var properties = compile(code);

@@ -1,10 +1,14 @@
 package ganymede.notebook;
 
 import java.util.concurrent.ConcurrentSkipListMap;
-import javax.script.Bindings;
+import javax.script.ScriptContext;
 import javax.script.SimpleBindings;
+import javax.script.SimpleScriptContext;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
+import static javax.script.ScriptContext.ENGINE_SCOPE;
+import static javax.script.ScriptContext.GLOBAL_SCOPE;
 
 /**
  * {@link NotebookContext} for {@link Notebook} {@link ganymede.shell.Shell}
@@ -15,8 +19,12 @@ import lombok.ToString;
  */
 @NoArgsConstructor @ToString
 public class NotebookContext {
-    public final Bindings bindings =
-        new SimpleBindings(new ConcurrentSkipListMap<>());
+    public final ScriptContext context = new SimpleScriptContext();
+
+    {
+        context.setBindings(new SimpleBindings(new ConcurrentSkipListMap<>()), GLOBAL_SCOPE);
+        context.setBindings(new SimpleBindings(new ConcurrentSkipListMap<>()), ENGINE_SCOPE);
+    }
 
     public Object invokeStaticMethod(String type, String method,
                                      Class<?>[] parameters, Object... arguments) {
