@@ -14,8 +14,8 @@
   <parent>
     <groupId>ball</groupId>
     <artifactId>parent</artifactId>
-    <version>20210220-SNAPSHOT</version>
-    <relativePath>../ball/parent/pom.xml</relativePath>
+    <version>20210218.0</version>
+    <relativePath/>
   </parent>
   <repositories>
     <repository>
