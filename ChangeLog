@@ -1,5 +1,7 @@
 2021-03-26  Allen D. Ball  <ball@hcf.dev>
 
+	* Added LICENSE and copyright protection notices.
+
 	* Translate POST /kernel/print to IOPub.pub(Message)
 	synchronously.
 

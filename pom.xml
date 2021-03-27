@@ -26,10 +26,18 @@
     </repository>
   </repositories>
   <inceptionYear>2021</inceptionYear>
+  <licenses>
+    <license>
+      <name>Apache-2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
   <properties>
     <jse.target>11</jse.target>
     <start-class>ganymede.Launcher</start-class>
     <ball-java-jar.version>1.0.0.20210218</ball-java-jar.version>
+    <ball-license-maven-plugin.version>1.2.3-SNAPSHOT</ball-license-maven-plugin.version>
     <ball-util.version>6.1.0.20210218</ball-util.version>
     <resolverVersion>1.6.2</resolverVersion>
     <!-- Spark 3.1.1 -->
