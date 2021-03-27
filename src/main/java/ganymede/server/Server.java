@@ -4,7 +4,6 @@ import ball.annotation.CompileTimeCheck;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.io.PrintStreamBuffer;
 import java.io.ByteArrayInputStream;
@@ -61,11 +60,12 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
     private final Channel.IOPub iopub = new Channel.IOPub(this);
     private final Channel.Stdin stdin = new Stdin();
     private final Channel.Shell shell = new Shell();
-    private final AtomicInteger execution_count = new AtomicInteger(0);
     private InputStream in = null;
     private PrintStreamBuffer out = null;
     private PrintStreamBuffer err = null;
     private String sessionId = null;
+    protected final AtomicInteger execution_count = new AtomicInteger(0);
+    protected transient Message request = null;
 
     /**
      * Sole constructor.
@@ -141,15 +141,6 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
     protected abstract void execute(String code) throws Exception;
 
     /**
-     * Method to get an {@link ArrayNode} of accumulated MIME bundles from
-     * the {@link ganymede.shell.Shell} (and {@link jdk.jshell.JShell}) from
-     * last {@link #execute(String)} call.
-     *
-     * @return  The {@link ArrayNode}.
-     */
-    protected abstract ArrayNode getMIMEBundles();
-
-    /**
      * Method to evaluate an expression.
      *
      * @param   expression      The expression.
@@ -174,7 +165,15 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
     protected abstract void interrupt();
 
     /**
-     * Method to stamp and outgoing {@link Message}.  Adds
+     * Method to schedule a {@link Message} for publishing.  See
+     * {@link Channel.IOPub#pub(Message)}.
+     *
+     * @param   message     The {@link Message} to send.
+     */
+    protected void pub(Message message) { iopub.pub(message); }
+
+    /**
+     * Method to stamp an outgoing {@link Message}.  Adds
      * {@link #PROTOCOL_VERSION}, session, and
      * {@link Message#timestamp() timestamp} if not already specified.
      *
@@ -251,7 +250,13 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
         @Override
         protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, Message message) {
             if (message.isRequest()) {
-                super.dispatch(dispatcher, socket, message);
+                try {
+                    Server.this.request = message;
+
+                    super.dispatch(dispatcher, socket, Server.this.request);
+                } finally {
+                    Server.this.request = null;
+                }
             } else {
                 log.warn("Ignoring non-request {}", message.msg_type());
             }
@@ -307,7 +312,6 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
                     }
                 }
 
-                var bundles = getMIMEBundles();
                 var stdout = out.toString();
                 var stderr = err.toString();
 
@@ -315,34 +319,6 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
                 err.reset();
 
                 if (! silent) {
-                    var count = execution_count.intValue();
-
-                    if (! bundles.isEmpty()) {
-                        var iterator = bundles.iterator();
-
-                        while (iterator.hasNext()) {
-                            var bundle = (ObjectNode) iterator.next();
-
-                            try {
-                                iopub.pub(request.execute_result(count, bundle));
-                                /* iopub.pub(request.display_data(bundle)); */
-                            } catch (Exception exception) {
-                                log.warn("{}", exception);
-                            }
-                        }
-                    } else {
-                        if (! stdout.isEmpty()) {
-                            try {
-                                iopub.pub(request.execute_result(count, stdout));
-                                /* iopub.pub(request.display_data(stdout)); */
-                            } catch (Exception exception) {
-                                log.warn("{}", exception);
-                            } finally {
-                                stdout = "";
-                            }
-                        }
-                    }
-
                     if (! stdout.isEmpty()) {
                         iopub.pub(request.stream(Message.stream.stdout, stdout));
                     }

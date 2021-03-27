@@ -1,6 +1,5 @@
 package ganymede.kernel;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.server.Message;
 import ganymede.server.Server;
@@ -81,7 +80,6 @@ public class Kernel extends Server implements ApplicationContextAware,
     private ApplicationContext context = null;
     private int port = -1;
     private JupyterRestClient client = null;
-    private ArrayNode bundles = OBJECT_MAPPER.createArrayNode();
 
     /**
      * Method to get the {@link Kernel} REST server port.
@@ -129,14 +127,23 @@ public class Kernel extends Server implements ApplicationContextAware,
     }
 
     /**
-     * REST method to capture print MIME bundles from a sub-process.  See
+     * REST method to print MIME bundles from a sub-process.  See
      * {@link KernelRestClient#print(JsonNode)}.
      *
      * @param   bundle          The MIME bundle {@link ObjectNode}.
      */
     @RequestMapping(method = { POST }, value = { "kernel/print" })
     public ResponseEntity<String> print(@RequestBody ObjectNode bundle) {
-        bundles.add(bundle);
+        var request = this.request;
+
+        if (request != null) {
+            var silent = request.content().at("/silent").asBoolean();
+
+            if (! silent) {
+                pub(request.execute_result(execution_count.intValue(), bundle));
+                /* pub(request.display_data(bundle)); */
+            }
+        }
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -219,15 +226,6 @@ public class Kernel extends Server implements ApplicationContextAware,
     @Override
     protected void execute(String code) throws Exception {
         shell.execute(code);
-    }
-
-    @Override
-    protected ArrayNode getMIMEBundles() {
-        var node = bundles;
-
-        bundles = OBJECT_MAPPER.createArrayNode();
-
-        return node;
     }
 
     @Override
