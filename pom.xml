@@ -39,6 +39,9 @@
     <ball-java-jar.version>1.0.0.20210218</ball-java-jar.version>
     <ball-license-maven-plugin.version>1.2.3-SNAPSHOT</ball-license-maven-plugin.version>
     <ball-util.version>6.1.0.20210218</ball-util.version>
+    <kotlin.version>1.4.32</kotlin.version>
+    <jetty.version>9.4.38.v20210224</jetty.version>
+    <log4j2.version>2.14.1</log4j2.version>
     <resolverVersion>1.6.2</resolverVersion>
     <!-- Spark 3.1.1 -->
     <spark.version>3.1.1</spark.version>
