@@ -20,7 +20,7 @@ package ganymede.shell.magic;
  * limitations under the License.
  * ##########################################################################
  */
-import javax.script.ScriptContext;
+import ganymede.notebook.NotebookContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import lombok.NoArgsConstructor;
@@ -77,12 +77,11 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic {
     }
 
     @Override
-    public void execute(ScriptContext context,
-                        String line0, String code) throws Exception {
+    public void execute(NotebookContext __, String line0, String code) throws Exception {
         var engine = engine();
 
         if (engine != null) {
-            engine.eval(code, context);
+            engine.eval(code, __.context);
         } else {
             System.err.format("No %s REPL available\n", getMagicNames()[0]);
         }

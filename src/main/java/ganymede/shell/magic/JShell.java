@@ -20,7 +20,7 @@ package ganymede.shell.magic;
  * limitations under the License.
  * ##########################################################################
  */
-import javax.script.ScriptContext;
+import ganymede.notebook.NotebookContext;
 import lombok.NoArgsConstructor;
 
 import static lombok.AccessLevel.PROTECTED;
@@ -35,8 +35,7 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 public abstract class JShell extends AbstractMagic {
     @Override
-    public void execute(ScriptContext context,
-                        String line0, String code) throws Exception {
+    public void execute(NotebookContext __, String line0, String code) throws Exception {
         throw new IllegalArgumentException(line0);
     }
 }

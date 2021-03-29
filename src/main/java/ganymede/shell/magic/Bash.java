@@ -21,8 +21,8 @@ package ganymede.shell.magic;
  * ##########################################################################
  */
 import ball.annotation.ServiceProviderFor;
+import ganymede.notebook.NotebookContext;
 import ganymede.shell.Magic;
-import javax.script.ScriptContext;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
@@ -38,10 +38,9 @@ import lombok.extern.log4j.Log4j2;
 @NoArgsConstructor @ToString @Log4j2
 public class Bash extends Script {
     @Override
-    public void execute(ScriptContext context,
-                        String line0, String code) throws Exception {
+    public void execute(NotebookContext __, String line0, String code) throws Exception {
         try {
-            super.execute(context,
+            super.execute(__,
                           String.format("%s%s %s",
                                         CELL, super.getMagicNames()[0],
                                         line0.substring(CELL.length())),

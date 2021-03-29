@@ -29,11 +29,8 @@ import ganymede.shell.magic.AnnotatedMagic;
 import ganymede.shell.magic.Description;
 import ganymede.shell.magic.MagicNames;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.io.StreamTokenizer;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
@@ -45,7 +42,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
-import javax.script.ScriptContext;
 import jdk.jshell.JShell;
 import jdk.jshell.JShellException;
 import jdk.jshell.SourceCodeAnalysis;
@@ -57,6 +53,7 @@ import org.apache.logging.log4j.io.IoBuilder;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StreamUtils;
 
+import static ganymede.notebook.NotebookContext.unescape;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
 import static jdk.jshell.Snippet.Status.REJECTED;
@@ -360,28 +357,6 @@ public class Shell implements AutoCloseable {
     }
 
     /**
-     * https://stackoverflow.com/questions/3537706/how-to-unescape-a-java-string-literal-in-java
-     */
-    private String unescape(String literal) {
-        var string = literal;
-
-        if (literal != null) {
-            try (var reader = new StringReader(literal)) {
-                var tokenizer = new StreamTokenizer(reader);
-
-                tokenizer.nextToken();
-
-                if (tokenizer.ttype == '"') {
-                    string = tokenizer.sval;
-                }
-            } catch (IOException exception) {
-            }
-        }
-
-        return string;
-    }
-
-    /**
      * Method to determine code's {@link Message.completeness completeness}.
      *
      * @param   code            The code to execute.
@@ -496,7 +471,7 @@ public class Shell implements AutoCloseable {
         }
 
         @Override
-        public void execute(ScriptContext context,
+        public void execute(NotebookContext context,
                             String line0, String code) throws Exception {
             throw new IllegalStateException();
         }

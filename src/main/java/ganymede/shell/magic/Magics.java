@@ -22,6 +22,7 @@ package ganymede.shell.magic;
  */
 import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import ganymede.notebook.NotebookContext;
 import ganymede.server.Message;
 import ganymede.server.Renderer;
 import ganymede.server.renderer.ForType;
@@ -35,7 +36,6 @@ import java.io.StringWriter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TreeMap;
-import javax.script.ScriptContext;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
@@ -65,8 +65,7 @@ public class Magics extends AbstractMagic {
     }
 
     @Override
-    public void execute(ScriptContext context,
-                        String line0, String code) throws Exception {
+    public void execute(NotebookContext __, String line0, String code) throws Exception {
         throw new IllegalArgumentException(line0);
     }
 

@@ -1,5 +1,8 @@
 2021-03-28  Allen D. Ball  <ball@hcf.dev>
 
+	* Refactor Magic methods to accept NotebookContext parameter
+	instead of ScriptContext.
+
 	* src/main/java/ganymede/notebook/NotebookContext.java:
 	Added static update(JShell) method to update NotebookContext in
 	the JShell instance.

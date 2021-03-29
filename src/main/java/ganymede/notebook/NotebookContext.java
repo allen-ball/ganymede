@@ -20,6 +20,9 @@ package ganymede.notebook;
  * limitations under the License.
  * ##########################################################################
  */
+import java.io.IOException;
+import java.io.StreamTokenizer;
+import java.io.StringReader;
 import java.util.concurrent.ConcurrentSkipListMap;
 import javax.script.ScriptContext;
 import javax.script.SimpleBindings;
@@ -35,7 +38,8 @@ import static jdk.jshell.Snippet.SubKind.TEMP_VAR_EXPRESSION_SUBKIND;
 
 /**
  * {@link NotebookContext} for {@link Notebook} {@link ganymede.shell.Shell}
- * {@link JShell} instance.  Bound to {@code __} in the {@link JShell}.
+ * {@link JShell} instance.  Bound to {@code __} in the {@link JShell}
+ * instance.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
@@ -44,33 +48,8 @@ import static jdk.jshell.Snippet.SubKind.TEMP_VAR_EXPRESSION_SUBKIND;
 public class NotebookContext {
 
     /**
-     * Static method used by the {@link ganymede.shell.Shell} to update the
-     * {@link NotebookContext} members.
-     *
-     * @param   jshell          The {@link JShell}.
-     */
-    public static void update(JShell jshell) {
-        var analyzer = jshell.sourceCodeAnalysis();
-        var variables =
-            jshell.variables()
-            .filter(t -> (! t.subKind().equals(TEMP_VAR_EXPRESSION_SUBKIND)))
-            .filter(t -> (! t.name().equals("__")))
-            .map(t -> t.name())
-            .collect(toSet());
-
-        for (var variable : variables) {
-            var expression =
-                String.format("__.context.getBindings(%1d).put(\"%2$s\", %2$s)",
-                              GLOBAL_SCOPE, variable);
-            var info = analyzer.analyzeCompletion(expression);
-
-            jshell.eval(info.source());
-        }
-    }
-
-    /**
      * Common {@link ScriptContext} supplied to
-     * {@link ganymede.shell.Magic#execute(ScriptContext,String,String)}.
+     * {@link ganymede.shell.Magic#execute(NotebookContext,String,String)}.
      */
     public final ScriptContext context = new SimpleScriptContext();
 
@@ -124,4 +103,56 @@ public class NotebookContext {
      * See {@link NotebookMethods#print(Object)}.
      */
     public void print(Object object) { NotebookMethods.print(object); }
+
+    /**
+     * Static method used by the {@link ganymede.shell.Shell} to update the
+     * {@link NotebookContext} members.
+     *
+     * @param   jshell          The {@link JShell}.
+     */
+    public static void update(JShell jshell) {
+        var analyzer = jshell.sourceCodeAnalysis();
+        var variables =
+            jshell.variables()
+            .filter(t -> (! t.subKind().equals(TEMP_VAR_EXPRESSION_SUBKIND)))
+            .filter(t -> (! t.name().equals("__")))
+            .map(t -> t.name())
+            .collect(toSet());
+
+        for (var variable : variables) {
+            var expression =
+                String.format("__.context.getBindings(%1d).put(\"%2$s\", %2$s)",
+                              GLOBAL_SCOPE, variable);
+            var info = analyzer.analyzeCompletion(expression);
+            var result = unescape(jshell.eval(info.source()).get(0).value());
+        }
+    }
+
+    /**
+     * Method to unescape a Java-escaped spring literal.
+     *
+     * @param   literal         The {@link String} to unescape.
+     *
+     * @return  The unescaped {@link String}.
+     */
+    public static String unescape(String literal) {
+        var string = literal;
+        /*
+         * https://stackoverflow.com/questions/3537706/how-to-unescape-a-java-string-literal-in-java
+         */
+        if (literal != null) {
+            try (var reader = new StringReader(literal)) {
+                var tokenizer = new StreamTokenizer(reader);
+
+                tokenizer.nextToken();
+
+                if (tokenizer.ttype == '"') {
+                    string = tokenizer.sval;
+                }
+            } catch (IOException exception) {
+            }
+        }
+
+        return string;
+    }
 }
