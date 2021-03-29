@@ -32,8 +32,6 @@ import lombok.extern.log4j.Log4j2;
 import scala.tools.nsc.Settings;
 import scala.tools.nsc.interpreter.Scripted;
 
-import static javax.script.ScriptContext.GLOBAL_SCOPE;
-
 /**
  * {@link Scala} {@link Magic}.
  *

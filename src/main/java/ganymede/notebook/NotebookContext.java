@@ -122,7 +122,7 @@ public class NotebookContext {
         for (var variable : variables) {
             var expression =
                 String.format("__.context.getBindings(%1d).put(\"%2$s\", %2$s)",
-                              GLOBAL_SCOPE, variable);
+                              ENGINE_SCOPE, variable);
             var info = analyzer.analyzeCompletion(expression);
             var result = unescape(jshell.eval(info.source()).get(0).value());
         }

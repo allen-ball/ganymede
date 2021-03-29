@@ -27,8 +27,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
-import static javax.script.ScriptContext.ENGINE_SCOPE;
-import static javax.script.ScriptContext.GLOBAL_SCOPE;
 import static lombok.AccessLevel.PROTECTED;
 
 /**
