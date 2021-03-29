@@ -45,7 +45,7 @@ import static org.springframework.util.MimeTypeUtils.TEXT_PLAIN_VALUE;
 import static org.springframework.util.MimeTypeUtils.TEXT_XML_VALUE;
 
 /**
- * {@link Thymeleaf} template {@link ganymede.shell.Magic}.
+ * {@link Thymeleaf} template {@link Magic}.
  *
  * @see TemplateEngine
  *
