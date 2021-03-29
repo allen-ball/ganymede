@@ -21,18 +21,20 @@ package ganymede.shell.magic;
  * ##########################################################################
  */
 import ganymede.notebook.NotebookContext;
+import ganymede.shell.Magic;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
+import static javax.script.ScriptContext.ENGINE_SCOPE;
 import static lombok.AccessLevel.PROTECTED;
 
 /**
  * Abstract
  * {@link.uri https://www.jcp.org/en/jsr/detail?id=223 target=newtab JSR 223}
- * {@link ScriptEngine} {@link ganymede.shell.Magic} base class.
+ * {@link ScriptEngine} {@link Magic} base class.
  *
  * @see ScriptEngineManager
  *
@@ -76,6 +78,28 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic {
 
     @Override
     public void execute(NotebookContext __, String line0, String code) throws Exception {
+        var bindings = __.context.getBindings(ENGINE_SCOPE);
+        var argv = Magic.getCellMagicCommand(line0);
+
+        try {
+            bindings.put(ScriptEngine.ARGV, argv);
+
+            execute(__, code);
+        } finally {
+            bindings.remove(ScriptEngine.ARGV);
+        }
+    }
+
+    /**
+     * Target of {@link #execute(NotebookContext,String,String)}.  The
+     * {@code argv} is available in the {@link javax.script.ScriptContext}
+     * {@code ENGINE_SCOPE} {@link javax.script.Bindings} as
+     * {@link ScriptEngine#ARGV ScriptEngine.ARGV}.
+     *
+     * @param   __              The {@link NotebookContext}.
+     * @param   code            The remainder of the cell.
+     */
+    protected void execute(NotebookContext __, String code) throws Exception {
         var engine = engine();
 
         if (engine != null) {

@@ -61,6 +61,14 @@ public class Thymeleaf extends AbstractMagic {
         execute(__, Magic.getCellMagicCommand(line0), code);
     }
 
+    /**
+     * Target of {@link #execute(NotebookContext,String,String)}.
+     *
+     * @param   __              The {@link NotebookContext}.
+     * @param   argv            The first line parsed as an array of
+     *                          {@link String}s.
+     * @param   code            The remainder of the cell.
+     */
     protected void execute(NotebookContext __, String[] argv, String code) throws Exception {
         try {
             var resolver = new StringTemplateResolver();

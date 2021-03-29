@@ -471,8 +471,7 @@ public class Shell implements AutoCloseable {
         }
 
         @Override
-        public void execute(NotebookContext context,
-                            String line0, String code) throws Exception {
+        public void execute(NotebookContext __, String line0, String code) throws Exception {
             throw new IllegalStateException();
         }
 
