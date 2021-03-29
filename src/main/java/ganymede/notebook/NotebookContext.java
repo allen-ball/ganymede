@@ -23,6 +23,9 @@ package ganymede.notebook;
 import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ConcurrentSkipListMap;
 import javax.script.ScriptContext;
 import javax.script.SimpleBindings;
@@ -31,6 +34,7 @@ import jdk.jshell.JShell;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toSet;
 import static javax.script.ScriptContext.ENGINE_SCOPE;
 import static javax.script.ScriptContext.GLOBAL_SCOPE;
@@ -51,12 +55,18 @@ public class NotebookContext {
      * Common {@link ScriptContext} supplied to
      * {@link ganymede.shell.Magic#execute(NotebookContext,String,String)}.
      */
-    public final ScriptContext context = new SimpleScriptContext();
+    public final ScriptContext context =
+        new SimpleScriptContext() {
+            {
+                setBindings(new SimpleBindings(new ConcurrentSkipListMap<>()), GLOBAL_SCOPE);
+                setBindings(new SimpleBindings(new ConcurrentSkipListMap<>()), ENGINE_SCOPE);
+            }
+        };
 
-    {
-        context.setBindings(new SimpleBindings(new ConcurrentSkipListMap<>()), GLOBAL_SCOPE);
-        context.setBindings(new SimpleBindings(new ConcurrentSkipListMap<>()), ENGINE_SCOPE);
-    }
+    /**
+     * {@link List} of accumulated {@code import}s.
+     */
+    public final List<String> imports = new LinkedList<>();
 
     /**
      * Method to construct a call to a static
@@ -111,7 +121,6 @@ public class NotebookContext {
      * @param   jshell          The {@link JShell}.
      */
     public static void update(JShell jshell) {
-        var analyzer = jshell.sourceCodeAnalysis();
         var variables =
             jshell.variables()
             .filter(t -> (! t.subKind().equals(TEMP_VAR_EXPRESSION_SUBKIND)))
@@ -120,12 +129,31 @@ public class NotebookContext {
             .collect(toSet());
 
         for (var variable : variables) {
-            var expression =
-                String.format("__.context.getBindings(%1d).put(\"%2$s\", %2$s)",
-                              ENGINE_SCOPE, variable);
-            var info = analyzer.analyzeCompletion(expression);
-            var result = unescape(jshell.eval(info.source()).get(0).value());
+            evaluate(jshell,
+                     "__.context.getBindings(%1d).put(\"%2$s\", %2$s)",
+                     ENGINE_SCOPE, variable);
         }
+
+        var imports =
+            jshell.imports()
+            .map(t -> t.source())
+            .map(String::strip)
+            .collect(toCollection(LinkedHashSet::new));
+
+        evaluate(jshell, "__.imports.clear()");
+
+        if (! imports.isEmpty()) {
+            evaluate(jshell,
+                     "java.util.Collections.addAll(__.imports, \"%1$s\".split(\",\"))",
+                     String.join(",", imports));
+        }
+    }
+
+    private static String evaluate(JShell jshell, String expression, Object... argv) {
+        var analyzer = jshell.sourceCodeAnalysis();
+        var info = analyzer.analyzeCompletion(String.format(expression, argv));
+
+        return unescape(jshell.eval(info.source()).get(0).value());
     }
 
     /**
