@@ -23,6 +23,7 @@ package ganymede.shell;
 import ganymede.dependency.POM;
 import ganymede.dependency.Resolver;
 import ganymede.kernel.Kernel;
+import ganymede.notebook.NotebookContext;
 import ganymede.server.Message;
 import ganymede.shell.magic.AnnotatedMagic;
 import ganymede.shell.magic.Description;
@@ -58,9 +59,7 @@ import org.springframework.util.StreamUtils;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toSet;
 import static jdk.jshell.Snippet.Status.REJECTED;
-import static jdk.jshell.Snippet.SubKind.TEMP_VAR_EXPRESSION_SUBKIND;
 import static org.apache.logging.log4j.Level.WARN;
 
 /**
@@ -312,25 +311,7 @@ public class Shell implements AutoCloseable {
             var jshell = this.jshell;
 
             if (jshell != null) {
-                var variables =
-                    jshell.variables()
-                    .filter(t -> (! t.subKind().equals(TEMP_VAR_EXPRESSION_SUBKIND)))
-                    .filter(t -> (! t.name().equals("__")))
-                    .map(t -> t.name())
-                    .collect(toSet());
-
-                var analyzer = jshell.sourceCodeAnalysis();
-
-                for (var variable : variables) {
-                    var expression = String.format("__.context.getBindings(javax.script.ScriptContext.GLOBAL_SCOPE).put(\"%1$s\", %1$s)", variable);
-                    var info = analyzer.analyzeCompletion(expression);
-                    var result = unescape(jshell.eval(info.source()).get(0).value());
-                }
-
-                var expression =
-                    String.format("__.context.getBindings(javax.script.ScriptContext.GLOBAL_SCOPE).keySet().retainAll(java.util.List.of(\"%1$s\".split(\",\")))", String.join(",", variables));
-                var info = analyzer.analyzeCompletion(expression);
-                var result = unescape(jshell.eval(info.source()).get(0).value());
+                NotebookContext.update(jshell);
             }
 
             var application = new Magic.Application(code);

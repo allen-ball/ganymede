@@ -56,7 +56,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 /**
  * Ganymede Jupyter {@link Kernel}.
@@ -152,7 +152,7 @@ public class Kernel extends Server implements ApplicationContextAware,
      *
      * @param   bundle          The MIME bundle {@link ObjectNode}.
      */
-    @RequestMapping(method = { POST }, value = { "kernel/print" })
+    @RequestMapping(method = { PUT }, value = { "kernel/print" })
     public ResponseEntity<String> print(@RequestBody ObjectNode bundle) {
         var request = this.request;
 

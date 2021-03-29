@@ -86,7 +86,7 @@ public class KernelRestClient {
             HttpRequest.newBuilder()
             .uri(uri.resolve("kernel/print"))
             .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-            .POST(HttpRequest.BodyPublishers.ofString(body))
+            .PUT(HttpRequest.BodyPublishers.ofString(body))
             .build();
         var response =
             client.send(request, HttpResponse.BodyHandlers.ofString());

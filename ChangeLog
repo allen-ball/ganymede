@@ -1,3 +1,9 @@
+2021-03-28  Allen D. Ball  <ball@hcf.dev>
+
+	* src/main/java/ganymede/notebook/NotebookContext.java:
+	Added static update(JShell) method to update NotebookContext in
+	the JShell instance.
+
 2021-03-26  Allen D. Ball  <ball@hcf.dev>
 
 	* Added LICENSE and copyright protection notices.

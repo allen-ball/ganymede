@@ -24,21 +24,54 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import javax.script.ScriptContext;
 import javax.script.SimpleBindings;
 import javax.script.SimpleScriptContext;
+import jdk.jshell.JShell;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import static java.util.stream.Collectors.toSet;
 import static javax.script.ScriptContext.ENGINE_SCOPE;
 import static javax.script.ScriptContext.GLOBAL_SCOPE;
+import static jdk.jshell.Snippet.SubKind.TEMP_VAR_EXPRESSION_SUBKIND;
 
 /**
  * {@link NotebookContext} for {@link Notebook} {@link ganymede.shell.Shell}
- * {@link jdk.jshell.JShell} instance.
+ * {@link JShell} instance.  Bound to {@code __} in the {@link JShell}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
 @NoArgsConstructor @ToString
 public class NotebookContext {
+
+    /**
+     * Static method used by the {@link ganymede.shell.Shell} to update the
+     * {@link NotebookContext} members.
+     *
+     * @param   jshell          The {@link JShell}.
+     */
+    public static void update(JShell jshell) {
+        var analyzer = jshell.sourceCodeAnalysis();
+        var variables =
+            jshell.variables()
+            .filter(t -> (! t.subKind().equals(TEMP_VAR_EXPRESSION_SUBKIND)))
+            .filter(t -> (! t.name().equals("__")))
+            .map(t -> t.name())
+            .collect(toSet());
+
+        for (var variable : variables) {
+            var expression =
+                String.format("__.context.getBindings(%1d).put(\"%2$s\", %2$s)",
+                              GLOBAL_SCOPE, variable);
+            var info = analyzer.analyzeCompletion(expression);
+
+            jshell.eval(info.source());
+        }
+    }
+
+    /**
+     * Common {@link ScriptContext} supplied to
+     * {@link ganymede.shell.Magic#execute(ScriptContext,String,String)}.
+     */
     public final ScriptContext context = new SimpleScriptContext();
 
     {
@@ -46,6 +79,17 @@ public class NotebookContext {
         context.setBindings(new SimpleBindings(new ConcurrentSkipListMap<>()), ENGINE_SCOPE);
     }
 
+    /**
+     * Method to construct a call to a static
+     * {@link java.lang.reflect.Method}.
+     *
+     * @param   type            The containing {@link Class}.
+     * @param   method          The {@link java.lang.reflect.Method} name.
+     * @param   parameters      The parameter types ({@link Class}es).
+     * @param   arguments       The argument {@link Object} array.
+     *
+     * @return  The {@link Object result}.
+     */
     public Object invokeStaticMethod(String type, String method,
                                      Class<?>[] parameters, Object... arguments) {
         Object object = null;
@@ -62,10 +106,22 @@ public class NotebookContext {
         return object;
     }
 
+    /**
+     * Method to construct a call to a static
+     * {@link java.lang.reflect.Method} with an empty argument list.
+     *
+     * @param   type            The containing {@link Class}.
+     * @param   method          The {@link java.lang.reflect.Method} name.
+     *
+     * @return  The {@link Object result}.
+     */
     public Object invokeStaticMethod(String type, String method) {
         return invokeStaticMethod(type, method,
                                   new Class<?>[] { }, new Object[] { });
     }
 
+    /**
+     * See {@link NotebookMethods#print(Object)}.
+     */
     public void print(Object object) { NotebookMethods.print(object); }
 }
