@@ -1,3 +1,8 @@
+2021-03-29  Allen D. Ball  <ball@hcf.dev>
+
+	* Added ganymede.jsr223 package with Thymeleaf ScriptEngineFactory
+	implementation.
+
 2021-03-28  Allen D. Ball  <ball@hcf.dev>
 
 	* Refactor Magic methods to accept NotebookContext parameter
