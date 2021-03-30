@@ -62,7 +62,11 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic {
         if (engine == null) {
             var manager = new ScriptEngineManager(getClass().getClassLoader());
 
-            engine = manager.getEngineByExtension(getExtension());
+            engine = manager.getEngineByName(getMagicNames()[0]);
+
+            if (engine == null) {
+                engine = manager.getEngineByExtension(getExtension());
+            }
 
             if (engine == null) {
                 engine =
@@ -79,11 +83,9 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic {
     @Override
     public void execute(NotebookContext __, String line0, String code) throws Exception {
         var bindings = __.context.getBindings(ENGINE_SCOPE);
-        var argv = Magic.getCellMagicCommand(line0);
 
         try {
-            bindings.put(ScriptEngine.ARGV, argv);
-
+            bindings.put(ScriptEngine.ARGV, Magic.getCellMagicCommand(line0));
             execute(__, code);
         } finally {
             bindings.remove(ScriptEngine.ARGV);
