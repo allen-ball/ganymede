@@ -27,7 +27,8 @@ import lombok.NoArgsConstructor;
 import static lombok.AccessLevel.PRIVATE;
 
 /**
- * Methods available in Notebook cells.
+ * Methods available in Notebook cells.  {@code public static} methods are
+ * linked into the {@link jdk.jshell.JShell} environment.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$

@@ -110,16 +110,6 @@ public class NotebookContext {
     }
 
     /**
-     * See {@link NotebookMethods#display(Object)}.
-     */
-    public void display(Object object) { NotebookMethods.display(object); }
-
-    /**
-     * See {@link NotebookMethods#print(Object)}.
-     */
-    public void print(Object object) { NotebookMethods.print(object); }
-
-    /**
      * Static method used by the {@link ganymede.shell.Shell} to update the
      * {@link NotebookContext} members.
      *

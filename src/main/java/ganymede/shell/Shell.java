@@ -23,6 +23,7 @@ package ganymede.shell;
 import ganymede.dependency.POM;
 import ganymede.dependency.Resolver;
 import ganymede.kernel.Kernel;
+import ganymede.notebook.Notebook;
 import ganymede.notebook.NotebookContext;
 import ganymede.server.Message;
 import ganymede.shell.magic.AnnotatedMagic;
@@ -50,11 +51,8 @@ import lombok.Synchronized;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.io.IoBuilder;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.util.StreamUtils;
 
 import static ganymede.notebook.NotebookContext.unescape;
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
 import static jdk.jshell.Snippet.Status.REJECTED;
 import static org.apache.logging.log4j.Level.WARN;
@@ -275,9 +273,8 @@ public class Shell implements AutoCloseable {
                         IoBuilder.forLogger(log)
                         .setLevel(WARN)
                         .buildPrintStream();
-                    var bootstrap = getResourceAsString("bootstrap.jsh");
 
-                    java.execute(jshell, logIn, logOut, logOut, bootstrap);
+                    java.execute(jshell, logIn, logOut, logOut, Notebook.bootstrap());
                 } catch (Exception exception) {
                     log.warn("{}", exception, exception);
                 }
@@ -285,17 +282,6 @@ public class Shell implements AutoCloseable {
         }
 
         return jshell;
-    }
-
-    private String getResourceAsString(String name) throws Exception {
-        String string = null;
-        var resource = new ClassPathResource(name);
-
-        try (var in = resource.getInputStream()) {
-            string = StreamUtils.copyToString(in, UTF_8);
-        }
-
-        return string;
     }
 
     /**

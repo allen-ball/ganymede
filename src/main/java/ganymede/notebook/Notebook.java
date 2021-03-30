@@ -20,11 +20,15 @@ package ganymede.notebook;
  * limitations under the License.
  * ##########################################################################
  */
+import java.lang.reflect.Method;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+
+import static java.lang.reflect.Modifier.isPublic;
+import static java.lang.reflect.Modifier.isStatic;
 
 /**
  * {@link Notebook} Spring launcher.
@@ -59,5 +63,51 @@ public class Notebook {
         }
 
         return __;
+    }
+
+    /**
+     * Method to generate the bootstrap code for a new
+     * {@link jdk.jshell.JShell} instance.
+     *
+     * @return  The boostrap code.
+     */
+    public static String bootstrap() {
+        var code =
+            String.format("var __ = %s.newNotebookContext();\n",
+                          Notebook.class.getCanonicalName());
+
+        for (var method : NotebookMethods.class.getDeclaredMethods()) {
+            var modifiers = method.getModifiers();
+
+            if (isPublic(modifiers) && isStatic(modifiers)) {
+                code += makeWrapperFor(method);
+            }
+        }
+
+        return code;
+    }
+
+    private static String makeWrapperFor(Method method) {
+        var types = method.getGenericParameterTypes();
+        var arguments = new String[types.length];
+        var parameters = new String[types.length];
+
+        for (int i = 0; i < arguments.length; i += 1) {
+            arguments[i] = String.format("argument%d", i);
+        }
+
+        for (int i = 0; i < parameters.length; i += 1) {
+            parameters[i] =
+                String.format("%s %s", types[i].getTypeName(), arguments[i]);
+        }
+
+        var plist = String.join(", ", parameters);
+        var alist = String.join(", ", arguments);
+
+        return String.format("%1$s %2$s(%3$s) { %4$s%5$s.%2$s(%6$s); }\n",
+                             method.getGenericReturnType().getTypeName(),
+                             method.getName(), plist,
+                             Void.TYPE.equals(method.getReturnType()) ? "" : "return ",
+                             method.getDeclaringClass().getName(), alist);
     }
 }
