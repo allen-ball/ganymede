@@ -105,9 +105,20 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic {
         var engine = engine();
 
         if (engine != null) {
-            engine.eval(code, __.context);
+            render(engine.eval(code, __.context));
         } else {
             System.err.format("No %s REPL available\n", getMagicNames()[0]);
         }
+    }
+
+    /**
+     * Callback to render the results of
+     * {@link ScriptEngine#eval(String,ScriptContext)}.  Made available for
+     * template engines.  Default implementation does nothing.
+     *
+     * @param   object          The result of
+     *                          {@link ScriptEngine#eval(String,ScriptContext)}.
+     */
+    protected void render(Object object) {
     }
 }
