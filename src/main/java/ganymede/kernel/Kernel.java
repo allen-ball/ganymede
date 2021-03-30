@@ -147,6 +147,27 @@ public class Kernel extends Server implements ApplicationContextAware,
     }
 
     /**
+     * REST method to display MIME bundles from a sub-process.  See
+     * {@link KernelRestClient#display(JsonNode)}.
+     *
+     * @param   bundle          The MIME bundle {@link ObjectNode}.
+     */
+    @RequestMapping(method = { PUT }, value = { "kernel/display" })
+    public ResponseEntity<String> display(@RequestBody ObjectNode bundle) {
+        var request = this.request;
+
+        if (request != null) {
+            var silent = request.content().at("/silent").asBoolean();
+
+            if (! silent) {
+                pub(request.display_data(bundle));
+            }
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
      * REST method to print MIME bundles from a sub-process.  See
      * {@link KernelRestClient#print(JsonNode)}.
      *
@@ -161,7 +182,6 @@ public class Kernel extends Server implements ApplicationContextAware,
 
             if (! silent) {
                 pub(request.execute_result(execution_count.intValue(), bundle));
-                /* pub(request.display_data(bundle)); */
             }
         }
 

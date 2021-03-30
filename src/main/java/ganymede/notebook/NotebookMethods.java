@@ -36,6 +36,20 @@ import static lombok.AccessLevel.PRIVATE;
 public abstract class NotebookMethods {
 
     /**
+     * Method to display from a Notebook cell.
+     *
+     * @param   object          The {@link Object} to display.
+     */
+    public static void display(Object object) {
+        try {
+            new KernelRestClient().display(Message.mime_bundle(object));
+        } catch (Exception exception) {
+            System.out.println(object);
+            exception.printStackTrace(System.err);
+        }
+    }
+
+    /**
      * Method to print from a Notebook cell.
      *
      * @param   object          The {@link Object} to print.

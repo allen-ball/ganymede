@@ -76,6 +76,23 @@ public class KernelRestClient {
     }
 
     /**
+     * See {@link Kernel#display(ObjectNode)}.
+     *
+     * @param   bundle          The MIME bundle {@link JsonNode}.
+     */
+    public void display(JsonNode bundle) throws Exception {
+        var body = bundle.toPrettyString();
+        var request =
+            HttpRequest.newBuilder()
+            .uri(uri.resolve("kernel/display"))
+            .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+            .PUT(HttpRequest.BodyPublishers.ofString(body))
+            .build();
+        var response =
+            client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    /**
      * See {@link Kernel#print(ObjectNode)}.
      *
      * @param   bundle          The MIME bundle {@link JsonNode}.
