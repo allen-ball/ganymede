@@ -32,6 +32,8 @@ import static lombok.AccessLevel.PROTECTED;
 /**
  * Abstract {@link javax.script.ScriptEngineFactory} base class.
  *
+ * {@bean.info}
+ *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
