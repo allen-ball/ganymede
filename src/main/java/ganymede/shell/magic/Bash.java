@@ -28,7 +28,7 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * {@link Bash} {@link Script} {@link ganymede.shell.Magic}.
+ * {@link Bash} {@link Script} {@link Magic}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
@@ -42,7 +42,7 @@ public class Bash extends Script {
         try {
             super.execute(__,
                           String.format("%s%s %s",
-                                        CELL, super.getMagicNames()[0],
+                                        CELL, "script",
                                         line0.substring(CELL.length())),
                           code);
         } catch (IllegalArgumentException exception) {

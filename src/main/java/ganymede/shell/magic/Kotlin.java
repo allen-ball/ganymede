@@ -27,15 +27,14 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * {@link Kotlin} {@link ganymede.shell.Magic}.
+ * {@link Kotlin} {@link Magic}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
 @ServiceProviderFor({ Magic.class })
 @Description("Execute code in kotlin REPL")
+@Extensions({ "kts" })
 @NoArgsConstructor @ToString @Log4j2
 public class Kotlin extends AbstractScriptEngineMagic {
-    @Override
-    public String getExtension() { return "kts"; }
 }

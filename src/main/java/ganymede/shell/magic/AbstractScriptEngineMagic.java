@@ -22,6 +22,7 @@ package ganymede.shell.magic;
  */
 import ganymede.notebook.NotebookContext;
 import ganymede.shell.Magic;
+import java.util.Objects;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import lombok.NoArgsConstructor;
@@ -42,15 +43,9 @@ import static lombok.AccessLevel.PROTECTED;
  * @version $Revision$
  */
 @NoArgsConstructor(access = PROTECTED) @ToString @Log4j2
-public abstract class AbstractScriptEngineMagic extends AbstractMagic {
+public abstract class AbstractScriptEngineMagic extends AbstractMagic
+                                                implements AnnotatedScriptEngineMagic {
     protected ScriptEngine engine = null;
-
-    /**
-     * Method to get the script extension.
-     *
-     * @return  The script extension.
-     */
-    public String getExtension() { return getMagicNames()[0]; }
 
     /**
      * Method to get the {@link ScriptEngine}.
@@ -62,17 +57,13 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic {
         if (engine == null) {
             var manager = new ScriptEngineManager(getClass().getClassLoader());
 
-            engine = manager.getEngineByName(getMagicNames()[0]);
-
-            if (engine == null) {
-                engine = manager.getEngineByExtension(getExtension());
-            }
+            engine = manager.getEngineByName(getScriptEngineName());
 
             if (engine == null) {
                 engine =
-                    manager.getEngineFactories().stream()
-                    .filter(t -> t.getExtensions().contains(getExtension()))
-                    .map(t -> t.getScriptEngine())
+                    getExtensions().stream()
+                    .map(t -> manager.getEngineByExtension(t))
+                    .filter(Objects::nonNull)
                     .findFirst().orElse(null);
             }
         }
@@ -82,10 +73,23 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic {
 
     @Override
     public void execute(NotebookContext __, String line0, String code) throws Exception {
+        execute(__, Magic.getCellMagicCommand(line0), code);
+    }
+
+    /**
+     * Method provided for subclass implementations to intercept calculation
+     * of {@link ScriptEngine#ARGV} binding.
+     *
+     * @param   __              The {@link NotebookContext}.
+     * @param   argv            The first line parsed as an array of
+     *                          {@link String}s.
+     * @param   code            The remainder of the cell.
+     */
+    protected void execute(NotebookContext __, String[] argv, String code) throws Exception {
         var bindings = __.context.getBindings(ENGINE_SCOPE);
 
         try {
-            bindings.put(ScriptEngine.ARGV, Magic.getCellMagicCommand(line0));
+            bindings.put(ScriptEngine.ARGV, argv);
             execute(__, code);
         } finally {
             bindings.remove(ScriptEngine.ARGV);
@@ -119,6 +123,5 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic {
      * @param   object          The result of
      *                          {@link ScriptEngine#eval(String,ScriptContext)}.
      */
-    protected void render(Object object) {
-    }
+    protected void render(Object object) { }
 }

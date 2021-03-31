@@ -32,7 +32,7 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * {@link Classpath} {@link ganymede.shell.Magic}.  See
+ * {@link Classpath} {@link Magic}.  See
  * {@link jdk.jshell.JShell#addToClasspath(String)}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}

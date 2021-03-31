@@ -32,7 +32,7 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * {@link POM} {@link ganymede.shell.Magic}.
+ * {@link POM} {@link Magic}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$

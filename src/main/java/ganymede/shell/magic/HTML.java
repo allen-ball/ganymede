@@ -31,19 +31,20 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * {@link HTML} template {@link ganymede.shell.Magic}.
+ * {@link HTML} template {@link Magic}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
 @ServiceProviderFor({ Magic.class })
 @Description("HTML template evaluator")
+@ScriptEngineName("thymeleaf")
 @NoArgsConstructor @ToString @Log4j2
 public class HTML extends Thymeleaf {
     @Override
     protected void execute(NotebookContext __, String[] argv, String code) throws Exception {
         argv =
-            Stream.of(new String[] { super.getMagicNames()[0] }, argv)
+            Stream.of(new String[] { "thymeleaf" }, argv)
             .flatMap(Stream::of)
             .toArray(String[]::new);
 

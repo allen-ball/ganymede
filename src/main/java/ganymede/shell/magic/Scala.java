@@ -32,6 +32,8 @@ import lombok.extern.log4j.Log4j2;
 import scala.tools.nsc.Settings;
 import scala.tools.nsc.interpreter.Scripted;
 
+import static java.util.Collections.disjoint;
+
 /**
  * {@link Scala} {@link Magic}.
  *
@@ -59,7 +61,7 @@ public class Scala extends AbstractScriptEngineMagic {
                 var factory =
                     (Scripted.Factory)
                     manager.getEngineFactories().stream()
-                    .filter(t -> t.getExtensions().contains(getExtension()))
+                    .filter(t -> (! disjoint(t.getExtensions(), getExtensions())))
                     .findFirst().orElse(null);
                 var settings = new Settings();
 

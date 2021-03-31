@@ -20,33 +20,23 @@ package ganymede.shell.magic;
  * limitations under the License.
  * ##########################################################################
  */
-import ball.annotation.ServiceProviderFor;
-import ganymede.notebook.NotebookContext;
-import ganymede.shell.Magic;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import lombok.extern.log4j.Log4j2;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * {@link Sh} {@link Script} {@link Magic}.
+ * {@link AnnotatedScriptEngineMagic#getScriptEngineName()} source
+ * {@link java.lang.annotation.Annotation}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@ServiceProviderFor({ Magic.class })
-@Description("Execute script with 'sh' command")
-@NoArgsConstructor @ToString @Log4j2
-public class Sh extends Script {
-    @Override
-    public void execute(NotebookContext __, String line0, String code) throws Exception {
-        try {
-            super.execute(__,
-                          String.format("%s%s %s",
-                                        CELL, "script",
-                                        line0.substring(CELL.length())),
-                          code);
-        } catch (IllegalArgumentException exception) {
-            throw new IllegalArgumentException(line0);
-        }
-    }
+@Documented
+@Retention(RUNTIME)
+@Target({ TYPE })
+public @interface ScriptEngineName {
+    String value();
 }

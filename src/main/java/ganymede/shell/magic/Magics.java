@@ -46,8 +46,7 @@ import static java.util.stream.Collectors.toMap;
 import static org.springframework.util.MimeTypeUtils.TEXT_HTML_VALUE;
 
 /**
- * {@link Magics} {@link ganymede.shell.Magic}: List configured
- * {@link Magic}s.
+ * {@link Magics} {@link Magic}: List configured {@link Magic}s.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$

@@ -27,7 +27,7 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * {@link Groovy} {@link ganymede.shell.Magic}.
+ * {@link Groovy} {@link Magic}.
  *
  * @see org.codehaus.groovy.jsr223.GroovyScriptEngineFactory
  *

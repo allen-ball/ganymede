@@ -32,7 +32,7 @@ import static java.lang.ProcessBuilder.Redirect.PIPE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * {@link Script} {@link ganymede.shell.Magic}.
+ * {@link Script} {@link Magic}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
@@ -48,7 +48,6 @@ public class Script extends AbstractMagic {
             Stream.of(Magic.getCellMagicCommand(line0))
             .skip(1)
             .toArray(String[]::new);
-
         var process =
             new ProcessBuilder(argv)
             .redirectInput(PIPE)

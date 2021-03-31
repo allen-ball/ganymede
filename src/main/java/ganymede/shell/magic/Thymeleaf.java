@@ -22,6 +22,7 @@ package ganymede.shell.magic;
  */
 import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import ganymede.jsr223.ThymeleafScriptEngine;
 import ganymede.notebook.NotebookContext;
 import ganymede.server.Message;
 import ganymede.server.Renderer;
@@ -47,50 +48,20 @@ import static org.springframework.util.MimeTypeUtils.TEXT_XML_VALUE;
 /**
  * {@link Thymeleaf} template {@link Magic}.
  *
- * @see TemplateEngine
- *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
 @ServiceProviderFor({ Magic.class })
 @Description("Thymeleaf template evaluator")
+@ScriptEngineName("thymeleaf")
 @NoArgsConstructor @ToString @Log4j2
-public class Thymeleaf extends AbstractMagic {
+public class Thymeleaf extends AbstractScriptEngineMagic {
     @Override
-    public void execute(NotebookContext __, String line0, String code) throws Exception {
-        execute(__, Magic.getCellMagicCommand(line0), code);
-    }
+    protected void render(Object object) {
+        var engine = (ThymeleafScriptEngine) engine();
+        var resolver = engine.getResolver();
 
-    /**
-     * Target of {@link #execute(NotebookContext,String,String)}.
-     *
-     * @param   __              The {@link NotebookContext}.
-     * @param   argv            The first line parsed as an array of
-     *                          {@link String}s.
-     * @param   code            The remainder of the cell.
-     */
-    protected void execute(NotebookContext __, String[] argv, String code) throws Exception {
-        try {
-            var resolver = new StringTemplateResolver();
-            var mode = StringTemplateResolver.DEFAULT_TEMPLATE_MODE;
-
-            if (argv.length > 1) {
-                mode = TemplateMode.valueOf(argv[1].toUpperCase());
-            }
-
-            resolver.setTemplateMode(mode);
-
-            var engine = new TemplateEngine();
-
-            engine.setTemplateResolver(resolver);
-
-            var icontext = new Context(null, __.context.getBindings(ENGINE_SCOPE));
-            var output = engine.process(code, icontext);
-
-            print(new Output(resolver.getTemplateMode(), output));
-        } catch (Exception exception) {
-            exception.printStackTrace(System.err);
-        }
+        print(new Output(resolver.getTemplateMode(), String.valueOf(object)));
     }
 
     /**

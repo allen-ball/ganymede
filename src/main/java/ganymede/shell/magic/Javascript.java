@@ -27,7 +27,7 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * {@link Javascript} {@link ganymede.shell.Magic}.
+ * {@link Javascript} {@link Magic}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
@@ -35,8 +35,7 @@ import lombok.extern.log4j.Log4j2;
 @ServiceProviderFor({ Magic.class })
 @MagicNames({ "javascript", "js" })
 @Description("Execute code in javascript REPL")
+@Extensions({ "js" })
 @NoArgsConstructor @ToString @Log4j2
 public class Javascript extends AbstractScriptEngineMagic {
-    @Override
-    public String getExtension() { return "js"; }
 }
