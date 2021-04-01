@@ -1,3 +1,9 @@
+2021-04-01  Allen D. Ball  <ball@hcf.dev>
+
+	* src/main/java/ganymede/dependency/Resolver.java;
+	Use addToClasspath(Artifact...) in
+	resolve(Shell,PrintStream,PrintStream,POM).
+
 2021-03-31  Allen D. Ball  <ball@hcf.dev>
 
 	* Refactored Thymeleaf Magic as subclass of

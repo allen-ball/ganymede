@@ -315,18 +315,15 @@ public class Resolver extends Analyzer {
                          .getArtifactResults()) {
                     if (result.isResolved()) {
                         var artifact = repository.resolve(result.getArtifact());
-                        var file = artifact.getFile();
 
-                        if (! classpath.contains(file)) {
+                        if (! classpath.contains(artifact.getFile())) {
                             var installed =
                                 repository.getArtifactsOn(classpath)
                                 .filter(t -> ArtifactIdUtils.equalsVersionlessId(artifact, t))
                                 .findFirst().orElse(null);
 
                             if (installed == null) {
-                                if (classpath.add(file)) {
-                                    files.add(file);
-                                }
+                                files.addAll(addToClasspath(artifact));
                             } else {
                                 log.debug("Ignored resolved artifact {}", artifact);
                                 log.debug("    for {} @ {}",
