@@ -44,7 +44,7 @@ public interface Renderer {
      * Method to get the {@link Class type} {@link.this} {@link Renderer}
      * provides.
      *
-     * @return  The array of {@link Class type}.
+     * @return  The {@link Class type}.
      */
     public Class<?> getForType();
 
@@ -58,6 +58,11 @@ public interface Renderer {
     public void renderTo(ObjectNode bundle, Object object);
 
     /**
+     * Static {@link RendererMap} instance used by {@link #render(Object)}.
+     */
+    public static RendererMap MAP = new RendererMap();
+
+    /**
      * Method to render an {@link Object} to
      * {@link Message#execute_result(int,ObjectNode)}.
      *
@@ -69,7 +74,7 @@ public interface Renderer {
         var bundle = OBJECT_MAPPER.createObjectNode();
         var type = (object != null) ? object.getClass() : Object.class;
 
-        new RendererMap().entrySet().stream()
+        MAP.reload().entrySet().stream()
             .filter(t -> t.getKey().isAssignableFrom(type))
             .forEach(t -> t.getValue().renderTo(bundle, object));
 
