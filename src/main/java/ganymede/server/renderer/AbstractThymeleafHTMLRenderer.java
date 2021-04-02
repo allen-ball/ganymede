@@ -41,7 +41,7 @@ import static org.springframework.util.MimeTypeUtils.TEXT_HTML_VALUE;
  * @version $Revision$
  */
 @NoArgsConstructor(access = PROTECTED)
-public abstract class AbstractThymeleafHTMLRenderer extends StringRenderer {
+public abstract class AbstractThymeleafHTMLRenderer implements AnnotatedRenderer {
     private final TemplateEngine engine = new TemplateEngine();
     private final String template;
 
@@ -84,6 +84,6 @@ public abstract class AbstractThymeleafHTMLRenderer extends StringRenderer {
             }
         }
 
-        super.renderTo(bundle, String.valueOf(object));
+        new ObjectRenderer().renderTo(bundle, object);
     }
 }

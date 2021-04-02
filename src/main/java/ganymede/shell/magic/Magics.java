@@ -25,8 +25,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.notebook.NotebookContext;
 import ganymede.server.Message;
 import ganymede.server.Renderer;
+import ganymede.server.renderer.AnnotatedRenderer;
 import ganymede.server.renderer.ForType;
-import ganymede.server.renderer.StringRenderer;
+import ganymede.server.renderer.ObjectRenderer;
 import ganymede.shell.Magic;
 import ganymede.shell.Shell;
 import java.io.InputStream;
@@ -96,29 +97,27 @@ public class Magics extends AbstractMagic {
     @ServiceProviderFor({ Renderer.class })
     @ForType(Output.class)
     @NoArgsConstructor @ToString
-    public static class RendererImpl extends StringRenderer {
+    public static class RendererImpl implements AnnotatedRenderer {
         @Override
         public void renderTo(ObjectNode bundle, Object object) {
             var output = (Output) object;
 
-            if (! bundle.with(DATA).has(TEXT_HTML_VALUE)) {
-                try (var writer = new StringWriter()) {
-                    var out = new PrintWriter(writer);
+            try (var writer = new StringWriter()) {
+                var out = new PrintWriter(writer);
 
-                    out.println("<h4>Cell Magic</h4>");
-                    out.println("<table>");
-                    out.format("<tr><th>%s</th><th>%s</th></tr>\n",
-                               "Name(s)", "Description");
-                    output.entrySet().stream()
-                        .forEach(t -> out.format("<tr><td>%s</td><td>%s</td></tr>\n",
-                                                 String.join(", ", t.getKey()),
-                                                 t.getValue()));
-                    out.println("</table>");
+                out.println("<h4>Cell Magic</h4>");
+                out.println("<table>");
+                out.format("<tr><th>%s</th><th>%s</th></tr>\n",
+                           "Name(s)", "Description");
+                output.entrySet().stream()
+                    .forEach(t -> out.format("<tr><td>%s</td><td>%s</td></tr>\n",
+                                             String.join(", ", t.getKey()),
+                                             t.getValue()));
+                out.println("</table>");
 
-                    bundle.with(DATA).put(TEXT_HTML_VALUE, writer.toString());
-                } catch (Exception exception) {
-                    throw new IllegalStateException(exception);
-                }
+                bundle.with(DATA).put(TEXT_HTML_VALUE, writer.toString());
+            } catch (Exception exception) {
+                throw new IllegalStateException(exception);
             }
 
             try (var writer = new StringWriter()) {
@@ -129,7 +128,7 @@ public class Magics extends AbstractMagic {
                                              String.join(", ", t.getKey()),
                                              t.getValue()));
 
-                super.renderTo(bundle, writer.toString());
+                new ObjectRenderer().renderTo(bundle, writer.toString());
             } catch (Exception exception) {
                 throw new IllegalStateException(exception);
             }

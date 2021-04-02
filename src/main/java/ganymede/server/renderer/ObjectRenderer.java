@@ -26,6 +26,8 @@ import ganymede.server.Renderer;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import static org.springframework.util.MimeTypeUtils.TEXT_PLAIN_VALUE;
+
 /**
  * {@link Object} {@link Renderer} service provider.
  *
@@ -35,9 +37,11 @@ import lombok.ToString;
 @ServiceProviderFor({ Renderer.class })
 @ForType(Object.class)
 @NoArgsConstructor @ToString
-public class ObjectRenderer extends StringRenderer {
+public class ObjectRenderer implements AnnotatedRenderer {
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
-        super.renderTo(bundle, String.valueOf(object));
+        if (! bundle.with(DATA).has(TEXT_PLAIN_VALUE)) {
+            bundle.with(DATA).put(TEXT_PLAIN_VALUE, String.valueOf(object));
+        }
     }
 }
