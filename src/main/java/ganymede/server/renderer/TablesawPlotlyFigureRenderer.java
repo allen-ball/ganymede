@@ -21,6 +21,7 @@ package ganymede.server.renderer;
  * ##########################################################################
  */
 import ball.annotation.ServiceProviderFor;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.server.Renderer;
 import java.util.Map;
 import lombok.NoArgsConstructor;
@@ -38,9 +39,14 @@ import tech.tablesaw.plotly.components.Figure;
 @ServiceProviderFor({ Renderer.class })
 @ForType(Figure.class)
 @NoArgsConstructor @ToString
-public class TablesawPlotlyFigureRenderer extends AbstractThymeleafHTMLRenderer {
+public class TablesawPlotlyFigureRenderer implements AnnotatedRenderer {
     @Override
-    protected Map<String,Object> getMap(Object object) {
-        return Map.<String,Object>of("figure", object);
+    public void renderTo(ObjectNode bundle, Object object) {
+        var resource = getClass().getSimpleName() + ".html";
+        var map = Map.<String,Object>of("figure", object);
+        var output =
+            new ThymeleafTemplateRenderer.Output(getClass(), resource, "html", map);
+
+        new ThymeleafTemplateRenderer().renderTo(bundle, output);
     }
 }

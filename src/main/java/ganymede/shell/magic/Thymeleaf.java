@@ -40,7 +40,6 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.StringTemplateResolver;
 
 import static ganymede.notebook.NotebookMethods.print;
-import static javax.script.ScriptContext.ENGINE_SCOPE;
 import static org.springframework.util.MimeTypeUtils.TEXT_HTML_VALUE;
 import static org.springframework.util.MimeTypeUtils.TEXT_PLAIN_VALUE;
 import static org.springframework.util.MimeTypeUtils.TEXT_XML_VALUE;
