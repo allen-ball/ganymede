@@ -63,7 +63,7 @@ public interface Renderer {
     public static RendererMap MAP = new RendererMap();
 
     /**
-     * Method to render an {@link Object} to
+     * Method to render an {@link Object} to an
      * {@link Message#execute_result(int,ObjectNode)}.
      *
      * @param   object          The {@link Object} to encode.
@@ -72,11 +72,8 @@ public interface Renderer {
      */
     public static ObjectNode render(Object object) {
         var bundle = OBJECT_MAPPER.createObjectNode();
-        var type = (object != null) ? object.getClass() : Object.class;
 
-        MAP.reload().entrySet().stream()
-            .filter(t -> t.getKey().isAssignableFrom(type))
-            .forEach(t -> t.getValue().renderTo(bundle, object));
+        MAP.renderTo(bundle, object);
 
         return bundle;
     }

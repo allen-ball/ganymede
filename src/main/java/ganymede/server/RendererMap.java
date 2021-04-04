@@ -20,6 +20,7 @@ package ganymede.server;
  * limitations under the License.
  * ##########################################################################
  */
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.util.ServiceProviderMap;
 import java.util.Comparator;
 import java.util.Map;
@@ -34,7 +35,7 @@ import lombok.ToString;
  * @version $Revision$
  */
 public class RendererMap extends TreeMap<Class<?>,Renderer> {
-    private static final long serialVersionUID = -6534802176270830152L;
+    private static final long serialVersionUID = 7453791310490166660L;
 
     private static final Comparator<Class<?>> COMPARATOR =
         new IsAssignableFromOrder().thenComparing(Class::getName);
@@ -72,6 +73,20 @@ public class RendererMap extends TreeMap<Class<?>,Renderer> {
         }
 
         return this;
+    }
+
+    /**
+     * Method to render an {@link Object} to a {@code mime-bundle}.
+     *
+     * @param   bundle          The {@code mime-bundle}.
+     * @param   object          The {@link Object} to render.
+     */
+    public void renderTo(ObjectNode bundle, Object object) {
+        var type = (object != null) ? object.getClass() : Object.class;
+
+        reload().entrySet().stream()
+            .filter(t -> t.getKey().isAssignableFrom(type))
+            .forEach(t -> t.getValue().renderTo(bundle, object));
     }
 
     @NoArgsConstructor @ToString

@@ -26,7 +26,6 @@ import ganymede.notebook.NotebookContext;
 import ganymede.server.Message;
 import ganymede.server.Renderer;
 import ganymede.server.renderer.AnnotatedRenderer;
-import ganymede.server.renderer.DefaultRenderer;
 import ganymede.server.renderer.ForType;
 import ganymede.shell.Magic;
 import ganymede.shell.Shell;
@@ -128,7 +127,7 @@ public class Magics extends AbstractMagic {
                                              String.join(", ", t.getKey()),
                                              t.getValue()));
 
-                new DefaultRenderer().renderTo(bundle, writer.toString());
+                MAP.renderTo(bundle, writer.toString());
             } catch (Exception exception) {
                 throw new IllegalStateException(exception);
             }

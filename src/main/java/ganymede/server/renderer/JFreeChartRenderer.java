@@ -48,7 +48,7 @@ public class JFreeChartRenderer implements AnnotatedRenderer {
             var height = 600;
             var bytes = ChartUtils.encodeAsPNG(chart.createBufferedImage(width, height));
 
-            new ImageRenderer().renderTo(bundle, bytes);
+            MAP.renderTo(bundle, bytes);
             /*
              * HTML
              *

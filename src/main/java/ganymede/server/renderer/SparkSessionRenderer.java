@@ -45,6 +45,6 @@ public class SparkSessionRenderer implements AnnotatedRenderer {
         var output =
             new ThymeleafTemplateRenderer.Output(getClass(), resource, "html", map);
 
-        new ThymeleafTemplateRenderer().renderTo(bundle, output);
+        MAP.renderTo(bundle, output);
     }
 }

@@ -47,7 +47,7 @@ public class XChartRenderer implements AnnotatedRenderer {
         try {
             var bytes = BitmapEncoder.getBitmapBytes((Chart) object, PNG);
 
-            new ImageRenderer().renderTo(bundle, bytes);
+            MAP.renderTo(bundle, bytes);
         } catch (IOException exception) {
             exception.printStackTrace(System.err);
         }
