@@ -84,6 +84,6 @@ public abstract class AbstractThymeleafHTMLRenderer implements AnnotatedRenderer
             }
         }
 
-        new ObjectRenderer().renderTo(bundle, object);
+        new DefaultRenderer().renderTo(bundle, object);
     }
 }

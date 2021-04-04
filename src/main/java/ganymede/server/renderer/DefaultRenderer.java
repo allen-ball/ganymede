@@ -29,7 +29,7 @@ import lombok.ToString;
 import static org.springframework.util.MimeTypeUtils.TEXT_PLAIN_VALUE;
 
 /**
- * {@link Object} {@link Renderer} service provider.
+ * Default {@link Object} {@link Renderer} service provider.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
@@ -37,7 +37,7 @@ import static org.springframework.util.MimeTypeUtils.TEXT_PLAIN_VALUE;
 @ServiceProviderFor({ Renderer.class })
 @ForType(Object.class)
 @NoArgsConstructor @ToString
-public class ObjectRenderer implements AnnotatedRenderer {
+public class DefaultRenderer implements AnnotatedRenderer {
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
         if (! bundle.with(DATA).has(TEXT_PLAIN_VALUE)) {
