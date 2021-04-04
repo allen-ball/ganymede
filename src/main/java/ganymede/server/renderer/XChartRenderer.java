@@ -41,13 +41,13 @@ import static org.knowm.xchart.BitmapEncoder.BitmapFormat.PNG;
 @ServiceProviderFor({ Renderer.class })
 @ForType(Chart.class)
 @NoArgsConstructor @ToString
-public class XChartRenderer extends ImageRenderer {
+public class XChartRenderer implements AnnotatedRenderer {
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
         try {
             var bytes = BitmapEncoder.getBitmapBytes((Chart) object, PNG);
 
-            super.renderTo(bundle, bytes);
+            new ImageRenderer().renderTo(bundle, bytes);
         } catch (IOException exception) {
             exception.printStackTrace(System.err);
         }

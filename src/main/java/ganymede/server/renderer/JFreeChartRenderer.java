@@ -39,7 +39,7 @@ import org.jfree.chart.JFreeChart;
 @ServiceProviderFor({ Renderer.class })
 @ForType(JFreeChart.class)
 @NoArgsConstructor @ToString
-public class JFreeChartRenderer extends ImageRenderer {
+public class JFreeChartRenderer implements AnnotatedRenderer {
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
         try {
@@ -48,7 +48,7 @@ public class JFreeChartRenderer extends ImageRenderer {
             var height = 600;
             var bytes = ChartUtils.encodeAsPNG(chart.createBufferedImage(width, height));
 
-            super.renderTo(bundle, bytes);
+            new ImageRenderer().renderTo(bundle, bytes);
             /*
              * HTML
              *

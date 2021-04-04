@@ -20,7 +20,7 @@ package ganymede.server.renderer;
  * limitations under the License.
  * ##########################################################################
  */
-/* import ball.annotation.ServiceProviderFor; */
+import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.server.Renderer;
 import java.io.ByteArrayInputStream;
@@ -30,15 +30,15 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
- * Abstract image {@link Renderer} base class.  See {@link ImageIO}.
+ * Image {@link Renderer}.  See {@link ImageIO}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-/* @ServiceProviderFor({ Renderer.class }) */
+@ServiceProviderFor({ Renderer.class })
 @ForType(byte[].class)
 @NoArgsConstructor @ToString
-public abstract class ImageRenderer implements AnnotatedRenderer {
+public class ImageRenderer implements AnnotatedRenderer {
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
         var bytes = (byte[]) object;
