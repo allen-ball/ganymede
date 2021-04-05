@@ -21,15 +21,16 @@ package ganymede.server;
  * ##########################################################################
  */
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import ganymede.server.renderer.ForClass;
+import ganymede.server.renderer.ForClassName;
 import ganymede.util.ServiceProviderMap;
 import java.util.Comparator;
-import java.util.Map;
 import java.util.TreeMap;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
- * {@link Renderer} {@link Map}.
+ * {@link Renderer} {@link java.util.Map}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
@@ -60,19 +61,46 @@ public class RendererMap extends TreeMap<Class<?>,Renderer> {
      * @return  {@link.this}
      */
     public RendererMap reload() {
-        var iterator = map.reload().values().iterator();
+        var iterator = map.reload(this::accept).values().iterator();
 
         while (iterator.hasNext()) {
             var renderer = iterator.next();
 
             try {
-                putIfAbsent(renderer.getForType(), renderer);
-            } catch (TypeNotPresentException exception) {
-                iterator.remove();
+                var key = getRenderType(renderer.getClass());
+
+                computeIfAbsent(key, k -> renderer);
+            } catch (Exception exception) {
             }
         }
 
         return this;
+    }
+
+    private boolean accept(Class<?> provider) {
+        boolean accept = true;
+
+        try {
+            getRenderType(provider);
+        } catch (Exception exception) {
+            accept = false;
+        }
+
+        return accept;
+    }
+
+    private Class<?> getRenderType(Class<?> provider) throws Exception {
+        Class<?> type = null;
+
+        if (provider.isAnnotationPresent(ForClassName.class)) {
+            var name = provider.getAnnotation(ForClassName.class).value();
+
+            type = Class.forName(name, false, map.getClassLoader());
+        } else {
+            type = provider.getAnnotation(ForClass.class).value();
+        }
+
+        return type;
     }
 
     /**

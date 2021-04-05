@@ -41,19 +41,10 @@ public interface Renderer {
     public static final Base64.Encoder BASE64_ENCODER = Base64.getEncoder();
 
     /**
-     * Method to get the {@link Class type} {@link.this} {@link Renderer}
-     * provides.
-     *
-     * @return  The {@link Class type}.
-     */
-    public Class<?> getForType();
-
-    /**
      * Method to render an {@link Object} to a {@code mime-bundle}.
      *
      * @param   bundle          The {@link Message} {@code mime-bundle}.
-     * @param   object          The {@link Object} to render (assignable to
-     *                          {@link #getForType()}.
+     * @param   object          The {@link Object} to render.
      */
     public void renderTo(ObjectNode bundle, Object object);
 

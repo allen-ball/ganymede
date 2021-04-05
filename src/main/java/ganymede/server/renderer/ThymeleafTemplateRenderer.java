@@ -34,7 +34,6 @@ import org.thymeleaf.templateresolver.StringTemplateResolver;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.springframework.util.MimeTypeUtils.TEXT_HTML_VALUE;
-import static org.springframework.util.MimeTypeUtils.TEXT_HTML_VALUE;
 import static org.springframework.util.MimeTypeUtils.TEXT_PLAIN_VALUE;
 import static org.springframework.util.MimeTypeUtils.TEXT_XML_VALUE;
 
@@ -45,9 +44,9 @@ import static org.springframework.util.MimeTypeUtils.TEXT_XML_VALUE;
  * @version $Revision$
  */
 @ServiceProviderFor({ Renderer.class })
-@ForType(ThymeleafTemplateRenderer.Output.class)
+@ForClass(ThymeleafTemplateRenderer.Output.class)
 @NoArgsConstructor @ToString
-public class ThymeleafTemplateRenderer implements AnnotatedRenderer {
+public class ThymeleafTemplateRenderer implements Renderer {
     private final TemplateEngine engine = new TemplateEngine();
     private final StringTemplateResolver resolver = new StringTemplateResolver();
 

@@ -36,9 +36,9 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
  * @version $Revision$
  */
 @ServiceProviderFor({ Renderer.class })
-@ForType(JsonNode.class)
+@ForClass(JsonNode.class)
 @NoArgsConstructor @ToString
-public class JsonNodeRenderer implements AnnotatedRenderer {
+public class JsonNodeRenderer implements Renderer {
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
         if (! bundle.with(DATA).has(APPLICATION_JSON_VALUE)) {

@@ -22,10 +22,8 @@ package ganymede.shell.magic;
  */
 import ball.annotation.ServiceProviderFor;
 import ganymede.notebook.NotebookContext;
-import ganymede.server.renderer.ForType;
 import ganymede.shell.Magic;
 import java.util.stream.Stream;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;

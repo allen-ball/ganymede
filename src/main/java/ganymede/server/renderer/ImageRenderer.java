@@ -36,9 +36,9 @@ import lombok.ToString;
  * @version $Revision$
  */
 @ServiceProviderFor({ Renderer.class })
-@ForType(byte[].class)
+@ForClass(byte[].class)
 @NoArgsConstructor @ToString
-public class ImageRenderer implements AnnotatedRenderer {
+public class ImageRenderer implements Renderer {
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
         var bytes = (byte[]) object;

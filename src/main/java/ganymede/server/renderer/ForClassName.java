@@ -20,19 +20,23 @@ package ganymede.server.renderer;
  * limitations under the License.
  * ##########################################################################
  */
-import ganymede.server.Renderer;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * {@link Renderer} annotation services.
+ * {@link ganymede.server.RendererMap} key source
+ * {@link java.lang.annotation.Annotation}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-public interface AnnotatedRenderer extends Renderer {
-    @Override
-    default Class<?> getForType() {
-        ForType annotation = getClass().getAnnotation(ForType.class);
-
-        return (annotation != null) ? annotation.value() : null;
-    }
+@Documented
+@Retention(RUNTIME)
+@Target({ TYPE })
+public @interface ForClassName {
+    String value();
 }

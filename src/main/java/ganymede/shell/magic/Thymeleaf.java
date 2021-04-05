@@ -23,21 +23,14 @@ package ganymede.shell.magic;
 import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.jsr223.ThymeleafScriptEngine;
-import ganymede.notebook.NotebookContext;
-import ganymede.server.Message;
 import ganymede.server.Renderer;
-import ganymede.server.renderer.AnnotatedRenderer;
-import ganymede.server.renderer.ForType;
+import ganymede.server.renderer.ForClass;
 import ganymede.shell.Magic;
-import java.util.stream.Stream;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
 import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.StringTemplateResolver;
 
 import static ganymede.notebook.NotebookMethods.print;
 import static org.springframework.util.MimeTypeUtils.TEXT_HTML_VALUE;
@@ -80,9 +73,9 @@ public class Thymeleaf extends AbstractScriptEngineMagic {
      * {@link Output Output}.
      */
     @ServiceProviderFor({ Renderer.class })
-    @ForType(Output.class)
+    @ForClass(Output.class)
     @NoArgsConstructor @ToString
-    public static class RendererImpl implements AnnotatedRenderer {
+    public static class RendererImpl implements Renderer {
         @Override
         public void renderTo(ObjectNode bundle, Object object) {
             var output = (Output) object;

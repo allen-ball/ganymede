@@ -35,15 +35,14 @@ import org.apache.spark.sql.SparkSession;
  * @version $Revision$
  */
 @ServiceProviderFor({ Renderer.class })
-@ForType(SparkSession.class)
+@ForClassName("org.apache.spark.sql.SparkSession")
 @NoArgsConstructor @ToString
-public class SparkSessionRenderer implements AnnotatedRenderer {
+public class SparkSessionRenderer implements Renderer {
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
         var resource = getClass().getSimpleName() + ".html";
-        var map = Map.<String,Object>of("session", object);
-        var output =
-            new ThymeleafTemplateRenderer.Output(getClass(), resource, "html", map);
+        var map = Map.<String,Object>of("session", (SparkSession) object);
+        var output = new ThymeleafTemplateRenderer.Output(getClass(), resource, "html", map);
 
         MAP.renderTo(bundle, output);
     }

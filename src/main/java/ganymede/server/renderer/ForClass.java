@@ -28,7 +28,7 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * {@link AnnotatedRenderer#getForType()} source
+ * {@link ganymede.server.RendererMap} key source
  * {@link java.lang.annotation.Annotation}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
@@ -37,6 +37,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Retention(RUNTIME)
 @Target({ TYPE })
-public @interface ForType {
+public @interface ForClass {
     Class<?> value();
 }

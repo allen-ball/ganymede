@@ -25,8 +25,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.notebook.NotebookContext;
 import ganymede.server.Message;
 import ganymede.server.Renderer;
-import ganymede.server.renderer.AnnotatedRenderer;
-import ganymede.server.renderer.ForType;
+import ganymede.server.renderer.ForClass;
 import ganymede.shell.Magic;
 import ganymede.shell.Shell;
 import java.io.InputStream;
@@ -40,9 +39,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
-import static ganymede.server.Server.OBJECT_MAPPER;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toMap;
 import static org.springframework.util.MimeTypeUtils.TEXT_HTML_VALUE;
 
 /**
@@ -94,9 +90,9 @@ public class Magics extends AbstractMagic {
      * Customized {@link Renderer} for {@link Magics} {@link Output Output}.
      */
     @ServiceProviderFor({ Renderer.class })
-    @ForType(Output.class)
+    @ForClass(Output.class)
     @NoArgsConstructor @ToString
-    public static class RendererImpl implements AnnotatedRenderer {
+    public static class RendererImpl implements Renderer {
         @Override
         public void renderTo(ObjectNode bundle, Object object) {
             var output = (Output) object;

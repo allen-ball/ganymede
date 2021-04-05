@@ -35,15 +35,14 @@ import org.apache.spark.sql.Dataset;
  * @version $Revision$
  */
 @ServiceProviderFor({ Renderer.class })
-@ForType(Dataset.class)
+@ForClassName("org.apache.spark.sql.Dataset")
 @NoArgsConstructor @ToString
-public class SparkDatasetRenderer implements AnnotatedRenderer {
+public class SparkDatasetRenderer implements Renderer {
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
         var resource = getClass().getSimpleName() + ".html";
-        var map = Map.<String,Object>of("dataset", object, "view", 50);
-        var output =
-            new ThymeleafTemplateRenderer.Output(getClass(), resource, "html", map);
+        var map = Map.<String,Object>of("dataset", (Dataset) object, "view", 50);
+        var output = new ThymeleafTemplateRenderer.Output(getClass(), resource, "html", map);
 
         MAP.renderTo(bundle, output);
     }

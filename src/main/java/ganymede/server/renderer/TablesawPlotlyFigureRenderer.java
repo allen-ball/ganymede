@@ -37,15 +37,14 @@ import tech.tablesaw.plotly.components.Figure;
  * @version $Revision$
  */
 @ServiceProviderFor({ Renderer.class })
-@ForType(Figure.class)
+@ForClassName("tech.tablesaw.plotly.components.Figure")
 @NoArgsConstructor @ToString
-public class TablesawPlotlyFigureRenderer implements AnnotatedRenderer {
+public class TablesawPlotlyFigureRenderer implements Renderer {
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
         var resource = getClass().getSimpleName() + ".html";
-        var map = Map.<String,Object>of("figure", object);
-        var output =
-            new ThymeleafTemplateRenderer.Output(getClass(), resource, "html", map);
+        var map = Map.<String,Object>of("figure", (Figure) object);
+        var output = new ThymeleafTemplateRenderer.Output(getClass(), resource, "html", map);
 
         MAP.renderTo(bundle, output);
     }

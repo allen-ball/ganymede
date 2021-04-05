@@ -35,9 +35,9 @@ import static org.springframework.util.MimeTypeUtils.TEXT_PLAIN_VALUE;
  * @version $Revision$
  */
 @ServiceProviderFor({ Renderer.class })
-@ForType(Object.class)
+@ForClass(Object.class)
 @NoArgsConstructor @ToString
-public class DefaultRenderer implements AnnotatedRenderer {
+public class DefaultRenderer implements Renderer {
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
         if (! bundle.with(DATA).has(TEXT_PLAIN_VALUE)) {

@@ -33,15 +33,16 @@ import static org.knowm.xchart.BitmapEncoder.BitmapFormat.PNG;
 
 /**
  * {@link.uri https://github.com/knowm/XChart target=newtab XChart}
- * {@link Renderer} service provider.  See {@link BitmapEncoder}.
+ * {@link Chart} {@link Renderer} service provider.  See
+ * {@link BitmapEncoder}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
 @ServiceProviderFor({ Renderer.class })
-@ForType(Chart.class)
+@ForClassName("org.knowm.xchart.internal.chartpart.Chart")
 @NoArgsConstructor @ToString
-public class XChartRenderer implements AnnotatedRenderer {
+public class XChartRenderer implements Renderer {
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
         try {

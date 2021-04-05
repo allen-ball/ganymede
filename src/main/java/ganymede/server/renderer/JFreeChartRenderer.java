@@ -31,15 +31,18 @@ import org.jfree.chart.JFreeChart;
 
 /**
  * {@link.uri https://github.com/jfree/jfreechart target=newtab JFreeChart}
- * {@link Renderer} service provider.  See {@link ChartUtils}.
+ * {@link Renderer} service provider.
+ *
+ * @see JFreeChart
+ * @see ChartUtils
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
 @ServiceProviderFor({ Renderer.class })
-@ForType(JFreeChart.class)
+@ForClassName("org.jfree.chart.JFreeChart")
 @NoArgsConstructor @ToString
-public class JFreeChartRenderer implements AnnotatedRenderer {
+public class JFreeChartRenderer implements Renderer {
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
         try {
