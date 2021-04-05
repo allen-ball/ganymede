@@ -1,3 +1,8 @@
+2021-04-05  Allen D. Ball  <ball@hcf.dev>
+
+	* src/main/java/ganymede/util/ServiceProviderMap.java:
+	Added getClassLoader() and reload(Predicate<Class<?>>) methods.
+
 2021-04-01  Allen D. Ball  <ball@hcf.dev>
 
 	* src/main/java/ganymede/dependency/Resolver.java;

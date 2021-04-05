@@ -24,6 +24,7 @@ import java.util.Comparator;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toList;
 
@@ -36,8 +37,9 @@ import static java.util.stream.Collectors.toList;
  * @version $Revision$
  */
 public class ServiceProviderMap<T> extends TreeMap<Class<? extends T>,T> {
-    private static final long serialVersionUID = 3185134891562929754L;
+    private static final long serialVersionUID = 1150156295503292563L;
 
+    /** @serial */ private final Class<T> service;
     /** @serial */ private final ServiceLoader<T> loader;
 
     /**
@@ -48,10 +50,18 @@ public class ServiceProviderMap<T> extends TreeMap<Class<? extends T>,T> {
     public ServiceProviderMap(Class<T> service) {
         super(Comparator.comparing(Class::getName));
 
-        loader = ServiceLoader.load(service, service.getClassLoader());
+        this.service = service;
+        this.loader = ServiceLoader.load(service, service.getClassLoader());
 
         reload();
     }
+
+    /**
+     * Method to get the {@link ServiceLoader}'s {@link ClassLoader}.
+     *
+     * @return  The {@link ServiceLoader}'s {@link ClassLoader}.
+     */
+    public ClassLoader getClassLoader() { return service.getClassLoader(); }
 
     /**
      * Reload {@link ServiceLoader} and {@link #put(Object,Object)} newly
@@ -59,17 +69,33 @@ public class ServiceProviderMap<T> extends TreeMap<Class<? extends T>,T> {
      *
      * @return  {@link.this}
      */
-    public ServiceProviderMap<T> reload() {
+    public ServiceProviderMap<T> reload() { return reload(t -> true); }
+
+    /**
+     * Reload {@link ServiceLoader} and {@link #put(Object,Object)} newly
+     * discovered entries.  A {@link Predicate} may be supplied to test a
+     * provider {@link Class} before attempting to load and might be used to
+     * test that other required {@link Class}es are loaded before attempting
+     * to load.
+     *
+     * @param   predicate       A {@link Predicate} to test whether or not
+     *                          the provider {@link Class} should be
+     *                          loaded.
+     *
+     * @return  {@link.this}
+     */
+    public ServiceProviderMap<T> reload(Predicate<Class<?>> predicate) {
         loader.reload();
 
-        var providers =
-            loader.stream()
-            .filter(t -> (! containsKey(t.type())))
-            .collect(toList());
+        var providers = loader.stream().collect(toList());
 
         for (var provider : providers) {
             try {
-                put(provider.type(), provider.get());
+                var type = provider.type();
+
+                if (predicate.test(type)) {
+                    computeIfAbsent(type, k -> provider.get());
+                }
             } catch (ServiceConfigurationError error) {
             }
         }
