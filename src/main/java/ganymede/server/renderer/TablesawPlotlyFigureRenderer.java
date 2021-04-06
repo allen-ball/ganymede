@@ -44,7 +44,7 @@ public class TablesawPlotlyFigureRenderer implements Renderer {
     public void renderTo(ObjectNode bundle, Object object) {
         var resource = getClass().getSimpleName() + ".html";
         var map = Map.<String,Object>of("figure", (Figure) object);
-        var output = new ThymeleafTemplateRenderer.Output(getClass(), resource, "html", map);
+        var output = ThymeleafRenderer.process(getClass(), resource, "html", map);
 
         MAP.renderTo(bundle, output);
     }

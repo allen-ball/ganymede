@@ -23,19 +23,13 @@ package ganymede.shell.magic;
 import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.jsr223.ThymeleafScriptEngine;
-import ganymede.server.Renderer;
-import ganymede.server.renderer.ForClass;
+import ganymede.server.renderer.ThymeleafRenderer;
 import ganymede.shell.Magic;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
-import org.thymeleaf.templatemode.TemplateMode;
 
 import static ganymede.notebook.NotebookFunctions.print;
-import static org.springframework.util.MimeTypeUtils.TEXT_HTML_VALUE;
-import static org.springframework.util.MimeTypeUtils.TEXT_PLAIN_VALUE;
-import static org.springframework.util.MimeTypeUtils.TEXT_XML_VALUE;
 
 /**
  * {@link Thymeleaf} template {@link Magic}.
@@ -51,71 +45,8 @@ public class Thymeleaf extends AbstractScriptEngineMagic {
     @Override
     protected void render(Object object) {
         var engine = (ThymeleafScriptEngine) engine();
-        var resolver = engine.getResolver();
+        var mode = engine.getResolver().getTemplateMode();
 
-        print(new Output(resolver.getTemplateMode(), String.valueOf(object)));
-    }
-
-    /**
-     * Customized {@link Output Output} for {@link Thymeleaf}
-     * {@link RendererImpl Renderer}.
-     *
-     * {@bean.info}
-     */
-    @Data
-    public static class Output {
-        private final TemplateMode templateMode;
-        private final String output;
-    }
-
-    /**
-     * Customized {@link Renderer} for {@link Thymeleaf}
-     * {@link Output Output}.
-     */
-    @ServiceProviderFor({ Renderer.class })
-    @ForClass(Output.class)
-    @NoArgsConstructor @ToString
-    public static class RendererImpl implements Renderer {
-        @Override
-        public void renderTo(ObjectNode bundle, Object object) {
-            var output = (Output) object;
-            var mimeType = TEXT_PLAIN_VALUE;
-
-            switch (output.getTemplateMode()) {
-            case CSS:
-                mimeType = "text/css";
-                break;
-
-            case HTML:
-            case HTML5:
-            case LEGACYHTML5:
-            case VALIDXHTML:
-            case XHTML:
-                mimeType = TEXT_HTML_VALUE;
-                break;
-
-            case JAVASCRIPT:
-                mimeType = "text/javascript";
-                break;
-
-            case VALIDXML:
-            case XML:
-                mimeType = TEXT_XML_VALUE;
-                break;
-
-            default:
-                break;
-            }
-
-            if (! bundle.with(DATA).has(mimeType)) {
-                bundle.with(DATA)
-                    .put(mimeType, output.getOutput());
-            }
-
-            if (! bundle.with(DATA).has(TEXT_PLAIN_VALUE)) {
-                bundle.with(DATA)
-                    .put(TEXT_PLAIN_VALUE, String.format("[%s]", mimeType));
-            }
-        }
+        print(new ThymeleafRenderer.Output(mode, String.valueOf(object)));
     }
 }

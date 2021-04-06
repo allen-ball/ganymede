@@ -24,12 +24,14 @@ import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.server.Renderer;
 import java.util.Map;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StreamUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.StringTemplateResolver;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -44,21 +46,57 @@ import static org.springframework.util.MimeTypeUtils.TEXT_XML_VALUE;
  * @version $Revision$
  */
 @ServiceProviderFor({ Renderer.class })
-@ForClass(ThymeleafTemplateRenderer.Output.class)
+@ForClass(ThymeleafRenderer.Output.class)
 @NoArgsConstructor @ToString
-public class ThymeleafTemplateRenderer implements Renderer {
-    private final TemplateEngine engine = new TemplateEngine();
-    private final StringTemplateResolver resolver = new StringTemplateResolver();
+public class ThymeleafRenderer implements Renderer {
+    private static final StringTemplateResolver RESOLVER;
+    private static final TemplateEngine ENGINE;
 
-    { engine.setTemplateResolver(resolver); }
+    static {
+        RESOLVER = new StringTemplateResolver();
+
+        ENGINE = new TemplateEngine();
+        ENGINE.setTemplateResolver(RESOLVER);
+    }
+
+    /**
+     * Method to evaluate a template from a {@link String}.
+     *
+     * @param template      The template {@link String}.
+     * @param mode          The template resolver mode.
+     * @param map           The {@link Context} name-value pairs.
+     *
+     * @return  The {@link Output} to be renderered.
+     */
+    public static Output process(String template, String mode, Map<String,Object> map) {
+        RESOLVER.setTemplateMode(mode);
+
+        return new Output(RESOLVER.getTemplateMode(),
+                          ENGINE.process(template, new Context(null, map)));
+    }
+
+    /**
+     * Method to evaluate a template from a resource.
+     *
+     * @param type          The {@link Class} to search relative for the
+     *                      resource.
+     * @param name          The template resource name.
+     * @param mode          The template resolver mode.
+     * @param map           The {@link Context} name-value pairs.
+     *
+     * @return  The {@link Output} to be renderered.
+     */
+    public static Output process(Class<?> type, String name, String mode, Map<String,Object> map) {
+        return process(getResourceAsString(type, name), mode, map);
+    }
 
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
         var output = (Output) object;
-        var string = output.process(engine, resolver);
+        var string = output.getOutput();
         var mimeType = TEXT_PLAIN_VALUE;
 
-        switch (resolver.getTemplateMode()) {
+        switch (output.getTemplateMode()) {
         case CSS:
             mimeType = "text/css";
             break;
@@ -87,58 +125,30 @@ public class ThymeleafTemplateRenderer implements Renderer {
         if (! bundle.with(DATA).has(mimeType)) {
             bundle.with(DATA).put(mimeType, string);
         }
+/*
+        if (! bundle.with(DATA).has(TEXT_PLAIN_VALUE)) {
+            bundle.with(DATA)
+                .put(TEXT_PLAIN_VALUE, String.format("[%s]", mimeType));
+        }
+*/
+    }
+
+    private static String getResourceAsString(Class<?> type, String name) {
+        try (var in = new ClassPathResource(name, type).getInputStream()) {
+            return StreamUtils.copyToString(in, UTF_8);
+        } catch (Exception exception) {
+            throw new ExceptionInInitializerError(exception);
+        }
     }
 
     /**
-     * Customized {@link Output Output} for
-     * {@link ThymeleafTemplateRenderer}.
+     * Customized {@link Output Output} for {@link ThymeleafRenderer}.
      *
      * {@bean.info}
      */
-    @ToString
+    @Data
     public static class Output {
-        private final String template;
-        private final String mode;
-        private final Context context;
-
-        /**
-         * Constructor to load a template from a {@link String}.
-         *
-         * @param template      The template {@link String}.
-         * @param mode          The template resolver mode.
-         * @param map           The {@link Context} name-value pairs.
-         */
-        public Output(String template, String mode, Map<String,Object> map) {
-            this.template = template;
-            this.mode = mode;
-            this.context = new Context(null, map);
-        }
-
-        /**
-         * Constructor to load a template from a resource.
-         *
-         * @param type          The {@link Class} to search relative for the
-         *                      resource.
-         * @param name          The template resource name.
-         * @param mode          The template resolver mode.
-         * @param map           The {@link Context} name-value pairs.
-         */
-        public Output(Class<?> type, String name, String mode, Map<String,Object> map) {
-            this(getResourceAsString(type, name), mode, map);
-        }
-
-        private String process(TemplateEngine engine, StringTemplateResolver resolver) {
-            resolver.setTemplateMode(mode);
-
-            return engine.process(template, context);
-        }
-
-        private static String getResourceAsString(Class<?> type, String name) {
-            try (var in = new ClassPathResource(name, type).getInputStream()) {
-                return StreamUtils.copyToString(in, UTF_8);
-            } catch (Exception exception) {
-                throw new ExceptionInInitializerError(exception);
-            }
-        }
+        private final TemplateMode templateMode;
+        private final String output;
     }
 }
