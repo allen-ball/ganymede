@@ -41,11 +41,17 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 public class JsonNodeRenderer implements Renderer {
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
+        var node = (JsonNode) object;
+
         if (! bundle.with(DATA).has(APPLICATION_JSON_VALUE)) {
             bundle.with(DATA)
-                .set(APPLICATION_JSON_VALUE, (JsonNode) object);
+                .set(APPLICATION_JSON_VALUE, node);
             bundle.with(METADATA).with(APPLICATION_JSON_VALUE)
                 .put("expanded", true);
+        }
+
+        if (node != null) {
+            MAP.renderTo(bundle, node.toPrettyString());
         }
     }
 }

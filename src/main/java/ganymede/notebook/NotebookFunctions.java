@@ -20,21 +20,23 @@ package ganymede.notebook;
  * limitations under the License.
  * ##########################################################################
  */
+import com.fasterxml.jackson.databind.JsonNode;
 import ganymede.kernel.KernelRestClient;
 import ganymede.server.Message;
 import lombok.NoArgsConstructor;
 
+import static ganymede.server.Server.OBJECT_MAPPER;
 import static lombok.AccessLevel.PRIVATE;
 
 /**
- * Methods available in Notebook cells.  {@code public static} methods are
+ * Functions available in Notebook cells.  {@code public static} methods are
  * linked into the {@link jdk.jshell.JShell} environment.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
 @NoArgsConstructor(access = PRIVATE)
-public abstract class NotebookMethods {
+public abstract class NotebookFunctions {
 
     /**
      * Method to display from a Notebook cell.
@@ -62,5 +64,17 @@ public abstract class NotebookMethods {
             System.out.println(object);
             exception.printStackTrace(System.err);
         }
+    }
+
+    /**
+     * Function to convert an {@link Object} to {@link JsonNode JSON}
+     * representation.
+     *
+     * @param   object          The {@link Object} to convert.
+     *
+     * @return  The {@link JsonNode} representation.
+     */
+    public static JsonNode asJson(Object object) {
+        return OBJECT_MAPPER.valueToTree(object);
     }
 }

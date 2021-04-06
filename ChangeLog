@@ -1,5 +1,8 @@
 2021-04-05  Allen D. Ball  <ball@hcf.dev>
 
+	* src/main/java/ganymede/notebook/NotebookFunctions.java:
+	Added asJson(Object) function.
+
 	* Refactored Renderer hierarchy.  Replaced @ForType with @ForClass
 	and @ForClassName (the latter used to identify classes that may
 	not be available).  Moved RendererMap key calculation to

@@ -76,7 +76,7 @@ public class Notebook {
             String.format("var __ = %s.newNotebookContext();\n",
                           Notebook.class.getCanonicalName());
 
-        for (var method : NotebookMethods.class.getDeclaredMethods()) {
+        for (var method : NotebookFunctions.class.getDeclaredMethods()) {
             var modifiers = method.getModifiers();
 
             if (isPublic(modifiers) && isStatic(modifiers)) {

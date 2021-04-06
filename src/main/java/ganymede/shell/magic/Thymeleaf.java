@@ -32,7 +32,7 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.thymeleaf.templatemode.TemplateMode;
 
-import static ganymede.notebook.NotebookMethods.print;
+import static ganymede.notebook.NotebookFunctions.print;
 import static org.springframework.util.MimeTypeUtils.TEXT_HTML_VALUE;
 import static org.springframework.util.MimeTypeUtils.TEXT_PLAIN_VALUE;
 import static org.springframework.util.MimeTypeUtils.TEXT_XML_VALUE;
