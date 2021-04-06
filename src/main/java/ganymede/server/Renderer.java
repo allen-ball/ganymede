@@ -58,13 +58,14 @@ public interface Renderer {
      * {@link Message#execute_result(int,ObjectNode)}.
      *
      * @param   object          The {@link Object} to encode.
+     * @param   alternates      Optional alternate representations.
      *
      * @return  The {@link Message} {@code mime-bundle}.
      */
-    public static ObjectNode render(Object object) {
+    public static ObjectNode render(Object object, Object... alternates) {
         var bundle = OBJECT_MAPPER.createObjectNode();
 
-        MAP.renderTo(bundle, object);
+        MAP.renderTo(bundle, object, alternates);
 
         return bundle;
     }

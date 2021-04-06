@@ -1,5 +1,8 @@
 2021-04-06  Allen D. Ball  <ball@hcf.dev>
 
+	* Change Renderer.render(Object) interface to
+	render(Object,Object...) to accept alternate representations.
+
 	* src/main/java/ganymede/server/renderer/ThymeleafRenderer.java,
 	src/main/java/ganymede/shell/magic/Thymeleaf.java:
 	Combined Renederer implementations into single ThymeleafRenderer.

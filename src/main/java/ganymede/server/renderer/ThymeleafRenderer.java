@@ -125,12 +125,6 @@ public class ThymeleafRenderer implements Renderer {
         if (! bundle.with(DATA).has(mimeType)) {
             bundle.with(DATA).put(mimeType, string);
         }
-/*
-        if (! bundle.with(DATA).has(TEXT_PLAIN_VALUE)) {
-            bundle.with(DATA)
-                .put(TEXT_PLAIN_VALUE, String.format("[%s]", mimeType));
-        }
-*/
     }
 
     private static String getResourceAsString(Class<?> type, String name) {

@@ -25,6 +25,7 @@ import ganymede.server.renderer.ForClass;
 import ganymede.server.renderer.ForClassName;
 import ganymede.util.ServiceProviderMap;
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.TreeMap;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -36,7 +37,7 @@ import lombok.ToString;
  * @version $Revision$
  */
 public class RendererMap extends TreeMap<Class<?>,Renderer> {
-    private static final long serialVersionUID = 7453791310490166660L;
+    private static final long serialVersionUID = 5660512908511151101L;
 
     private static final Comparator<Class<?>> COMPARATOR =
         new IsAssignableFromOrder().thenComparing(Class::getName);
@@ -108,13 +109,31 @@ public class RendererMap extends TreeMap<Class<?>,Renderer> {
      *
      * @param   bundle          The {@code mime-bundle}.
      * @param   object          The {@link Object} to render.
+     * @param   alternates      Optional alternate representations.
      */
-    public void renderTo(ObjectNode bundle, Object object) {
+    public void renderTo(ObjectNode bundle, Object object, Object... alternates) {
         var type = (object != null) ? object.getClass() : Object.class;
 
-        reload().entrySet().stream()
+        reload().find(type).ifPresent(t -> t.renderTo(bundle, object));
+
+        if (alternates != null) {
+            for (var alternate : alternates) {
+                if (alternate != null) {
+                    find(alternate.getClass())
+                        .ifPresent(t -> t.renderTo(bundle, alternate));
+                }
+            }
+        }
+    }
+
+    private Optional<Renderer> find(Class<?> type) {
+        var value =
+            entrySet().stream()
             .filter(t -> t.getKey().isAssignableFrom(type))
-            .forEach(t -> t.getValue().renderTo(bundle, object));
+            .map(t -> t.getValue())
+            .findFirst();
+
+        return value;
     }
 
     @NoArgsConstructor @ToString
