@@ -1,24 +1,30 @@
-Ganymede Kernel 1.0.0-SNAPSHOT
-==============================
+# Ganymede Kernel 1.0.0-SNAPSHOT
 
-The [Ganymede Kernel] is a [Jupyter Notebook] Java
-[kernel](https://jupyter-client.readthedocs.io/en/stable/kernels.html).
+The [Ganymede Kernel] is a [Jupyter Notebook] Java [kernel][Jupyter Kernel].
 Java code is compiled and interpreted with the Java Shell tool, [JShell].
 This kernel offers the following additional features:
 
-  * Integrated Project Object Model (POM) for [Apache Maven] artifact
+* Integrated Project Object Model (POM) for [Apache Maven] artifact
     dependency resolution<sup id="ref1">[1](#endnote1)</sup>
 
-  * Support for [Apache Spark] integration
+* Integrated support for [JSR 223] scripting languages including:
+
+    * [Groovy]
+    * [Javascript]<sup id="ref2">[2](#endnote2)</sup>
+    * [Kotlin]
+
+* Templates (via [Thymeleaf])
+
+* Support for [Apache Spark] and [Scala] binary distributions
 
 
-Installation
-------------
+## Installation
+
 The [Ganymede Kernel] is distributed in a single JAR.
 
-The [Jupyter Notebook] must be installed first and the `jupyter` and
-`python` commands must be on the `${PATH}`.  Then the typical (and minimal)
-installation command line:
+Java 11 or later is required.  In addition to Java, the [Jupyter Notebook]
+must be installed first and the `jupyter` and `python` commands must be on
+the `${PATH}`.  Then the typical (and minimal) installation command line:
 
 ```bash
 $ java -jar ganymede-kernel-1.0.0-SNAPSHOT.jar --install
@@ -91,7 +97,7 @@ The [Ganymede Kernel] makes extensive use of templates and POM fragments.
 While not strictly required, the authors suggest that the
 [Hide Input](https://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/hide_input/readme.html)
 is enabled so notebook authors can hide the input templates and POMs for any
-finished product.  This may be done from the command line with:
+finished product.  This may be set from the command line with:
 
 ```bash
 $ jupyter nbextension enable hide_input/main --sys-prefix
@@ -100,27 +106,47 @@ $ jupyter nbextension enable hide_input/main --sys-prefix
 (or `--user` as appropriate).
 
 
-Features and Usage
-------------------
+## Features and Usage
+
+The following subsections outline many of the features of the kernel.
 
 
-Documentation
--------------
+### Java
 
 
-License
--------
+### Magics
+
+
+### Other Interpreted Laguages
+
+
+### Shells
+
+
+### Templates
+
+
+### Dependency and Classpath Management
+
+
+## Documentation
+
+
+## License
 
 Ganymede Kernel is released under the
 [Apache License][Apache License, Version 2.0].
 
 
-Endnotes
---------
+## Endnotes
 
 <b id="endnote1">[1]</b>
 Implemented with [Apache Maven Artifact Resolver].
 [↩](#ref1)
+
+<b id="endnote2">[2]</b>
+With the built-in Oracle Nashorn engine.
+[↩](#ref2)
 
 [Ganymede Kernel]: https://github.com/allen-ball/ganymede-kernel
 
@@ -132,5 +158,20 @@ Implemented with [Apache Maven Artifact Resolver].
 
 [Apache Spark]: http://spark.apache.org/
 
+[Groovy]: https://groovy-lang.org/
+
+[Javascript]: https://www.oracle.com/technical-resources/articles/java/jf14-nashorn.html
+
 [JShell]: https://docs.oracle.com/en/java/javase/11/docs/api/jdk.jshell/jdk/jshell/JShell.html?is-external=true
+
+[JSR 223]: https://jcp.org/en/jsr/detail?id=223
+
 [Jupyter Notebook]: https://jupyter-notebook.readthedocs.io/en/stable/index.html
+
+[Jupyter Kernel]: https://jupyter-client.readthedocs.io/en/stable/kernels.html
+
+[Kotlin]: https://kotlinlang.org/
+
+[Scala]: https://www.scala-lang.org/
+
+[Thymeleaf]: https://www.thymeleaf.org/index.html
