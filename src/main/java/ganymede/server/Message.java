@@ -488,11 +488,12 @@ public class Message {
      * {@link Message} {@code mime-bundle}.
      *
      * @param   object          The {@link Object} to encode.
+     * @param   alternates      Optional alternate representations.
      *
      * @return  The {@link Message} {@code mime-bundle}.
      */
-    public static ObjectNode mime_bundle(Object object) {
-        return Renderer.render(object);
+    public static ObjectNode mime_bundle(Object object, Object... alternates) {
+        return Renderer.render(object, alternates);
     }
 
     private static String getCallingMethodName(int skip) {

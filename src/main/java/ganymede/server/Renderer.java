@@ -26,7 +26,7 @@ import java.util.Base64;
 import static ganymede.server.Server.OBJECT_MAPPER;
 
 /**
- * {@link Message#mime_bundle(Object)} output {@link Renderer}.
+ * {@link Message#mime_bundle(Object,Object...)} output {@link Renderer}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
@@ -49,7 +49,8 @@ public interface Renderer {
     public void renderTo(ObjectNode bundle, Object object);
 
     /**
-     * Static {@link RendererMap} instance used by {@link #render(Object)}.
+     * Static {@link RendererMap} instance used by
+     * {@link #render(Object,Object...)}.
      */
     public static RendererMap MAP = new RendererMap();
 
