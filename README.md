@@ -20,7 +20,7 @@ This kernel offers the following additional features:
 
 ## Installation
 
-The [Ganymede Kernel] is distributed in a single JAR.
+The [Ganymede Kernel] is distributed as a single JAR.
 
 Java 11 or later is required.  In addition to Java, the [Jupyter Notebook]
 must be installed first and the `jupyter` and `python` commands must be on
@@ -30,9 +30,9 @@ the `${PATH}`.  Then the typical (and minimal) installation command line:
 $ java -jar ganymede-kernel-1.0.0-SNAPSHOT.jar --install
 ```
 
-The kernel will be configured to use the same `java` installation as invoked
-in the install command above.  These additional command line options are
-supported.
+The [kernel][Ganymede Kernel] will be configured to use the same `java`
+installation as invoked in the install command above.  These additional
+command line options are supported.
 
 | Option                               | Action                                                                                    | Default                                                  |
 | ---                                  | ---                                                                                       | ---                                                      |
@@ -93,11 +93,11 @@ kernelspec:
 }
 ```
 
-The [Ganymede Kernel] makes extensive use of templates and POM fragments.
-While not strictly required, the authors suggest that the
-[Hide Input](https://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/hide_input/readme.html)
-is enabled so notebook authors can hide the input templates and POMs for any
-finished product.  This may be set from the command line with:
+The [kernel][Ganymede Kernel] makes extensive use of templates and POM
+fragments.  While not strictly required, the authors suggest that the
+[Hide Input] extension is enabled so notebook authors can hide the input
+templates and POMs for any finished product.  This may be set from the
+command line with:
 
 ```bash
 $ jupyter nbextension enable hide_input/main --sys-prefix
@@ -108,25 +108,280 @@ $ jupyter nbextension enable hide_input/main --sys-prefix
 
 ## Features and Usage
 
-The following subsections outline many of the features of the kernel.
+The following subsections outline many of the features of the
+[kernel][Ganymede Kernel].
 
 
 ### Java
 
+The Java REPL is [JShell] and has all the Java features of the installed
+JVM.  The minimum required Java version is 11 and subsequent versions are
+supported.
+
+The [JShell] environment includes builtin functions implemented through
+methods that wrap the `public static` methods defined in the
+[NotebookFunctions] class.  These functions include:
+
+| Method          | Description                            |
+| ---             | ---                                    |
+| print(Object)   | Render the Object to a Notebook format |
+| display(Object) | Render the Object to a Notebook format |
+| toJson(Object)  | Convert argument to JsonNode           |
+
+The builtin functions are mostly concerned with "printing" or displaying
+(rendering) Objects to multimedia formats.  For example, `print(byte[])`
+will render the byte array as an image.  Integrated renderers for chart and
+plot objects include:
+
+* [JFreeChart]
+
+* [Tablesaw] (wrapping [Plotly])
+
+* [XChart]
+
+The [sine.ipynb] notebook demonstrates rendering of an [XChart].
+
 
 ### Magics
 
+Cell magic commands are identified by `%%` starting the first line of a code
+cell.  The list of available magic commands is shown below.  The default
+cell magic is `java`.
 
-### Other Interpreted Laguages
+<div>
+  <table border="1" class="magics">
+    <thead>
+      <tr ><th>Name(s)</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>!, script</td><td>Execute script with the argument command</td>
+      </tr>
+      <tr>
+        <td>bash</td><td>Execute script with &#39;bash&#39; command</td>
+      </tr>
+      <tr>
+        <td>classpath</td><td>Add to or print JShell classpath</td>
+      </tr>
+      <tr>
+        <td>env</td><td>Add/Update or print the environment</td>
+      </tr>
+      <tr>
+        <td>groovy</td><td>Execute code in groovy REPL</td>
+      </tr>
+      <tr>
+        <td>html</td><td>HTML template evaluator</td>
+      </tr>
+      <tr>
+        <td>java</td><td>Execute code in Java REPL</td>
+      </tr>
+      <tr>
+        <td>javascript, js</td><td>Execute code in javascript REPL</td>
+      </tr>
+      <tr>
+        <td>kotlin</td><td>Execute code in kotlin REPL</td>
+      </tr>
+      <tr>
+        <td>magics</td><td>Lists available cell magics</td>
+      </tr>
+      <tr>
+        <td>perl</td><td>Execute script with &#39;perl&#39; command</td>
+      </tr>
+      <tr>
+        <td>pom</td><td>Define the Notebook&#39;s Project Object Model</td>
+      </tr>
+      <tr>
+        <td>ruby</td><td>Execute script with &#39;ruby&#39; command</td>
+      </tr>
+      <tr>
+        <td>scala</td><td>Execute code in scala REPL</td>
+      </tr>
+      <tr>
+        <td>sh</td><td>Execute script with &#39;sh&#39; command</td>
+      </tr>
+      <tr>
+        <td>thymeleaf</td><td>Thymeleaf template evaluator</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+`script`, `bash`, `perl`, etc. are executed by creating a [Process]
+instance.  [`groovy`][Groovy], [`javascript`][Javascript],
+[`kotlin`][Kotlin], etc. are provided through their respective [JSR 223]
+interfaces.<sup id="ref3">[3](#endnote3)</sup>  Dependency and classpath
+management are provided with the `classpath` and `pom` magics and are
+described in detail in a subsequent subsection.  `thymeleaf` and `html`
+provide [Thymeleaf] template evaluation.
+
+The [kernel][Ganymede Kernel] does not implement any "line" magics.
+
+
+### Dependency and Classpath Management
+
+The `classpath` magic adds JAR and directory paths to the [JShell]
+classpath.  The `pom` magic resolves and downloads [Maven][Apache Maven]
+artifacts and then adds those artifacts to the classpath.
+
+The [sine.ipynb] notebook demonstrates the use of the `pom` magic to resolve
+the `org.knowm.xchart:xchart:3.8.0` artifact and its transient dependencies.
+
+```yaml
+%%pom
+dependencies:
+- org.knowm.xchart:xchart:3.8.0
+```
+
+The POM is expressed in [YAML] and repositories and dependencies may be
+expressed.  The Notebook's POM may be split across multiple cells since each
+repository and dependency is added or merged and dependency resolution is
+attempted whenever a `pom` cell is executed.  The default/initial Notebook
+POM is:
+
+```yaml
+repositories:
+  - id: central
+    layout: default
+    url: https://repo1.maven.org/maven2
+    snapshots:
+      enabled: false
+```
+
+Dependencies may either be expressed in "expanded" YAML or in
+`groupId:artifactId[:extension]:version` format:
+
+```yaml
+dependencies:
+  - groupId: groupA
+    artifactId: groupAartifact1
+    version: 1.0
+  - groupB:groupB-artifact2:2.0
+```
+
+The specific attributes for repositories and dependencies are defined by the
+[Apache Maven Artifact Resolver] classes [RemoteRepository] (with
+[RepositoryPolicy]) and [Dependency].  (Note that these classes are slightly
+different than their [Maven][Apache Maven] settings counterparts.)
+
+Whenever a JAR is added to the classpath, it is analyzed to determine if its
+[Maven coordinates] can be determined and, if they can be determined, the
+JAR is added as an artifact to the
+[resolver][Apache Maven Artifact Resolver].  The following checks are made
+before adding the JAR to the [JShell] classpath:
+
+1. It is a new, unique path
+
+2. No previously resolved artifact with the same `groupId:artifactId` on the
+   classpath
+
+3. Special heuristics for logging configuration:
+
+    a. Ignore `commons-logging:commons-logging:jar`
+
+    b. Only allow one of `org.slf4j:jcl-over-slf4j:jar` or
+    `org.springframework:spring-jcl:jar` to be configured
+
+    c. Only allow one of `org.slf4j:slf4j-log4j12:jar` and
+    `ch.qos.logback:logback-classic:jar` to be configured
+
+Artifacts that fail any of the above checks will be (mostly silently)
+ignored.  Because only the first version of a resolved artifact is ever
+added to the classpath, the [kernel][Ganymede Kernel] must be restarted if a
+different version of the same artifact is specified for the change to take
+effect.
+
+Finally, the [kernel][Ganymede Kernel] provides special processing to add
+artifacts from [Apache Spark] binary distributions.  The dependencies for
+[Spark SQL][Apache Spark SQL] and corresponding [Scala] compiler artifacts
+for currently available Spark binary distributions as resources.  The kernel
+searches the `${SPARK_HOME}` for JARs for which it has the corresponding
+dependencies and then resolves the dependencies from the `${SPARK_HOME}`
+hierarchy with the heuristics described above.
+
+
+### Other Laguages ([JSR 223])
+
+The [kernel][Ganymede Kernel] leverages the [java.scripting API] to provide
+[`groovy`][Groovy], [`javascript`][Javascript], [`kotlin`][Kotlin], and
+[`scala`][Scala].<sup id="ref4">[4](#endnote4)</sup>
 
 
 ### Shells
 
+The `script` magic (with the alias `!`) maybe used to run an operating
+system command with the remaining code in the cell fed to the [Process]'s
+standard input.  `bash`, `perl`, `ruby`, and `sh` are provided as aliases
+for `%%!bash`, `%%!perl`, etc., respectively.
+
 
 ### Templates
 
+The template magics `thymeleaf` and `html` offer templating with
+[Thymeleaf].  All defined Java variables are bound into the Thymeleaf
+context before evaluation.  For example (Java detail implementation
+removed):
 
-### Dependency and Classpath Management
+```java
+%%java
+...
+var map = new TreeMap<Ranking,List<Card>>(Ranking.COMPARATOR.reversed());
+...
+var rankings = Arrays.asList(Ranking.values());
+...
+```
+
+```html
+%%html
+<table>
+  <tr th:each="ranking : ${rankings}">
+    <th:block th:if="${map.containsKey(ranking)}">
+      <th th:text="${ranking}"/><td th:each="card : ${map.get(ranking)}" th:text="${card}"/>
+    </th:block>
+  </tr>
+  <tr><th>Remaining</th><td th:each="card : ${deck}" th:text="${card}"/></tr>
+</table>
+```
+
+Would generate:
+
+<table>
+  <tr>
+    <th>RoyalFlush</th><td>A-♧</td><td>K-♧</td><td>Q-♧</td><td>J-♧</td><td>10-♧</td>
+  </tr>
+  <tr>
+    <th>StraightFlush</th><td>K-♢</td><td>Q-♢</td><td>J-♢</td><td>10-♢</td><td>9-♢</td>
+  </tr>
+  <tr>
+    <th>FourOfAKind</th><td>8-♧</td><td>8-♢</td><td>8-♡</td><td>8-♤</td><td>J-♤</td>
+  </tr>
+  <tr>
+    <th>FullHouse</th><td>A-♢</td><td>A-♡</td><td>A-♤</td><td>K-♡</td><td>K-♤</td>
+  </tr>
+  <tr>
+    <th>Flush</th><td>Q-♡</td><td>J-♡</td><td>10-♡</td><td>9-♡</td><td>7-♡</td>
+  </tr>
+  <tr>
+    <th>Straight</th><td>7-♧</td><td>6-♧</td><td>5-♧</td><td>4-♧</td><td>3-♧</td>
+  </tr>
+  <tr>
+    <th>ThreeOfAKind</th><td>6-♢</td><td>6-♡</td><td>6-♤</td><td>10-♤</td><td>5-♤</td>
+  </tr>
+  <tr>
+    <th>TwoPair</th><td>9-♧</td><td>9-♤</td><td>7-♢</td><td>7-♤</td><td>4-♢</td>
+  </tr>
+  <tr>
+    <th>Pair</th><td>5-♢</td><td>5-♡</td><td>4-♡</td><td>4-♤</td><td>3-♢</td>
+  </tr>
+  <tr>
+    <th>HighCard</th><td>Q-♤</td><td>3-♡</td><td>3-♤</td><td>2-♧</td><td>2-♢</td>
+  </tr>
+  <tr>
+  </tr>
+  <tr><th>Remaining</th><td>2-♡</td><td>2-♤</td></tr>
+</table>
+
+Please refer to the installation instructions for discussion of enabling the
+[Hide Input] extension.
 
 
 ## Documentation
@@ -134,7 +389,7 @@ The following subsections outline many of the features of the kernel.
 
 ## License
 
-Ganymede Kernel is released under the
+[Ganymede Kernel] is released under the
 [Apache License][Apache License, Version 2.0].
 
 
@@ -148,30 +403,67 @@ Implemented with [Apache Maven Artifact Resolver].
 With the built-in Oracle Nashorn engine.
 [↩](#ref2)
 
-[Ganymede Kernel]: https://github.com/allen-ball/ganymede-kernel
+<b id="endnote3">[3]</b>
+[`scala`][Scala] is special cased: It requires additional dependencies be
+specified at runtime and is optimized to be used with [Apache Spark].
+[↩](#ref3)
+
+<b id="endnote4">[4]</b>
+Ibid.
+[↩](#ref4)
 
 [Apache License, Version 2.0]: https://www.apache.org/licenses/LICENSE-2.0
 
 [Apache Maven]: https://maven.apache.org/
+[Maven coordinates]: https://maven.apache.org/pom.html#Maven_Coordinates
 
 [Apache Maven Artifact Resolver]: https://maven.apache.org/resolver/index.html
+[RemoteRepository]: https://maven.apache.org/resolver/maven-resolver-api/apidocs/org/eclipse/aether/repository/RemoteRepository.html?is-external=true
+[RepositoryPolicy]: https://maven.apache.org/resolver/maven-resolver-api/apidocs/org/eclipse/aether/repository/RepositoryPolicy.html
+[Dependency]: https://maven.apache.org/resolver/maven-resolver-api/apidocs/org/eclipse/aether/graph/Dependency.html?is-external=true
 
 [Apache Spark]: http://spark.apache.org/
+[Apache Spark SQL]: https://spark.apache.org/sql/
 
 [Groovy]: https://groovy-lang.org/
 
 [Javascript]: https://www.oracle.com/technical-resources/articles/java/jf14-nashorn.html
 
+[JFreeChart]: https://github.com/jfree/jfreechart
+
 [JShell]: https://docs.oracle.com/en/java/javase/11/docs/api/jdk.jshell/jdk/jshell/JShell.html?is-external=true
 
 [JSR 223]: https://jcp.org/en/jsr/detail?id=223
+[java.scripting API]: https://docs.oracle.com/en/java/javase/11/docs/api/java.scripting/module-summary.html
 
 [Jupyter Notebook]: https://jupyter-notebook.readthedocs.io/en/stable/index.html
+[Hide Input]: https://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/hide_input/readme.html
 
 [Jupyter Kernel]: https://jupyter-client.readthedocs.io/en/stable/kernels.html
 
 [Kotlin]: https://kotlinlang.org/
 
+[Plotly]: https://github.com/plotly
+
 [Scala]: https://www.scala-lang.org/
 
+[Tablesaw]: https://github.com/jfree/jfreechart
+
 [Thymeleaf]: https://www.thymeleaf.org/index.html
+
+[XChart]: https://github.com/knowm/XChart
+
+[YAML]: https://yaml.org/
+
+
+[Process]: https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Process.html
+
+
+[Ganymede Kernel]: https://github.com/allen-ball/ganymede-kernel
+
+[Ganymede API Javadoc]: ../hcf-dev/repo.hcf.dev/javadoc/ganymede-kernel/target/site/apidocs/ganymede-kernel/1.0.0-SNAPSHOT/index.html
+
+[NotebookFunctions]: ../hcf-dev/repo.hcf.dev/javadoc/ganymede-kernel/target/site/apidocs/ganymede-kernel/1.0.0-SNAPSHOT/ganymede/notebook/NotebookFunctions.html
+
+
+[sine.ipynb]: notebooks/sine.ipynb

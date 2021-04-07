@@ -1,3 +1,7 @@
+2021-04-07  Allen D. Ball  <ball@hcf.dev>
+
+	* README.md: First draft.
+
 2021-04-06  Allen D. Ball  <ball@hcf.dev>
 
 	* Changed Java Magic to display bindings if no code is specified.
