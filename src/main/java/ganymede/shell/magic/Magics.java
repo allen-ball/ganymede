@@ -24,22 +24,18 @@ import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.notebook.NotebookContext;
 import ganymede.server.Message;
-import ganymede.server.Renderer;
-import ganymede.server.renderer.ForClass;
+import ganymede.server.renderer.ThymeleafRenderer;
 import ganymede.shell.Magic;
 import ganymede.shell.Shell;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Comparator;
-import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
-import static org.springframework.util.MimeTypeUtils.TEXT_HTML_VALUE;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * {@link Magics} {@link Magic}: List configured {@link Magic}s.
@@ -55,78 +51,22 @@ public class Magics extends AbstractMagic {
     public void execute(Shell shell,
                         InputStream in, PrintStream out, PrintStream err,
                         String line0, String code) throws Exception {
-        shell.kernel()
-            .print(Message.mime_bundle(new Output(shell)));
+        var magics =
+            shell.magics().values().stream()
+            .distinct()
+            .collect(toMap(k -> String.join(", ", k.getMagicNames()),
+                           v -> v.getDescription(),
+                           (t, u) -> t, () -> new TreeMap<>()));
+        var resource = getClass().getSimpleName();
+        var map = Map.<String,Object>of("magics", magics);
+        var html = ThymeleafRenderer.process(getClass(), resource + ".html", "html", map);
+        var text = ThymeleafRenderer.process(getClass(), resource + ".text", "text", map);
+
+        shell.kernel().print(Message.mime_bundle(html, text));
     }
 
     @Override
     public void execute(NotebookContext __, String line0, String code) throws Exception {
         throw new IllegalArgumentException(line0);
-    }
-
-    private static final Comparator<List<String>> COMPARATOR =
-        Comparator.comparing(t -> t.toString());
-
-    /**
-     * Customized {@link Output Output} for {@link Magics}
-     * {@link RendererImpl Renderer}.
-     */
-    public static class Output extends TreeMap<List<String>,String> {
-        private static final long serialVersionUID = -2609872192564130449L;
-
-        private Output(Shell shell) {
-            super(COMPARATOR);
-
-            var magics = shell.magics();
-
-            magics.values().stream()
-                .distinct()
-                .forEach(t -> putIfAbsent(List.of(t.getMagicNames()),
-                                          t.getDescription()));
-        }
-    }
-
-    /**
-     * Customized {@link Renderer} for {@link Magics} {@link Output Output}.
-     */
-    @ServiceProviderFor({ Renderer.class })
-    @ForClass(Output.class)
-    @NoArgsConstructor @ToString
-    public static class RendererImpl implements Renderer {
-        @Override
-        public void renderTo(ObjectNode bundle, Object object) {
-            var output = (Output) object;
-
-            try (var writer = new StringWriter()) {
-                var out = new PrintWriter(writer);
-
-                out.println("<h4>Cell Magic</h4>");
-                out.println("<table>");
-                out.format("<tr><th>%s</th><th>%s</th></tr>\n",
-                           "Name(s)", "Description");
-                output.entrySet().stream()
-                    .forEach(t -> out.format("<tr><td>%s</td><td>%s</td></tr>\n",
-                                             String.join(", ", t.getKey()),
-                                             t.getValue()));
-                out.println("</table>");
-
-                bundle.with(DATA).put(TEXT_HTML_VALUE, writer.toString());
-            } catch (Exception exception) {
-                throw new IllegalStateException(exception);
-            }
-
-            try (var writer = new StringWriter()) {
-                var out = new PrintWriter(writer);
-
-                output.entrySet().stream()
-                    .forEach(t -> out.format("%s\t%s\n",
-                                             String.join(", ", t.getKey()),
-                                             t.getValue()));
-
-                MAP.renderTo(bundle, writer.toString());
-            } catch (Exception exception) {
-                throw new IllegalStateException(exception);
-            }
-        }
     }
 }
