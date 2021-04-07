@@ -26,6 +26,7 @@ import java.io.StringReader;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import javax.script.ScriptContext;
 import javax.script.SimpleBindings;
@@ -35,7 +36,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.toMap;
 import static javax.script.ScriptContext.ENGINE_SCOPE;
 import static javax.script.ScriptContext.GLOBAL_SCOPE;
 import static jdk.jshell.Snippet.SubKind.TEMP_VAR_EXPRESSION_SUBKIND;
@@ -62,6 +63,11 @@ public class NotebookContext {
                 setBindings(new SimpleBindings(new ConcurrentSkipListMap<>()), ENGINE_SCOPE);
             }
         };
+
+    /**
+     * {@link Map} of known bindings' {@link Class types}.
+     */
+    public final Map<String,String> types = new ConcurrentSkipListMap<>();
 
     /**
      * {@link List} of accumulated {@code import}s.
@@ -116,17 +122,21 @@ public class NotebookContext {
      * @param   jshell          The {@link JShell}.
      */
     public static void update(JShell jshell) {
-        var variables =
+        var types =
             jshell.variables()
             .filter(t -> (! t.subKind().equals(TEMP_VAR_EXPRESSION_SUBKIND)))
             .filter(t -> (! t.name().equals("__")))
-            .map(t -> t.name())
-            .collect(toSet());
+            .collect(toMap(k -> k.name(), v -> v.typeName()));
 
-        for (var variable : variables) {
+        evaluate(jshell, "__.types.clear()");
+
+        for (var entry : types.entrySet()) {
             evaluate(jshell,
                      "__.context.getBindings(%1d).put(\"%2$s\", %2$s)",
-                     ENGINE_SCOPE, variable);
+                     ENGINE_SCOPE, entry.getKey());
+            evaluate(jshell,
+                     "__.types.put(\"%1$s\", \"%2$s\")",
+                     entry.getKey(), entry.getValue());
         }
 
         var imports =

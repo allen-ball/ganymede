@@ -412,7 +412,13 @@ public class Shell implements AutoCloseable {
         public void execute(Shell shell,
                             InputStream in, PrintStream out, PrintStream err,
                             String line0, String code) throws Exception {
-            execute(shell.jshell(), in, out, err, code);
+            if (! code.isBlank()) {
+                execute(shell.jshell(), in, out, err, code);
+            } else {
+                if (line0 != null) {
+                    Magic.sendTo(shell, getMagicNames()[0], line0, code);
+                }
+            }
         }
 
         @Override
