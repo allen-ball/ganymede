@@ -227,8 +227,7 @@
 	* src/main/java/galyleo/shell/Shell.java:
 	Added classpath() method.
 
-	* src/main/java/galyleo/shell/magic/Classpath.java,
-	src/main/java/galyleo/shell/magic/SysProperties.java:
+	* src/main/java/galyleo/shell/magic/Classpath.java:
 	Initial writing.
 
 	* src/main/java/galyleo/shell/Magic.java:

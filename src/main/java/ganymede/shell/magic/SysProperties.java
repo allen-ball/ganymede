@@ -33,7 +33,7 @@ import lombok.extern.log4j.Log4j2;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@ServiceProviderFor({ Magic.class })
+/* @ServiceProviderFor({ Magic.class }) */
 @Description("Add/Update or print System properties")
 @NoArgsConstructor @ToString @Log4j2
 public class SysProperties extends AbstractPropertiesMagic {
