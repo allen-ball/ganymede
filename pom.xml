@@ -16,6 +16,19 @@
     <version>20210220-SNAPSHOT</version>
     <relativePath/>
   </parent>
+  <distributionManagement>
+    <downloadUrl>https://repo.hcf.dev/maven/release/</downloadUrl>
+    <repository>
+      <id>github</id>
+      <name>GitHub allen-ball Apache Maven Packages</name>
+      <url>https://maven.pkg.github.com/allen-ball/repository</url>
+    </repository>
+    <snapshotRepository>
+      <id>github</id>
+      <name>GitHub allen-ball Apache Maven Packages</name>
+      <url>https://maven.pkg.github.com/allen-ball/repository</url>
+    </snapshotRepository>
+  </distributionManagement>
   <repositories>
     <repository>
       <id>repo.hcf.dev-RELEASE</id>
