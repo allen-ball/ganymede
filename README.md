@@ -20,7 +20,8 @@ This kernel offers the following additional features:
 
 ## Installation
 
-The [Ganymede Kernel] is distributed as a single JAR.
+The [Ganymede Kernel] is distributed as a single JAR
+([download here][Ganymede Kernel download]).
 
 Java 11 or later is required.  In addition to Java, the [Jupyter Notebook]
 must be installed first and the `jupyter` and `python` commands must be on
@@ -463,6 +464,7 @@ Ibid.
 
 
 [Ganymede Kernel]: https://github.com/allen-ball/ganymede-kernel
+[Ganymede Kernel download]: https://github.com/allen-ball/repository/packages/719174
 [Ganymede API Javadoc]: https://allen-ball.github.io/ganymede-kernel/index.html?overview-summary.html
 [NotebookFunctions]: https://allen-ball.github.io/ganymede-kernel/ganymede/notebook/NotebookFunctions.html
 
