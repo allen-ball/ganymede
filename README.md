@@ -3,4 +3,3 @@
 | Links                    |
 |--------------------------|
 | [API Javadoc](./api/)    |
-| [Notebooks](./notebooks) |
