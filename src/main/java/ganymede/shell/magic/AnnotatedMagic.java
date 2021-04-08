@@ -2,8 +2,6 @@ package ganymede.shell.magic;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -26,7 +24,6 @@ import ganymede.shell.Magic;
  * {@link ganymede.shell.Magic} annotation services.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 public interface AnnotatedMagic extends Magic {
     @Override

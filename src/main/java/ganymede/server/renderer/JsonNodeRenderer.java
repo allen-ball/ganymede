@@ -2,8 +2,6 @@ package ganymede.server.renderer;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -33,7 +31,6 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
  * {@link JsonNode} {@link Renderer} service provider.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @ServiceProviderFor({ Renderer.class })
 @ForClass(JsonNode.class)

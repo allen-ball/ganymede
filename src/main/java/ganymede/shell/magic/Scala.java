@@ -2,8 +2,6 @@ package ganymede.shell.magic;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -40,7 +38,6 @@ import static java.util.Collections.disjoint;
  * @see Scripted
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @ServiceProviderFor({ Magic.class })
 @Description("Execute code in scala REPL")

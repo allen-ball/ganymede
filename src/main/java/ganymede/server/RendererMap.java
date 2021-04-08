@@ -2,8 +2,6 @@ package ganymede.server;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -34,7 +32,6 @@ import lombok.ToString;
  * {@link Renderer} {@link java.util.Map}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 public class RendererMap extends TreeMap<Class<?>,Renderer> {
     private static final long serialVersionUID = 5660512908511151101L;

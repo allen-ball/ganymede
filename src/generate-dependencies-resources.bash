@@ -1,5 +1,5 @@
 #!/bin/bash
-# $Id$
+# generate-dependencies-resources.bash
 REPOSITORY="${HOME}/.m2/repository"
 
 for artifact in ${*}; do

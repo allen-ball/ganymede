@@ -2,8 +2,6 @@ package ganymede.server.renderer;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -43,7 +41,6 @@ import static org.springframework.util.MimeTypeUtils.TEXT_XML_VALUE;
  * Thymeleaf template {@link Renderer}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @ServiceProviderFor({ Renderer.class })
 @ForClass(ThymeleafRenderer.Output.class)

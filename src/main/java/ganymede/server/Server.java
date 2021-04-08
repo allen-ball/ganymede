@@ -2,8 +2,6 @@ package ganymede.server;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -49,7 +47,6 @@ import static lombok.AccessLevel.PROTECTED;
  * {@bean.info}
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @Getter @Setter(PROTECTED) @Log4j2
 public abstract class Server extends ScheduledThreadPoolExecutor {

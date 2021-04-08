@@ -2,8 +2,6 @@ package ganymede.server.renderer;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -32,7 +30,6 @@ import org.apache.spark.sql.Dataset;
  * Spark {@link Dataset} {@link Renderer} service provider.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @ServiceProviderFor({ Renderer.class })
 @ForClassName("org.apache.spark.sql.Dataset")

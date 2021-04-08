@@ -2,8 +2,6 @@ package ganymede.server.renderer;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -33,7 +31,6 @@ import lombok.ToString;
  * Image {@link Renderer}.  See {@link ImageIO}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @ServiceProviderFor({ Renderer.class })
 @ForClass(byte[].class)

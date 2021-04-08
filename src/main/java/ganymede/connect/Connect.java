@@ -2,8 +2,6 @@ package ganymede.connect;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -43,7 +41,6 @@ import static ganymede.server.Server.OBJECT_MAPPER;
  * {@injected.fields}
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @SpringBootApplication
 @NoArgsConstructor @ToString @Log4j2

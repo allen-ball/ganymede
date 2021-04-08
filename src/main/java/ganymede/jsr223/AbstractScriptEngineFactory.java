@@ -2,8 +2,6 @@ package ganymede.jsr223;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -35,7 +33,6 @@ import static lombok.AccessLevel.PROTECTED;
  * {@bean.info}
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @NoArgsConstructor(access = PROTECTED)  @ToString @Log4j2
 public abstract class AbstractScriptEngineFactory implements AnnotatedScriptEngineFactory {

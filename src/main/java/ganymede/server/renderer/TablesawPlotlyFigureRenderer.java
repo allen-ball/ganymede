@@ -2,8 +2,6 @@ package ganymede.server.renderer;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -34,7 +32,6 @@ import tech.tablesaw.plotly.components.Figure;
  * {@link Figure} {@link Renderer} service provider.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @ServiceProviderFor({ Renderer.class })
 @ForClassName("tech.tablesaw.plotly.components.Figure")

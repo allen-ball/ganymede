@@ -2,8 +2,6 @@ package ganymede;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -40,7 +38,6 @@ import static org.springframework.boot.WebApplicationType.NONE;
  * {@injected.fields}
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @NoArgsConstructor @ToString @Log4j2
 public class Launcher implements ApplicationRunner {

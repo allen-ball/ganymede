@@ -2,8 +2,6 @@ package ganymede.server;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -38,7 +36,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
  * {@bean.info}
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @Data @Log4j2
 public class Dispatcher implements Runnable {

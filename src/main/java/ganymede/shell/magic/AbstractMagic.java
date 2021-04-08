@@ -2,8 +2,6 @@ package ganymede.shell.magic;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -30,7 +28,6 @@ import static lombok.AccessLevel.PROTECTED;
  * Abstract base class for {@link ganymede.shell.Magic}s.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @NoArgsConstructor(access = PROTECTED)
 public abstract class AbstractMagic implements AnnotatedMagic {

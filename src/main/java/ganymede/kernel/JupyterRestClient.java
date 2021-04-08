@@ -2,8 +2,6 @@ package ganymede.kernel;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -37,7 +35,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  * {@link.uri https://github.com/jupyter/jupyter/wiki/Jupyter-Notebook-Server-API target=newtab Jupyter Notebook Server API}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @Log4j2
 public class JupyterRestClient {

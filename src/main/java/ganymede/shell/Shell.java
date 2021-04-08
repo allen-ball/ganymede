@@ -2,8 +2,6 @@ package ganymede.shell;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -63,7 +61,6 @@ import static org.apache.logging.log4j.Level.WARN;
  * @see JShell
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @ToString @Log4j2
 public class Shell implements AutoCloseable {

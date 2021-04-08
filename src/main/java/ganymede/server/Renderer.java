@@ -2,8 +2,6 @@ package ganymede.server;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -29,7 +27,6 @@ import static ganymede.server.Server.OBJECT_MAPPER;
  * {@link Message#mime_bundle(Object,Object...)} output {@link Renderer}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 public interface Renderer {
     public static final String DATA = "data";

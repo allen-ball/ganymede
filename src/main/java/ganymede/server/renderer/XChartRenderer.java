@@ -2,8 +2,6 @@ package ganymede.server.renderer;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -37,7 +35,6 @@ import static org.knowm.xchart.BitmapEncoder.BitmapFormat.PNG;
  * {@link BitmapEncoder}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @ServiceProviderFor({ Renderer.class })
 @ForClassName("org.knowm.xchart.internal.chartpart.Chart")

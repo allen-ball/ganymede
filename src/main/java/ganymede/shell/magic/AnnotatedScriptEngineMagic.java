@@ -2,8 +2,6 @@ package ganymede.shell.magic;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -28,7 +26,6 @@ import java.util.List;
  * {@link AbstractScriptEngineMagic} annotation services.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 public interface AnnotatedScriptEngineMagic extends AnnotatedMagic {
 

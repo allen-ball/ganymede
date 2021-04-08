@@ -3,15 +3,12 @@
  * {@link javax.script.ScriptEngineFactory} services.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @Manifest.Section
 package ganymede.jsr223;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%

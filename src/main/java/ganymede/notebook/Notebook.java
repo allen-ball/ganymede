@@ -2,8 +2,6 @@ package ganymede.notebook;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -34,7 +32,6 @@ import static java.lang.reflect.Modifier.isStatic;
  * {@link Notebook} Spring launcher.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @SpringBootApplication
 @NoArgsConstructor @ToString

@@ -2,8 +2,6 @@ package ganymede.server;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -32,7 +30,6 @@ import lombok.extern.log4j.Log4j2;
  * {@bean.info}
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @Data @Log4j2
 public class Connection {

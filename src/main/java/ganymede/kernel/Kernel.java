@@ -2,8 +2,6 @@ package ganymede.kernel;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -64,7 +62,6 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
  * {@injected.fields}
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @SpringBootApplication
 @RestController

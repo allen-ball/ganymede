@@ -2,8 +2,6 @@ package ganymede.util;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -34,7 +32,6 @@ import static java.util.stream.Collectors.toList;
  * @param       <T>             The service type.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 public class ServiceProviderMap<T> extends TreeMap<Class<? extends T>,T> {
     private static final long serialVersionUID = 1150156295503292563L;

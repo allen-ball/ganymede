@@ -2,8 +2,6 @@ package ganymede.dependency;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -69,7 +67,6 @@ import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toVersionlessId;
  * {@bean.info}
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @JsonPropertyOrder({ "localRepository", "interactiveMode", "offline",
                      "repositories", "dependencies" })

@@ -2,8 +2,6 @@ package ganymede.shell.magic;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -41,7 +39,6 @@ import static java.util.stream.Collectors.toMap;
  * {@link Magics} {@link Magic}: List configured {@link Magic}s.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @ServiceProviderFor({ Magic.class })
 @Description("Lists available cell magics")

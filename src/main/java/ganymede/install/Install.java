@@ -2,8 +2,6 @@ package ganymede.install;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -49,7 +47,6 @@ import static org.springframework.util.FileSystemUtils.deleteRecursively;
  * {@injected.fields}
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @SpringBootApplication
 @NoArgsConstructor @ToString @Log4j2

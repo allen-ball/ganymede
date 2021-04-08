@@ -2,8 +2,6 @@ package ganymede.shell;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -30,7 +28,6 @@ import lombok.NoArgsConstructor;
  * {@link Magic} {@link Map}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @NoArgsConstructor
 public class MagicMap extends TreeMap<String,Magic> {

@@ -2,8 +2,6 @@ package ganymede.shell;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -43,7 +41,6 @@ import static java.util.stream.Collectors.toMap;
  * {@link Magic} service interface.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 public interface Magic {
 

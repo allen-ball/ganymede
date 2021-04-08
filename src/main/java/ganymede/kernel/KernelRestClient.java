@@ -2,8 +2,6 @@ package ganymede.kernel;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -41,7 +39,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  * Ganymede {@link Kernel} REST client.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @NoArgsConstructor @ToString @Log4j2
 public class KernelRestClient {

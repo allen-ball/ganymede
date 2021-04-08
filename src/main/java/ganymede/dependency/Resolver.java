@@ -2,8 +2,6 @@ package ganymede.dependency;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -76,7 +74,6 @@ import static java.util.stream.Collectors.toSet;
  * Dependency {@link Resolver}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @NoArgsConstructor @ToString @Log4j2
 public class Resolver extends Analyzer {

@@ -2,8 +2,6 @@ package ganymede.io;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -31,7 +29,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @see ByteArrayOutputStream
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 public class PrintStreamBuffer extends PrintStream {
     private final ByteArrayOutputStream buffer;

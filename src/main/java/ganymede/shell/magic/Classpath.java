@@ -2,8 +2,6 @@ package ganymede.shell.magic;
 /*-
  * ##########################################################################
  * Ganymede
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2021 Allen D. Ball
  * %%
@@ -36,7 +34,6 @@ import lombok.extern.log4j.Log4j2;
  * {@link jdk.jshell.JShell#addToClasspath(String)}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @ServiceProviderFor({ Magic.class })
 @Description("Add to or print JShell classpath")
