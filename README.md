@@ -387,7 +387,7 @@ Please refer to the installation instructions for discussion of enabling the
 ## Documentation
 
 [Javadoc][Ganymede API Javadoc] is published at
-https://allen-ball.github.io/ganymede-kernel/api.
+https://allen-ball.github.io/ganymede-kernel.
 
 
 ## License
@@ -463,8 +463,8 @@ Ibid.
 
 
 [Ganymede Kernel]: https://github.com/allen-ball/ganymede-kernel
-[Ganymede API Javadoc]: https://allen-ball.github.io/ganymede-kernel/api/index.html?overview-summary.html
-[NotebookFunctions]: https://allen-ball.github.io/ganymede-kernel/api/ganymede/notebook/NotebookFunctions.html
+[Ganymede API Javadoc]: https://allen-ball.github.io/ganymede-kernel/index.html?overview-summary.html
+[NotebookFunctions]: https://allen-ball.github.io/ganymede-kernel/ganymede/notebook/NotebookFunctions.html
 
 
 [sine.ipynb]: notebooks/sine.ipynb
