@@ -463,7 +463,7 @@ Ibid.
 
 
 [Ganymede Kernel]: https://github.com/allen-ball/ganymede-kernel
-[Ganymede API Javadoc]: https://allen-ball.github.io/ganymede-kernel/api/index.html
+[Ganymede API Javadoc]: https://allen-ball.github.io/ganymede-kernel/api/index.html?overview-summary.html
 [NotebookFunctions]: https://allen-ball.github.io/ganymede-kernel/api/ganymede/notebook/NotebookFunctions.html
 
 
