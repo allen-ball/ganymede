@@ -1,0 +1,13 @@
+ganymede
+ganymede.connect
+ganymede.dependency
+ganymede.install
+ganymede.io
+ganymede.jsr223
+ganymede.kernel
+ganymede.notebook
+ganymede.server
+ganymede.server.renderer
+ganymede.shell
+ganymede.shell.magic
+ganymede.util
