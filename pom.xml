@@ -498,54 +498,6 @@
                 <url>https://www.javadoc.io/doc/org.apache.httpcomponents/httpcore/latest/</url>
                 <location>${javadoc-offline-locations}/httpcore-javadoc-jar/</location>
               </offlineLink>
-              <!-- Flexmark -->
-              <offlineLink>
-                <url>${flexmark.apidocs}flexmark/latest/</url>
-                <location>${javadoc-offline-locations}/flexmark-javadoc-jar/</location>
-              </offlineLink>
-              <offlineLink>
-                <url>${flexmark.apidocs}flexmark-util-ast/latest/</url>
-                <location>${javadoc-offline-locations}/flexmark-util-ast-javadoc-jar/</location>
-              </offlineLink>
-              <!-- flexmark-ext-abbreviation-javadoc-jar -->
-              <!-- flexmark-ext-admonition-javadoc-jar -->
-              <!-- flexmark-ext-anchorlink-javadoc-jar -->
-              <!-- flexmark-ext-aside-javadoc-jar -->
-              <!-- flexmark-ext-attributes-javadoc-jar -->
-              <!-- flexmark-ext-autolink-javadoc-jar -->
-              <!-- flexmark-ext-definition-javadoc-jar -->
-              <!-- flexmark-ext-emoji-javadoc-jar -->
-              <!-- flexmark-ext-enumerated-reference-javadoc-jar -->
-              <!-- flexmark-ext-escaped-character-javadoc-jar -->
-              <!-- flexmark-ext-footnotes-javadoc-jar -->
-              <!-- flexmark-ext-gfm-issues-javadoc-jar -->
-              <!-- flexmark-ext-gfm-strikethrough-javadoc-jar -->
-              <!-- flexmark-ext-gfm-tasklist-javadoc-jar -->
-              <!-- flexmark-ext-gfm-users-javadoc-jar -->
-              <!-- flexmark-ext-gitlab-javadoc-jar -->
-              <!-- flexmark-ext-ins-javadoc-jar -->
-              <!-- flexmark-ext-jekyll-front-matter-javadoc-jar -->
-              <!-- flexmark-ext-jekyll-tag-javadoc-jar -->
-              <!-- flexmark-ext-macros-javadoc-jar -->
-              <!-- flexmark-ext-media-tags-javadoc-jar -->
-              <!-- flexmark-ext-superscript-javadoc-jar -->
-              <offlineLink>
-                <url>${flexmark.apidocs}flexmark-ext-tables-javadoc-jar/latest/</url>
-                <location>${javadoc-offline-locations}/flexmark-ext-tables-javadoc-jar</location>
-              </offlineLink>
-              <!-- flexmark-ext-toc-javadoc-jar -->
-              <!-- flexmark-ext-typographic-javadoc-jar -->
-              <!-- flexmark-ext-wikilink-javadoc-jar -->
-              <!-- flexmark-ext-xwiki-macros-javadoc-jar -->
-              <!-- flexmark-ext-yaml-front-matter-javadoc-jar -->
-              <!-- flexmark-ext-youtube-embedded-javadoc-jar -->
-              <!-- Flyway -->
-<!--
-              <offlineLink>
-                <url>https://flywaydb.org/documentation/usage/api/javadoc/</url>
-                <location>${javadoc-offline-locations}/flyway-core-javadoc-jar/</location>
-              </offlineLink>
--->
               <!-- Groovy -->
               <offlineLink>
                 <url>${javadoc.io}org.codehaus.groovy/groovy-all/latest/</url>
@@ -566,11 +518,6 @@
                 <location>${javadoc-offline-locations}/scala-library-javadoc-jar</location>
               </offlineLink>
 -->
-              <!-- SPDX -->
-              <offlineLink>
-                <url>${spdx.apidocs}spdx-tools/latest/</url>
-                <location>${javadoc-offline-locations}/spdx-tools-javadoc-jar/</location>
-              </offlineLink>
               <!-- Tablesaw -->
               <offlineLink>
                 <url>https://javadoc.io/doc/tech.tablesaw/tablesaw-core/latest/</url>
@@ -588,11 +535,6 @@
               <offlineLink>
                 <url>https://www.thymeleaf.org/apidocs/thymeleaf-spring5/${thymeleaf.version}/</url>
                 <location>${javadoc-offline-locations}/thymeleaf-spring5-javadoc-jar/</location>
-              </offlineLink>
-              <!-- webjars-locator-core -->
-              <offlineLink>
-                <url>${javadoc.io}org.webjars/webjars-locator-core/latest/</url>
-                <location>${javadoc-offline-locations}/webjars-locator-core-javadoc-jar/</location>
               </offlineLink>
             </offlineLinks>
             <quiet>true</quiet>
