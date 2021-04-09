@@ -18,6 +18,8 @@ package ganymede.notebook;
  * limitations under the License.
  * ##########################################################################
  */
+import ganymede.shell.Shell;
+import java.io.File;
 import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
@@ -34,6 +36,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static javax.script.ScriptContext.ENGINE_SCOPE;
 import static javax.script.ScriptContext.GLOBAL_SCOPE;
@@ -62,14 +65,19 @@ public class NotebookContext {
         };
 
     /**
-     * {@link Map} of known bindings' {@link Class types}.
+     * {@link List} of {@code classpath} entries.
      */
-    public final Map<String,String> types = new ConcurrentSkipListMap<>();
+    public final List<String> classpath = new LinkedList<>();
 
     /**
      * {@link List} of accumulated {@code import}s.
      */
     public final List<String> imports = new LinkedList<>();
+
+    /**
+     * {@link Map} of known bindings' {@link Class types}.
+     */
+    public final Map<String,String> types = new ConcurrentSkipListMap<>();
 
     /**
      * Method to construct a call to a static
@@ -116,9 +124,37 @@ public class NotebookContext {
      * Static method used by the {@link ganymede.shell.Shell} to update the
      * {@link NotebookContext} members.
      *
-     * @param   jshell          The {@link JShell}.
+     * @param   shell           The {@link Shell}.
      */
-    public static void update(JShell jshell) {
+    public static void update(Shell shell) {
+        var jshell = shell.jshell();
+        var classpath =
+            shell.classpath().stream()
+            .map(File::getAbsolutePath)
+            .collect(toList());
+
+        evaluate(jshell, "__.classpath.clear()");
+
+        if (! classpath.isEmpty()) {
+            evaluate(jshell,
+                     "java.util.Collections.addAll(__.classpath, \"%1$s\".split(\",\"))",
+                     String.join(",", classpath));
+        }
+
+        var imports =
+            jshell.imports()
+            .map(t -> t.source())
+            .map(String::strip)
+            .collect(toCollection(LinkedHashSet::new));
+
+        evaluate(jshell, "__.imports.clear()");
+
+        if (! imports.isEmpty()) {
+            evaluate(jshell,
+                     "java.util.Collections.addAll(__.imports, \"%1$s\".split(\",\"))",
+                     String.join(",", imports));
+        }
+
         var types =
             jshell.variables()
             .filter(t -> (! t.subKind().equals(TEMP_VAR_EXPRESSION_SUBKIND)))
@@ -134,20 +170,6 @@ public class NotebookContext {
             evaluate(jshell,
                      "__.types.put(\"%1$s\", \"%2$s\")",
                      entry.getKey(), entry.getValue());
-        }
-
-        var imports =
-            jshell.imports()
-            .map(t -> t.source())
-            .map(String::strip)
-            .collect(toCollection(LinkedHashSet::new));
-
-        evaluate(jshell, "__.imports.clear()");
-
-        if (! imports.isEmpty()) {
-            evaluate(jshell,
-                     "java.util.Collections.addAll(__.imports, \"%1$s\".split(\",\"))",
-                     String.join(",", imports));
         }
     }
 

@@ -288,11 +288,7 @@ public class Shell implements AutoCloseable {
      */
     public void execute(String code) throws Exception {
         try {
-            var jshell = this.jshell;
-
-            if (jshell != null) {
-                NotebookContext.update(jshell);
-            }
+            NotebookContext.update(this);
 
             var application = new Magic.Application(code);
             var name = application.getMagicName();
