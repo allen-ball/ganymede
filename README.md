@@ -1,4 +1,4 @@
-![Ganymede](README/ganymede.png)
+[![Ganymede](README/ganymede.png)](https://images.nasa.gov/details-GSFC_20171208_Archive_e002091)
 
 # Ganymede Jupyter  Notebook Java Kernel
 
