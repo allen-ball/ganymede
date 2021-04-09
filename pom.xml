@@ -45,47 +45,6 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-  <profiles>
-    <profile>
-      <id>jdk9-and-later</id>
-      <activation><jdk>[9,)</jdk></activation>
-      <properties>
-        <ball-api.version>20210218.0</ball-api.version>
-      </properties>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-javadoc-plugin</artifactId>
-              <configuration>
-                <source>${maven.compiler.source}</source>
-                <additionalOptions>
-                  <additionalOption>--frames</additionalOption>
-                  <additionalOption>-html5</additionalOption>
-                </additionalOptions>
-                <doclet>ball.tools.javadoc.StandardDoclet</doclet>
-                <docletArtifacts combine.children="append">
-                  <docletArtifact>
-                    <groupId>ball</groupId>
-                    <artifactId>ball-tools-javadoc</artifactId>
-                    <version>${ball-tools-javadoc.version}</version>
-                  </docletArtifact>
-                </docletArtifacts>
-                <tagletArtifacts combine.children="append">
-                  <tagletArtifact>
-                    <groupId>ball</groupId>
-                    <artifactId>ball-tools-javadoc</artifactId>
-                    <version>${ball-tools-javadoc.version}</version>
-                  </tagletArtifact>
-                </tagletArtifacts>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-  </profiles>
   <properties>
     <license.skipUpdateProjectLicense>true</license.skipUpdateProjectLicense>
     <jse.target>11</jse.target>
@@ -639,24 +598,6 @@
             <quiet>true</quiet>
             <serialwarn>true</serialwarn>
             <show>protected</show>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>wagon-maven-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>upload-javadoc</id>
-              <phase>deploy</phase>
-              <goals>
-                <goal>upload</goal>
-              </goals>
-              <configuration>
-              </configuration>
-            </execution>
-          </executions>
-          <configuration>
-            <fromDir>${project.reporting.outputDirectory}/apidocs/${project.artifactId}</fromDir>
           </configuration>
         </plugin>
       </plugins>
