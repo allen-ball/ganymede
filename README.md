@@ -1,4 +1,6 @@
-# Ganymede Kernel 1.0.0-SNAPSHOT
+![Ganymede](README/GSFC_20171208_Archive_e002091_orig.jpg)
+
+# Ganymede Jupyter  Notebook Java Kernel
 
 The [Ganymede Kernel] is a [Jupyter Notebook] Java [kernel][Jupyter Kernel].
 Java code is compiled and interpreted with the Java Shell tool, [JShell].
