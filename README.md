@@ -1,4 +1,4 @@
-![Ganymede](README/GSFC_20171208_Archive_e002091_orig.jpg)
+![Ganymede](README/ganymede.png)
 
 # Ganymede Jupyter  Notebook Java Kernel
 
