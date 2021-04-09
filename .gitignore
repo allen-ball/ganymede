@@ -1,6 +1,7 @@
 # .gitignore
 .DS_Store
 .classpath
+.ipynb_checkpoints/
 .project
 .settings/
 .svn/

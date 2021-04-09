@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <name>Ganymede Java Kernel</name>
+  <description>Jupyter Java Kernel</description>
+  <groupId>ganymede</groupId>
+  <artifactId>ganymede-kernel</artifactId>
+  <packaging>jar</packaging>
+  <parent>
+    <groupId>ganymede</groupId>
+    <artifactId>parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  <inceptionYear>2021</inceptionYear>
+  <properties>
+    <start-class>ganymede.Launcher</start-class>
+  </properties>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>${project.basedir}</directory>
+              <includes>
+                <include>dependency-reduced-pom.xml</include>
+              </includes>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>META-INF/shaded.dependencies</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>tree</goal>
+            </goals>
+            <configuration>
+              <outputFile>${project.build.outputDirectory}/META-INF/shaded.dependencies</outputFile>
+              <outputScope>false</outputScope>
+              <scope>runtime</scope>
+              <tokens>whitespace</tokens>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <version>${spring-boot.version}</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <createDependencyReducedPom>true</createDependencyReducedPom>
+          <filters>
+            <filter>
+              <artifact>*:*</artifact>
+              <excludes>META-INF/*.SF</excludes>
+              <excludes>META-INF/*.DSA</excludes>
+              <excludes>META-INF/*.RSA</excludes>
+              <excludes>**/module-info.class</excludes>
+            </filter>
+          </filters>
+          <transformers>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer"/>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
+              <addHeader>false</addHeader>
+            </transformer>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+              <resource>META-INF/DEPENDENCIES</resource>
+            </transformer>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+              <manifestEntries>
+                <Main-Class>${start-class}</Main-Class>
+              </manifestEntries>
+            </transformer>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+              <resource>META-INF/sisu/javax.inject.Named</resource>
+            </transformer>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+              <resource>META-INF/spring.handlers</resource>
+            </transformer>
+            <transformer implementation="org.springframework.boot.maven.PropertiesMergingResourceTransformer">
+              <resource>META-INF/spring.factories</resource>
+            </transformer>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+              <resource>META-INF/spring.schemas</resource>
+            </transformer>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+              <resource>META-INF/spring.tooling</resource>
+            </transformer>
+          </transformers>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-install-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-install</id>
+            <goals>
+              <goal>install-file</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <pomFile>dependency-reduced-pom.xml</pomFile>
+          <file>${project.build.directory}/${project.build.finalName}.jar</file>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

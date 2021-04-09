@@ -4,12 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <name>Ganymede</name>
-  <description>Jupyter Java Kernel</description>
+  <name>Ganymede Parent POM</name>
+  <description>Parent POM</description>
   <groupId>ganymede</groupId>
-  <artifactId>ganymede-kernel</artifactId>
+  <artifactId>parent</artifactId>
   <version>1.0.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
   <parent>
     <groupId>ball</groupId>
     <artifactId>parent</artifactId>
@@ -45,9 +45,51 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+  <profiles>
+    <profile>
+      <id>jdk9-and-later</id>
+      <activation><jdk>[9,)</jdk></activation>
+      <properties>
+        <ball-api.version>20210218.0</ball-api.version>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-javadoc-plugin</artifactId>
+              <configuration>
+                <source>${maven.compiler.source}</source>
+                <additionalOptions>
+                  <additionalOption>--frames</additionalOption>
+                  <additionalOption>-html5</additionalOption>
+                </additionalOptions>
+                <doclet>ball.tools.javadoc.StandardDoclet</doclet>
+                <docletArtifacts combine.children="append">
+                  <docletArtifact>
+                    <groupId>ball</groupId>
+                    <artifactId>ball-tools-javadoc</artifactId>
+                    <version>${ball-tools-javadoc.version}</version>
+                  </docletArtifact>
+                </docletArtifacts>
+                <tagletArtifacts combine.children="append">
+                  <tagletArtifact>
+                    <groupId>ball</groupId>
+                    <artifactId>ball-tools-javadoc</artifactId>
+                    <version>${ball-tools-javadoc.version}</version>
+                  </tagletArtifact>
+                </tagletArtifacts>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
   <properties>
+    <license.skipUpdateProjectLicense>true</license.skipUpdateProjectLicense>
     <jse.target>11</jse.target>
-    <start-class>ganymede.Launcher</start-class>
+    <maven.compiler.source>${jse.target}</maven.compiler.source>
     <kotlin.version>1.4.32</kotlin.version>
     <jetty.version>9.4.39.v20210325</jetty.version>
     <log4j2.version>2.14.1</log4j2.version>
@@ -59,6 +101,16 @@
     <scala.version>${scala.binary.version}.10</scala.version>
     <!-- Optional -->
     <tablesaw.version>0.38.2</tablesaw.version>
+    <!-- Javadoc Generation -->
+    <!-- <ball-api.version>${ball-parent.version}</ball-api.version> -->
+    <ball-api.version>20210218.0</ball-api.version>
+    <javadoc-offline-locations>${settings.localRepository}/javadoc-offline-locations</javadoc-offline-locations>
+
+    <javadoc.io>https://javadoc.io/doc/</javadoc.io>
+    <flexmark.apidocs>${javadoc.io}com.vladsch.flexmark/</flexmark.apidocs>
+    <jeromq.apidocs>${javadoc.io}org.zeromq/jeromq/</jeromq.apidocs>
+    <spdx.apidocs>${javadoc.io}org.spdx/spdx-tools/</spdx.apidocs>
+    <tomcat.apidocs>https://tomcat.apache.org/tomcat-${tomcat.major.version}-doc</tomcat.apidocs>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -335,118 +387,279 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
+  <modules>
+    <module>kernel</module>
+  </modules>
   <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-clean-plugin</artifactId>
-        <configuration>
-          <filesets>
-            <fileset>
-              <directory>${project.basedir}</directory>
-              <includes>
-                <include>dependency-reduced-pom.xml</include>
-              </includes>
-            </fileset>
-          </filesets>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>META-INF/shaded.dependencies</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>tree</goal>
-            </goals>
-            <configuration>
-              <outputFile>${project.build.outputDirectory}/META-INF/shaded.dependencies</outputFile>
-              <outputScope>false</outputScope>
-              <scope>runtime</scope>
-              <tokens>whitespace</tokens>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <dependencies>
-          <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-maven-plugin</artifactId>
-            <version>${spring-boot.version}</version>
-          </dependency>
-        </dependencies>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <createDependencyReducedPom>true</createDependencyReducedPom>
-          <filters>
-            <filter>
-              <artifact>*:*</artifact>
-              <excludes>META-INF/*.SF</excludes>
-              <excludes>META-INF/*.DSA</excludes>
-              <excludes>META-INF/*.RSA</excludes>
-              <excludes>**/module-info.class</excludes>
-            </filter>
-          </filters>
-          <transformers>
-            <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer"/>
-            <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
-              <addHeader>false</addHeader>
-            </transformer>
-            <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-              <resource>META-INF/DEPENDENCIES</resource>
-            </transformer>
-            <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-              <manifestEntries>
-                <Main-Class>${start-class}</Main-Class>
-              </manifestEntries>
-            </transformer>
-            <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-            <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-              <resource>META-INF/sisu/javax.inject.Named</resource>
-            </transformer>
-            <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-              <resource>META-INF/spring.handlers</resource>
-            </transformer>
-            <transformer implementation="org.springframework.boot.maven.PropertiesMergingResourceTransformer">
-              <resource>META-INF/spring.factories</resource>
-            </transformer>
-            <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-              <resource>META-INF/spring.schemas</resource>
-            </transformer>
-            <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-              <resource>META-INF/spring.tooling</resource>
-            </transformer>
-          </transformers>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-install-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>default-install</id>
-            <goals>
-              <goal>install-file</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <pomFile>dependency-reduced-pom.xml</pomFile>
-          <file>${project.build.directory}/${project.build.finalName}.jar</file>
-        </configuration>
-      </plugin>
-    </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <source>${maven.compiler.source}</source>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>javadoc-offline-locations</id>
+              <phase>generate-sources</phase>
+              <goals>
+                <goal>unpack-dependencies</goal>
+              </goals>
+              <configuration>
+                <classifier>javadoc</classifier>
+                <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
+                <includes>package*-list,element*-list</includes>
+                <outputDirectory>${javadoc-offline-locations}</outputDirectory>
+                <stripClassifier>true</stripClassifier>
+                <stripVersion>true</stripVersion>
+                <useSubDirectoryPerArtifact>true</useSubDirectoryPerArtifact>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>javadoc-offline-locations</id>
+              <phase>generate-sources</phase>
+              <goals>
+                <goal>run</goal>
+              </goals>
+              <configuration>
+                <target>
+                  <copy filtering="false" preservelastmodified="true"
+                        todir="${javadoc-offline-locations}">
+                    <fileset dir="${javadoc-offline-locations}"/>
+                    <regexpmapper from="^(.*/)?element-list$"
+                                  to="\1/package-list"/>
+                  </copy>
+                  <copy filtering="false" preservelastmodified="true"
+                        todir="${javadoc-offline-locations}">
+                    <fileset dir="${javadoc-offline-locations}"/>
+                    <regexpmapper from="^(.*/)?package-list$"
+                                  to="\1/element-list"/>
+                  </copy>
+                </target>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <configuration>
+            <detectLinks>true</detectLinks>
+            <detectOfflineLinks>true</detectOfflineLinks>
+            <keywords>true</keywords>
+            <doclint>none</doclint>
+            <links>
+              <link>https://repo.hcf.dev/javadoc/ball-api/${ball-api.version}/</link>
+              <!-- Java EE 8 -->
+              <link>https://javaee.github.io/javaee-spec/javadocs/</link>
+              <!-- Apache Commons -->
+              <link>https://commons.apache.org/proper/commons-io/apidocs/</link>
+              <link>https://commons.apache.org/proper/commons-lang/apidocs/</link>
+              <!-- Apache Maven -->
+              <link>https://maven.apache.org/ref/${maven.version}/apidocs/</link>
+              <link>https://maven.apache.org/ref/${maven.version}/maven-plugin-api/apidocs/</link>
+              <link>https://maven.apache.org/plugin-tools/maven-plugin-annotations/apidocs/</link>
+              <link>https://maven.apache.org/shared/maven-artifact-transfer/apidocs/</link>
+              <link>https://maven.apache.org/wagon/wagon-provider-api/apidocs/</link>
+              <link>https://maven.apache.org/components/wagon/wagon-providers/wagon-file/apidocs/</link>
+              <link>https://maven.apache.org/components/wagon/wagon-providers/wagon-ftp/apidocs/</link>
+              <link>https://maven.apache.org/components/wagon/wagon-providers/wagon-http/apidocs/</link>
+              <link>https://maven.apache.org/components/wagon/wagon-providers/wagon-http-lightweight/apidocs/</link>
+              <link>https://maven.apache.org/components/wagon/wagon-providers/wagon-scm/apidocs/</link>
+              <link>https://maven.apache.org/components/wagon/wagon-providers/wagon-ssh/apidocs/</link>
+              <link>https://maven.apache.org/components/wagon/wagon-providers/wagon-ssh-external/apidocs/</link>
+              <link>https://maven.apache.org/components/wagon/wagon-providers/wagon-webdav-jackrabbit/apidocs/</link>
+              <!-- Apache Spark -->
+              <link>https://spark.apache.org/docs/latest/api/java/</link>
+              <!-- Apache Tika -->
+              <link>https://tika.apache.org/${tika.version}/api/</link>
+              <!-- Apache Tomcat -->
+              <link>${tomcat.apidocs}/api/</link>
+              <link>${tomcat.apidocs}/servletapi/</link>
+              <link>${tomcat.apidocs}/jspapi/</link>
+              <link>${tomcat.apidocs}/elapi/</link>
+              <link>${tomcat.apidocs}/websocketapi/</link>
+              <!-- Eclipse Aether -->
+              <link>${javadoc.io}org.eclipse.aether/aether-api/latest/</link>
+              <!-- HawtJNI -->
+              <link>https://fusesource.github.io/hawtjni/documentation/api/</link>
+              <!-- Hibernate -->
+              <link>https://docs.jboss.org/hibernate/stable/orm/javadocs/</link>
+              <link>https://docs.jboss.org/hibernate/stable/validator/api/</link>
+              <!-- Jackson -->
+              <link>https://fasterxml.github.io/jackson-annotations/javadoc/${jackson.major.version}/</link>
+              <link>https://fasterxml.github.io/jackson-core/javadoc/${jackson.major.version}/</link>
+              <link>https://fasterxml.github.io/jackson-databind/javadoc/${jackson.major.version}/</link>
+              <!-- Netty -->
+              <link>https://netty.io/${netty.major.version}/api/</link>
+              <!-- Plexus -->
+              <link>https://codehaus-plexus.github.io/plexus-classworlds/apidocs/</link>
+              <link>https://codehaus-plexus.github.io/plexus-containers/plexus-container-default/apidocs/</link>
+              <link>https://codehaus-plexus.github.io/plexus-containers/plexus-component-metadata/apidocs/</link>
+              <link>https://codehaus-plexus.github.io/plexus-containers/plexus-component-annotations/apidocs/</link>
+              <!-- JeroMQ -->
+              <link>${jeromq.apidocs}jeromq/latest/</link>
+              <!-- JFreeChart -->
+              <link>https://www.jfree.org/jfreechart/api/javadoc/</link>
+              <!-- Spring -->
+              <link>https://docs.spring.io/spring/docs/${spring-framework.version}/javadoc-api/</link>
+              <link>https://docs.spring.io/spring-boot/docs/${spring-boot.version}/api/</link>
+              <link>https://docs.spring.io/spring-boot/docs/${spring-boot.version}/gradle-plugin/api/</link>
+              <link>https://docs.spring.io/spring-data/commons/docs/current/api/</link>
+              <link>https://docs.spring.io/spring-data/jpa/docs/current/api/</link>
+              <link>https://docs.spring.io/spring-security/site/docs/${spring-security.version}/api/</link>
+              <!-- XChart -->
+              <link>https://knowm.org/javadocs/xchart/</link>
+            </links>
+            <linksource>true</linksource>
+            <locale>en_US</locale>
+            <offlineLinks>
+              <!-- Apache Ant -->
+              <offlineLink>
+                <url>${javadoc.io}org.apache.ant/ant/latest/</url>
+                <location>${javadoc-offline-locations}/ant-javadoc-jar/</location>
+              </offlineLink>
+              <!-- Apache HttpComponents -->
+              <offlineLink>
+                <url>https://www.javadoc.io/doc/org.apache.httpcomponents/httpclient/latest/</url>
+                <location>${javadoc-offline-locations}/httpclient-javadoc-jar/</location>
+              </offlineLink>
+              <offlineLink>
+                <url>https://www.javadoc.io/doc/org.apache.httpcomponents/httpcore/latest/</url>
+                <location>${javadoc-offline-locations}/httpcore-javadoc-jar/</location>
+              </offlineLink>
+              <!-- Flexmark -->
+              <offlineLink>
+                <url>${flexmark.apidocs}flexmark/latest/</url>
+                <location>${javadoc-offline-locations}/flexmark-javadoc-jar/</location>
+              </offlineLink>
+              <offlineLink>
+                <url>${flexmark.apidocs}flexmark-util-ast/latest/</url>
+                <location>${javadoc-offline-locations}/flexmark-util-ast-javadoc-jar/</location>
+              </offlineLink>
+              <!-- flexmark-ext-abbreviation-javadoc-jar -->
+              <!-- flexmark-ext-admonition-javadoc-jar -->
+              <!-- flexmark-ext-anchorlink-javadoc-jar -->
+              <!-- flexmark-ext-aside-javadoc-jar -->
+              <!-- flexmark-ext-attributes-javadoc-jar -->
+              <!-- flexmark-ext-autolink-javadoc-jar -->
+              <!-- flexmark-ext-definition-javadoc-jar -->
+              <!-- flexmark-ext-emoji-javadoc-jar -->
+              <!-- flexmark-ext-enumerated-reference-javadoc-jar -->
+              <!-- flexmark-ext-escaped-character-javadoc-jar -->
+              <!-- flexmark-ext-footnotes-javadoc-jar -->
+              <!-- flexmark-ext-gfm-issues-javadoc-jar -->
+              <!-- flexmark-ext-gfm-strikethrough-javadoc-jar -->
+              <!-- flexmark-ext-gfm-tasklist-javadoc-jar -->
+              <!-- flexmark-ext-gfm-users-javadoc-jar -->
+              <!-- flexmark-ext-gitlab-javadoc-jar -->
+              <!-- flexmark-ext-ins-javadoc-jar -->
+              <!-- flexmark-ext-jekyll-front-matter-javadoc-jar -->
+              <!-- flexmark-ext-jekyll-tag-javadoc-jar -->
+              <!-- flexmark-ext-macros-javadoc-jar -->
+              <!-- flexmark-ext-media-tags-javadoc-jar -->
+              <!-- flexmark-ext-superscript-javadoc-jar -->
+              <offlineLink>
+                <url>${flexmark.apidocs}flexmark-ext-tables-javadoc-jar/latest/</url>
+                <location>${javadoc-offline-locations}/flexmark-ext-tables-javadoc-jar</location>
+              </offlineLink>
+              <!-- flexmark-ext-toc-javadoc-jar -->
+              <!-- flexmark-ext-typographic-javadoc-jar -->
+              <!-- flexmark-ext-wikilink-javadoc-jar -->
+              <!-- flexmark-ext-xwiki-macros-javadoc-jar -->
+              <!-- flexmark-ext-yaml-front-matter-javadoc-jar -->
+              <!-- flexmark-ext-youtube-embedded-javadoc-jar -->
+              <!-- Flyway -->
+<!--
+              <offlineLink>
+                <url>https://flywaydb.org/documentation/usage/api/javadoc/</url>
+                <location>${javadoc-offline-locations}/flyway-core-javadoc-jar/</location>
+              </offlineLink>
+-->
+              <!-- Groovy -->
+              <offlineLink>
+                <url>${javadoc.io}org.codehaus.groovy/groovy-all/latest/</url>
+                <location>${javadoc-offline-locations}/groovy-javadoc-jar/</location>
+              </offlineLink>
+              <offlineLink>
+                <url>${javadoc.io}org.codehaus.groovy/groovy-all/latest/</url>
+                <location>${javadoc-offline-locations}/groovy-jsr223-javadoc-jar/</location>
+              </offlineLink>
+              <!-- Scala -->
+<!--
+              <offlineLink>
+                <url>https://www.javadoc.io/doc/org.scala-lang/scala-compiler/latest/</url>
+                <location>${javadoc-offline-locations}/scala-compiler-javadoc-jar</location>
+              </offlineLink>
+              <offlineLink>
+                <url>https://www.javadoc.io/doc/org.scala-lang/scala-library/latest/</url>
+                <location>${javadoc-offline-locations}/scala-library-javadoc-jar</location>
+              </offlineLink>
+-->
+              <!-- SPDX -->
+              <offlineLink>
+                <url>${spdx.apidocs}spdx-tools/latest/</url>
+                <location>${javadoc-offline-locations}/spdx-tools-javadoc-jar/</location>
+              </offlineLink>
+              <!-- Tablesaw -->
+              <offlineLink>
+                <url>https://javadoc.io/doc/tech.tablesaw/tablesaw-core/latest/</url>
+                <location>${javadoc-offline-locations}/tablesaw-core-javadoc-jar/</location>
+              </offlineLink>
+              <offlineLink>
+                <url>https://javadoc.io/doc/tech.tablesaw/tablesaw-jsplot/latest/</url>
+                <location>${javadoc-offline-locations}/tablesaw-jsplot-javadoc-jar/</location>
+              </offlineLink>
+              <!-- Thymeleaf -->
+              <offlineLink>
+                <url>https://www.thymeleaf.org/apidocs/thymeleaf/${thymeleaf.version}/</url>
+                <location>${javadoc-offline-locations}/thymeleaf-javadoc-jar/</location>
+              </offlineLink>
+              <offlineLink>
+                <url>https://www.thymeleaf.org/apidocs/thymeleaf-spring5/${thymeleaf.version}/</url>
+                <location>${javadoc-offline-locations}/thymeleaf-spring5-javadoc-jar/</location>
+              </offlineLink>
+              <!-- webjars-locator-core -->
+              <offlineLink>
+                <url>${javadoc.io}org.webjars/webjars-locator-core/latest/</url>
+                <location>${javadoc-offline-locations}/webjars-locator-core-javadoc-jar/</location>
+              </offlineLink>
+            </offlineLinks>
+            <quiet>true</quiet>
+            <serialwarn>true</serialwarn>
+            <show>protected</show>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>wagon-maven-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>upload-javadoc</id>
+              <phase>deploy</phase>
+              <goals>
+                <goal>upload</goal>
+              </goals>
+              <configuration>
+              </configuration>
+            </execution>
+          </executions>
+          <configuration>
+            <fromDir>${project.reporting.outputDirectory}/apidocs/${project.artifactId}</fromDir>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 </project>
