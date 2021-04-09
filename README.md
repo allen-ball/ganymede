@@ -464,7 +464,7 @@ Ibid.
 
 
 [Ganymede Kernel]: https://github.com/allen-ball/ganymede-kernel
-[Ganymede Kernel download]: releases/download/v1.0.0-SNAPSHOT/ganymede-kernel-1.0.0-SNAPSHOT.jar
+[Ganymede Kernel download]: https://github.com/allen-ball/ganymede/releases/download/v1.0.0-SNAPSHOT/ganymede-kernel-1.0.0-SNAPSHOT.jar
 [Ganymede API Javadoc]: https://allen-ball.github.io/ganymede-kernel/index.html?overview-summary.html
 [NotebookFunctions]: https://allen-ball.github.io/ganymede-kernel/ganymede/notebook/NotebookFunctions.html
 
