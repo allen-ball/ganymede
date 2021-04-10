@@ -115,7 +115,7 @@
 <span class="sourceLineNo">106</span><a id="line.106">        var engine = engine();</a>
 <span class="sourceLineNo">107</span><a id="line.107"></a>
 <span class="sourceLineNo">108</span><a id="line.108">        if (engine != null) {</a>
-<span class="sourceLineNo">109</span><a id="line.109">            render(engine.eval(code, __.context));</a>
+<span class="sourceLineNo">109</span><a id="line.109">            render(__, engine.eval(code, __.context));</a>
 <span class="sourceLineNo">110</span><a id="line.110">        } else {</a>
 <span class="sourceLineNo">111</span><a id="line.111">            System.err.format("No %s REPL available\n", getMagicNames()[0]);</a>
 <span class="sourceLineNo">112</span><a id="line.112">        }</a>
@@ -126,11 +126,12 @@
 <span class="sourceLineNo">117</span><a id="line.117">     * {@link ScriptEngine#eval(String,ScriptContext)}.  Made available for</a>
 <span class="sourceLineNo">118</span><a id="line.118">     * template engines.  Default implementation does nothing.</a>
 <span class="sourceLineNo">119</span><a id="line.119">     *</a>
-<span class="sourceLineNo">120</span><a id="line.120">     * @param   object          The result of</a>
-<span class="sourceLineNo">121</span><a id="line.121">     *                          {@link ScriptEngine#eval(String,ScriptContext)}.</a>
-<span class="sourceLineNo">122</span><a id="line.122">     */</a>
-<span class="sourceLineNo">123</span><a id="line.123">    protected void render(Object object) { }</a>
-<span class="sourceLineNo">124</span><a id="line.124">}</a>
+<span class="sourceLineNo">120</span><a id="line.120">     * @param   __              The {@link NotebookContext}.</a>
+<span class="sourceLineNo">121</span><a id="line.121">     * @param   object          The result of</a>
+<span class="sourceLineNo">122</span><a id="line.122">     *                          {@link ScriptEngine#eval(String,ScriptContext)}.</a>
+<span class="sourceLineNo">123</span><a id="line.123">     */</a>
+<span class="sourceLineNo">124</span><a id="line.124">    protected void render(NotebookContext __, Object object) { }</a>
+<span class="sourceLineNo">125</span><a id="line.125">}</a>
 
 
 
