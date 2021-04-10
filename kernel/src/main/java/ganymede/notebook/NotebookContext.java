@@ -18,6 +18,9 @@ package ganymede.notebook;
  * limitations under the License.
  * ##########################################################################
  */
+import com.fasterxml.jackson.databind.JsonNode;
+import ganymede.kernel.KernelRestClient;
+import ganymede.server.Message;
 import ganymede.shell.Shell;
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +38,7 @@ import jdk.jshell.JShell;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import static ganymede.server.Server.OBJECT_MAPPER;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -104,6 +108,49 @@ public class NotebookContext {
         }
 
         return object;
+    }
+
+    /**
+     * {@link NotebookFunction} to display from a Notebook cell.
+     *
+     * @param   object          The {@link Object} to display.
+     */
+    @NotebookFunction
+    public void display(Object object) {
+        try {
+            new KernelRestClient().display(Message.mime_bundle(object));
+        } catch (Exception exception) {
+            System.out.println(object);
+            exception.printStackTrace(System.err);
+        }
+    }
+
+    /**
+     * {@link NotebookFunction} to print from a Notebook cell.
+     *
+     * @param   object          The {@link Object} to print.
+     */
+    @NotebookFunction
+    public void print(Object object) {
+        try {
+            new KernelRestClient().print(Message.mime_bundle(object));
+        } catch (Exception exception) {
+            System.out.println(object);
+            exception.printStackTrace(System.err);
+        }
+    }
+
+    /**
+     * {@link NotebookFunction} to convert an {@link Object} to
+     * {@link JsonNode JSON} representation.
+     *
+     * @param   object          The {@link Object} to convert.
+     *
+     * @return  The {@link JsonNode} representation.
+     */
+    @NotebookFunction
+    public JsonNode asJson(Object object) {
+        return OBJECT_MAPPER.valueToTree(object);
     }
 
     /**

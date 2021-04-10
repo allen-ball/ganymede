@@ -122,8 +122,9 @@ JVM.  The minimum required Java version is 11 and subsequent versions are
 supported.
 
 The [JShell] environment includes builtin functions implemented through
-methods that wrap the `public static` methods defined in the
-[NotebookFunctions] class.  These functions include:
+methods that wrap the `public` methods defined in [NotebookContext] class
+annotated with [@NotebookFunction][NotebookFunction].  These functions
+include:
 
 | Method          | Description                            |
 | ---             | ---                                    |
@@ -468,7 +469,8 @@ Ibid.
 [Ganymede Kernel]: https://github.com/allen-ball/ganymede
 [Ganymede Kernel download]: https://github.com/allen-ball/ganymede/releases/download/v1.0.0-SNAPSHOT/ganymede-kernel-1.0.0-SNAPSHOT.jar
 [Ganymede API Javadoc]: https://allen-ball.github.io/ganymede/index.html?overview-summary.html
-[NotebookFunctions]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookFunctions.html
+[NotebookContext]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookContext.html
+[NotebookFunction]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookFunction.html
 
 
 [sine.ipynb]: notebooks/sine.ipynb

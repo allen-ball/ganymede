@@ -26,7 +26,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
 import static java.lang.reflect.Modifier.isPublic;
-import static java.lang.reflect.Modifier.isStatic;
 
 /**
  * {@link Notebook} Spring launcher.
@@ -73,18 +72,18 @@ public class Notebook {
             String.format("var __ = %s.newNotebookContext();\n",
                           Notebook.class.getCanonicalName());
 
-        for (var method : NotebookFunctions.class.getDeclaredMethods()) {
-            var modifiers = method.getModifiers();
-
-            if (isPublic(modifiers) && isStatic(modifiers)) {
-                code += makeWrapperFor(method);
+        for (var method : NotebookContext.class.getDeclaredMethods()) {
+            if (method.isAnnotationPresent(NotebookFunction.class)) {
+                if (isPublic(method.getModifiers())) {
+                    code += makeWrapperFor("__", method);
+                }
             }
         }
 
         return code;
     }
 
-    private static String makeWrapperFor(Method method) {
+    private static String makeWrapperFor(String instance, Method method) {
         var types = method.getGenericParameterTypes();
         var arguments = new String[types.length];
         var parameters = new String[types.length];
@@ -105,6 +104,6 @@ public class Notebook {
                              method.getGenericReturnType().getTypeName(),
                              method.getName(), plist,
                              Void.TYPE.equals(method.getReturnType()) ? "" : "return ",
-                             method.getDeclaringClass().getName(), alist);
+                             instance, alist);
     }
 }

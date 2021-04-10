@@ -27,7 +27,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
-import static ganymede.notebook.NotebookFunctions.print;
 import static javax.script.ScriptContext.ENGINE_SCOPE;
 
 /**
@@ -49,7 +48,7 @@ public class Java extends AbstractMagic {
                                       "types", __.types);
             var html = ThymeleafRenderer.process(getClass(), resource + ".html", "html", map);
 
-            print(html);
+            __.print(html);
         } else {
             throw new IllegalStateException();
         }

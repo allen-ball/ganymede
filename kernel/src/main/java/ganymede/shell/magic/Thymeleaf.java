@@ -21,13 +21,12 @@ package ganymede.shell.magic;
 import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.jsr223.ThymeleafScriptEngine;
+import ganymede.notebook.NotebookContext;
 import ganymede.server.renderer.ThymeleafRenderer;
 import ganymede.shell.Magic;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
-
-import static ganymede.notebook.NotebookFunctions.print;
 
 /**
  * {@link Thymeleaf} template {@link Magic}.
@@ -40,10 +39,10 @@ import static ganymede.notebook.NotebookFunctions.print;
 @NoArgsConstructor @ToString @Log4j2
 public class Thymeleaf extends AbstractScriptEngineMagic {
     @Override
-    protected void render(Object object) {
+    protected void render(NotebookContext __, Object object) {
         var engine = (ThymeleafScriptEngine) engine();
         var mode = engine.getResolver().getTemplateMode();
 
-        print(new ThymeleafRenderer.Output(mode, String.valueOf(object)));
+        __.print(new ThymeleafRenderer.Output(mode, String.valueOf(object)));
     }
 }
