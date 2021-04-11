@@ -29,53 +29,52 @@
 <span class="sourceLineNo">020</span><a id="line.20"> */</a>
 <span class="sourceLineNo">021</span><a id="line.21">import ball.annotation.ServiceProviderFor;</a>
 <span class="sourceLineNo">022</span><a id="line.22">import com.fasterxml.jackson.databind.node.ObjectNode;</a>
-<span class="sourceLineNo">023</span><a id="line.23">import ganymede.notebook.NotebookContext;</a>
-<span class="sourceLineNo">024</span><a id="line.24">import ganymede.server.Message;</a>
-<span class="sourceLineNo">025</span><a id="line.25">import ganymede.server.renderer.ThymeleafRenderer;</a>
-<span class="sourceLineNo">026</span><a id="line.26">import ganymede.shell.Magic;</a>
-<span class="sourceLineNo">027</span><a id="line.27">import ganymede.shell.Shell;</a>
-<span class="sourceLineNo">028</span><a id="line.28">import java.io.InputStream;</a>
-<span class="sourceLineNo">029</span><a id="line.29">import java.io.PrintStream;</a>
-<span class="sourceLineNo">030</span><a id="line.30">import java.util.Map;</a>
-<span class="sourceLineNo">031</span><a id="line.31">import java.util.TreeMap;</a>
-<span class="sourceLineNo">032</span><a id="line.32">import lombok.NoArgsConstructor;</a>
-<span class="sourceLineNo">033</span><a id="line.33">import lombok.ToString;</a>
-<span class="sourceLineNo">034</span><a id="line.34">import lombok.extern.log4j.Log4j2;</a>
-<span class="sourceLineNo">035</span><a id="line.35"></a>
-<span class="sourceLineNo">036</span><a id="line.36">import static java.util.stream.Collectors.toMap;</a>
-<span class="sourceLineNo">037</span><a id="line.37"></a>
-<span class="sourceLineNo">038</span><a id="line.38">/**</a>
-<span class="sourceLineNo">039</span><a id="line.39"> * {@link Magics} {@link Magic}: List configured {@link Magic}s.</a>
-<span class="sourceLineNo">040</span><a id="line.40"> *</a>
-<span class="sourceLineNo">041</span><a id="line.41"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
-<span class="sourceLineNo">042</span><a id="line.42"> */</a>
-<span class="sourceLineNo">043</span><a id="line.43">@ServiceProviderFor({ Magic.class })</a>
-<span class="sourceLineNo">044</span><a id="line.44">@Description("Lists available cell magics")</a>
-<span class="sourceLineNo">045</span><a id="line.45">@NoArgsConstructor @ToString @Log4j2</a>
-<span class="sourceLineNo">046</span><a id="line.46">public class Magics extends AbstractMagic {</a>
-<span class="sourceLineNo">047</span><a id="line.47">    @Override</a>
-<span class="sourceLineNo">048</span><a id="line.48">    public void execute(Shell shell,</a>
-<span class="sourceLineNo">049</span><a id="line.49">                        InputStream in, PrintStream out, PrintStream err,</a>
-<span class="sourceLineNo">050</span><a id="line.50">                        String line0, String code) throws Exception {</a>
-<span class="sourceLineNo">051</span><a id="line.51">        var magics =</a>
-<span class="sourceLineNo">052</span><a id="line.52">            shell.magics().values().stream()</a>
-<span class="sourceLineNo">053</span><a id="line.53">            .distinct()</a>
-<span class="sourceLineNo">054</span><a id="line.54">            .collect(toMap(k -&gt; String.join(", ", k.getMagicNames()),</a>
-<span class="sourceLineNo">055</span><a id="line.55">                           v -&gt; v.getDescription(),</a>
-<span class="sourceLineNo">056</span><a id="line.56">                           (t, u) -&gt; t, () -&gt; new TreeMap&lt;&gt;()));</a>
-<span class="sourceLineNo">057</span><a id="line.57">        var resource = getClass().getSimpleName();</a>
-<span class="sourceLineNo">058</span><a id="line.58">        var map = Map.&lt;String,Object&gt;of("magics", magics);</a>
-<span class="sourceLineNo">059</span><a id="line.59">        var html = ThymeleafRenderer.process(getClass(), resource + ".html", "html", map);</a>
-<span class="sourceLineNo">060</span><a id="line.60">        var text = ThymeleafRenderer.process(getClass(), resource + ".text", "text", map);</a>
-<span class="sourceLineNo">061</span><a id="line.61"></a>
-<span class="sourceLineNo">062</span><a id="line.62">        shell.kernel().print(Message.mime_bundle(html, text));</a>
-<span class="sourceLineNo">063</span><a id="line.63">    }</a>
-<span class="sourceLineNo">064</span><a id="line.64"></a>
-<span class="sourceLineNo">065</span><a id="line.65">    @Override</a>
-<span class="sourceLineNo">066</span><a id="line.66">    public void execute(NotebookContext __, String line0, String code) throws Exception {</a>
-<span class="sourceLineNo">067</span><a id="line.67">        throw new IllegalArgumentException(line0);</a>
-<span class="sourceLineNo">068</span><a id="line.68">    }</a>
-<span class="sourceLineNo">069</span><a id="line.69">}</a>
+<span class="sourceLineNo">023</span><a id="line.23">import ganymede.server.Message;</a>
+<span class="sourceLineNo">024</span><a id="line.24">import ganymede.server.renderer.ThymeleafRenderer;</a>
+<span class="sourceLineNo">025</span><a id="line.25">import ganymede.shell.Magic;</a>
+<span class="sourceLineNo">026</span><a id="line.26">import ganymede.shell.Shell;</a>
+<span class="sourceLineNo">027</span><a id="line.27">import java.io.InputStream;</a>
+<span class="sourceLineNo">028</span><a id="line.28">import java.io.PrintStream;</a>
+<span class="sourceLineNo">029</span><a id="line.29">import java.util.Map;</a>
+<span class="sourceLineNo">030</span><a id="line.30">import java.util.TreeMap;</a>
+<span class="sourceLineNo">031</span><a id="line.31">import lombok.NoArgsConstructor;</a>
+<span class="sourceLineNo">032</span><a id="line.32">import lombok.ToString;</a>
+<span class="sourceLineNo">033</span><a id="line.33">import lombok.extern.log4j.Log4j2;</a>
+<span class="sourceLineNo">034</span><a id="line.34"></a>
+<span class="sourceLineNo">035</span><a id="line.35">import static java.util.stream.Collectors.toMap;</a>
+<span class="sourceLineNo">036</span><a id="line.36"></a>
+<span class="sourceLineNo">037</span><a id="line.37">/**</a>
+<span class="sourceLineNo">038</span><a id="line.38"> * {@link Magics} {@link Magic}: List configured {@link Magic}s.</a>
+<span class="sourceLineNo">039</span><a id="line.39"> *</a>
+<span class="sourceLineNo">040</span><a id="line.40"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
+<span class="sourceLineNo">041</span><a id="line.41"> */</a>
+<span class="sourceLineNo">042</span><a id="line.42">@ServiceProviderFor({ Magic.class })</a>
+<span class="sourceLineNo">043</span><a id="line.43">@Description("Lists available cell magics")</a>
+<span class="sourceLineNo">044</span><a id="line.44">@NoArgsConstructor @ToString @Log4j2</a>
+<span class="sourceLineNo">045</span><a id="line.45">public class Magics extends AbstractMagic {</a>
+<span class="sourceLineNo">046</span><a id="line.46">    @Override</a>
+<span class="sourceLineNo">047</span><a id="line.47">    public void execute(Shell shell,</a>
+<span class="sourceLineNo">048</span><a id="line.48">                        InputStream in, PrintStream out, PrintStream err,</a>
+<span class="sourceLineNo">049</span><a id="line.49">                        String line0, String code) throws Exception {</a>
+<span class="sourceLineNo">050</span><a id="line.50">        var magics =</a>
+<span class="sourceLineNo">051</span><a id="line.51">            shell.magics().values().stream()</a>
+<span class="sourceLineNo">052</span><a id="line.52">            .distinct()</a>
+<span class="sourceLineNo">053</span><a id="line.53">            .collect(toMap(k -&gt; String.join(", ", k.getMagicNames()),</a>
+<span class="sourceLineNo">054</span><a id="line.54">                           v -&gt; v.getDescription(),</a>
+<span class="sourceLineNo">055</span><a id="line.55">                           (t, u) -&gt; t, () -&gt; new TreeMap&lt;&gt;()));</a>
+<span class="sourceLineNo">056</span><a id="line.56">        var resource = getClass().getSimpleName();</a>
+<span class="sourceLineNo">057</span><a id="line.57">        var map = Map.&lt;String,Object&gt;of("magics", magics);</a>
+<span class="sourceLineNo">058</span><a id="line.58">        var html = ThymeleafRenderer.process(getClass(), resource + ".html", "html", map);</a>
+<span class="sourceLineNo">059</span><a id="line.59">        var text = ThymeleafRenderer.process(getClass(), resource + ".text", "text", map);</a>
+<span class="sourceLineNo">060</span><a id="line.60"></a>
+<span class="sourceLineNo">061</span><a id="line.61">        shell.kernel().print(Message.mime_bundle(html, text));</a>
+<span class="sourceLineNo">062</span><a id="line.62">    }</a>
+<span class="sourceLineNo">063</span><a id="line.63"></a>
+<span class="sourceLineNo">064</span><a id="line.64">    @Override</a>
+<span class="sourceLineNo">065</span><a id="line.65">    public void execute(String line0, String code) throws Exception {</a>
+<span class="sourceLineNo">066</span><a id="line.66">        throw new IllegalArgumentException(line0);</a>
+<span class="sourceLineNo">067</span><a id="line.67">    }</a>
+<span class="sourceLineNo">068</span><a id="line.68">}</a>
 
 
 

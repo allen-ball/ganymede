@@ -81,7 +81,7 @@
 <span class="sourceLineNo">072</span><a id="line.72">    private final Kernel kernel;</a>
 <span class="sourceLineNo">073</span><a id="line.73">    private Locale locale = null;       /* TBD: Query Notebook server */</a>
 <span class="sourceLineNo">074</span><a id="line.74">    private final AtomicInteger restarts = new AtomicInteger(0);</a>
-<span class="sourceLineNo">075</span><a id="line.75">    private final MagicMap magics = new MagicMap();</a>
+<span class="sourceLineNo">075</span><a id="line.75">    private final MagicMap magics = new MagicMap(null);</a>
 <span class="sourceLineNo">076</span><a id="line.76">    private final Java java = new Java();</a>
 <span class="sourceLineNo">077</span><a id="line.77">    private JShell jshell = null;</a>
 <span class="sourceLineNo">078</span><a id="line.78">    private InputStream in = null;</a>
@@ -464,71 +464,76 @@
 <span class="sourceLineNo">455</span><a id="line.455">        }</a>
 <span class="sourceLineNo">456</span><a id="line.456"></a>
 <span class="sourceLineNo">457</span><a id="line.457">        @Override</a>
-<span class="sourceLineNo">458</span><a id="line.458">        public void execute(NotebookContext __, String line0, String code) throws Exception {</a>
+<span class="sourceLineNo">458</span><a id="line.458">        public void configure(NotebookContext context) {</a>
 <span class="sourceLineNo">459</span><a id="line.459">            throw new IllegalStateException();</a>
 <span class="sourceLineNo">460</span><a id="line.460">        }</a>
 <span class="sourceLineNo">461</span><a id="line.461"></a>
-<span class="sourceLineNo">462</span><a id="line.462">        protected void execute(JShell jshell,</a>
-<span class="sourceLineNo">463</span><a id="line.463">                               InputStream in, PrintStream out, PrintStream err,</a>
-<span class="sourceLineNo">464</span><a id="line.464">                               String code) throws Exception {</a>
-<span class="sourceLineNo">465</span><a id="line.465">            try {</a>
-<span class="sourceLineNo">466</span><a id="line.466">                var iterator = parse(jshell, code).entrySet().iterator();</a>
-<span class="sourceLineNo">467</span><a id="line.467"></a>
-<span class="sourceLineNo">468</span><a id="line.468">                while (iterator.hasNext()) {</a>
-<span class="sourceLineNo">469</span><a id="line.469">                    var entry = iterator.next();</a>
-<span class="sourceLineNo">470</span><a id="line.470">                    var info = entry.getValue();</a>
-<span class="sourceLineNo">471</span><a id="line.471">                    var events = jshell.eval(info.source());</a>
-<span class="sourceLineNo">472</span><a id="line.472">                    var exception =</a>
-<span class="sourceLineNo">473</span><a id="line.473">                        events.stream()</a>
-<span class="sourceLineNo">474</span><a id="line.474">                        .map(t -&gt; t.exception())</a>
-<span class="sourceLineNo">475</span><a id="line.475">                        .filter(Objects::nonNull)</a>
-<span class="sourceLineNo">476</span><a id="line.476">                        .findFirst().orElse(null);</a>
-<span class="sourceLineNo">477</span><a id="line.477"></a>
-<span class="sourceLineNo">478</span><a id="line.478">                    if (exception != null) {</a>
-<span class="sourceLineNo">479</span><a id="line.479">                        exception.printStackTrace(err);</a>
-<span class="sourceLineNo">480</span><a id="line.480">                        break;</a>
-<span class="sourceLineNo">481</span><a id="line.481">                    }</a>
+<span class="sourceLineNo">462</span><a id="line.462">        @Override</a>
+<span class="sourceLineNo">463</span><a id="line.463">        public void execute(String line0, String code) throws Exception {</a>
+<span class="sourceLineNo">464</span><a id="line.464">            throw new IllegalStateException();</a>
+<span class="sourceLineNo">465</span><a id="line.465">        }</a>
+<span class="sourceLineNo">466</span><a id="line.466"></a>
+<span class="sourceLineNo">467</span><a id="line.467">        protected void execute(JShell jshell,</a>
+<span class="sourceLineNo">468</span><a id="line.468">                               InputStream in, PrintStream out, PrintStream err,</a>
+<span class="sourceLineNo">469</span><a id="line.469">                               String code) throws Exception {</a>
+<span class="sourceLineNo">470</span><a id="line.470">            try {</a>
+<span class="sourceLineNo">471</span><a id="line.471">                var iterator = parse(jshell, code).entrySet().iterator();</a>
+<span class="sourceLineNo">472</span><a id="line.472"></a>
+<span class="sourceLineNo">473</span><a id="line.473">                while (iterator.hasNext()) {</a>
+<span class="sourceLineNo">474</span><a id="line.474">                    var entry = iterator.next();</a>
+<span class="sourceLineNo">475</span><a id="line.475">                    var info = entry.getValue();</a>
+<span class="sourceLineNo">476</span><a id="line.476">                    var events = jshell.eval(info.source());</a>
+<span class="sourceLineNo">477</span><a id="line.477">                    var exception =</a>
+<span class="sourceLineNo">478</span><a id="line.478">                        events.stream()</a>
+<span class="sourceLineNo">479</span><a id="line.479">                        .map(t -&gt; t.exception())</a>
+<span class="sourceLineNo">480</span><a id="line.480">                        .filter(Objects::nonNull)</a>
+<span class="sourceLineNo">481</span><a id="line.481">                        .findFirst().orElse(null);</a>
 <span class="sourceLineNo">482</span><a id="line.482"></a>
-<span class="sourceLineNo">483</span><a id="line.483">                    var reason =</a>
-<span class="sourceLineNo">484</span><a id="line.484">                        events.stream()</a>
-<span class="sourceLineNo">485</span><a id="line.485">                        .filter(t -&gt; t.status().equals(REJECTED))</a>
-<span class="sourceLineNo">486</span><a id="line.486">                        .map(t -&gt; jshell.diagnostics(t.snippet())</a>
-<span class="sourceLineNo">487</span><a id="line.487">                             .map(u -&gt; u.getMessage(locale))</a>
-<span class="sourceLineNo">488</span><a id="line.488">                             .collect(joining("\n",</a>
-<span class="sourceLineNo">489</span><a id="line.489">                                              String.format("%s %s\n%s\n",</a>
-<span class="sourceLineNo">490</span><a id="line.490">                                                            t.status(),</a>
-<span class="sourceLineNo">491</span><a id="line.491">                                                            t.snippet().kind(),</a>
-<span class="sourceLineNo">492</span><a id="line.492">                                                            t.snippet().source()),</a>
-<span class="sourceLineNo">493</span><a id="line.493">                                              "")))</a>
-<span class="sourceLineNo">494</span><a id="line.494">                        .findFirst().orElse(null);</a>
-<span class="sourceLineNo">495</span><a id="line.495"></a>
-<span class="sourceLineNo">496</span><a id="line.496">                    if (reason != null) {</a>
-<span class="sourceLineNo">497</span><a id="line.497">                        err.println(reason);</a>
-<span class="sourceLineNo">498</span><a id="line.498">                        break;</a>
-<span class="sourceLineNo">499</span><a id="line.499">                    }</a>
+<span class="sourceLineNo">483</span><a id="line.483">                    if (exception != null) {</a>
+<span class="sourceLineNo">484</span><a id="line.484">                        exception.printStackTrace(err);</a>
+<span class="sourceLineNo">485</span><a id="line.485">                        break;</a>
+<span class="sourceLineNo">486</span><a id="line.486">                    }</a>
+<span class="sourceLineNo">487</span><a id="line.487"></a>
+<span class="sourceLineNo">488</span><a id="line.488">                    var reason =</a>
+<span class="sourceLineNo">489</span><a id="line.489">                        events.stream()</a>
+<span class="sourceLineNo">490</span><a id="line.490">                        .filter(t -&gt; t.status().equals(REJECTED))</a>
+<span class="sourceLineNo">491</span><a id="line.491">                        .map(t -&gt; jshell.diagnostics(t.snippet())</a>
+<span class="sourceLineNo">492</span><a id="line.492">                             .map(u -&gt; u.getMessage(locale))</a>
+<span class="sourceLineNo">493</span><a id="line.493">                             .collect(joining("\n",</a>
+<span class="sourceLineNo">494</span><a id="line.494">                                              String.format("%s %s\n%s\n",</a>
+<span class="sourceLineNo">495</span><a id="line.495">                                                            t.status(),</a>
+<span class="sourceLineNo">496</span><a id="line.496">                                                            t.snippet().kind(),</a>
+<span class="sourceLineNo">497</span><a id="line.497">                                                            t.snippet().source()),</a>
+<span class="sourceLineNo">498</span><a id="line.498">                                              "")))</a>
+<span class="sourceLineNo">499</span><a id="line.499">                        .findFirst().orElse(null);</a>
 <span class="sourceLineNo">500</span><a id="line.500"></a>
-<span class="sourceLineNo">501</span><a id="line.501">                    if (! iterator.hasNext()) {</a>
-<span class="sourceLineNo">502</span><a id="line.502">                        if (! events.isEmpty()) {</a>
-<span class="sourceLineNo">503</span><a id="line.503">                            var event = events.get(events.size() - 1);</a>
-<span class="sourceLineNo">504</span><a id="line.504"></a>
-<span class="sourceLineNo">505</span><a id="line.505">                            switch (event.snippet().kind()) {</a>
-<span class="sourceLineNo">506</span><a id="line.506">                            case EXPRESSION:</a>
-<span class="sourceLineNo">507</span><a id="line.507">                                out.println(event.value());</a>
-<span class="sourceLineNo">508</span><a id="line.508">                                break;</a>
+<span class="sourceLineNo">501</span><a id="line.501">                    if (reason != null) {</a>
+<span class="sourceLineNo">502</span><a id="line.502">                        err.println(reason);</a>
+<span class="sourceLineNo">503</span><a id="line.503">                        break;</a>
+<span class="sourceLineNo">504</span><a id="line.504">                    }</a>
+<span class="sourceLineNo">505</span><a id="line.505"></a>
+<span class="sourceLineNo">506</span><a id="line.506">                    if (! iterator.hasNext()) {</a>
+<span class="sourceLineNo">507</span><a id="line.507">                        if (! events.isEmpty()) {</a>
+<span class="sourceLineNo">508</span><a id="line.508">                            var event = events.get(events.size() - 1);</a>
 <span class="sourceLineNo">509</span><a id="line.509"></a>
-<span class="sourceLineNo">510</span><a id="line.510">                            default:</a>
-<span class="sourceLineNo">511</span><a id="line.511">                                break;</a>
-<span class="sourceLineNo">512</span><a id="line.512">                            }</a>
-<span class="sourceLineNo">513</span><a id="line.513">                        }</a>
-<span class="sourceLineNo">514</span><a id="line.514">                    }</a>
-<span class="sourceLineNo">515</span><a id="line.515">                }</a>
-<span class="sourceLineNo">516</span><a id="line.516">            } finally {</a>
-<span class="sourceLineNo">517</span><a id="line.517">                out.flush();</a>
-<span class="sourceLineNo">518</span><a id="line.518">                err.flush();</a>
-<span class="sourceLineNo">519</span><a id="line.519">            }</a>
-<span class="sourceLineNo">520</span><a id="line.520">        }</a>
-<span class="sourceLineNo">521</span><a id="line.521">    }</a>
-<span class="sourceLineNo">522</span><a id="line.522">}</a>
+<span class="sourceLineNo">510</span><a id="line.510">                            switch (event.snippet().kind()) {</a>
+<span class="sourceLineNo">511</span><a id="line.511">                            case EXPRESSION:</a>
+<span class="sourceLineNo">512</span><a id="line.512">                                out.println(event.value());</a>
+<span class="sourceLineNo">513</span><a id="line.513">                                break;</a>
+<span class="sourceLineNo">514</span><a id="line.514"></a>
+<span class="sourceLineNo">515</span><a id="line.515">                            default:</a>
+<span class="sourceLineNo">516</span><a id="line.516">                                break;</a>
+<span class="sourceLineNo">517</span><a id="line.517">                            }</a>
+<span class="sourceLineNo">518</span><a id="line.518">                        }</a>
+<span class="sourceLineNo">519</span><a id="line.519">                    }</a>
+<span class="sourceLineNo">520</span><a id="line.520">                }</a>
+<span class="sourceLineNo">521</span><a id="line.521">            } finally {</a>
+<span class="sourceLineNo">522</span><a id="line.522">                out.flush();</a>
+<span class="sourceLineNo">523</span><a id="line.523">                err.flush();</a>
+<span class="sourceLineNo">524</span><a id="line.524">            }</a>
+<span class="sourceLineNo">525</span><a id="line.525">        }</a>
+<span class="sourceLineNo">526</span><a id="line.526">    }</a>
+<span class="sourceLineNo">527</span><a id="line.527">}</a>
 
 
 

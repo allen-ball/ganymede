@@ -51,7 +51,7 @@
 <span class="sourceLineNo">042</span><a id="line.42">     * @return  An initialized {@link NotebookContext}.</a>
 <span class="sourceLineNo">043</span><a id="line.43">     */</a>
 <span class="sourceLineNo">044</span><a id="line.44">    public static NotebookContext newNotebookContext() {</a>
-<span class="sourceLineNo">045</span><a id="line.45">        var __ = new NotebookContext();</a>
+<span class="sourceLineNo">045</span><a id="line.45">        var context = new NotebookContext();</a>
 <span class="sourceLineNo">046</span><a id="line.46"></a>
 <span class="sourceLineNo">047</span><a id="line.47">        try {</a>
 <span class="sourceLineNo">048</span><a id="line.48">            var type = Notebook.class;</a>
@@ -64,7 +64,7 @@
 <span class="sourceLineNo">055</span><a id="line.55">            exception.printStackTrace(System.err);</a>
 <span class="sourceLineNo">056</span><a id="line.56">        }</a>
 <span class="sourceLineNo">057</span><a id="line.57"></a>
-<span class="sourceLineNo">058</span><a id="line.58">        return __;</a>
+<span class="sourceLineNo">058</span><a id="line.58">        return context;</a>
 <span class="sourceLineNo">059</span><a id="line.59">    }</a>
 <span class="sourceLineNo">060</span><a id="line.60">}</a>
 
