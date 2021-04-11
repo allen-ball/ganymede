@@ -19,7 +19,6 @@ package ganymede.shell.magic;
  * ##########################################################################
  */
 import ball.annotation.ServiceProviderFor;
-import ganymede.notebook.NotebookContext;
 import ganymede.server.renderer.ThymeleafRenderer;
 import ganymede.shell.Magic;
 import java.util.Map;
@@ -40,15 +39,15 @@ import static javax.script.ScriptContext.ENGINE_SCOPE;
 @NoArgsConstructor @ToString @Log4j2
 public class Java extends AbstractMagic {
     @Override
-    public void execute(NotebookContext __, String line0, String code) throws Exception {
+    public void execute(String line0, String code) throws Exception {
         if (code.isBlank()) {
             var resource = getClass().getSimpleName();
             var map =
-                Map.<String,Object>of("bindings", __.context.getBindings(ENGINE_SCOPE),
-                                      "types", __.types);
+                Map.<String,Object>of("bindings", context.context.getBindings(ENGINE_SCOPE),
+                                      "types", context.types);
             var html = ThymeleafRenderer.process(getClass(), resource + ".html", "html", map);
 
-            __.print(html);
+            context.print(html);
         } else {
             throw new IllegalStateException();
         }

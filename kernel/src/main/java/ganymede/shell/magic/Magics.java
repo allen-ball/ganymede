@@ -20,7 +20,6 @@ package ganymede.shell.magic;
  */
 import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import ganymede.notebook.NotebookContext;
 import ganymede.server.Message;
 import ganymede.server.renderer.ThymeleafRenderer;
 import ganymede.shell.Magic;
@@ -63,7 +62,7 @@ public class Magics extends AbstractMagic {
     }
 
     @Override
-    public void execute(NotebookContext __, String line0, String code) throws Exception {
+    public void execute(String line0, String code) throws Exception {
         throw new IllegalArgumentException(line0);
     }
 }

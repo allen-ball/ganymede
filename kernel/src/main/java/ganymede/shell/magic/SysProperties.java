@@ -19,7 +19,6 @@ package ganymede.shell.magic;
  * ##########################################################################
  */
 import ball.annotation.ServiceProviderFor;
-import ganymede.notebook.NotebookContext;
 import ganymede.shell.Magic;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -35,7 +34,7 @@ import lombok.extern.log4j.Log4j2;
 @NoArgsConstructor @ToString @Log4j2
 public class SysProperties extends AbstractPropertiesMagic {
     @Override
-    public void execute(NotebookContext __, String line0, String code) throws Exception {
+    public void execute(String line0, String code) throws Exception {
         if (! code.isBlank()) {
             var properties = compile(code);
 

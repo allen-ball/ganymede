@@ -20,24 +20,31 @@ package ganymede.shell;
  */
 import ganymede.util.ServiceProviderMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
-import lombok.NoArgsConstructor;
 
 /**
  * {@link Magic} {@link Map}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
-@NoArgsConstructor
 public class MagicMap extends TreeMap<String,Magic> {
-    private static final long serialVersionUID = 194836601918125315L;
+    private static final long serialVersionUID = 6930042409603983399L;
 
-    /** @serial */
-    private final ServiceProviderMap<Magic> map =
-        new ServiceProviderMap<>(Magic.class);
+    /** @serial */ private final ServiceProviderMap<Magic> map = new ServiceProviderMap<>(Magic.class);
+    /** @serial */ private final Consumer<Magic> initializer;
 
-    { reload(); }
+    /**
+     * Sole constructor.
+     *
+     * @param   initializer     The {@link Consumer} to apply to newly
+     *                          allocated {@link Magic} providers.
+     */
+    public MagicMap(Consumer<Magic> initializer) {
+        this.initializer = initializer;
+    }
 
     /**
      * Reload the underlying {@link ServiceProviderMap} and add the
@@ -46,9 +53,26 @@ public class MagicMap extends TreeMap<String,Magic> {
      * @return  {@link.this}
      */
     public MagicMap reload() {
-        map.reload().values().stream()
-            .flatMap(v -> Stream.of(v.getMagicNames()).map(k -> Map.entry(k, v)))
-            .forEach(t -> putIfAbsent(t.getKey(), t.getValue()));
+        var iterator = map.reload().values().iterator();
+
+        while (iterator.hasNext()) {
+            var magic = iterator.next();
+
+            try {
+                var keys = Set.of(magic.getMagicNames());
+
+                if (! keySet().containsAll(keys)) {
+                    if (initializer != null) {
+                        initializer.accept(magic);
+                    }
+
+                    for (var key : keys) {
+                        computeIfAbsent(key, k -> magic);
+                    }
+                }
+            } catch (Exception exception) {
+            }
+        }
 
         return this;
     }

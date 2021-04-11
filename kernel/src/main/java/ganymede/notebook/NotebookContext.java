@@ -63,7 +63,7 @@ public class NotebookContext {
 
     /**
      * Common {@link ScriptContext} supplied to
-     * {@link ganymede.shell.Magic#execute(NotebookContext,String,String)}.
+     * {@link ganymede.shell.Magic#execute(String,String)}.
      */
     public final ScriptContext context =
         new SimpleScriptContext() {
@@ -88,7 +88,7 @@ public class NotebookContext {
      */
     public final Map<String,String> types = new ConcurrentSkipListMap<>();
 
-    private final MagicMap magics = new MagicMap();
+    private final MagicMap magics = new MagicMap(t -> t.configure(this));
 
     /**
      * Method to receive a {@link ganymede.shell.Magic} request in the
@@ -103,7 +103,7 @@ public class NotebookContext {
         magics.reload();
 
         if (magics.containsKey(name)) {
-            magics.get(name).execute(this, decode(line0), decode(code));
+            magics.get(name).execute(decode(line0), decode(code));
         } else {
             throw new IllegalStateException("Magic '" + name + "' not found");
         }

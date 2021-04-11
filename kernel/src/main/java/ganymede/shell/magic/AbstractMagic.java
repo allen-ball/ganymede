@@ -18,6 +18,7 @@ package ganymede.shell.magic;
  * limitations under the License.
  * ##########################################################################
  */
+import ganymede.notebook.NotebookContext;
 import ganymede.server.Message;
 import lombok.NoArgsConstructor;
 import org.springframework.util.PropertyPlaceholderHelper;
@@ -31,6 +32,8 @@ import static lombok.AccessLevel.PROTECTED;
  */
 @NoArgsConstructor(access = PROTECTED)
 public abstract class AbstractMagic implements AnnotatedMagic {
+    /** Value received from {@link #configure(NotebookContext)}. */
+    protected NotebookContext context = null;
 
     /**
      * Common static {@link PropertyPlaceholderHelper}.
@@ -42,4 +45,7 @@ public abstract class AbstractMagic implements AnnotatedMagic {
     public Message.completeness isComplete(String line0, String code) {
         return Message.completeness.complete;
     }
+
+    @Override
+    public void configure(NotebookContext context) { this.context = context; }
 }

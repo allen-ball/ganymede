@@ -59,10 +59,9 @@ public interface Magic {
     public String getDescription();
 
     /**
-     * Entry-point method.  Executed in the {@link ganymede.shell.Shell}.
-     * Default implementation sends to the
-     * {@link #execute(NotebookContext,String,String)} method in the
-     * {@link jdk.jshell.JShell} instance.
+     * {@link ganymede.shell.Shell} execution method.  Default
+     * implementation sends to the {@link #execute(String,String)} method in
+     * the {@link jdk.jshell.JShell} instance.
      *
      * @param   shell           The {@link Shell}.
      * @param   in              The {@code in} {@link InputStream}.
@@ -88,14 +87,19 @@ public interface Magic {
     public Message.completeness isComplete(String line0, String code);
 
     /**
-     * Implementation method.  Executed in the {@link jdk.jshell.JShell}
-     * instance.
+     * {@link jdk.jshell.JShell} configuation method.
      *
-     * @param   __              The {@link NotebookContext}.
+     * @param   context         The {@link NotebookContext}.
+     */
+    public void configure(NotebookContext context);
+
+    /**
+     * {@link jdk.jshell.JShell} execution method.
+     *
      * @param   line0           The initial magic line.
      * @param   code            The remainder of the cell.
      */
-    public void execute(NotebookContext __, String line0, String code) throws Exception;
+    public void execute(String line0, String code) throws Exception;
 
     /**
      * Method to determine if the code is cell magic (starts with

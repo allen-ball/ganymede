@@ -19,7 +19,6 @@ package ganymede.shell.magic;
  * ##########################################################################
  */
 import ball.annotation.ServiceProviderFor;
-import ganymede.kernel.KernelRestClient;
 import ganymede.shell.Magic;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
@@ -64,7 +63,7 @@ public class Scala extends AbstractScriptEngineMagic {
 
                 settings.usejavacp().value_$eq(true);
 
-                new KernelRestClient().classpath().stream()
+                context.classpath.stream()
                     .forEach(t -> settings.classpath().append(t));
 
                 engine = new Scripted(factory, settings, Scripted.apply$default$3());

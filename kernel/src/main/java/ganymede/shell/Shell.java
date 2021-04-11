@@ -72,7 +72,7 @@ public class Shell implements AutoCloseable {
     private final Kernel kernel;
     private Locale locale = null;       /* TBD: Query Notebook server */
     private final AtomicInteger restarts = new AtomicInteger(0);
-    private final MagicMap magics = new MagicMap();
+    private final MagicMap magics = new MagicMap(null);
     private final Java java = new Java();
     private JShell jshell = null;
     private InputStream in = null;
@@ -455,7 +455,12 @@ public class Shell implements AutoCloseable {
         }
 
         @Override
-        public void execute(NotebookContext __, String line0, String code) throws Exception {
+        public void configure(NotebookContext context) {
+            throw new IllegalStateException();
+        }
+
+        @Override
+        public void execute(String line0, String code) throws Exception {
             throw new IllegalStateException();
         }
 

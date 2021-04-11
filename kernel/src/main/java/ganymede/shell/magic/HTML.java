@@ -19,7 +19,6 @@ package ganymede.shell.magic;
  * ##########################################################################
  */
 import ball.annotation.ServiceProviderFor;
-import ganymede.notebook.NotebookContext;
 import ganymede.shell.Magic;
 import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
@@ -37,12 +36,12 @@ import lombok.extern.log4j.Log4j2;
 @NoArgsConstructor @ToString @Log4j2
 public class HTML extends Thymeleaf {
     @Override
-    protected void execute(NotebookContext __, String[] argv, String code) throws Exception {
+    protected void execute(String[] argv, String code) throws Exception {
         argv =
             Stream.of(new String[] { "thymeleaf" }, argv)
             .flatMap(Stream::of)
             .toArray(String[]::new);
 
-        super.execute(__, argv, code);
+        super.execute(argv, code);
     }
 }

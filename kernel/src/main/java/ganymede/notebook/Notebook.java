@@ -42,7 +42,7 @@ public class Notebook {
      * @return  An initialized {@link NotebookContext}.
      */
     public static NotebookContext newNotebookContext() {
-        var __ = new NotebookContext();
+        var context = new NotebookContext();
 
         try {
             var type = Notebook.class;
@@ -55,6 +55,6 @@ public class Notebook {
             exception.printStackTrace(System.err);
         }
 
-        return __;
+        return context;
     }
 }

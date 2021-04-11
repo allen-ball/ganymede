@@ -18,7 +18,6 @@ package ganymede.shell.magic;
  * limitations under the License.
  * ##########################################################################
  */
-import ganymede.notebook.NotebookContext;
 import ganymede.shell.Magic;
 import java.util.Objects;
 import javax.script.ScriptEngine;
@@ -69,44 +68,42 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic
     }
 
     @Override
-    public void execute(NotebookContext __, String line0, String code) throws Exception {
-        execute(__, Magic.getCellMagicCommand(line0), code);
+    public void execute(String line0, String code) throws Exception {
+        execute(Magic.getCellMagicCommand(line0), code);
     }
 
     /**
      * Method provided for subclass implementations to intercept calculation
      * of {@link ScriptEngine#ARGV} binding.
      *
-     * @param   __              The {@link NotebookContext}.
      * @param   argv            The first line parsed as an array of
      *                          {@link String}s.
      * @param   code            The remainder of the cell.
      */
-    protected void execute(NotebookContext __, String[] argv, String code) throws Exception {
-        var bindings = __.context.getBindings(ENGINE_SCOPE);
+    protected void execute(String[] argv, String code) throws Exception {
+        var bindings = context.context.getBindings(ENGINE_SCOPE);
 
         try {
             bindings.put(ScriptEngine.ARGV, argv);
-            execute(__, code);
+            execute(code);
         } finally {
             bindings.remove(ScriptEngine.ARGV);
         }
     }
 
     /**
-     * Target of {@link #execute(NotebookContext,String,String)}.  The
+     * Target of {@link #execute(String,String)}.  The
      * {@code argv} is available in the {@link javax.script.ScriptContext}
      * {@code ENGINE_SCOPE} {@link javax.script.Bindings} as
      * {@link ScriptEngine#ARGV ScriptEngine.ARGV}.
      *
-     * @param   __              The {@link NotebookContext}.
      * @param   code            The remainder of the cell.
      */
-    protected void execute(NotebookContext __, String code) throws Exception {
+    protected void execute(String code) throws Exception {
         var engine = engine();
 
         if (engine != null) {
-            render(__, engine.eval(code, __.context));
+            render(engine.eval(code, context.context));
         } else {
             System.err.format("No %s REPL available\n", getMagicNames()[0]);
         }
@@ -117,9 +114,8 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic
      * {@link ScriptEngine#eval(String,ScriptContext)}.  Made available for
      * template engines.  Default implementation does nothing.
      *
-     * @param   __              The {@link NotebookContext}.
      * @param   object          The result of
      *                          {@link ScriptEngine#eval(String,ScriptContext)}.
      */
-    protected void render(NotebookContext __, Object object) { }
+    protected void render(Object object) { }
 }
