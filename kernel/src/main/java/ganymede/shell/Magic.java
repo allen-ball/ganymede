@@ -24,18 +24,13 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
-import java.util.Base64;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 import lombok.Data;
 
 import static java.io.StreamTokenizer.TT_EOF;
 import static java.io.StreamTokenizer.TT_EOL;
 import static java.io.StreamTokenizer.TT_WORD;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.stream.Collectors.toMap;
 
 /**
  * {@link Magic} service interface.
@@ -48,16 +43,6 @@ public interface Magic {
      * Cell {@link Magic} indicator.
      */
     public static final String CELL = "%%";
-
-    /**
-     * See {@link #decode(String)}.
-     */
-    public static final Base64.Decoder BASE64_DECODER = Base64.getDecoder();
-
-    /**
-     * See {@link #encode(String)}.
-     */
-    public static final Base64.Encoder BASE64_ENCODER = Base64.getEncoder();
 
     /**
      * Method to get the names associated with {@link.this} {@link Magic}.
@@ -89,7 +74,7 @@ public interface Magic {
     default void execute(Shell shell,
                          InputStream in, PrintStream out, PrintStream err,
                          String line0, String code) throws Exception {
-        sendTo(shell, getMagicNames()[0], line0, code);
+        NotebookContext.magic(shell, getMagicNames()[0], line0, code);
     }
 
     /**
@@ -202,79 +187,6 @@ public interface Magic {
         }
 
         return list.toArray(new String[] { });
-    }
-
-    /**
-     * Static method to send a request to be executed in the
-     * {@link jdk.jshell.JShell} instance.  The
-     * {@link #sendTo(Shell,String,String,String)} method packs the
-     * arguments and creates a
-     * {@link #receive(String,NotebookContext,String,String)} expression which
-     * is evaluated in the {@link jdk.jshell.JShell}.
-     *
-     * @param   shell           The {@link Shell}.
-     * @param   name            The magic name.
-     * @param   line0           The initial magic line.
-     * @param   code            The remainder of the cell.
-     */
-    public static void sendTo(Shell shell, String name, String line0, String code) throws Exception {
-        var expression =
-            String.format("__.invokeStaticMethod(\"%s\", \"%s\", new Class<?>[] { String.class, ganymede.notebook.NotebookContext.class, String.class, String.class }, \"%s\", __, \"%s\", \"%s\")",
-                          Magic.class.getName(), "receive",
-                          name, encode(line0), encode(code));
-
-        shell.evaluate(expression);
-    }
-
-    /**
-     * Static {@link MagicMap} instance used by
-     * {@link #receive(String,NotebookContext,String,String)}.
-     */
-    public static MagicMap MAP = new MagicMap();
-
-    /**
-     * Static method to receive a request in the {@link jdk.jshell.JShell}
-     * instance.  The {@link #sendTo(Shell,String,String,String)} method
-     * packs the arguments and creates a
-     * {@link #receive(String,NotebookContext,String,String)} expression which
-     * is evaluated in the {@link jdk.jshell.JShell}.
-     *
-     * @param   name            The magic name.
-     * @param   __              The {@link NotebookContext}.
-     * @param   line0           The initial magic line.
-     * @param   code            The remainder of the cell.
-     */
-    public static void receive(String name, NotebookContext __,
-                               String line0, String code) throws Exception {
-        MAP.reload();
-
-        if (MAP.containsKey(name)) {
-            MAP.get(name).execute(__, decode(line0), decode(code));
-        } else {
-            throw new IllegalStateException("Magic '" + name + "' not found");
-        }
-    }
-
-    /**
-     * Convenience method to {@link Base64}-decode a {@link String}.
-     *
-     * @param   string          The encoded {@link String}.
-     *
-     * @return  The decoded {@link String}.
-     */
-    public static String decode(String string) {
-        return new String(BASE64_DECODER.decode(string), UTF_8);
-    }
-
-    /**
-     * Convenience method to {@link Base64}-encode a {@link String}.
-     *
-     * @param   string          The un-encoded {@link String}.
-     *
-     * @return  The encoded {@link String}.
-     */
-    public static String encode(String string) {
-        return BASE64_ENCODER.encodeToString(((string != null) ? string : "").getBytes(UTF_8));
     }
 
     /**

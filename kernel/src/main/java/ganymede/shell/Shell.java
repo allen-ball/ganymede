@@ -21,7 +21,6 @@ package ganymede.shell;
 import ganymede.dependency.POM;
 import ganymede.dependency.Resolver;
 import ganymede.kernel.Kernel;
-import ganymede.notebook.Notebook;
 import ganymede.notebook.NotebookContext;
 import ganymede.server.Message;
 import ganymede.shell.magic.AnnotatedMagic;
@@ -271,7 +270,7 @@ public class Shell implements AutoCloseable {
                         .setLevel(WARN)
                         .buildPrintStream();
 
-                    java.execute(jshell, logIn, logOut, logOut, Notebook.bootstrap());
+                    java.execute(jshell, logIn, logOut, logOut, NotebookContext.bootstrap());
                 } catch (Exception exception) {
                     log.warn("{}", exception, exception);
                 }
@@ -409,7 +408,7 @@ public class Shell implements AutoCloseable {
                 execute(shell.jshell(), in, out, err, code);
             } else {
                 if (line0 != null) {
-                    Magic.sendTo(shell, getMagicNames()[0], line0, code);
+                    AnnotatedMagic.super.execute(shell, in, out, err, line0, code);
                 }
             }
         }

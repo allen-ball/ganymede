@@ -21,11 +21,14 @@ package ganymede.notebook;
 import com.fasterxml.jackson.databind.JsonNode;
 import ganymede.kernel.KernelRestClient;
 import ganymede.server.Message;
+import ganymede.shell.MagicMap;
 import ganymede.shell.Shell;
 import java.io.File;
 import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
+import java.lang.reflect.Method;
+import java.util.Base64;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,15 +42,15 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import static ganymede.server.Server.OBJECT_MAPPER;
+import static java.lang.reflect.Modifier.isPublic;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static javax.script.ScriptContext.ENGINE_SCOPE;
-import static javax.script.ScriptContext.GLOBAL_SCOPE;
 import static jdk.jshell.Snippet.SubKind.TEMP_VAR_EXPRESSION_SUBKIND;
 
 /**
- * {@link NotebookContext} for {@link Notebook} {@link ganymede.shell.Shell}
+ * {@link NotebookContext} for {@link Notebook} {@link Shell}
  * {@link JShell} instance.  Bound to {@code __} in the {@link JShell}
  * instance.
  *
@@ -55,6 +58,8 @@ import static jdk.jshell.Snippet.SubKind.TEMP_VAR_EXPRESSION_SUBKIND;
  */
 @NoArgsConstructor @ToString
 public class NotebookContext {
+    private static final Base64.Decoder DECODER = Base64.getDecoder();
+    private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     /**
      * Common {@link ScriptContext} supplied to
@@ -83,31 +88,25 @@ public class NotebookContext {
      */
     public final Map<String,String> types = new ConcurrentSkipListMap<>();
 
+    private final MagicMap magics = new MagicMap();
+
     /**
-     * Method to construct a call to a static
-     * {@link java.lang.reflect.Method}.
+     * Method to receive a {@link ganymede.shell.Magic} request in the
+     * {@link JShell} instance.  See
+     * {@link magic(Shell,String,String,String)}.
      *
-     * @param   type            The containing {@link Class}.
-     * @param   method          The {@link java.lang.reflect.Method} name.
-     * @param   parameters      The parameter types ({@link Class}es).
-     * @param   arguments       The argument {@link Object} array.
-     *
-     * @return  The {@link Object result}.
+     * @param   name            The magic name.
+     * @param   line0           The initial magic line.
+     * @param   code            The remainder of the cell.
      */
-    public Object invokeStaticMethod(String type, String method,
-                                     Class<?>[] parameters, Object... arguments) {
-        Object object = null;
+    public void magic(String name, String line0, String code) throws Exception {
+        magics.reload();
 
-        try {
-            object =
-                Class.forName(type)
-                .getDeclaredMethod(method, parameters)
-                .invoke(null, arguments);
-        } catch (Throwable throwable) {
-            throwable.printStackTrace(System.err);
+        if (magics.containsKey(name)) {
+            magics.get(name).execute(this, decode(line0), decode(code));
+        } else {
+            throw new IllegalStateException("Magic '" + name + "' not found");
         }
-
-        return object;
     }
 
     /**
@@ -154,21 +153,53 @@ public class NotebookContext {
     }
 
     /**
-     * Method to construct a call to a static
-     * {@link java.lang.reflect.Method} with an empty argument list.
+     * Method to generate the bootstrap code for a new {@link JShell}
+     * instance.
      *
-     * @param   type            The containing {@link Class}.
-     * @param   method          The {@link java.lang.reflect.Method} name.
-     *
-     * @return  The {@link Object result}.
+     * @return  The boostrap code.
      */
-    public Object invokeStaticMethod(String type, String method) {
-        return invokeStaticMethod(type, method,
-                                  new Class<?>[] { }, new Object[] { });
+    public static String bootstrap() {
+        var code =
+            String.format("var __ = %s.newNotebookContext();\n",
+                          Notebook.class.getCanonicalName());
+
+        for (var method : NotebookContext.class.getDeclaredMethods()) {
+            if (method.isAnnotationPresent(NotebookFunction.class)) {
+                if (isPublic(method.getModifiers())) {
+                    code += makeWrapperFor("__", method);
+                }
+            }
+        }
+
+        return code;
+    }
+
+    private static String makeWrapperFor(String instance, Method method) {
+        var types = method.getGenericParameterTypes();
+        var arguments = new String[types.length];
+        var parameters = new String[types.length];
+
+        for (int i = 0; i < arguments.length; i += 1) {
+            arguments[i] = String.format("argument%d", i);
+        }
+
+        for (int i = 0; i < parameters.length; i += 1) {
+            parameters[i] =
+                String.format("%s %s", types[i].getTypeName(), arguments[i]);
+        }
+
+        var plist = String.join(", ", parameters);
+        var alist = String.join(", ", arguments);
+
+        return String.format("%1$s %2$s(%3$s) { %4$s%5$s.%2$s(%6$s); }\n",
+                             method.getGenericReturnType().getTypeName(),
+                             method.getName(), plist,
+                             Void.TYPE.equals(method.getReturnType()) ? "" : "return ",
+                             instance, alist);
     }
 
     /**
-     * Static method used by the {@link ganymede.shell.Shell} to update the
+     * Static method used by the {@link Shell} to update the
      * {@link NotebookContext} members.
      *
      * @param   shell           The {@link Shell}.
@@ -213,7 +244,7 @@ public class NotebookContext {
         for (var entry : types.entrySet()) {
             evaluate(jshell,
                      "__.context.getBindings(%1d).put(\"%2$s\", %2$s)",
-                     ENGINE_SCOPE, entry.getKey());
+                     ScriptContext.ENGINE_SCOPE, entry.getKey());
             evaluate(jshell,
                      "__.types.put(\"%1$s\", \"%2$s\")",
                      entry.getKey(), entry.getValue());
@@ -225,6 +256,23 @@ public class NotebookContext {
         var info = analyzer.analyzeCompletion(String.format(expression, argv));
 
         return unescape(jshell.eval(info.source()).get(0).value());
+    }
+
+    /**
+     * Static method invoke a {@link ganymede.shell.Magic} in a
+     * {@link JShell} instance.  See {@link #magic(String,String,String)}.
+     *
+     * @param   shell           The {@link Shell}.
+     * @param   name            The magic name.
+     * @param   line0           The initial magic line.
+     * @param   code            The remainder of the cell.
+     */
+    public static void magic(Shell shell, String name, String line0, String code) {
+        var jshell = shell.jshell();
+
+        evaluate(jshell,
+                 "__.magic(\"%s\", \"%s\", \"%s\")",
+                 name, encode(line0), encode(code));
     }
 
     /**
@@ -253,5 +301,13 @@ public class NotebookContext {
         }
 
         return string;
+    }
+
+    private static String decode(String string) {
+        return new String(DECODER.decode(string), UTF_8);
+    }
+
+    private static String encode(String string) {
+        return ENCODER.encodeToString(((string != null) ? string : "").getBytes(UTF_8));
     }
 }
