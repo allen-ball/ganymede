@@ -30,7 +30,7 @@ must be installed first and the `jupyter` and `python` commands must be on
 the `${PATH}`.  Then the typical (and minimal) installation command line:
 
 ```bash
-$ java -jar ganymede-kernel-1.0.0-SNAPSHOT.jar --install
+$ java -jar ganymede-kernel-1.0.0-beta.1.jar --install
 ```
 
 The [kernel][Ganymede Kernel] will be configured to use the same `java`
@@ -67,7 +67,7 @@ of a user's local [Maven][Apache Maven] repository:
 ```bash
 $ export JAVA_HOME=$(/usr/libexec/java_home -v 11)
 $ ${JAVA_HOME}/bin/java \
-      -jar ${HOME}/.m2/repository/ganymede/ganymede-kernel/1.0.0-SNAPSHOT/ganymede-kernel-1.0.0-SNAPSHOT.jar \
+      -jar ${HOME}/.m2/repository/ganymede/ganymede-kernel/1.0.0-beta.1/ganymede-kernel-1.0.0-beta.1.jar \
       --install --sys-prefix --copy-jar=false \
       --id-suffix=spark-3.1.1 --display-name-suffix="with Spark 3.1.1" \
       --env=SPARK_HOME=/path/to/spark-3.1.1-bin-hadoop3.2
@@ -83,11 +83,11 @@ kernelspec:
     "/Library/Java/JavaVirtualMachines/graalvm-ce-java11-21.0.0/Contents/Home/bin/java",
     "-Dmaven.repo.local=/Users/jdoe/Notebooks/.venv/share/jupyter/repository",
     "-jar",
-    "/Users/jdoe/.m2/repository/ganymede/ganymede-kernel/1.0.0-SNAPSHOT/ganymede-kernel-1.0.0-SNAPSHOT.jar",
+    "/Users/jdoe/.m2/repository/ganymede/ganymede-kernel/1.0.0-beta.1/ganymede-kernel-1.0.0-beta.1.jar",
     "--runtime-dir=/Users/jdoe/Library/Jupyter/runtime",
     "--connection-file={connection_file}"
   ],
-  "display_name" : "Ganymede 1.0.0-SNAPSHOT (Java 11) with Spark 3.1.1",
+  "display_name" : "Ganymede 1.0.0-beta.1 (Java 11) with Spark 3.1.1",
   "env" : {
     "SPARK_HOME" : "/path/to/spark-3.1.1-bin-hadoop3.2"
   },
@@ -467,7 +467,7 @@ Ibid.
 
 
 [Ganymede Kernel]: https://github.com/allen-ball/ganymede
-[Ganymede Kernel download]: https://github.com/allen-ball/ganymede/releases/download/v1.0.0-SNAPSHOT/ganymede-kernel-1.0.0-SNAPSHOT.jar
+[Ganymede Kernel download]: https://github.com/allen-ball/ganymede/releases/download/v1.0.0-beta.1/ganymede-kernel-1.0.0-beta.1.jar
 [Ganymede API Javadoc]: https://allen-ball.github.io/ganymede/index.html?overview-summary.html
 [NotebookContext]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookContext.html
 [NotebookFunction]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookFunction.html
