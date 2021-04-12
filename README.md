@@ -282,10 +282,10 @@ before adding the JAR to the [JShell] classpath:
 
     a. Ignore `commons-logging:commons-logging:jar`
 
-    b. Only allow one of `org.slf4j:jcl-over-slf4j:jar` or
+    b. Allow only one of `org.slf4j:jcl-over-slf4j:jar` or
     `org.springframework:spring-jcl:jar` to be configured
 
-    c. Only allow one of `org.slf4j:slf4j-log4j12:jar` and
+    c. Allow only one of `org.slf4j:slf4j-log4j12:jar` and
     `ch.qos.logback:logback-classic:jar` to be configured
 
 Artifacts that fail any of the above checks will be (mostly silently)
@@ -322,7 +322,7 @@ for `%%!bash`, `%%!perl`, etc., respectively.
 
 The template magics `thymeleaf` and `html` offer templating with
 [Thymeleaf].  All defined Java variables are bound into the Thymeleaf
-context before evaluation.  For example (Java detail implementation
+context before evaluation.  For example (Java implementation detail
 removed):
 
 ```java
