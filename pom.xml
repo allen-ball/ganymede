@@ -16,6 +16,19 @@
     <version>20210220-SNAPSHOT</version>
     <relativePath/>
   </parent>
+  <distributionManagement>
+    <downloadUrl>https://maven.pkg.github.com/allen-ball/ganymede/</downloadUrl>
+    <repository>
+      <id>github</id>
+      <name>GitHub allen-ball/ganymede Packages</name>
+      <url>https://maven.pkg.github.com/allen-ball/ganymede/</url>
+    </repository>
+    <snapshotRepository>
+      <id>github</id>
+      <name>GitHub allen-ball/ganymede Packages</name>
+      <url>https://maven.pkg.github.com/allen-ball/ganymede/</url>
+    </snapshotRepository>
+  </distributionManagement>
   <repositories>
     <repository>
       <id>repo.hcf.dev-RELEASE</id>
