@@ -19,6 +19,8 @@ package ganymede.shell.magic;
  * ##########################################################################
  */
 import ball.annotation.ServiceProviderFor;
+import ganymede.kernel.KernelRestClient;
+import ganymede.server.Message;
 import ganymede.server.renderer.ThymeleafRenderer;
 import ganymede.shell.Magic;
 import java.util.Map;
@@ -46,8 +48,9 @@ public class Java extends AbstractMagic {
                 Map.<String,Object>of("bindings", context.context.getBindings(ENGINE_SCOPE),
                                       "types", context.types);
             var html = ThymeleafRenderer.process(getClass(), resource + ".html", "html", map);
+            var text = ThymeleafRenderer.process(getClass(), resource + ".text", "text", map);
 
-            context.print(html);
+            new KernelRestClient().display(Message.mime_bundle(html, text));
         } else {
             throw new IllegalStateException();
         }
