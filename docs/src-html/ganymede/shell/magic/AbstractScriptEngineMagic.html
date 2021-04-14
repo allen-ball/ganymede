@@ -50,84 +50,95 @@
 <span class="sourceLineNo">041</span><a id="line.41">@NoArgsConstructor(access = PROTECTED) @ToString @Log4j2</a>
 <span class="sourceLineNo">042</span><a id="line.42">public abstract class AbstractScriptEngineMagic extends AbstractMagic</a>
 <span class="sourceLineNo">043</span><a id="line.43">                                                implements AnnotatedScriptEngineMagic {</a>
-<span class="sourceLineNo">044</span><a id="line.44">    protected ScriptEngine engine = null;</a>
-<span class="sourceLineNo">045</span><a id="line.45"></a>
-<span class="sourceLineNo">046</span><a id="line.46">    /**</a>
-<span class="sourceLineNo">047</span><a id="line.47">     * Method to get the {@link ScriptEngine}.</a>
-<span class="sourceLineNo">048</span><a id="line.48">     *</a>
-<span class="sourceLineNo">049</span><a id="line.49">     * @return  The {@link ScriptEngine} if it can be instantiated;</a>
-<span class="sourceLineNo">050</span><a id="line.50">     *          {@code null} otherwise.</a>
-<span class="sourceLineNo">051</span><a id="line.51">     */</a>
-<span class="sourceLineNo">052</span><a id="line.52">    protected ScriptEngine engine() {</a>
-<span class="sourceLineNo">053</span><a id="line.53">        if (engine == null) {</a>
-<span class="sourceLineNo">054</span><a id="line.54">            var manager = new ScriptEngineManager(getClass().getClassLoader());</a>
-<span class="sourceLineNo">055</span><a id="line.55"></a>
-<span class="sourceLineNo">056</span><a id="line.56">            engine = manager.getEngineByName(getScriptEngineName());</a>
-<span class="sourceLineNo">057</span><a id="line.57"></a>
-<span class="sourceLineNo">058</span><a id="line.58">            if (engine == null) {</a>
-<span class="sourceLineNo">059</span><a id="line.59">                engine =</a>
-<span class="sourceLineNo">060</span><a id="line.60">                    getExtensions().stream()</a>
-<span class="sourceLineNo">061</span><a id="line.61">                    .map(t -&gt; manager.getEngineByExtension(t))</a>
-<span class="sourceLineNo">062</span><a id="line.62">                    .filter(Objects::nonNull)</a>
-<span class="sourceLineNo">063</span><a id="line.63">                    .findFirst().orElse(null);</a>
-<span class="sourceLineNo">064</span><a id="line.64">            }</a>
-<span class="sourceLineNo">065</span><a id="line.65">        }</a>
-<span class="sourceLineNo">066</span><a id="line.66"></a>
-<span class="sourceLineNo">067</span><a id="line.67">        return engine;</a>
-<span class="sourceLineNo">068</span><a id="line.68">    }</a>
-<span class="sourceLineNo">069</span><a id="line.69"></a>
-<span class="sourceLineNo">070</span><a id="line.70">    @Override</a>
-<span class="sourceLineNo">071</span><a id="line.71">    public void execute(String line0, String code) throws Exception {</a>
-<span class="sourceLineNo">072</span><a id="line.72">        execute(Magic.getCellMagicCommand(line0), code);</a>
-<span class="sourceLineNo">073</span><a id="line.73">    }</a>
-<span class="sourceLineNo">074</span><a id="line.74"></a>
-<span class="sourceLineNo">075</span><a id="line.75">    /**</a>
-<span class="sourceLineNo">076</span><a id="line.76">     * Method provided for subclass implementations to intercept calculation</a>
-<span class="sourceLineNo">077</span><a id="line.77">     * of {@link ScriptEngine#ARGV} binding.</a>
-<span class="sourceLineNo">078</span><a id="line.78">     *</a>
-<span class="sourceLineNo">079</span><a id="line.79">     * @param   argv            The first line parsed as an array of</a>
-<span class="sourceLineNo">080</span><a id="line.80">     *                          {@link String}s.</a>
-<span class="sourceLineNo">081</span><a id="line.81">     * @param   code            The remainder of the cell.</a>
-<span class="sourceLineNo">082</span><a id="line.82">     */</a>
-<span class="sourceLineNo">083</span><a id="line.83">    protected void execute(String[] argv, String code) throws Exception {</a>
-<span class="sourceLineNo">084</span><a id="line.84">        var bindings = context.context.getBindings(ENGINE_SCOPE);</a>
-<span class="sourceLineNo">085</span><a id="line.85"></a>
-<span class="sourceLineNo">086</span><a id="line.86">        try {</a>
-<span class="sourceLineNo">087</span><a id="line.87">            bindings.put(ScriptEngine.ARGV, argv);</a>
-<span class="sourceLineNo">088</span><a id="line.88">            execute(code);</a>
-<span class="sourceLineNo">089</span><a id="line.89">        } finally {</a>
-<span class="sourceLineNo">090</span><a id="line.90">            bindings.remove(ScriptEngine.ARGV);</a>
-<span class="sourceLineNo">091</span><a id="line.91">        }</a>
-<span class="sourceLineNo">092</span><a id="line.92">    }</a>
-<span class="sourceLineNo">093</span><a id="line.93"></a>
-<span class="sourceLineNo">094</span><a id="line.94">    /**</a>
-<span class="sourceLineNo">095</span><a id="line.95">     * Target of {@link #execute(String,String)}.  The</a>
-<span class="sourceLineNo">096</span><a id="line.96">     * {@code argv} is available in the {@link javax.script.ScriptContext}</a>
-<span class="sourceLineNo">097</span><a id="line.97">     * {@code ENGINE_SCOPE} {@link javax.script.Bindings} as</a>
-<span class="sourceLineNo">098</span><a id="line.98">     * {@link ScriptEngine#ARGV ScriptEngine.ARGV}.</a>
-<span class="sourceLineNo">099</span><a id="line.99">     *</a>
-<span class="sourceLineNo">100</span><a id="line.100">     * @param   code            The remainder of the cell.</a>
-<span class="sourceLineNo">101</span><a id="line.101">     */</a>
-<span class="sourceLineNo">102</span><a id="line.102">    protected void execute(String code) throws Exception {</a>
-<span class="sourceLineNo">103</span><a id="line.103">        var engine = engine();</a>
-<span class="sourceLineNo">104</span><a id="line.104"></a>
-<span class="sourceLineNo">105</span><a id="line.105">        if (engine != null) {</a>
-<span class="sourceLineNo">106</span><a id="line.106">            render(engine.eval(code, context.context));</a>
-<span class="sourceLineNo">107</span><a id="line.107">        } else {</a>
-<span class="sourceLineNo">108</span><a id="line.108">            System.err.format("No %s REPL available\n", getMagicNames()[0]);</a>
-<span class="sourceLineNo">109</span><a id="line.109">        }</a>
-<span class="sourceLineNo">110</span><a id="line.110">    }</a>
-<span class="sourceLineNo">111</span><a id="line.111"></a>
-<span class="sourceLineNo">112</span><a id="line.112">    /**</a>
-<span class="sourceLineNo">113</span><a id="line.113">     * Callback to render the results of</a>
-<span class="sourceLineNo">114</span><a id="line.114">     * {@link ScriptEngine#eval(String,ScriptContext)}.  Made available for</a>
-<span class="sourceLineNo">115</span><a id="line.115">     * template engines.  Default implementation does nothing.</a>
-<span class="sourceLineNo">116</span><a id="line.116">     *</a>
-<span class="sourceLineNo">117</span><a id="line.117">     * @param   object          The result of</a>
-<span class="sourceLineNo">118</span><a id="line.118">     *                          {@link ScriptEngine#eval(String,ScriptContext)}.</a>
-<span class="sourceLineNo">119</span><a id="line.119">     */</a>
-<span class="sourceLineNo">120</span><a id="line.120">    protected void render(Object object) { }</a>
-<span class="sourceLineNo">121</span><a id="line.121">}</a>
+<span class="sourceLineNo">044</span><a id="line.44">    /** See {@link #engine()}. */</a>
+<span class="sourceLineNo">045</span><a id="line.45">    protected ScriptEngine engine = null;</a>
+<span class="sourceLineNo">046</span><a id="line.46"></a>
+<span class="sourceLineNo">047</span><a id="line.47">    /**</a>
+<span class="sourceLineNo">048</span><a id="line.48">     * Method to get the {@link ScriptEngine}.</a>
+<span class="sourceLineNo">049</span><a id="line.49">     *</a>
+<span class="sourceLineNo">050</span><a id="line.50">     * @return  The {@link ScriptEngine} if it can be instantiated;</a>
+<span class="sourceLineNo">051</span><a id="line.51">     *          {@code null} otherwise.</a>
+<span class="sourceLineNo">052</span><a id="line.52">     */</a>
+<span class="sourceLineNo">053</span><a id="line.53">    protected ScriptEngine engine() {</a>
+<span class="sourceLineNo">054</span><a id="line.54">        if (engine == null) {</a>
+<span class="sourceLineNo">055</span><a id="line.55">            var manager = new ScriptEngineManager(getClass().getClassLoader());</a>
+<span class="sourceLineNo">056</span><a id="line.56"></a>
+<span class="sourceLineNo">057</span><a id="line.57">            engine = manager.getEngineByName(getScriptEngineName());</a>
+<span class="sourceLineNo">058</span><a id="line.58"></a>
+<span class="sourceLineNo">059</span><a id="line.59">            if (engine == null) {</a>
+<span class="sourceLineNo">060</span><a id="line.60">                engine =</a>
+<span class="sourceLineNo">061</span><a id="line.61">                    getExtensions().stream()</a>
+<span class="sourceLineNo">062</span><a id="line.62">                    .map(t -&gt; manager.getEngineByExtension(t))</a>
+<span class="sourceLineNo">063</span><a id="line.63">                    .filter(Objects::nonNull)</a>
+<span class="sourceLineNo">064</span><a id="line.64">                    .findFirst().orElse(null);</a>
+<span class="sourceLineNo">065</span><a id="line.65">            }</a>
+<span class="sourceLineNo">066</span><a id="line.66">        }</a>
+<span class="sourceLineNo">067</span><a id="line.67"></a>
+<span class="sourceLineNo">068</span><a id="line.68">        return engine;</a>
+<span class="sourceLineNo">069</span><a id="line.69">    }</a>
+<span class="sourceLineNo">070</span><a id="line.70"></a>
+<span class="sourceLineNo">071</span><a id="line.71">    @Override</a>
+<span class="sourceLineNo">072</span><a id="line.72">    public void execute(String line0, String code) throws Exception {</a>
+<span class="sourceLineNo">073</span><a id="line.73">        execute(Magic.getCellMagicCommand(line0), code);</a>
+<span class="sourceLineNo">074</span><a id="line.74">    }</a>
+<span class="sourceLineNo">075</span><a id="line.75"></a>
+<span class="sourceLineNo">076</span><a id="line.76">    /**</a>
+<span class="sourceLineNo">077</span><a id="line.77">     * Method provided for subclass implementations to intercept calculation</a>
+<span class="sourceLineNo">078</span><a id="line.78">     * of {@link ScriptEngine#ARGV} binding.</a>
+<span class="sourceLineNo">079</span><a id="line.79">     *</a>
+<span class="sourceLineNo">080</span><a id="line.80">     * @param   argv            The first line parsed as an array of</a>
+<span class="sourceLineNo">081</span><a id="line.81">     *                          {@link String}s.</a>
+<span class="sourceLineNo">082</span><a id="line.82">     * @param   code            The remainder of the cell.</a>
+<span class="sourceLineNo">083</span><a id="line.83">     */</a>
+<span class="sourceLineNo">084</span><a id="line.84">    protected void execute(String[] argv, String code) throws Exception {</a>
+<span class="sourceLineNo">085</span><a id="line.85">        var bindings = context.context.getBindings(ENGINE_SCOPE);</a>
+<span class="sourceLineNo">086</span><a id="line.86"></a>
+<span class="sourceLineNo">087</span><a id="line.87">        try {</a>
+<span class="sourceLineNo">088</span><a id="line.88">            bindings.put(ScriptEngine.ARGV, argv);</a>
+<span class="sourceLineNo">089</span><a id="line.89">            execute(code);</a>
+<span class="sourceLineNo">090</span><a id="line.90">        } finally {</a>
+<span class="sourceLineNo">091</span><a id="line.91">            bindings.remove(ScriptEngine.ARGV);</a>
+<span class="sourceLineNo">092</span><a id="line.92">        }</a>
+<span class="sourceLineNo">093</span><a id="line.93">    }</a>
+<span class="sourceLineNo">094</span><a id="line.94"></a>
+<span class="sourceLineNo">095</span><a id="line.95">    /**</a>
+<span class="sourceLineNo">096</span><a id="line.96">     * Target of {@link #execute(String,String)}.  The</a>
+<span class="sourceLineNo">097</span><a id="line.97">     * {@code argv} is available in the {@link javax.script.ScriptContext}</a>
+<span class="sourceLineNo">098</span><a id="line.98">     * {@code ENGINE_SCOPE} {@link javax.script.Bindings} as</a>
+<span class="sourceLineNo">099</span><a id="line.99">     * {@link ScriptEngine#ARGV ScriptEngine.ARGV}.</a>
+<span class="sourceLineNo">100</span><a id="line.100">     *</a>
+<span class="sourceLineNo">101</span><a id="line.101">     * @param   code            The remainder of the cell.</a>
+<span class="sourceLineNo">102</span><a id="line.102">     */</a>
+<span class="sourceLineNo">103</span><a id="line.103">    protected void execute(String code) throws Exception {</a>
+<span class="sourceLineNo">104</span><a id="line.104">        var engine = engine();</a>
+<span class="sourceLineNo">105</span><a id="line.105"></a>
+<span class="sourceLineNo">106</span><a id="line.106">        if (engine != null) {</a>
+<span class="sourceLineNo">107</span><a id="line.107">            if (! code.isBlank()) {</a>
+<span class="sourceLineNo">108</span><a id="line.108">                render(engine.eval(code, context.context));</a>
+<span class="sourceLineNo">109</span><a id="line.109">            } else {</a>
+<span class="sourceLineNo">110</span><a id="line.110">                show();</a>
+<span class="sourceLineNo">111</span><a id="line.111">            }</a>
+<span class="sourceLineNo">112</span><a id="line.112">        } else {</a>
+<span class="sourceLineNo">113</span><a id="line.113">            System.err.format("No %s REPL available\n", getMagicNames()[0]);</a>
+<span class="sourceLineNo">114</span><a id="line.114">        }</a>
+<span class="sourceLineNo">115</span><a id="line.115">    }</a>
+<span class="sourceLineNo">116</span><a id="line.116"></a>
+<span class="sourceLineNo">117</span><a id="line.117">    /**</a>
+<span class="sourceLineNo">118</span><a id="line.118">     * Callback to render the results of</a>
+<span class="sourceLineNo">119</span><a id="line.119">     * {@link ScriptEngine#eval(String,ScriptContext)}.  Made available for</a>
+<span class="sourceLineNo">120</span><a id="line.120">     * template engines.  Default implementation does nothing.</a>
+<span class="sourceLineNo">121</span><a id="line.121">     *</a>
+<span class="sourceLineNo">122</span><a id="line.122">     * @param   object          The result of</a>
+<span class="sourceLineNo">123</span><a id="line.123">     *                          {@link ScriptEngine#eval(String,ScriptContext)}.</a>
+<span class="sourceLineNo">124</span><a id="line.124">     */</a>
+<span class="sourceLineNo">125</span><a id="line.125">    protected void render(Object object) { }</a>
+<span class="sourceLineNo">126</span><a id="line.126"></a>
+<span class="sourceLineNo">127</span><a id="line.127">    /**</a>
+<span class="sourceLineNo">128</span><a id="line.128">     * Callback to show information about the {@link ScriptEngine} instance.</a>
+<span class="sourceLineNo">129</span><a id="line.129">     * Default implementation does nothing.</a>
+<span class="sourceLineNo">130</span><a id="line.130">     */</a>
+<span class="sourceLineNo">131</span><a id="line.131">    protected void show() { }</a>
+<span class="sourceLineNo">132</span><a id="line.132">}</a>
 
 
 
