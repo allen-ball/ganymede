@@ -41,6 +41,7 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED) @ToString @Log4j2
 public abstract class AbstractScriptEngineMagic extends AbstractMagic
                                                 implements AnnotatedScriptEngineMagic {
+    /** See {@link #engine()}. */
     protected ScriptEngine engine = null;
 
     /**
@@ -103,7 +104,11 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic
         var engine = engine();
 
         if (engine != null) {
-            render(engine.eval(code, context.context));
+            if (! code.isBlank()) {
+                render(engine.eval(code, context.context));
+            } else {
+                show();
+            }
         } else {
             System.err.format("No %s REPL available\n", getMagicNames()[0]);
         }
@@ -118,4 +123,10 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic
      *                          {@link ScriptEngine#eval(String,ScriptContext)}.
      */
     protected void render(Object object) { }
+
+    /**
+     * Callback to show information about the {@link ScriptEngine} instance.
+     * Default implementation does nothing.
+     */
+    protected void show() { }
 }
