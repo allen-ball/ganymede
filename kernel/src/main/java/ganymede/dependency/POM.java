@@ -82,7 +82,7 @@ public class POM {
         .addDeserializer(RemoteRepository.class, new RemoteRepositoryDeserializer())
         .addSerializer(RemoteRepository.class, new RemoteRepositorySerializer())
         .addDeserializer(RepositoryPolicy.class, new RepositoryPolicyDeserializer());
-    private static final ObjectMapper OBJECT_MAPPER =
+    private static final ObjectMapper YAML_OBJECT_MAPPER =
         new ObjectMapper(YAML_FACTORY)
         .registerModule(MODULE)
         .setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
@@ -99,7 +99,7 @@ public class POM {
         var resource = POM.class.getSimpleName() + ".yaml";
 
         try (var in = POM.class.getResourceAsStream(resource)) {
-            pom = OBJECT_MAPPER.readValue(in, POM.class);
+            pom = YAML_OBJECT_MAPPER.readValue(in, POM.class);
         }
 
         return pom;
@@ -113,7 +113,7 @@ public class POM {
      * @return  The parsed {@link POM}.
      */
     public static POM parse(String yaml) throws Exception {
-        return OBJECT_MAPPER.readValue(yaml, POM.class);
+        return YAML_OBJECT_MAPPER.readValue(yaml, POM.class);
     }
 
     private String localRepository = null;
@@ -178,7 +178,7 @@ public class POM {
      *                          reason.
      */
     public void writeTo(OutputStream out) throws IOException {
-        OBJECT_MAPPER.writeValue(out, this);
+        YAML_OBJECT_MAPPER.writeValue(out, this);
     }
 
     private static String asText(JsonNode node, String name) {
