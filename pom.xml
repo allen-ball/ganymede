@@ -13,7 +13,7 @@
   <parent>
     <groupId>ball</groupId>
     <artifactId>parent</artifactId>
-    <version>20210220-SNAPSHOT</version>
+    <version>20210415.0</version>
     <relativePath/>
   </parent>
   <distributionManagement>
@@ -61,8 +61,7 @@
     <!-- Optional -->
     <tablesaw.version>0.38.2</tablesaw.version>
     <!-- Javadoc Generation -->
-    <!-- <ball-api.version>${ball-parent.version}</ball-api.version> -->
-    <ball-api.version>20210218.0</ball-api.version>
+    <ball-api.version>${ball-parent.version}</ball-api.version>
     <javadoc-offline-locations>${settings.localRepository}/javadoc-offline-locations</javadoc-offline-locations>
 
     <javadoc.io>https://javadoc.io/doc/</javadoc.io>
