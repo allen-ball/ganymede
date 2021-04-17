@@ -91,7 +91,7 @@
 <span class="sourceLineNo">082</span><a id="line.82">        .addDeserializer(RemoteRepository.class, new RemoteRepositoryDeserializer())</a>
 <span class="sourceLineNo">083</span><a id="line.83">        .addSerializer(RemoteRepository.class, new RemoteRepositorySerializer())</a>
 <span class="sourceLineNo">084</span><a id="line.84">        .addDeserializer(RepositoryPolicy.class, new RepositoryPolicyDeserializer());</a>
-<span class="sourceLineNo">085</span><a id="line.85">    private static final ObjectMapper OBJECT_MAPPER =</a>
+<span class="sourceLineNo">085</span><a id="line.85">    private static final ObjectMapper YAML_OBJECT_MAPPER =</a>
 <span class="sourceLineNo">086</span><a id="line.86">        new ObjectMapper(YAML_FACTORY)</a>
 <span class="sourceLineNo">087</span><a id="line.87">        .registerModule(MODULE)</a>
 <span class="sourceLineNo">088</span><a id="line.88">        .setSerializationInclusion(JsonInclude.Include.NON_EMPTY)</a>
@@ -108,7 +108,7 @@
 <span class="sourceLineNo">099</span><a id="line.99">        var resource = POM.class.getSimpleName() + ".yaml";</a>
 <span class="sourceLineNo">100</span><a id="line.100"></a>
 <span class="sourceLineNo">101</span><a id="line.101">        try (var in = POM.class.getResourceAsStream(resource)) {</a>
-<span class="sourceLineNo">102</span><a id="line.102">            pom = OBJECT_MAPPER.readValue(in, POM.class);</a>
+<span class="sourceLineNo">102</span><a id="line.102">            pom = YAML_OBJECT_MAPPER.readValue(in, POM.class);</a>
 <span class="sourceLineNo">103</span><a id="line.103">        }</a>
 <span class="sourceLineNo">104</span><a id="line.104"></a>
 <span class="sourceLineNo">105</span><a id="line.105">        return pom;</a>
@@ -122,7 +122,7 @@
 <span class="sourceLineNo">113</span><a id="line.113">     * @return  The parsed {@link POM}.</a>
 <span class="sourceLineNo">114</span><a id="line.114">     */</a>
 <span class="sourceLineNo">115</span><a id="line.115">    public static POM parse(String yaml) throws Exception {</a>
-<span class="sourceLineNo">116</span><a id="line.116">        return OBJECT_MAPPER.readValue(yaml, POM.class);</a>
+<span class="sourceLineNo">116</span><a id="line.116">        return YAML_OBJECT_MAPPER.readValue(yaml, POM.class);</a>
 <span class="sourceLineNo">117</span><a id="line.117">    }</a>
 <span class="sourceLineNo">118</span><a id="line.118"></a>
 <span class="sourceLineNo">119</span><a id="line.119">    private String localRepository = null;</a>
@@ -187,7 +187,7 @@
 <span class="sourceLineNo">178</span><a id="line.178">     *                          reason.</a>
 <span class="sourceLineNo">179</span><a id="line.179">     */</a>
 <span class="sourceLineNo">180</span><a id="line.180">    public void writeTo(OutputStream out) throws IOException {</a>
-<span class="sourceLineNo">181</span><a id="line.181">        OBJECT_MAPPER.writeValue(out, this);</a>
+<span class="sourceLineNo">181</span><a id="line.181">        YAML_OBJECT_MAPPER.writeValue(out, this);</a>
 <span class="sourceLineNo">182</span><a id="line.182">    }</a>
 <span class="sourceLineNo">183</span><a id="line.183"></a>
 <span class="sourceLineNo">184</span><a id="line.184">    private static String asText(JsonNode node, String name) {</a>
