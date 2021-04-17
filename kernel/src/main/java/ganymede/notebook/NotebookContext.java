@@ -326,7 +326,7 @@ public class NotebookContext {
     }
 
     /**
-     * Method to unescape a Java-escaped spring literal.
+     * Method to unescape a Java-escaped string literal.
      *
      * @param   literal         The {@link String} to unescape.
      *
