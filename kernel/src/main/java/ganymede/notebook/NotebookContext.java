@@ -66,7 +66,7 @@ public class NotebookContext {
     private static final Base64.Decoder DECODER = Base64.getDecoder();
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
-    public static final ObjectMapper JSON_OBJECT_MAPPER =
+    private static final ObjectMapper JSON_OBJECT_MAPPER =
         new ObjectMapper()
         .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_VALUES)
         .enable(SerializationFeature.INDENT_OUTPUT);
@@ -239,12 +239,12 @@ public class NotebookContext {
     }
 
     /**
-     * Static method used by the {@link Shell} to update the
-     * {@link NotebookContext} members.
+     * Static method used by the {@link Shell} REPL to update the
+     * {@link NotebookContext} instance before execution.
      *
      * @param   shell           The {@link Shell}.
      */
-    public static void update(Shell shell) {
+    public static void preExecute(Shell shell) {
         var jshell = shell.jshell();
         var classpath =
             shell.classpath().stream()
@@ -283,12 +283,22 @@ public class NotebookContext {
 
         for (var entry : types.entrySet()) {
             evaluate(jshell,
-                     "__.context.getBindings(%1d).put(\"%2$s\", %2$s)",
+                     "__.context.getBindings(%1$d).put(\"%2$s\", %2$s)",
                      ScriptContext.ENGINE_SCOPE, entry.getKey());
             evaluate(jshell,
                      "__.types.put(\"%1$s\", \"%2$s\")",
                      entry.getKey(), entry.getValue());
         }
+    }
+
+    /**
+     * Static method used by the {@link Shell} REPL to update the
+     * {@link Shell} and {@link JShell} after execution.
+     *
+     * @param   shell           The {@link Shell}.
+     */
+    public static void postExecute(Shell shell) {
+        /* var jshell = shell.jshell(); */
     }
 
     private static String evaluate(JShell jshell, String expression, Object... argv) {

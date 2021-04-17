@@ -287,7 +287,7 @@ public class Shell implements AutoCloseable {
      */
     public void execute(String code) throws Exception {
         try {
-            NotebookContext.update(this);
+            NotebookContext.preExecute(this);
 
             var application = new Magic.Application(code);
             var name = application.getMagicName();
@@ -305,6 +305,8 @@ public class Shell implements AutoCloseable {
         } catch (Exception exception) {
             err.println(exception);
             throw exception;
+        } finally {
+            NotebookContext.postExecute(this);
         }
     }
 
@@ -349,8 +351,7 @@ public class Shell implements AutoCloseable {
         if (name == null || magics.containsKey(name)) {
             var magic = (name != null) ? magics.get(name) : java;
 
-            completeness =
-                magic.isComplete(application.getLine0(), application.getCode());
+            completeness = magic.isComplete(application.getLine0(), application.getCode());
         } else {
             completeness = Message.completeness.invalid;
         }
