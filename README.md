@@ -26,8 +26,9 @@ The [Ganymede Kernel] is distributed as a single JAR
 ([download here][Ganymede Kernel download]).
 
 Java 11 or later is required.  In addition to Java, the [Jupyter Notebook]
-must be installed first and the `jupyter` and `python` commands must be on
-the `${PATH}`.  Then the typical (and minimal) installation command line:
+must be [installed][Jupyter Notebook Installation] first and the `jupyter`
+and `python` commands must be on the `${PATH}`.  Then the typical (and
+minimal) installation command line:
 
 ```bash
 $ java -jar ganymede-kernel-1.0.0-beta.1.jar --install
@@ -444,6 +445,7 @@ Ibid.
 [java.scripting API]: https://docs.oracle.com/en/java/javase/11/docs/api/java.scripting/module-summary.html
 
 [Jupyter Notebook]: https://jupyter-notebook.readthedocs.io/en/stable/index.html
+[Jupyter Notebook Installation]: https://jupyter.readthedocs.io/en/latest/install/notebook-classic.html
 [Hide Input]: https://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/hide_input/readme.html
 
 [Jupyter Kernel]: https://jupyter-client.readthedocs.io/en/stable/kernels.html
