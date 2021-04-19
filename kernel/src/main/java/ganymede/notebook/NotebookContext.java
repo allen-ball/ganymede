@@ -56,7 +56,7 @@ import static jdk.jshell.Snippet.SubKind.TEMP_VAR_EXPRESSION_SUBKIND;
 
 /**
  * {@link NotebookContext} for {@link Notebook} {@link Shell}
- * {@link JShell} instance.  Bound to {@code __} in the {@link JShell}
+ * {@link JShell} instance.  Bound to {@code $$} in the {@link JShell}
  * instance.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
@@ -200,13 +200,13 @@ public class NotebookContext {
      */
     public static String bootstrap() {
         var code =
-            String.format("var __ = %s.newNotebookContext();\n",
+            String.format("var $$ = %s.newNotebookContext();\n",
                           Notebook.class.getCanonicalName());
 
         for (var method : NotebookContext.class.getDeclaredMethods()) {
             if (method.isAnnotationPresent(NotebookFunction.class)) {
                 if (isPublic(method.getModifiers())) {
-                    code += makeWrapperFor("__", method);
+                    code += makeWrapperFor("$$", method);
                 }
             }
         }
@@ -251,11 +251,11 @@ public class NotebookContext {
             .map(File::getAbsolutePath)
             .collect(toList());
 
-        evaluate(jshell, "__.classpath.clear()");
+        evaluate(jshell, "$$.classpath.clear()");
 
         if (! classpath.isEmpty()) {
             evaluate(jshell,
-                     "java.util.Collections.addAll(__.classpath, \"%1$s\".split(\",\"))",
+                     "java.util.Collections.addAll($$.classpath, \"%1$s\".split(\",\"))",
                      String.join(",", classpath));
         }
 
@@ -265,28 +265,28 @@ public class NotebookContext {
             .map(String::strip)
             .collect(toCollection(LinkedHashSet::new));
 
-        evaluate(jshell, "__.imports.clear()");
+        evaluate(jshell, "$$.imports.clear()");
 
         if (! imports.isEmpty()) {
             evaluate(jshell,
-                     "java.util.Collections.addAll(__.imports, \"%1$s\".split(\",\"))",
+                     "java.util.Collections.addAll($$.imports, \"%1$s\".split(\",\"))",
                      String.join(",", imports));
         }
 
         var types =
             jshell.variables()
             .filter(t -> (! t.subKind().equals(TEMP_VAR_EXPRESSION_SUBKIND)))
-            .filter(t -> (! t.name().equals("__")))
+            .filter(t -> (! t.name().equals("$$")))
             .collect(toMap(k -> k.name(), v -> v.typeName()));
 
-        evaluate(jshell, "__.types.clear()");
+        evaluate(jshell, "$$.types.clear()");
 
         for (var entry : types.entrySet()) {
             evaluate(jshell,
-                     "__.context.getBindings(%1$d).put(\"%2$s\", %2$s)",
+                     "$$.context.getBindings(%1$d).put(\"%2$s\", %2$s)",
                      ScriptContext.ENGINE_SCOPE, entry.getKey());
             evaluate(jshell,
-                     "__.types.put(\"%1$s\", \"%2$s\")",
+                     "$$.types.put(\"%1$s\", \"%2$s\")",
                      entry.getKey(), entry.getValue());
         }
     }
@@ -321,7 +321,7 @@ public class NotebookContext {
         var jshell = shell.jshell();
 
         evaluate(jshell,
-                 "__.magic(\"%s\", \"%s\", \"%s\")",
+                 "$$.magic(\"%s\", \"%s\", \"%s\")",
                  name, encode(line0), encode(code));
     }
 
