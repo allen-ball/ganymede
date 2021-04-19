@@ -19,16 +19,21 @@ package ganymede.shell.magic;
  * ##########################################################################
  */
 import ball.annotation.ServiceProviderFor;
+import ganymede.notebook.NotebookContext;
 import ganymede.shell.Magic;
+import java.io.InputStreamReader;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.StreamUtils;
 import scala.tools.nsc.Settings;
 import scala.tools.nsc.interpreter.Scripted;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.disjoint;
 import static javax.script.ScriptContext.ENGINE_SCOPE;
 
@@ -77,7 +82,9 @@ public class Scala extends AbstractScriptEngineMagic {
 
                 scripted.setBindings(bindings, ENGINE_SCOPE);
 
-                engine = scripted;
+                if (initialize(scripted)) {
+                    engine = scripted;
+                }
             } catch (NoClassDefFoundError exception) {
             } catch (Exception exception) {
                 exception.printStackTrace(System.err);
@@ -85,5 +92,30 @@ public class Scala extends AbstractScriptEngineMagic {
         }
 
         return (Scripted) engine;
+    }
+
+    @Override
+    protected boolean initialize(ScriptEngine engine) {
+        var initialized = true;
+        var scripted = (Scripted) engine;
+        var name = getClass().getSimpleName() + ".sc";
+        var resource = new ClassPathResource(name, getClass());
+
+        if (initialized && resource.exists()) {
+            try (var in = new InputStreamReader(resource.getInputStream(), UTF_8)) {
+                scripted.compile(in).eval(context.context);
+            } catch (Exception exception) {
+                initialized = false;
+                exception.printStackTrace(System.err);
+            }
+        }
+
+        if (initialized) {
+            for (var method : NotebookContext.getNotebookFunctions()) {
+                // TBD: Generate Scala wrappers through reflection
+            }
+        }
+
+        return initialized;
     }
 }
