@@ -65,7 +65,7 @@
 <span class="sourceLineNo">056</span><a id="line.56"></a>
 <span class="sourceLineNo">057</span><a id="line.57">/**</a>
 <span class="sourceLineNo">058</span><a id="line.58"> * {@link NotebookContext} for {@link Notebook} {@link Shell}</a>
-<span class="sourceLineNo">059</span><a id="line.59"> * {@link JShell} instance.  Bound to {@code __} in the {@link JShell}</a>
+<span class="sourceLineNo">059</span><a id="line.59"> * {@link JShell} instance.  Bound to {@code $$} in the {@link JShell}</a>
 <span class="sourceLineNo">060</span><a id="line.60"> * instance.</a>
 <span class="sourceLineNo">061</span><a id="line.61"> *</a>
 <span class="sourceLineNo">062</span><a id="line.62"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
@@ -209,13 +209,13 @@
 <span class="sourceLineNo">200</span><a id="line.200">     */</a>
 <span class="sourceLineNo">201</span><a id="line.201">    public static String bootstrap() {</a>
 <span class="sourceLineNo">202</span><a id="line.202">        var code =</a>
-<span class="sourceLineNo">203</span><a id="line.203">            String.format("var __ = %s.newNotebookContext();\n",</a>
+<span class="sourceLineNo">203</span><a id="line.203">            String.format("var $$ = %s.newNotebookContext();\n",</a>
 <span class="sourceLineNo">204</span><a id="line.204">                          Notebook.class.getCanonicalName());</a>
 <span class="sourceLineNo">205</span><a id="line.205"></a>
 <span class="sourceLineNo">206</span><a id="line.206">        for (var method : NotebookContext.class.getDeclaredMethods()) {</a>
 <span class="sourceLineNo">207</span><a id="line.207">            if (method.isAnnotationPresent(NotebookFunction.class)) {</a>
 <span class="sourceLineNo">208</span><a id="line.208">                if (isPublic(method.getModifiers())) {</a>
-<span class="sourceLineNo">209</span><a id="line.209">                    code += makeWrapperFor("__", method);</a>
+<span class="sourceLineNo">209</span><a id="line.209">                    code += makeWrapperFor("$$", method);</a>
 <span class="sourceLineNo">210</span><a id="line.210">                }</a>
 <span class="sourceLineNo">211</span><a id="line.211">            }</a>
 <span class="sourceLineNo">212</span><a id="line.212">        }</a>
@@ -260,11 +260,11 @@
 <span class="sourceLineNo">251</span><a id="line.251">            .map(File::getAbsolutePath)</a>
 <span class="sourceLineNo">252</span><a id="line.252">            .collect(toList());</a>
 <span class="sourceLineNo">253</span><a id="line.253"></a>
-<span class="sourceLineNo">254</span><a id="line.254">        evaluate(jshell, "__.classpath.clear()");</a>
+<span class="sourceLineNo">254</span><a id="line.254">        evaluate(jshell, "$$.classpath.clear()");</a>
 <span class="sourceLineNo">255</span><a id="line.255"></a>
 <span class="sourceLineNo">256</span><a id="line.256">        if (! classpath.isEmpty()) {</a>
 <span class="sourceLineNo">257</span><a id="line.257">            evaluate(jshell,</a>
-<span class="sourceLineNo">258</span><a id="line.258">                     "java.util.Collections.addAll(__.classpath, \"%1$s\".split(\",\"))",</a>
+<span class="sourceLineNo">258</span><a id="line.258">                     "java.util.Collections.addAll($$.classpath, \"%1$s\".split(\",\"))",</a>
 <span class="sourceLineNo">259</span><a id="line.259">                     String.join(",", classpath));</a>
 <span class="sourceLineNo">260</span><a id="line.260">        }</a>
 <span class="sourceLineNo">261</span><a id="line.261"></a>
@@ -274,28 +274,28 @@
 <span class="sourceLineNo">265</span><a id="line.265">            .map(String::strip)</a>
 <span class="sourceLineNo">266</span><a id="line.266">            .collect(toCollection(LinkedHashSet::new));</a>
 <span class="sourceLineNo">267</span><a id="line.267"></a>
-<span class="sourceLineNo">268</span><a id="line.268">        evaluate(jshell, "__.imports.clear()");</a>
+<span class="sourceLineNo">268</span><a id="line.268">        evaluate(jshell, "$$.imports.clear()");</a>
 <span class="sourceLineNo">269</span><a id="line.269"></a>
 <span class="sourceLineNo">270</span><a id="line.270">        if (! imports.isEmpty()) {</a>
 <span class="sourceLineNo">271</span><a id="line.271">            evaluate(jshell,</a>
-<span class="sourceLineNo">272</span><a id="line.272">                     "java.util.Collections.addAll(__.imports, \"%1$s\".split(\",\"))",</a>
+<span class="sourceLineNo">272</span><a id="line.272">                     "java.util.Collections.addAll($$.imports, \"%1$s\".split(\",\"))",</a>
 <span class="sourceLineNo">273</span><a id="line.273">                     String.join(",", imports));</a>
 <span class="sourceLineNo">274</span><a id="line.274">        }</a>
 <span class="sourceLineNo">275</span><a id="line.275"></a>
 <span class="sourceLineNo">276</span><a id="line.276">        var types =</a>
 <span class="sourceLineNo">277</span><a id="line.277">            jshell.variables()</a>
 <span class="sourceLineNo">278</span><a id="line.278">            .filter(t -&gt; (! t.subKind().equals(TEMP_VAR_EXPRESSION_SUBKIND)))</a>
-<span class="sourceLineNo">279</span><a id="line.279">            .filter(t -&gt; (! t.name().equals("__")))</a>
+<span class="sourceLineNo">279</span><a id="line.279">            .filter(t -&gt; (! t.name().equals("$$")))</a>
 <span class="sourceLineNo">280</span><a id="line.280">            .collect(toMap(k -&gt; k.name(), v -&gt; v.typeName()));</a>
 <span class="sourceLineNo">281</span><a id="line.281"></a>
-<span class="sourceLineNo">282</span><a id="line.282">        evaluate(jshell, "__.types.clear()");</a>
+<span class="sourceLineNo">282</span><a id="line.282">        evaluate(jshell, "$$.types.clear()");</a>
 <span class="sourceLineNo">283</span><a id="line.283"></a>
 <span class="sourceLineNo">284</span><a id="line.284">        for (var entry : types.entrySet()) {</a>
 <span class="sourceLineNo">285</span><a id="line.285">            evaluate(jshell,</a>
-<span class="sourceLineNo">286</span><a id="line.286">                     "__.context.getBindings(%1$d).put(\"%2$s\", %2$s)",</a>
+<span class="sourceLineNo">286</span><a id="line.286">                     "$$.context.getBindings(%1$d).put(\"%2$s\", %2$s)",</a>
 <span class="sourceLineNo">287</span><a id="line.287">                     ScriptContext.ENGINE_SCOPE, entry.getKey());</a>
 <span class="sourceLineNo">288</span><a id="line.288">            evaluate(jshell,</a>
-<span class="sourceLineNo">289</span><a id="line.289">                     "__.types.put(\"%1$s\", \"%2$s\")",</a>
+<span class="sourceLineNo">289</span><a id="line.289">                     "$$.types.put(\"%1$s\", \"%2$s\")",</a>
 <span class="sourceLineNo">290</span><a id="line.290">                     entry.getKey(), entry.getValue());</a>
 <span class="sourceLineNo">291</span><a id="line.291">        }</a>
 <span class="sourceLineNo">292</span><a id="line.292">    }</a>
@@ -330,12 +330,12 @@
 <span class="sourceLineNo">321</span><a id="line.321">        var jshell = shell.jshell();</a>
 <span class="sourceLineNo">322</span><a id="line.322"></a>
 <span class="sourceLineNo">323</span><a id="line.323">        evaluate(jshell,</a>
-<span class="sourceLineNo">324</span><a id="line.324">                 "__.magic(\"%s\", \"%s\", \"%s\")",</a>
+<span class="sourceLineNo">324</span><a id="line.324">                 "$$.magic(\"%s\", \"%s\", \"%s\")",</a>
 <span class="sourceLineNo">325</span><a id="line.325">                 name, encode(line0), encode(code));</a>
 <span class="sourceLineNo">326</span><a id="line.326">    }</a>
 <span class="sourceLineNo">327</span><a id="line.327"></a>
 <span class="sourceLineNo">328</span><a id="line.328">    /**</a>
-<span class="sourceLineNo">329</span><a id="line.329">     * Method to unescape a Java-escaped spring literal.</a>
+<span class="sourceLineNo">329</span><a id="line.329">     * Method to unescape a Java-escaped string literal.</a>
 <span class="sourceLineNo">330</span><a id="line.330">     *</a>
 <span class="sourceLineNo">331</span><a id="line.331">     * @param   literal         The {@link String} to unescape.</a>
 <span class="sourceLineNo">332</span><a id="line.332">     *</a>
