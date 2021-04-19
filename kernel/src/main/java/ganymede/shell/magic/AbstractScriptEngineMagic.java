@@ -56,17 +56,28 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic
 
             engine = manager.getEngineByName(getScriptEngineName());
 
-            if (engine == null) {
+            if (engine == null || (! initialize(engine))) {
                 engine =
                     getExtensions().stream()
                     .map(t -> manager.getEngineByExtension(t))
                     .filter(Objects::nonNull)
+                    .filter(this::initialize)
                     .findFirst().orElse(null);
             }
         }
 
         return engine;
     }
+
+    /**
+     * Method to initialize the {@link ScriptEngine}.  Default implementation
+     * simply returns {@code true}.  A {@link ScriptEngine} instance that
+     * cannot be initialized will be ignored.
+     *
+     * @return  {@code true} if the {@link ScriptEngine} can be initialized,
+     *          {@code false} otherwise.
+     */
+    protected boolean initialize(ScriptEngine engine) { return true; }
 
     @Override
     public void execute(String line0, String code) throws Exception {
