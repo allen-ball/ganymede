@@ -30,6 +30,7 @@ import scala.tools.nsc.Settings;
 import scala.tools.nsc.interpreter.Scripted;
 
 import static java.util.Collections.disjoint;
+import static javax.script.ScriptContext.ENGINE_SCOPE;
 
 /**
  * {@link Scala} {@link Magic}.
@@ -43,7 +44,7 @@ import static java.util.Collections.disjoint;
 @NoArgsConstructor @ToString @Log4j2
 public class Scala extends AbstractScriptEngineMagic {
     @Override
-    protected ScriptEngine engine() {
+    protected Scripted engine() {
         if (engine == null) {
             /*
              * Can't simply extend AbstractScriptEngineMagic because:
@@ -51,6 +52,10 @@ public class Scala extends AbstractScriptEngineMagic {
              *     new ScriptEngineManager().getEngineByName("scala");
              *
              * tickles https://github.com/scala/bug/issues/11754.
+             *
+             * The following workaround is required to use println():
+             *
+             *     Console.withOut(System.out) { println($ctx.greeting) }
              */
             try {
                 var manager = new ScriptEngineManager(getClass().getClassLoader());
@@ -60,19 +65,25 @@ public class Scala extends AbstractScriptEngineMagic {
                     .filter(t -> (! disjoint(t.getExtensions(), getExtensions())))
                     .findFirst().orElse(null);
                 var settings = new Settings();
-
-                settings.usejavacp().value_$eq(true);
-
+                /*
+                 * settings.Yreplclassbased().value_$eq(true);
+                 * settings.usejavacp().value_$eq(true);
+                 */
                 context.classpath.stream()
                     .forEach(t -> settings.classpath().append(t));
 
-                engine = new Scripted(factory, settings, Scripted.apply$default$3());
+                var scripted = Scripted.apply(factory, settings, Scripted.apply$default$3());
+                var bindings = context.context.getBindings(ENGINE_SCOPE);
+
+                scripted.setBindings(bindings, ENGINE_SCOPE);
+
+                engine = scripted;
             } catch (NoClassDefFoundError exception) {
             } catch (Exception exception) {
                 exception.printStackTrace(System.err);
             }
         }
 
-        return engine;
+        return (Scripted) engine;
     }
 }
