@@ -40,6 +40,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.stream.Stream;
 import javax.script.ScriptContext;
 import javax.script.SimpleBindings;
 import javax.script.SimpleScriptContext;
@@ -56,12 +57,12 @@ import static jdk.jshell.Snippet.SubKind.TEMP_VAR_EXPRESSION_SUBKIND;
 
 /**
  * {@link NotebookContext} for {@link Notebook} {@link Shell}
- * {@link JShell} instance.  Bound to {@code $$} in the {@link JShell}
+ * {@link JShell} instance.  Bound to {@value #NAME} in the {@link JShell}
  * instance.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
-@NoArgsConstructor @ToString
+@NoArgsConstructor @ToString(callSuper = true, onlyExplicitlyIncluded = true)
 public class NotebookContext {
     private static final Base64.Decoder DECODER = Base64.getDecoder();
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
@@ -79,6 +80,12 @@ public class NotebookContext {
         .setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
         .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_VALUES)
         .enable(SerializationFeature.INDENT_OUTPUT);
+
+    /**
+     * The name ({@value #NAME}) the {@link NotebookContext} instance is
+     * bound to in the {@link JShell} instance.
+     */
+    public static final String NAME = "$$";
 
     /**
      * Common {@link ScriptContext} supplied to
@@ -200,15 +207,11 @@ public class NotebookContext {
      */
     public static String bootstrap() {
         var code =
-            String.format("var $$ = %s.newNotebookContext();\n",
-                          Notebook.class.getCanonicalName());
+            String.format("var %1$s = %2$s.newNotebookContext();\n",
+                          NAME, Notebook.class.getCanonicalName());
 
-        for (var method : NotebookContext.class.getDeclaredMethods()) {
-            if (method.isAnnotationPresent(NotebookFunction.class)) {
-                if (isPublic(method.getModifiers())) {
-                    code += makeWrapperFor("$$", method);
-                }
-            }
+        for (var method : getNotebookFunctions()) {
+            code += makeWrapperFor(NAME, method);
         }
 
         return code;
@@ -220,12 +223,13 @@ public class NotebookContext {
         var parameters = new String[types.length];
 
         for (int i = 0; i < arguments.length; i += 1) {
-            arguments[i] = String.format("argument%d", i);
+            arguments[i] = String.format("argument%1$d", i);
         }
 
         for (int i = 0; i < parameters.length; i += 1) {
             parameters[i] =
-                String.format("%s %s", types[i].getTypeName(), arguments[i]);
+                String.format("%1$s %2$s",
+                              types[i].getTypeName(), arguments[i]);
         }
 
         var plist = String.join(", ", parameters);
@@ -236,6 +240,23 @@ public class NotebookContext {
                              method.getName(), plist,
                              Void.TYPE.equals(method.getReturnType()) ? "" : "return ",
                              instance, alist);
+    }
+
+    /**
+     * Method to get the {@link NotebookContext} {@link Method}s annotated
+     * with {@link NotebookFunction} that should be linked into the
+     * {@link Notebook} environment.
+     *
+     * @return  The array of {@link Method}s.
+     */
+    public static Method[] getNotebookFunctions() {
+        var functions =
+            Stream.of(NotebookContext.class.getDeclaredMethods())
+            .filter(t -> t.isAnnotationPresent(NotebookFunction.class))
+            .filter(t -> isPublic(t.getModifiers()))
+            .toArray(Method[]::new);
+
+        return functions;
     }
 
     /**
@@ -251,12 +272,12 @@ public class NotebookContext {
             .map(File::getAbsolutePath)
             .collect(toList());
 
-        evaluate(jshell, "$$.classpath.clear()");
+        evaluate(jshell, "%1$s.classpath.clear()", NAME);
 
         if (! classpath.isEmpty()) {
             evaluate(jshell,
-                     "java.util.Collections.addAll($$.classpath, \"%1$s\".split(\",\"))",
-                     String.join(",", classpath));
+                     "java.util.Collections.addAll(%1$s.classpath, \"%2$s\".split(\",\"))",
+                     NAME, String.join(",", classpath));
         }
 
         var imports =
@@ -265,29 +286,28 @@ public class NotebookContext {
             .map(String::strip)
             .collect(toCollection(LinkedHashSet::new));
 
-        evaluate(jshell, "$$.imports.clear()");
+        evaluate(jshell, "%1$s.imports.clear()", NAME);
 
         if (! imports.isEmpty()) {
             evaluate(jshell,
-                     "java.util.Collections.addAll($$.imports, \"%1$s\".split(\",\"))",
-                     String.join(",", imports));
+                     "java.util.Collections.addAll(%1$s.imports, \"%2$s\".split(\",\"))",
+                     NAME, String.join(",", imports));
         }
 
         var types =
             jshell.variables()
             .filter(t -> (! t.subKind().equals(TEMP_VAR_EXPRESSION_SUBKIND)))
-            .filter(t -> (! t.name().equals("$$")))
             .collect(toMap(k -> k.name(), v -> v.typeName()));
 
-        evaluate(jshell, "$$.types.clear()");
+        evaluate(jshell, "%1$s.types.clear()", NAME);
 
         for (var entry : types.entrySet()) {
             evaluate(jshell,
-                     "$$.context.getBindings(%1$d).put(\"%2$s\", %2$s)",
-                     ScriptContext.ENGINE_SCOPE, entry.getKey());
+                     "%1$s.context.getBindings(%2$d).put(\"%3$s\", %3$s)",
+                     NAME, ScriptContext.ENGINE_SCOPE, entry.getKey());
             evaluate(jshell,
-                     "$$.types.put(\"%1$s\", \"%2$s\")",
-                     entry.getKey(), entry.getValue());
+                     "%1$s.types.put(\"%2$s\", \"%3$s\")",
+                     NAME, entry.getKey(), entry.getValue());
         }
     }
 
@@ -321,8 +341,8 @@ public class NotebookContext {
         var jshell = shell.jshell();
 
         evaluate(jshell,
-                 "$$.magic(\"%s\", \"%s\", \"%s\")",
-                 name, encode(line0), encode(code));
+                 "%1$s.magic(\"%2$s\", \"%3$s\", \"%4$s\")",
+                 NAME, name, encode(line0), encode(code));
     }
 
     /**
