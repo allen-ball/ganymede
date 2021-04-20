@@ -112,7 +112,9 @@ public class Scala extends AbstractScriptEngineMagic {
 
         if (initialized) {
             for (var method : NotebookContext.getNotebookFunctions()) {
-                // TBD: Generate Scala wrappers through reflection
+                /*
+                 * TBD: Generate Scala wrappers through reflection.
+                 */
             }
         }
 
@@ -124,6 +126,32 @@ public class Scala extends AbstractScriptEngineMagic {
         var scripted = (Scripted) engine;
 
         if (engine != null) {
+            for (var path : context.classpath) {
+                /*
+                 * TBD: Add paths to Scripted classpath.
+                 */
+            }
+
+            for (var statement : context.imports) {
+                try {
+                    statement =
+                        statement
+                        .replaceAll("[;]", "")
+                        .replaceAll("[\\p{Space}]+", " ")
+                        .replaceAll("import static ", "import ")
+                        .replaceAll("[*]", "_")
+                        .strip();
+                    /*
+                     * TBD: Add imports (depends on successful classpath
+                     * updates).
+                     *
+                     * scripted.compile(statement).eval(context.context);
+                     */
+                } catch (Exception exception) {
+                    exception.printStackTrace(System.err);
+                }
+            }
+
             try {
                 if (! code.isBlank()) {
                     render(scripted.compile(code).eval(context.context));
