@@ -118,4 +118,23 @@ public class Scala extends AbstractScriptEngineMagic {
 
         return initialized;
     }
+
+    @Override
+    protected void execute(String code) throws Exception {
+        var scripted = (Scripted) engine;
+
+        if (engine != null) {
+            try {
+                if (! code.isBlank()) {
+                    render(scripted.compile(code).eval(context.context));
+                } else {
+                    show();
+                }
+            } catch (Exception exception) {
+                exception.printStackTrace(System.err);
+            }
+        } else {
+            super.execute(code);
+        }
+    }
 }

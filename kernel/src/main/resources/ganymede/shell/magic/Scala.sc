@@ -20,18 +20,33 @@
 /*
  * Partial workaround for https://github.com/scala/bug/issues/11754.
  */
-def print(obj: Any): Unit = {
-    Console.withOut(System.out) { Console.out.print(obj) }
+def printf(format: String, args: Any*): Unit = {
+    Console.withOut(System.out) { Console.out.printf(format, args) }
 }
 
-def printf(text: String, args: Any*): Unit = {
-    Console.withOut(System.out) { Console.out.printf(text, args) }
-}
-
-def println(x: Any): Unit = {
-    Console.withOut(System.out) { Console.out.println(x) }
+def println(obj: Any): Unit = {
+    Console.withOut(System.out) { Console.out.println(obj) }
 }
 
 def println(): Unit = {
     Console.withOut(System.out) { Console.out.println() }
+}
+/*
+ * The following should be added programmatically.
+ * See NotebookContext.getNotebookFunctions().
+ */
+def display(obj: Any): Unit = {
+    $ctx.$$.asInstanceOf[_root_.ganymede.notebook.NotebookContext].display(obj)
+}
+
+def print(obj: Any): Unit = {
+    $ctx.$$.asInstanceOf[_root_.ganymede.notebook.NotebookContext].print(obj)
+}
+
+def asJson(obj: Any): _root_.com.fasterxml.jackson.databind.JsonNode = {
+    $ctx.$$.asInstanceOf[_root_.ganymede.notebook.NotebookContext].asJson(obj)
+}
+
+def asYaml(obj: Any): String = {
+    $ctx.$$.asInstanceOf[_root_.ganymede.notebook.NotebookContext].asYaml(obj)
 }
