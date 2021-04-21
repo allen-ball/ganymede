@@ -122,8 +122,8 @@ public class Scala extends AbstractScriptEngineMagic {
     }
 
     @Override
-    protected void execute(String code) throws Exception {
-        var scripted = (Scripted) engine;
+    protected void execute(String code) {
+        var engine = engine();
 
         if (engine != null) {
             for (var path : context.classpath) {
@@ -145,7 +145,7 @@ public class Scala extends AbstractScriptEngineMagic {
                      * TBD: Add imports (depends on successful classpath
                      * updates).
                      *
-                     * scripted.compile(statement).eval(context.context);
+                     * engine.compile(statement).eval(context.context);
                      */
                 } catch (Exception exception) {
                     exception.printStackTrace(System.err);
@@ -154,7 +154,7 @@ public class Scala extends AbstractScriptEngineMagic {
 
             try {
                 if (! code.isBlank()) {
-                    render(scripted.compile(code).eval(context.context));
+                    render(engine.compile(code).eval(context.context));
                 } else {
                     show();
                 }

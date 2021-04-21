@@ -111,14 +111,18 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic
      *
      * @param   code            The remainder of the cell.
      */
-    protected void execute(String code) throws Exception {
+    protected void execute(String code) {
         var engine = engine();
 
         if (engine != null) {
-            if (! code.isBlank()) {
-                render(engine.eval(code, context.context));
-            } else {
-                show();
+            try {
+                if (! code.isBlank()) {
+                    render(engine.eval(code, context.context));
+                } else {
+                    show();
+                }
+            } catch (Exception exception) {
+                exception.printStackTrace(System.err);
             }
         } else {
             System.err.format("No %s REPL available\n", getMagicNames()[0]);
