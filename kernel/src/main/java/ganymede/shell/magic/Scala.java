@@ -98,15 +98,15 @@ public class Scala extends AbstractScriptEngineMagic {
     protected boolean initialize(ScriptEngine engine) {
         var initialized = true;
         var scripted = (Scripted) engine;
-        var name = getClass().getSimpleName() + ".sc";
+        var name = getClass().getSimpleName() + "." + "scala";
         var resource = new ClassPathResource(name, getClass());
 
         if (initialized && resource.exists()) {
             try (var in = new InputStreamReader(resource.getInputStream(), UTF_8)) {
                 scripted.compile(in).eval(context.context);
-            } catch (Exception exception) {
+            } catch (Throwable throwable) {
                 initialized = false;
-                exception.printStackTrace(System.err);
+                throwable.printStackTrace(System.err);
             }
         }
 
@@ -147,8 +147,8 @@ public class Scala extends AbstractScriptEngineMagic {
                      *
                      * engine.compile(statement).eval(context.context);
                      */
-                } catch (Exception exception) {
-                    exception.printStackTrace(System.err);
+                } catch (Throwable throwable) {
+                    throwable.printStackTrace(System.err);
                 }
             }
 
@@ -158,8 +158,8 @@ public class Scala extends AbstractScriptEngineMagic {
                 } else {
                     show();
                 }
-            } catch (Exception exception) {
-                exception.printStackTrace(System.err);
+            } catch (Throwable throwable) {
+                throwable.printStackTrace(System.err);
             }
         } else {
             super.execute(code);

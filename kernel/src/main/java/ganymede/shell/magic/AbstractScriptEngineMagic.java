@@ -19,13 +19,18 @@ package ganymede.shell.magic;
  * ##########################################################################
  */
 import ganymede.shell.Magic;
+import java.io.InputStreamReader;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.core.io.ClassPathResource;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static javax.script.ScriptContext.ENGINE_SCOPE;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -70,14 +75,37 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic
     }
 
     /**
-     * Method to initialize the {@link ScriptEngine}.  Default implementation
-     * simply returns {@code true}.  A {@link ScriptEngine} instance that
-     * cannot be initialized will be ignored.
+     * Method to initialize the {@link ScriptEngine}.  Default
+     * implementation looks for a {@link Class} resource named with the
+     * {@link Class#getSimpleName()} and one of the {@link ScriptEngine}'s
+     * {@link javax.script.ScriptEngineFactory#getExtensions() extensions}.
+     * A {@link ScriptEngine} instance that cannot be initialized will be
+     * ignored.
      *
      * @return  {@code true} if the {@link ScriptEngine} can be initialized,
      *          {@code false} otherwise.
      */
-    protected boolean initialize(ScriptEngine engine) { return true; }
+    protected boolean initialize(ScriptEngine engine) {
+        var initialized = true;
+        var resource =
+            Optional.ofNullable(engine.getFactory().getExtensions()).stream()
+            .flatMap(List::stream)
+            .map(t -> getClass().getSimpleName() + "." + t)
+            .map(t -> new ClassPathResource(t, getClass()))
+            .filter(ClassPathResource::exists)
+            .findFirst().orElse(null);
+
+        if (initialized && resource != null) {
+            try (var in = new InputStreamReader(resource.getInputStream(), UTF_8)) {
+                engine.eval(in, context.context);
+            } catch (Throwable throwable) {
+                initialized = false;
+                throwable.printStackTrace(System.err);
+            }
+        }
+
+        return initialized;
+    }
 
     @Override
     public void execute(String line0, String code) throws Exception {
@@ -121,8 +149,8 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic
                 } else {
                     show();
                 }
-            } catch (Exception exception) {
-                exception.printStackTrace(System.err);
+            } catch (Throwable throwable) {
+                throwable.printStackTrace(System.err);
             }
         } else {
             System.err.format("No %s REPL available\n", getMagicNames()[0]);

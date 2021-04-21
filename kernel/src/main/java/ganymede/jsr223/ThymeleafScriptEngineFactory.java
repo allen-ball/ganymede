@@ -39,6 +39,7 @@ import lombok.extern.log4j.Log4j2;
 @Parameter(name = ScriptEngine.ENGINE_VERSION, value = "3.0")
 @Parameter(name = ScriptEngine.LANGUAGE, value = "thymeleaf")
 @Parameter(name = ScriptEngine.LANGUAGE_VERSION, value = "3.0")
+@Extensions({ })
 @NoArgsConstructor @ToString @Log4j2
 public class ThymeleafScriptEngineFactory extends AbstractScriptEngineFactory {
     @Override
