@@ -43,8 +43,6 @@ import lombok.extern.log4j.Log4j2;
 public class Classpath extends JShell {
     private static final String SEPARATOR = System.getProperty("path.separator");
 
-    private static final SubstitutionMap MAP = new SubstitutionMap();
-
     @Override
     public void execute(Shell shell,
                         InputStream in, PrintStream out, PrintStream err,
@@ -63,9 +61,11 @@ public class Classpath extends JShell {
 
             shell.addToClasspath(files);
         } else {
+            var map = new SubstitutionMap();
+
             shell.resolver().classpath().stream()
                 .map(Object::toString)
-                .map(MAP::shorten)
+                .map(map::shorten)
                 .forEach(out::println);
         }
     }
