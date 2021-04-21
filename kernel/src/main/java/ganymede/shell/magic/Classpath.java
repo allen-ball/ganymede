@@ -78,7 +78,7 @@ public class Classpath extends JShell {
                   .comparingInt(String::length).reversed()
                   .thenComparing(String::toString, Comparator.naturalOrder()));
 
-            Stream.of(System.getProperties(), System.getenv())
+            Stream.of(System.getenv(), System.getProperties())
                 .flatMap(t -> t.entrySet().stream())
                 .filter(t -> (! t.getKey().toString().endsWith(".path")))
                 .filter(t -> t.getValue() != null)
