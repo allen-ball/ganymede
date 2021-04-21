@@ -24,6 +24,8 @@ import ganymede.shell.Shell;
 import java.io.File;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.Comparator;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -40,6 +42,8 @@ import lombok.extern.log4j.Log4j2;
 @NoArgsConstructor @ToString @Log4j2
 public class Classpath extends JShell {
     private static final String SEPARATOR = System.getProperty("path.separator");
+
+    private static final SubstitutionMap MAP = new SubstitutionMap();
 
     @Override
     public void execute(Shell shell,
@@ -59,8 +63,42 @@ public class Classpath extends JShell {
 
             shell.addToClasspath(files);
         } else {
-            shell.resolver().classpath()
-                .stream().forEach(out::println);
+            shell.resolver().classpath().stream()
+                .map(Object::toString)
+                .map(MAP::shorten)
+                .forEach(out::println);
+        }
+    }
+
+    private static class SubstitutionMap extends TreeMap<String,String> {
+        private static final long serialVersionUID = -8831575361943474872L;
+
+        public SubstitutionMap() {
+            super(Comparator
+                  .comparingInt(String::length).reversed()
+                  .thenComparing(String::toString, Comparator.naturalOrder()));
+
+            Stream.of(System.getProperties(), System.getenv())
+                .flatMap(t -> t.entrySet().stream())
+                .filter(t -> (! t.getKey().toString().endsWith(".path")))
+                .filter(t -> t.getValue() != null)
+                .filter(t -> t.getValue().toString().length() > 1)
+                .filter(t -> (! t.getValue().toString().contains(SEPARATOR)))
+                .filter(t -> new File(t.getValue().toString()).isAbsolute())
+                .forEach(t -> put(t.getValue().toString(),
+                                  "${" + t.getKey().toString() + "}"));
+        }
+
+        public String shorten(String string) {
+            var shortened = string;
+
+            for (var entry : entrySet()) {
+                if (shortened.startsWith(entry.getKey())) {
+                    shortened = shortened.replace(entry.getKey(), entry.getValue());
+                }
+            }
+
+            return shortened;
         }
     }
 }
