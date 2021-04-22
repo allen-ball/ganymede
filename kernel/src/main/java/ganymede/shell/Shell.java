@@ -29,6 +29,7 @@ import ganymede.shell.magic.MagicNames;
 import java.io.File;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
@@ -41,7 +42,6 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import jdk.jshell.JShell;
-import jdk.jshell.JShellException;
 import jdk.jshell.SourceCodeAnalysis;
 import lombok.NoArgsConstructor;
 import lombok.Synchronized;
@@ -285,7 +285,7 @@ public class Shell implements AutoCloseable {
      *
      * @param   code            The code to execute.
      */
-    public void execute(String code) throws Exception {
+    public void execute(String code) {
         try {
             NotebookContext.preExecute(this);
 
@@ -299,12 +299,8 @@ public class Shell implements AutoCloseable {
             var magic = (name != null) ? magics.get(name) : java;
 
             application.apply(magic, this, in, out, err);
-        } catch (JShellException exception) {
-            exception.printStackTrace(err);
-            throw exception;
         } catch (Exception exception) {
-            err.println(exception);
-            throw exception;
+            exception.printStackTrace(err);
         } finally {
             NotebookContext.postExecute(this);
         }
@@ -379,24 +375,6 @@ public class Shell implements AutoCloseable {
      */
     public int restarts() { return restarts.intValue(); }
 
-    private SortedMap<Integer,SourceCodeAnalysis.CompletionInfo> parse(JShell jshell, String code) {
-        var map = new TreeMap<Integer,SourceCodeAnalysis.CompletionInfo>();
-        var analyzer = jshell.sourceCodeAnalysis();
-        var offset = 0;
-        var remaining = code;
-
-        while (! remaining.isEmpty()) {
-            var value = analyzer.analyzeCompletion(remaining);
-
-            map.put(offset, value);
-
-            offset += value.source().length();
-            remaining = remaining.substring(value.source().length());
-        }
-
-        return map;
-    }
-
     @MagicNames({ "java" })
     @Description("Execute code in Java REPL")
     @NoArgsConstructor @ToString
@@ -422,30 +400,14 @@ public class Shell implements AutoCloseable {
                 var jshell = Shell.this.jshell;
 
                 if (jshell != null) {
-                    var map = parse(jshell, code);
-
-                    if (! map.isEmpty()) {
-                        var info = map.get(map.lastKey());
-
-                        if (info.completeness().isComplete()) {
+                    try {
+                        if (! parse(jshell, code).isEmpty()) {
                             completeness = Message.completeness.complete;
                         } else {
-                            switch (info.completeness()) {
-                            case CONSIDERED_INCOMPLETE:
-                            case DEFINITELY_INCOMPLETE:
-                                completeness = Message.completeness.incomplete;
-                                break;
-
-                            case UNKNOWN:
-                                completeness = Message.completeness.invalid;
-                                break;
-
-                            default:
-                                break;
-                            }
+                            completeness = Message.completeness.incomplete;
                         }
-                    } else {
-                        completeness = Message.completeness.invalid;
+                    } catch (ParseException exception) {
+                        completeness = Message.completeness.incomplete;
                     }
                 }
             } else {
@@ -453,6 +415,40 @@ public class Shell implements AutoCloseable {
             }
 
             return completeness;
+        }
+
+        private SortedMap<Integer,SourceCodeAnalysis.CompletionInfo> parse(JShell jshell, String code) throws ParseException {
+            var map = new TreeMap<Integer,SourceCodeAnalysis.CompletionInfo>();
+            var analyzer = jshell.sourceCodeAnalysis();
+            var offset = 0;
+            var remaining = code;
+
+            while (! remaining.isEmpty()) {
+                var value = analyzer.analyzeCompletion(remaining);
+
+                switch (value.completeness()) {
+                case DEFINITELY_INCOMPLETE:
+                    throw new IncompleteParseException(offset);
+                    /* break; */
+
+                case UNKNOWN:
+                    throw new UnknownParseException(offset);
+                    /* break; */
+
+                default:
+                    map.put(offset, value);
+
+                    offset += value.source().length();
+                    remaining = remaining.substring(value.source().length());
+                    break;
+                }
+
+                if (remaining.isBlank()) {
+                    break;
+                }
+            }
+
+            return map;
         }
 
         @Override
@@ -467,62 +463,98 @@ public class Shell implements AutoCloseable {
 
         protected void execute(JShell jshell,
                                InputStream in, PrintStream out, PrintStream err,
-                               String code) throws Exception {
+                               String code) {
             try {
                 var iterator = parse(jshell, code).entrySet().iterator();
 
                 while (iterator.hasNext()) {
                     var entry = iterator.next();
+                    var errored = false;
                     var info = entry.getValue();
-                    var events = jshell.eval(info.source());
-                    var exception =
-                        events.stream()
-                        .map(t -> t.exception())
-                        .filter(Objects::nonNull)
-                        .findFirst().orElse(null);
 
-                    if (exception != null) {
-                        exception.printStackTrace(err);
+                    switch (info.completeness()) {
+                    case EMPTY:
                         break;
-                    }
 
-                    var reason =
-                        events.stream()
-                        .filter(t -> t.status().equals(REJECTED))
-                        .map(t -> jshell.diagnostics(t.snippet())
-                             .map(u -> u.getMessage(locale))
-                             .collect(joining("\n",
-                                              String.format("%s %s\n%s\n",
-                                                            t.status(),
-                                                            t.snippet().kind(),
-                                                            t.snippet().source()),
-                                              "")))
-                        .findFirst().orElse(null);
+                    case COMPLETE:
+                    case COMPLETE_WITH_SEMI:
+                    case CONSIDERED_INCOMPLETE:
+                        var events = jshell.eval(info.source());
 
-                    if (reason != null) {
-                        err.println(reason);
-                        break;
-                    }
+                        for (var event : events) {
+                            if (! event.status().equals(REJECTED)) {
+                                if (event.exception() != null) {
+                                    errored |= true;
 
-                    if (! iterator.hasNext()) {
-                        if (! events.isEmpty()) {
-                            var event = events.get(events.size() - 1);
+                                    event.exception().printStackTrace(err);
+                                }
+                            } else {
+                                errored |= true;
 
-                            switch (event.snippet().kind()) {
-                            case EXPRESSION:
-                                out.println(event.value());
-                                break;
-
-                            default:
-                                break;
+                                err.format("%s %s\n%s\n",
+                                           event.status(),
+                                           event.snippet().kind(),
+                                           event.snippet().source());
+                                jshell.diagnostics(event.snippet())
+                                    .map(t -> t.getMessage(locale))
+                                    .forEach(err::println);
                             }
                         }
+
+                        if (! iterator.hasNext()) {
+                            if (! events.isEmpty()) {
+                                var event = events.get(events.size() - 1);
+
+                                switch (event.snippet().subKind()) {
+                                case TEMP_VAR_EXPRESSION_SUBKIND:
+                                case VAR_VALUE_SUBKIND:
+                                    kernel.print(Message.mime_bundle(unescape(event.value())));
+                                    break;
+
+                                default:
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+
+                    default:
+                        throw new IllegalStateException(String.valueOf(info.completeness()));
+                        /* break; */
+                    }
+
+                    if (errored) {
+                        break;
                     }
                 }
+            } catch (IncompleteParseException exception) {
+                err.format("Incomplete input:\n%s\n",
+                           code.substring(exception.getErrorOffset()));
+            } catch (UnknownParseException exception) {
+                err.format("Unknown input:\n%s\n",
+                           code.substring(exception.getErrorOffset()));
+            } catch (Exception exception) {
+                exception.printStackTrace(err);
             } finally {
                 out.flush();
                 err.flush();
             }
+        }
+    }
+
+    private class IncompleteParseException extends ParseException {
+        private static final long serialVersionUID = 1L;
+
+        public IncompleteParseException(int offset) {
+            super("Incomplete input", offset);
+        }
+    }
+
+    private class UnknownParseException extends ParseException {
+        private static final long serialVersionUID = 2L;
+
+        public UnknownParseException(int offset) {
+            super("Unknown input", offset);
         }
     }
 }
