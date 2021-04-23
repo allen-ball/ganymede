@@ -62,13 +62,13 @@ The following OS environment variables may be configured:
 | ---                  | ---                                                                          |
 | SPARK_HOME           | If configured, the kernel will add the Spark JARs to the kernel's classpath. |
 
-For example, a sophisticated configuration to test the current snapshot out
-of a user's local [Maven][Apache Maven] repository:
+For example, a sophisticated configuration to test a snapshot out of a
+user's local [Maven][Apache Maven] repository:
 
 ```bash
 $ export JAVA_HOME=$(/usr/libexec/java_home -v 11)
 $ ${JAVA_HOME}/bin/java \
-      -jar ${HOME}/.m2/repository/ganymede/ganymede-kernel/1.0.0.20210422/ganymede-kernel-1.0.0.20210422.jar \
+      -jar ${HOME}/.m2/repository/ganymede/ganymede-kernel/1.0.0-SNAPSHOT/ganymede-kernel-1.0.0-SNAPSHOT.jar \
       --install --sys-prefix --copy-jar=false \
       --id-suffix=spark-3.1.1 --display-name-suffix="with Spark 3.1.1" \
       --env=SPARK_HOME=/path/to/spark-3.1.1-bin-hadoop3.2
