@@ -68,7 +68,7 @@ user's local [Maven][Apache Maven] repository:
 ```bash
 $ export JAVA_HOME=$(/usr/libexec/java_home -v 11)
 $ ${JAVA_HOME}/bin/java \
-      -jar ${HOME}/.m2/repository/ganymede/ganymede-kernel/1.0.0-SNAPSHOT/ganymede-kernel-1.0.0-SNAPSHOT.jar \
+      -jar ${HOME}/.m2/repository/ganymede/ganymede-kernel/1.0.1-SNAPSHOT/ganymede-kernel-1.0.1-SNAPSHOT.jar \
       --install --sys-prefix --copy-jar=false \
       --id-suffix=spark-3.1.1 --display-name-suffix="with Spark 3.1.1" \
       --env=SPARK_HOME=/path/to/spark-3.1.1-bin-hadoop3.2
