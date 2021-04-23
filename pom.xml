@@ -12,7 +12,7 @@
   <parent>
     <groupId>ganymede</groupId>
     <artifactId>parent</artifactId>
-    <version>1.0.0.20210422</version>
+    <version>1.0.1-SNAPSHOT</version>
     <relativePath/>
   </parent>
   <dependencies>
