@@ -19,25 +19,29 @@
   */-->
 <div>
   <style scoped>
-    .magics thead th {
+    .table thead th {
       text-align: center;
     }
 
-    .magics tbody tr th {
+    .table tbody tr th {
       vertical-align: top;
     }
 
-    .magics tbody td {
+    .table tbody td {
       text-align: left;
     }
   </style>
-  <table border="1" class="magics">
+  <table border="1" class="table">
     <thead>
-      <tr><th>Name(s)</th><th>Description</th></tr>
+      <tr>
+        <th th:each="x : ${#numbers.sequence(0, model.getColumnCount() - 1)}"
+            th:text="${model.getColumnName(x)}"/>
+      </th>
     </thead>
     <tbody>
-      <tr th:each="entry : ${magics.entrySet()}">
-        <td th:text="${entry.getKey()}"/><td th:text="${entry.getValue()}"/>
+      <tr th:each="y : ${#numbers.sequence(0, model.getRowCount() - 1)}">
+        <td th:each="x : ${#numbers.sequence(0, model.getColumnCount() - 1)}"
+            th:text="${model.getValueAt(y, x)}"/>
       </tr>
     </tbody>
   </table>
