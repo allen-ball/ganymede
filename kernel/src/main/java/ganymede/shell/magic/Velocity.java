@@ -27,6 +27,7 @@ import lombok.extern.log4j.Log4j2;
 /**
  * {@link Velocity} {@link Magic}.
  *
+ * @see org.apache.velocity.Template
  * @see org.apache.velocity.script.VelocityScriptEngineFactory
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
