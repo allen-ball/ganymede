@@ -15,7 +15,8 @@ This kernel offers the following additional features:
     * [Javascript]<sup id="ref2">[2](#endnote2)</sup>
     * [Kotlin]
 
-* Templates (via [Thymeleaf])
+* Templates (via any of [FreeMarker][Apache FreeMarker],
+  [Handlebars][Handlebars.java], [Thymeleaf], and [Velocity][Apache Velocity])
 
 * Support for [Apache Spark] and [Scala] binary distributions
 
@@ -162,7 +163,7 @@ cell magic is `java`.
 <div>
   <table border="1" class="magics">
     <thead>
-      <tr ><th>Name(s)</th><th>Description</th></tr>
+      <tr><th>Name(s)</th><th>Description</th></tr>
     </thead>
     <tbody>
       <tr>
@@ -178,7 +179,13 @@ cell magic is `java`.
         <td>env</td><td>Add/Update or print the environment</td>
       </tr>
       <tr>
+        <td>freemarker</td><td>FreeMarker template evaluator</td>
+      </tr>
+      <tr>
         <td>groovy</td><td>Execute code in groovy REPL</td>
+      </tr>
+      <tr>
+        <td>handlebars</td><td>Handlebars template evaluator</td>
       </tr>
       <tr>
         <td>html</td><td>HTML template evaluator</td>
@@ -212,6 +219,9 @@ cell magic is `java`.
       </tr>
       <tr>
         <td>thymeleaf</td><td>Thymeleaf template evaluator</td>
+      </tr>
+      <tr>
+        <td>velocity</td><td>Velocity template evaluator</td>
       </tr>
     </tbody>
   </table>
@@ -428,6 +438,8 @@ Ibid.
 
 [Apache License, Version 2.0]: https://www.apache.org/licenses/LICENSE-2.0
 
+[Apache FreeMarker]: https://freemarker.apache.org/
+
 [Apache Maven]: https://maven.apache.org/
 [Maven coordinates]: https://maven.apache.org/pom.html#Maven_Coordinates
 
@@ -439,7 +451,11 @@ Ibid.
 [Apache Spark]: http://spark.apache.org/
 [Apache Spark SQL]: https://spark.apache.org/sql/
 
+[Apache Velocity]: https://velocity.apache.org/
+
 [Groovy]: https://groovy-lang.org/
+
+[Handlebars.java]: https://github.com/jknack/handlebars.java
 
 [Javascript]: https://www.oracle.com/technical-resources/articles/java/jf14-nashorn.html
 
