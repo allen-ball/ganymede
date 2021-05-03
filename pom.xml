@@ -434,7 +434,7 @@
             <keywords>true</keywords>
             <doclint>none</doclint>
             <links>
-              <link>https://repo.hcf.dev/javadoc/ball-api/${ball-api.version}/</link>
+              <link>https://allen-ball.github.io/javadoc/ball-api/${ball-api.version}/</link>
               <!-- Java EE 8 -->
               <link>https://javaee.github.io/javaee-spec/javadocs/</link>
               <!-- Apache Commons -->
