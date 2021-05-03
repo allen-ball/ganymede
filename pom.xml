@@ -69,7 +69,6 @@
     <flexmark.apidocs>${javadoc.io}com.vladsch.flexmark/</flexmark.apidocs>
     <jeromq.apidocs>${javadoc.io}org.zeromq/jeromq/</jeromq.apidocs>
     <spdx.apidocs>${javadoc.io}org.spdx/spdx-tools/</spdx.apidocs>
-    <tomcat.apidocs>https://tomcat.apache.org/tomcat-${tomcat.major.version}-doc</tomcat.apidocs>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -440,6 +439,8 @@
               <!-- Apache Commons -->
               <link>https://commons.apache.org/proper/commons-io/apidocs/</link>
               <link>https://commons.apache.org/proper/commons-lang/apidocs/</link>
+              <!-- Apache FreeMarker -->
+              <link>https://freemarker.apache.org/docs/api/</link>
               <!-- Apache Maven -->
               <link>https://maven.apache.org/ref/${maven.version}/apidocs/</link>
               <link>https://maven.apache.org/ref/${maven.version}/maven-plugin-api/apidocs/</link>
@@ -458,14 +459,12 @@
               <link>https://spark.apache.org/docs/latest/api/java/</link>
               <!-- Apache Tika -->
               <link>https://tika.apache.org/${tika.version}/api/</link>
-              <!-- Apache Tomcat -->
-              <link>${tomcat.apidocs}/api/</link>
-              <link>${tomcat.apidocs}/servletapi/</link>
-              <link>${tomcat.apidocs}/jspapi/</link>
-              <link>${tomcat.apidocs}/elapi/</link>
-              <link>${tomcat.apidocs}/websocketapi/</link>
+              <!-- Apache Velocity -->
+              <link>${javadoc.io}org.apache.velocity/velocity-engine-core/latest/</link>
               <!-- Eclipse Aether -->
               <link>${javadoc.io}org.eclipse.aether/aether-api/latest/</link>
+              <!-- Handlebars -->
+              <link>${javadoc.io}com.github.jknack/handlebars/latest/</link>
               <!-- HawtJNI -->
               <link>https://fusesource.github.io/hawtjni/documentation/api/</link>
               <!-- Hibernate -->
@@ -535,11 +534,11 @@
 -->
               <!-- Tablesaw -->
               <offlineLink>
-                <url>https://javadoc.io/doc/tech.tablesaw/tablesaw-core/latest/</url>
+                <url>${javadoc.io}tech.tablesaw/tablesaw-core/latest/</url>
                 <location>${javadoc-offline-locations}/tablesaw-core-javadoc-jar/</location>
               </offlineLink>
               <offlineLink>
-                <url>https://javadoc.io/doc/tech.tablesaw/tablesaw-jsplot/latest/</url>
+                <url>${javadoc.io}tech.tablesaw/tablesaw-jsplot/latest/</url>
                 <location>${javadoc-offline-locations}/tablesaw-jsplot-javadoc-jar/</location>
               </offlineLink>
               <!-- Thymeleaf -->
