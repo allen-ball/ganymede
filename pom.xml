@@ -461,6 +461,7 @@
               <link>https://tika.apache.org/${tika.version}/api/</link>
               <!-- Apache Velocity -->
               <link>${javadoc.io}org.apache.velocity/velocity-engine-core/latest/</link>
+              <link>${javadoc.io}org.apache.velocity/velocity-engine-scripting/latest/</link>
               <!-- Eclipse Aether -->
               <link>${javadoc.io}org.eclipse.aether/aether-api/latest/</link>
               <!-- HawtJNI -->
