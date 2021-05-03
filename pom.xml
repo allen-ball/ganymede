@@ -463,8 +463,6 @@
               <link>${javadoc.io}org.apache.velocity/velocity-engine-core/latest/</link>
               <!-- Eclipse Aether -->
               <link>${javadoc.io}org.eclipse.aether/aether-api/latest/</link>
-              <!-- Handlebars -->
-              <link>${javadoc.io}com.github.jknack/handlebars/latest/</link>
               <!-- HawtJNI -->
               <link>https://fusesource.github.io/hawtjni/documentation/api/</link>
               <!-- Hibernate -->
@@ -520,6 +518,11 @@
               <offlineLink>
                 <url>${javadoc.io}org.codehaus.groovy/groovy-all/latest/</url>
                 <location>${javadoc-offline-locations}/groovy-jsr223-javadoc-jar/</location>
+              </offlineLink>
+              <!-- Handlebars -->
+              <offlineLink>
+                <url>${javadoc.io}com.github.jknack/handlebars/latest/</url>
+                <location>${javadoc-offline-locations}/handlebars-javadoc-jar/</location>
               </offlineLink>
               <!-- Scala -->
 <!--
