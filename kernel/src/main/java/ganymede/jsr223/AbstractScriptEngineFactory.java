@@ -36,7 +36,8 @@ import static lombok.AccessLevel.PROTECTED;
  */
 @NoArgsConstructor(access = PROTECTED)  @ToString @Log4j2
 public abstract class AbstractScriptEngineFactory implements AnnotatedScriptEngineFactory {
-    private Map<String,String> parameters = null;
+    /** See {@link #getParameters()}. */
+    protected Map<String,String> parameters = null;
 
     @Override
     public String getEngineName() {
