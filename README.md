@@ -72,6 +72,12 @@ $ ${JAVA_HOME}/bin/java \
       --install --sys-prefix --copy-jar=false \
       --id-suffix=spark-3.1.1 --display-name-suffix="with Spark 3.1.1" \
       --env=SPARK_HOME=/path/to/spark-3.1.1-bin-hadoop3.2
+$ jupyter kernelspec list
+Loading .env environment variables...
+Available kernels:
+...
+  ganymede-1.0.1-snapshot-java-11-spark-3.1.1    /.../share/jupyter/kernels/ganymede-1.0.1-snapshot-java-11-spark-3.1.1
+...
 ```
 
 would result in the configured
