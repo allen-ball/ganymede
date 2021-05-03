@@ -20,15 +20,16 @@ package ganymede.shell.magic;
  */
 import ball.annotation.ServiceProviderFor;
 import ganymede.shell.Magic;
+import java.io.StringWriter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
+import org.apache.velocity.script.VelocityScriptEngine;
 
 /**
  * {@link Velocity} {@link Magic}.
  *
- * @see org.apache.velocity.Template
- * @see org.apache.velocity.script.VelocityScriptEngineFactory
+ * @see VelocityScriptEngine
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
@@ -36,4 +37,30 @@ import lombok.extern.log4j.Log4j2;
 @Description("Velocity template evaluator")
 @NoArgsConstructor @ToString @Log4j2
 public class Velocity extends AbstractScriptEngineMagic {
+    private final StringWriter out = new StringWriter();
+
+    @Override
+    protected VelocityScriptEngine engine() {
+        return (VelocityScriptEngine) super.engine();
+    }
+
+    @Override
+    protected void execute(String code) {
+        var stdout = context.context.getWriter();
+
+        try {
+            out.getBuffer().setLength(0);
+
+            context.context.setWriter(out);
+
+            super.execute(code);
+        } finally {
+            context.context.setWriter(stdout);
+        }
+    }
+
+    @Override
+    protected void render(Object object) {
+        context.print(out.toString());
+    }
 }
