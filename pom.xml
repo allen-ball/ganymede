@@ -539,16 +539,6 @@
               <link>https://maven.apache.org/components/wagon/wagon-providers/wagon-webdav-jackrabbit/apidocs/</link>
               <!-- Apache Spark -->
               <link>https://spark.apache.org/docs/latest/api/java/</link>
-              <!-- Commonmark -->
-              <link>${javadoc.io}org.commonmark/commonmark/latest/</link>
-              <link>${javadoc.io}org.commonmark/commonmark-ext-autolink/latest/</link>
-              <link>${javadoc.io}org.commonmark/commonmark-ext-gfm-strikethrough/latest/</link>
-              <link>${javadoc.io}org.commonmark/commonmark-ext-gfm-tables/latest/</link>
-              <link>${javadoc.io}org.commonmark/commonmark-ext-heading-anchor/latest/</link>
-              <link>${javadoc.io}org.commonmark/commonmark-ext-image-attributes/latest/</link>
-              <link>${javadoc.io}org.commonmark/commonmark-ext-ins/latest/</link>
-              <link>${javadoc.io}org.commonmark/commonmark-ext-task-list-items/latest/</link>
-              <link>${javadoc.io}org.commonmark/commonmark-ext-yaml-front-matter/latest/</link>
               <!-- Jackson -->
               <link>https://fasterxml.github.io/jackson-annotations/javadoc/${jackson.major.version}/</link>
               <link>https://fasterxml.github.io/jackson-core/javadoc/${jackson.major.version}/</link>
@@ -592,6 +582,43 @@
               <offlineLink>
                 <url>${javadoc.io}org.apache.velocity/velocity-engine-scripting/latest/</url>
                 <location>${javadoc-offline-locations}/velocity-engine-scripting-javadoc-jar/</location>
+              </offlineLink>
+              <!-- Commonmark -->
+              <offlineLink>
+                <url>${javadoc.io}org.commonmark/commonmark/latest/</url>
+                <location>${javadoc-offline-locations}/commonmark-javadoc-jar/</location>
+              </offlineLink>
+              <offlineLink>
+                <url>${javadoc.io}org.commonmark/commonmark-ext-autourl/latest/</url>
+                <location>${javadoc-offline-locations}/commonmark-ext-autolink-javadoc-jar/</location>
+              </offlineLink>
+              <offlineLink>
+                <url>${javadoc.io}org.commonmark/commonmark-ext-gfm-strikethrough/latest/</url>
+                <location>${javadoc-offline-locations}/commonmark-ext-gfm-strikethrough-javadoc-jar/</location>
+              </offlineLink>
+              <offlineLink>
+                <url>${javadoc.io}org.commonmark/commonmark-ext-gfm-tables/latest/</url>
+                <location>${javadoc-offline-locations}/commonmark-ext-gfm-tables-javadoc-jar/</location>
+              </offlineLink>
+              <offlineLink>
+                <url>${javadoc.io}org.commonmark/commonmark-ext-heading-anchor/latest/</url>
+                <location>${javadoc-offline-locations}/commonmark-ext-heading-anchor-javadoc-jar/</location>
+              </offlineLink>
+              <offlineLink>
+                <url>${javadoc.io}org.commonmark/commonmark-ext-image-attributes/latest/</url>
+                <location>${javadoc-offline-locations}/commonmark-ext-image-attributes-javadoc-jar/</location>
+              </offlineLink>
+              <offlineLink>
+                <url>${javadoc.io}org.commonmark/commonmark-ext-ins/latest/</url>
+                <location>${javadoc-offline-locations}/commonmark-ext-ins-javadoc-jar/</location>
+              </offlineLink>
+              <offlineLink>
+                <url>${javadoc.io}org.commonmark/commonmark-ext-task-list-items/latest/</url>
+                <location>${javadoc-offline-locations}/commonmark-ext-task-list-items-javadoc-jar/</location>
+              </offlineLink>
+              <offlineLink>
+                <url>${javadoc.io}org.commonmark/commonmark-ext-yaml-front-matter/latest/</url>
+                <location>${javadoc-offline-locations}/commonmark-ext-yaml-front-matter-javadoc-jar/</location>
               </offlineLink>
               <!-- Groovy -->
               <offlineLink>
