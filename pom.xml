@@ -49,6 +49,7 @@
     <license.skipUpdateProjectLicense>true</license.skipUpdateProjectLicense>
     <jse.target>11</jse.target>
     <maven.compiler.source>${jse.target}</maven.compiler.source>
+    <commonmark.version>0.17.1</commonmark.version>
     <jetty.version>9.4.39.v20210325</jetty.version>
     <kotlin.version>1.5.0</kotlin.version>
     <log4j2.version>2.14.1</log4j2.version>
@@ -81,6 +82,51 @@
         <groupId>ball</groupId>
         <artifactId>ball-util</artifactId>
         <version>${ball-util.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.commonmark</groupId>
+        <artifactId>commonmark</artifactId>
+        <version>${commonmark.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.commonmark</groupId>
+        <artifactId>commonmark-ext-autolink</artifactId>
+        <version>${commonmark.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.commonmark</groupId>
+        <artifactId>commonmark-ext-gfm-strikethrough</artifactId>
+        <version>${commonmark.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.commonmark</groupId>
+        <artifactId>commonmark-ext-gfm-tables</artifactId>
+        <version>${commonmark.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.commonmark</groupId>
+        <artifactId>commonmark-ext-heading-anchor</artifactId>
+        <version>${commonmark.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.commonmark</groupId>
+        <artifactId>commonmark-ext-image-attributes</artifactId>
+        <version>${commonmark.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.commonmark</groupId>
+        <artifactId>commonmark-ext-ins</artifactId>
+        <version>${commonmark.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.commonmark</groupId>
+        <artifactId>commonmark-ext-task-list-items</artifactId>
+        <version>${commonmark.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.commonmark</groupId>
+        <artifactId>commonmark-ext-yaml-front-matter</artifactId>
+        <version>${commonmark.version}</version>
       </dependency>
       <dependency>
         <groupId>com.github.jknack</groupId>
@@ -212,6 +258,42 @@
           <artifactId>kotlin-reflect</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.commonmark</groupId>
+      <artifactId>commonmark</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.commonmark</groupId>
+      <artifactId>commonmark-ext-autolink</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.commonmark</groupId>
+      <artifactId>commonmark-ext-gfm-strikethrough</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.commonmark</groupId>
+      <artifactId>commonmark-ext-gfm-tables</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.commonmark</groupId>
+      <artifactId>commonmark-ext-heading-anchor</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.commonmark</groupId>
+      <artifactId>commonmark-ext-image-attributes</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.commonmark</groupId>
+      <artifactId>commonmark-ext-ins</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.commonmark</groupId>
+      <artifactId>commonmark-ext-task-list-items</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.commonmark</groupId>
+      <artifactId>commonmark-ext-yaml-front-matter</artifactId>
     </dependency>
     <dependency>
       <groupId>com.github.jknack</groupId>
@@ -457,26 +539,20 @@
               <link>https://maven.apache.org/components/wagon/wagon-providers/wagon-webdav-jackrabbit/apidocs/</link>
               <!-- Apache Spark -->
               <link>https://spark.apache.org/docs/latest/api/java/</link>
-              <!-- Apache Tika -->
-              <link>https://tika.apache.org/${tika.version}/api/</link>
-              <!-- Eclipse Aether -->
-              <link>${javadoc.io}org.eclipse.aether/aether-api/latest/</link>
-              <!-- HawtJNI -->
-              <link>https://fusesource.github.io/hawtjni/documentation/api/</link>
-              <!-- Hibernate -->
-              <link>https://docs.jboss.org/hibernate/stable/orm/javadocs/</link>
-              <link>https://docs.jboss.org/hibernate/stable/validator/api/</link>
+              <!-- Commonmark -->
+              <link>${javadoc.io}org.commonmark/commonmark/latest/</link>
+              <link>${javadoc.io}org.commonmark/commonmark-ext-autolink/latest/</link>
+              <link>${javadoc.io}org.commonmark/commonmark-ext-gfm-strikethrough/latest/</link>
+              <link>${javadoc.io}org.commonmark/commonmark-ext-gfm-tables/latest/</link>
+              <link>${javadoc.io}org.commonmark/commonmark-ext-heading-anchor/latest/</link>
+              <link>${javadoc.io}org.commonmark/commonmark-ext-image-attributes/latest/</link>
+              <link>${javadoc.io}org.commonmark/commonmark-ext-ins/latest/</link>
+              <link>${javadoc.io}org.commonmark/commonmark-ext-task-list-items/latest/</link>
+              <link>${javadoc.io}org.commonmark/commonmark-ext-yaml-front-matter/latest/</link>
               <!-- Jackson -->
               <link>https://fasterxml.github.io/jackson-annotations/javadoc/${jackson.major.version}/</link>
               <link>https://fasterxml.github.io/jackson-core/javadoc/${jackson.major.version}/</link>
               <link>https://fasterxml.github.io/jackson-databind/javadoc/${jackson.major.version}/</link>
-              <!-- Netty -->
-              <link>https://netty.io/${netty.major.version}/api/</link>
-              <!-- Plexus -->
-              <link>https://codehaus-plexus.github.io/plexus-classworlds/apidocs/</link>
-              <link>https://codehaus-plexus.github.io/plexus-containers/plexus-container-default/apidocs/</link>
-              <link>https://codehaus-plexus.github.io/plexus-containers/plexus-component-metadata/apidocs/</link>
-              <link>https://codehaus-plexus.github.io/plexus-containers/plexus-component-annotations/apidocs/</link>
               <!-- JeroMQ -->
               <link>${jeromq.apidocs}jeromq/latest/</link>
               <!-- JFreeChart -->
@@ -501,11 +577,11 @@
               </offlineLink>
               <!-- Apache HttpComponents -->
               <offlineLink>
-                <url>https://www.javadoc.io/doc/org.apache.httpcomponents/httpclient/latest/</url>
+                <url>${javadoc.io}org.apache.httpcomponents/httpclient/latest/</url>
                 <location>${javadoc-offline-locations}/httpclient-javadoc-jar/</location>
               </offlineLink>
               <offlineLink>
-                <url>https://www.javadoc.io/doc/org.apache.httpcomponents/httpcore/latest/</url>
+                <url>${javadoc.io}org.apache.httpcomponents/httpcore/latest/</url>
                 <location>${javadoc-offline-locations}/httpcore-javadoc-jar/</location>
               </offlineLink>
               <!-- Apache Velocity -->
@@ -534,11 +610,11 @@
               <!-- Scala -->
 <!--
               <offlineLink>
-                <url>https://www.javadoc.io/doc/org.scala-lang/scala-compiler/latest/</url>
+                <url>${javadoc.io}org.scala-lang/scala-compiler/latest/</url>
                 <location>${javadoc-offline-locations}/scala-compiler-javadoc-jar</location>
               </offlineLink>
               <offlineLink>
-                <url>https://www.javadoc.io/doc/org.scala-lang/scala-library/latest/</url>
+                <url>${javadoc.io}org.scala-lang/scala-library/latest/</url>
                 <location>${javadoc-offline-locations}/scala-library-javadoc-jar</location>
               </offlineLink>
 -->
