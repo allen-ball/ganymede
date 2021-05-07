@@ -18,46 +18,36 @@ package ganymede.jsr223;
  * limitations under the License.
  * ##########################################################################
  */
-import com.github.jknack.handlebars.Context;
-import com.github.jknack.handlebars.Handlebars;
+import java.io.Reader;
+import java.util.Scanner;
+import javax.script.AbstractScriptEngine;
+import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptException;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import javax.script.SimpleBindings;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
-import static javax.script.ScriptContext.ENGINE_SCOPE;
 import static lombok.AccessLevel.PROTECTED;
 
 /**
- * Handlebars {@link ScriptEngine}.
- *
- * {@bean.info}
- *
- * @see Handlebars
- * @see Context
+ * Abstract template {@link javax.script.ScriptEngine} base class.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
-@RequiredArgsConstructor(access = PROTECTED) @Getter @ToString @Log4j2
-public class HandlebarsScriptEngine extends AbstractTemplateScriptEngine {
-    private final HandlebarsScriptEngineFactory factory;
-    private final Handlebars handlebars = new Handlebars();
+@NoArgsConstructor(access = PROTECTED) @ToString @Log4j2
+public abstract class AbstractTemplateScriptEngine extends AbstractScriptEngine {
+    @Override
+    public abstract String eval(String script, ScriptContext context) throws ScriptException;
 
     @Override
-    public String eval(String script, ScriptContext context) throws ScriptException {
-        var bindings = context.getBindings(ENGINE_SCOPE);
-        var out = "";
-
-        try {
-            var template = handlebars.compileInline(script);
-
-            out = template.apply(Context.newContext(bindings));
-        } catch (Exception exception) {
-            exception.printStackTrace(System.err);
+    public String eval(Reader reader, ScriptContext context) throws ScriptException {
+        try (var scanner = new Scanner(reader)) {
+            return eval(scanner.useDelimiter("\\A").next(), context);
         }
-
-        return out;
     }
+
+    @Override
+    public Bindings createBindings() { return new SimpleBindings(); }
 }

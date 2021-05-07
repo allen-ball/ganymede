@@ -34,7 +34,7 @@ import static lombok.AccessLevel.PROTECTED;
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
-@NoArgsConstructor(access = PROTECTED)  @ToString @Log4j2
+@NoArgsConstructor(access = PROTECTED) @ToString @Log4j2
 public abstract class AbstractScriptEngineFactory implements AnnotatedScriptEngineFactory {
     /** See {@link #getParameters()}. */
     protected Map<String,String> parameters = null;

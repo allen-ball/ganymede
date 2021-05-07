@@ -18,14 +18,9 @@ package ganymede.jsr223;
  * limitations under the License.
  * ##########################################################################
  */
-import java.io.Reader;
-import java.util.Scanner;
-import javax.script.AbstractScriptEngine;
-import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
-import javax.script.SimpleBindings;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -49,7 +44,7 @@ import static lombok.AccessLevel.PROTECTED;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 @RequiredArgsConstructor(access = PROTECTED) @Getter @ToString @Log4j2
-public class ThymeleafScriptEngine extends AbstractScriptEngine {
+public class ThymeleafScriptEngine extends AbstractTemplateScriptEngine {
     private final ThymeleafScriptEngineFactory factory;
     private final StringTemplateResolver resolver = new StringTemplateResolver();
 
@@ -71,14 +66,4 @@ public class ThymeleafScriptEngine extends AbstractScriptEngine {
 
         return engine.process(script, new Context(null, bindings));
     }
-
-    @Override
-    public String eval(Reader reader, ScriptContext context) throws ScriptException {
-        try (var scanner = new Scanner(reader)) {
-            return eval(scanner.useDelimiter("\\A").next(), context);
-        }
-    }
-
-    @Override
-    public Bindings createBindings() { return new SimpleBindings(); }
 }

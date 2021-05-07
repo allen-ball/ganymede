@@ -21,16 +21,10 @@ package ganymede.jsr223;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Version;
-import java.io.Reader;
 import java.io.StringWriter;
 import java.util.Objects;
-import java.util.Scanner;
-import javax.script.AbstractScriptEngine;
-import javax.script.Bindings;
 import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
 import javax.script.ScriptException;
-import javax.script.SimpleBindings;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
@@ -48,7 +42,7 @@ import static javax.script.ScriptContext.ENGINE_SCOPE;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 @Getter @ToString @Log4j2
-public class FreeMarkerScriptEngine extends AbstractScriptEngine {
+public class FreeMarkerScriptEngine extends AbstractTemplateScriptEngine {
     private final FreeMarkerScriptEngineFactory factory;
     private final Configuration configuration;
     private final StringTemplateLoader loader = new StringTemplateLoader();
@@ -84,14 +78,4 @@ public class FreeMarkerScriptEngine extends AbstractScriptEngine {
 
         return out.toString();
     }
-
-    @Override
-    public String eval(Reader reader, ScriptContext context) throws ScriptException {
-        try (var scanner = new Scanner(reader)) {
-            return eval(scanner.useDelimiter("\\A").next(), context);
-        }
-    }
-
-    @Override
-    public Bindings createBindings() { return new SimpleBindings(); }
 }
