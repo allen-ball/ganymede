@@ -31,7 +31,7 @@ import static javax.script.ScriptContext.ENGINE_SCOPE;
 import static lombok.AccessLevel.PROTECTED;
 
 /**
- * Handlebars {@link ScriptEngine}.
+ * Handlebars {@link javax.script.ScriptEngine}.
  *
  * {@bean.info}
  *

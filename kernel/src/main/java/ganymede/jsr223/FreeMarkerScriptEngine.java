@@ -32,7 +32,7 @@ import lombok.extern.log4j.Log4j2;
 import static javax.script.ScriptContext.ENGINE_SCOPE;
 
 /**
- * FreeMarker {@link ScriptEngine}.
+ * FreeMarker {@link javax.script.ScriptEngine}.
  *
  * {@bean.info}
  *
