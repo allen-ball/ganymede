@@ -1,5 +1,6 @@
 [![Ganymede](README/ganymede.png)](https://images.nasa.gov/details-GSFC_20171208_Archive_e002091)
 
+
 # Ganymede: Jupyter  Notebook Java Kernel
 
 The [Ganymede Kernel] is a [Jupyter Notebook] Java [kernel][Jupyter Kernel].
@@ -15,8 +16,9 @@ This kernel offers the following additional features:
     * [Javascript]<sup id="ref2">[2](#endnote2)</sup>
     * [Kotlin]
 
-* Templates (via any of [FreeMarker][Apache FreeMarker],
-  [Handlebars][Handlebars.java], [Thymeleaf], and [Velocity][Apache Velocity])
+* Templates (via any of [Thymeleaf], [Markdown] ([CommonMark]) with
+  [Handlebars][Handlebars.java], [FreeMarker][Apache FreeMarker], and
+  [Velocity][Apache Velocity])
 
 * Support for [Apache Spark] and [Scala] binary distributions
 
@@ -203,6 +205,9 @@ cell magic is `java`.
         <td>magics</td><td>Lists available cell magics</td>
       </tr>
       <tr>
+        <td>markdown</td><td>Markdown template evaluator</td>
+      </tr>
+      <tr>
         <td>perl</td><td>Execute script with &#39;perl&#39; command</td>
       </tr>
       <tr>
@@ -337,6 +342,12 @@ for `%%!bash`, `%%!perl`, etc., respectively.
 
 ### Templates
 
+Please refer to the installation instructions for discussion of enabling the
+[Hide Input] extension.
+
+
+#### Thymeleaf
+
 The template magics `thymeleaf` and `html` offer templating with
 [Thymeleaf].  All defined Java variables are bound into the Thymeleaf
 context before evaluation.  For example (Java implementation detail
@@ -401,8 +412,86 @@ Would generate:
   <tr><th>Remaining</th><td>2-♡</td><td>2-♤</td></tr>
 </table>
 
-Please refer to the installation instructions for discussion of enabling the
-[Hide Input] extension.
+
+### Markdown and Handlebars.java
+
+
+```java
+%%java
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
+
+var fib =
+    Stream.iterate(new int[] { 0, 1 }, t -> new int[] { t[1], t[0] + t[1] })
+    .mapToInt(t -> t[0])
+    .limit(10)
+    .boxed()
+    .collect(toList());
+```
+
+
+```java
+%%markdown
+| Index | Value |
+| --- | ---|
+{{#each fib}}| {{@index}} | {{this}} |
+{{/each}}
+```
+
+<table>
+<thead>
+<tr>
+<th>Index</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3</td>
+<td>2</td>
+</tr>
+<tr>
+<td>4</td>
+<td>3</td>
+</tr>
+<tr>
+<td>5</td>
+<td>5</td>
+</tr>
+<tr>
+<td>6</td>
+<td>8</td>
+</tr>
+<tr>
+<td>7</td>
+<td>13</td>
+</tr>
+<tr>
+<td>8</td>
+<td>21</td>
+</tr>
+<tr>
+<td>9</td>
+<td>34</td>
+</tr>
+</tbody>
+</table>
+
+
+### FreeMarker and Velocity
 
 
 ## Documentation
@@ -473,6 +562,9 @@ Ibid.
 [Jupyter Kernel]: https://jupyter-client.readthedocs.io/en/stable/kernels.html
 
 [Kotlin]: https://kotlinlang.org/
+
+[Markdown]: https://en.wikipedia.org/wiki/Markdown
+[CommonMark]: https://commonmark.org/
 
 [Plotly]: https://github.com/plotly
 
