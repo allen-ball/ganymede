@@ -342,79 +342,24 @@ for `%%!bash`, `%%!perl`, etc., respectively.
 
 ### Templates
 
-Please refer to the installation instructions for discussion of enabling the
-[Hide Input] extension.
+A number of templating languages are supported as magics:
 
+* [Markdown] ([CommonMark] preprocessed with [Handlebars.java])
+* [Apache FreeMarker]
+* [Apache Velocity]
+* [Handlebars.java]
+* [Thymeleaf]
 
-#### Thymeleaf
-
-The template magics `thymeleaf` and `html` offer templating with
-[Thymeleaf].  All defined Java variables are bound into the Thymeleaf
-context before evaluation.  For example (Java implementation detail
-removed):
-
-```java
-%%java
-...
-var map = new TreeMap<Ranking,List<Card>>(Ranking.COMPARATOR.reversed());
-...
-var rankings = Arrays.asList(Ranking.values());
-...
-```
-
-```html
-%%html
-<table>
-  <tr th:each="ranking : ${rankings}">
-    <th:block th:if="${map.containsKey(ranking)}">
-      <th th:text="${ranking}"/><td th:each="card : ${map.get(ranking)}" th:text="${card}"/>
-    </th:block>
-  </tr>
-  <tr><th>Remaining</th><td th:each="card : ${deck}" th:text="${card}"/></tr>
-</table>
-```
-
-Would generate:
-
-<table>
-  <tr>
-    <th>RoyalFlush</th><td>A-♧</td><td>K-♧</td><td>Q-♧</td><td>J-♧</td><td>10-♧</td>
-  </tr>
-  <tr>
-    <th>StraightFlush</th><td>K-♢</td><td>Q-♢</td><td>J-♢</td><td>10-♢</td><td>9-♢</td>
-  </tr>
-  <tr>
-    <th>FourOfAKind</th><td>8-♧</td><td>8-♢</td><td>8-♡</td><td>8-♤</td><td>J-♤</td>
-  </tr>
-  <tr>
-    <th>FullHouse</th><td>A-♢</td><td>A-♡</td><td>A-♤</td><td>K-♡</td><td>K-♤</td>
-  </tr>
-  <tr>
-    <th>Flush</th><td>Q-♡</td><td>J-♡</td><td>10-♡</td><td>9-♡</td><td>7-♡</td>
-  </tr>
-  <tr>
-    <th>Straight</th><td>7-♧</td><td>6-♧</td><td>5-♧</td><td>4-♧</td><td>3-♧</td>
-  </tr>
-  <tr>
-    <th>ThreeOfAKind</th><td>6-♢</td><td>6-♡</td><td>6-♤</td><td>10-♤</td><td>5-♤</td>
-  </tr>
-  <tr>
-    <th>TwoPair</th><td>9-♧</td><td>9-♤</td><td>7-♢</td><td>7-♤</td><td>4-♢</td>
-  </tr>
-  <tr>
-    <th>Pair</th><td>5-♢</td><td>5-♡</td><td>4-♡</td><td>4-♤</td><td>3-♢</td>
-  </tr>
-  <tr>
-    <th>HighCard</th><td>Q-♤</td><td>3-♡</td><td>3-♤</td><td>2-♧</td><td>2-♢</td>
-  </tr>
-  <tr>
-  </tr>
-  <tr><th>Remaining</th><td>2-♡</td><td>2-♤</td></tr>
-</table>
+The following subsections provide examples of the `markdown` and `thymeleaf`
+magics but the other template magics are similar.  Please refer to the
+installation instructions for discussion of enabling the [Hide Input]
+extension so only the template output is displayed in the notebook.
 
 
 ### Markdown and Handlebars.java
 
+The template magic `markdown` provides [Markdown] processing with
+[Handlebars][Handlebars.java] preprocessing:
 
 ```java
 %%java
@@ -491,13 +436,77 @@ var fib =
 </table>
 
 
-### FreeMarker and Velocity
+#### Thymeleaf
+
+The template magics `thymeleaf` and `html` offer templating with
+[Thymeleaf].  All defined Java variables are bound into the Thymeleaf
+context before evaluation.  For example (Java implementation detail
+removed):
+
+```java
+%%java
+...
+var map = new TreeMap<Ranking,List<Card>>(Ranking.COMPARATOR.reversed());
+...
+var rankings = Arrays.asList(Ranking.values());
+...
+```
+
+```html
+%%html
+<table>
+  <tr th:each="ranking : ${rankings}">
+    <th:block th:if="${map.containsKey(ranking)}">
+      <th th:text="${ranking}"/><td th:each="card : ${map.get(ranking)}" th:text="${card}"/>
+    </th:block>
+  </tr>
+  <tr><th>Remaining</th><td th:each="card : ${deck}" th:text="${card}"/></tr>
+</table>
+```
+
+Would generate:
+
+<table>
+  <tr>
+    <th>RoyalFlush</th><td>A-♧</td><td>K-♧</td><td>Q-♧</td><td>J-♧</td><td>10-♧</td>
+  </tr>
+  <tr>
+    <th>StraightFlush</th><td>K-♢</td><td>Q-♢</td><td>J-♢</td><td>10-♢</td><td>9-♢</td>
+  </tr>
+  <tr>
+    <th>FourOfAKind</th><td>8-♧</td><td>8-♢</td><td>8-♡</td><td>8-♤</td><td>J-♤</td>
+  </tr>
+  <tr>
+    <th>FullHouse</th><td>A-♢</td><td>A-♡</td><td>A-♤</td><td>K-♡</td><td>K-♤</td>
+  </tr>
+  <tr>
+    <th>Flush</th><td>Q-♡</td><td>J-♡</td><td>10-♡</td><td>9-♡</td><td>7-♡</td>
+  </tr>
+  <tr>
+    <th>Straight</th><td>7-♧</td><td>6-♧</td><td>5-♧</td><td>4-♧</td><td>3-♧</td>
+  </tr>
+  <tr>
+    <th>ThreeOfAKind</th><td>6-♢</td><td>6-♡</td><td>6-♤</td><td>10-♤</td><td>5-♤</td>
+  </tr>
+  <tr>
+    <th>TwoPair</th><td>9-♧</td><td>9-♤</td><td>7-♢</td><td>7-♤</td><td>4-♢</td>
+  </tr>
+  <tr>
+    <th>Pair</th><td>5-♢</td><td>5-♡</td><td>4-♡</td><td>4-♤</td><td>3-♢</td>
+  </tr>
+  <tr>
+    <th>HighCard</th><td>Q-♤</td><td>3-♡</td><td>3-♤</td><td>2-♧</td><td>2-♢</td>
+  </tr>
+  <tr>
+  </tr>
+  <tr><th>Remaining</th><td>2-♡</td><td>2-♤</td></tr>
+</table>
 
 
 ## Documentation
 
 [Javadoc][Ganymede API Javadoc] is published at
-https://allen-ball.github.io/ganymede.
+<https://allen-ball.github.io/ganymede>.
 
 
 ## License
