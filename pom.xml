@@ -67,7 +67,6 @@
     <javadoc-offline-locations>${settings.localRepository}/javadoc-offline-locations</javadoc-offline-locations>
 
     <javadoc.io>https://javadoc.io/doc/</javadoc.io>
-    <flexmark.apidocs>${javadoc.io}com.vladsch.flexmark/</flexmark.apidocs>
     <jeromq.apidocs>${javadoc.io}org.zeromq/jeromq/</jeromq.apidocs>
     <spdx.apidocs>${javadoc.io}org.spdx/spdx-tools/</spdx.apidocs>
   </properties>
