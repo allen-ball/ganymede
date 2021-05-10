@@ -379,7 +379,7 @@ var fib =
 ```java
 %%markdown
 | Index | Value |
-| --- | ---|
+| --- | --- |
 {{#each fib}}| {{@index}} | {{this}} |
 {{/each}}
 ```
