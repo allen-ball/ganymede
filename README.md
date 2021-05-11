@@ -27,16 +27,6 @@ This kernel offers the following additional features:
 
 The [Ganymede Kernel] is distributed as a single JAR
 ([download here][Ganymede Kernel download]).
-Alternatively, [Maven][Apache Maven] users may download from the repository
-with something like:
-
-```bash
-$ mvn dependency:get \
-    -DremoteRepositories=https://maven.pkg.github.com/allen-ball/ \
-    -Dartifact=ganymede:ganymede-kernel:LATEST:jar \
-    -Dtransitive=false \
-    -Ddestination=ganymede-kernel.jar
-```
 
 Java 11 or later is required.  In addition to Java, the [Jupyter Notebook]
 must be [installed][Jupyter Notebook Installation] first and the `jupyter`
