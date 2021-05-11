@@ -48,7 +48,6 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
 import org.eclipse.aether.graph.Dependency;
-import org.eclipse.aether.impl.DefaultServiceLocator;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.eclipse.aether.repository.WorkspaceReader;
@@ -356,15 +355,6 @@ public class Resolver extends Analyzer {
             locator.addService(TransporterFactory.class, FileTransporterFactory.class);
             locator.addService(TransporterFactory.class, HttpTransporterFactory.class);
             locator.addService(TransporterFactory.class, ClasspathTransporterFactory.class);
-            /* locator.setServices(Logger.class, log); */
-            locator
-                .setErrorHandler(new DefaultServiceLocator.ErrorHandler() {
-                        @Override
-                        public void serviceCreationFailed(Class<?> type, Class<?> impl, Throwable exception) {
-                            log.error("Service creation failed for {} with implementation {}",
-                                      type, impl, exception);
-                        }
-                });
 
             system = locator.getService(RepositorySystem.class);
         }
