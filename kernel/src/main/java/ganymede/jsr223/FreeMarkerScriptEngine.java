@@ -42,7 +42,7 @@ import static javax.script.ScriptContext.ENGINE_SCOPE;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 @Getter @ToString @Log4j2
-public class FreeMarkerScriptEngine extends AbstractTemplateScriptEngine {
+public class FreeMarkerScriptEngine extends AbstractScriptEngine {
     private final FreeMarkerScriptEngineFactory factory;
     private final Configuration configuration;
     private final StringTemplateLoader loader = new StringTemplateLoader();

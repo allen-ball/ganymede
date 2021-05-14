@@ -20,7 +20,6 @@ package ganymede.jsr223;
  */
 import java.io.Reader;
 import java.util.Scanner;
-import javax.script.AbstractScriptEngine;
 import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptException;
@@ -32,12 +31,12 @@ import lombok.extern.log4j.Log4j2;
 import static lombok.AccessLevel.PROTECTED;
 
 /**
- * Abstract template {@link javax.script.ScriptEngine} base class.
+ * Abstract {@link javax.script.ScriptEngine} base class.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 @NoArgsConstructor(access = PROTECTED) @ToString @Log4j2
-public abstract class AbstractTemplateScriptEngine extends AbstractScriptEngine {
+public abstract class AbstractScriptEngine extends javax.script.AbstractScriptEngine {
     @Override
     public abstract String eval(String script, ScriptContext context) throws ScriptException;
 

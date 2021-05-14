@@ -44,7 +44,7 @@ import static lombok.AccessLevel.PROTECTED;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 @RequiredArgsConstructor(access = PROTECTED) @Getter @ToString @Log4j2
-public class ThymeleafScriptEngine extends AbstractTemplateScriptEngine {
+public class ThymeleafScriptEngine extends AbstractScriptEngine {
     private final ThymeleafScriptEngineFactory factory;
     private final StringTemplateResolver resolver = new StringTemplateResolver();
 

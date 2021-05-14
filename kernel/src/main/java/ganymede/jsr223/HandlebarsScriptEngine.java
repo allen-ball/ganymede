@@ -41,7 +41,7 @@ import static lombok.AccessLevel.PROTECTED;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 @RequiredArgsConstructor(access = PROTECTED) @Getter @ToString @Log4j2
-public class HandlebarsScriptEngine extends AbstractTemplateScriptEngine {
+public class HandlebarsScriptEngine extends AbstractScriptEngine {
     private final HandlebarsScriptEngineFactory factory;
     private final Handlebars handlebars = new Handlebars();
 
