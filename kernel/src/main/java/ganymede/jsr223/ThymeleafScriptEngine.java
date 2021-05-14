@@ -18,9 +18,10 @@ package ganymede.jsr223;
  * limitations under the License.
  * ##########################################################################
  */
+import java.util.stream.Stream;
 import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
 import javax.script.ScriptException;
+import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -29,12 +30,15 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.StringTemplateResolver;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.ParameterException;
+import picocli.CommandLine.Parameters;
 
 import static javax.script.ScriptContext.ENGINE_SCOPE;
 import static lombok.AccessLevel.PROTECTED;
 
 /**
- * Thymeleaf {@link ScriptEngine}.
+ * Thymeleaf {@link javax.script.ScriptEngine}.
  *
  * {@bean.info}
  *
@@ -50,20 +54,36 @@ public class ThymeleafScriptEngine extends AbstractScriptEngine {
 
     @Override
     public String eval(String script, ScriptContext context) throws ScriptException {
-        var bindings = context.getBindings(ENGINE_SCOPE);
-        var mode = StringTemplateResolver.DEFAULT_TEMPLATE_MODE;
-        var argv = (String[]) bindings.get(ScriptEngine.ARGV);
+        var out = "";
 
-        if (argv != null && argv.length > 1) {
-            mode = TemplateMode.valueOf(argv[1].toUpperCase());
+        try {
+            var arguments = new Arguments();
+            var result = parse(context, arguments);
+
+            resolver.setTemplateMode(arguments.getMode());
+
+            var engine = new TemplateEngine();
+
+            engine.setTemplateResolver(resolver);
+
+            var bindings = context.getBindings(ENGINE_SCOPE);
+
+            out = engine.process(script, new Context(null, bindings));
+        } catch (ParameterException exception) {
+            System.err.println(exception.getMessage());
+            System.err.println();
+            exception.getCommandLine().usage(System.err);
+        } catch (Exception exception) {
+            exception.printStackTrace(System.err);
         }
 
-        resolver.setTemplateMode(mode);
+        return out;
+    }
 
-        var engine = new TemplateEngine();
-
-        engine.setTemplateResolver(resolver);
-
-        return engine.process(script, new Context(null, bindings));
+    @Command @Data
+    private class Arguments {
+        @Parameters(index = "0", arity = "0..1", defaultValue = "HTML",
+                    description = { "One of: ${COMPLETION-CANDIDATES} (default: ${DEFAULT-VALUE})" })
+        private TemplateMode mode = StringTemplateResolver.DEFAULT_TEMPLATE_MODE;
     }
 }

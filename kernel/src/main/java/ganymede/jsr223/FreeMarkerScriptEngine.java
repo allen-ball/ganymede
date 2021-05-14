@@ -25,9 +25,12 @@ import java.io.StringWriter;
 import java.util.Objects;
 import javax.script.ScriptContext;
 import javax.script.ScriptException;
+import lombok.Data;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.ParameterException;
 
 import static javax.script.ScriptContext.ENGINE_SCOPE;
 
@@ -61,21 +64,30 @@ public class FreeMarkerScriptEngine extends AbstractScriptEngine {
 
     @Override
     public String eval(String script, ScriptContext context) throws ScriptException {
-        var bindings = context.getBindings(ENGINE_SCOPE);
         var out = new StringWriter();
 
         try {
+            var arguments = new Arguments();
+            var result = parse(context, arguments);
             var name = String.class.getName() + "@" + Integer.toString(Objects.hashCode(script));
 
             loader.putTemplate(name, script);
 
             var template = configuration.getTemplate(name);
+            var bindings = context.getBindings(ENGINE_SCOPE);
 
             template.process(bindings, out);
+        } catch (ParameterException exception) {
+            System.err.println(exception.getMessage());
+            System.err.println();
+            exception.getCommandLine().usage(System.err);
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
         }
 
         return out.toString();
     }
+
+    @Command @Data
+    private class Arguments { }
 }
