@@ -53,6 +53,7 @@
     <groovy.version>3.0.8</groovy.version>
     <jetty.version>9.4.39.v20210325</jetty.version>
     <kotlin.version>1.5.0</kotlin.version>
+    <kotlin-coroutines.version>1.5.0</kotlin-coroutines.version>
     <log4j2.version>2.14.1</log4j2.version>
     <resolverVersion>1.7.0</resolverVersion>
     <!-- Spark 3.1.1 -->
