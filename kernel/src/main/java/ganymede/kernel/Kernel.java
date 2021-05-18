@@ -30,6 +30,7 @@ import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -223,10 +224,7 @@ public class Kernel extends Server implements ApplicationContextAware,
 
         shell.restart(getIn(), getOut(), getErr());
 
-        setSessionId(String.join("-",
-                                 Kernel.class.getCanonicalName(),
-                                 String.valueOf(ProcessHandle.current().pid()),
-                                 String.valueOf(shell.restarts())));
+        setSessionId(UUID.randomUUID().toString());
     }
 
     @Override
