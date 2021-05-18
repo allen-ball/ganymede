@@ -51,7 +51,7 @@
     <maven.compiler.source>${jse.target}</maven.compiler.source>
     <commonmark.version>0.17.1</commonmark.version>
     <groovy.version>3.0.8</groovy.version>
-    <jetty.version>9.4.39.v20210325</jetty.version>
+    <jetty.version>9.4.41.v20210516</jetty.version>
     <kotlin.version>1.5.0</kotlin.version>
     <kotlin-coroutines.version>1.5.0</kotlin-coroutines.version>
     <log4j2.version>2.14.1</log4j2.version>
@@ -59,7 +59,6 @@
     <!-- Spark 3.1.1 -->
     <spark.version>3.1.1</spark.version>
     <jackson-bom.version>2.10.5.20201202</jackson-bom.version>
-    <jetty.version>9.4.40.v20210413</jetty.version>
     <scala.binary.version>2.12</scala.binary.version>
     <scala.version>${scala.binary.version}.10</scala.version>
     <!-- Optional -->
