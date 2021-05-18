@@ -215,17 +215,6 @@ public class Kernel extends Server implements ApplicationContextAware,
         OBJECT_MAPPER.writeValue(file, node);
 
         file.deleteOnExit();
-/*
-        try {
-            for (var session : client.getSessions()) {
-                if (kernelId.equals(session.at("/kernel/id").asText())) {
-                    setSessionId(session.at("/id").asText());
-                }
-            }
-        } catch (Exception exception) {
-            log.warn("{}", exception);
-        }
-*/
     }
 
     @Override
