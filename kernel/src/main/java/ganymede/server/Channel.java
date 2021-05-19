@@ -84,8 +84,11 @@ public abstract class Channel {
      * @param   message         The {@link Message}.
      */
     protected void send(Dispatcher dispatcher, ZMQ.Socket socket, Message message) {
-        getServer().stamp(message)
-            .send(socket, dispatcher.getConnection().getDigester());
+        getServer().stamp(message);
+
+        log.debug("{}\n{}", dispatcher.getAddress(), message);
+
+        message.send(socket, dispatcher.getConnection().getDigester());
     }
 
     /**
@@ -144,6 +147,8 @@ public abstract class Channel {
             try {
                 var message =
                     Message.receive(socket, frame, dispatcher.getConnection().getDigester());
+
+                log.debug("{}\n{}", dispatcher.getAddress(), message);
 
                 dispatch(dispatcher, socket, message);
             } catch (Exception exception) {
@@ -204,7 +209,9 @@ public abstract class Channel {
 
                     reply.status(throwable);
                 } finally {
-                    send(dispatcher, socket, reply);
+                    if (reply != null) {
+                        send(dispatcher, socket, reply);
+                    }
                 }
             } else {
                 log.warn("Could not determine action from {}", message.header());
