@@ -587,6 +587,10 @@ public class Message {
     private static class Pub extends Child {
         public Pub(String msg_type, Message request) {
             super(msg_type, request);
+
+            var topic = msg_type;
+
+            envelope().add(topic.getBytes(ZMQ.CHARSET));
         }
     }
 }
