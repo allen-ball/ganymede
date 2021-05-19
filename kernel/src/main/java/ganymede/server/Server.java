@@ -69,7 +69,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
     private static final Pattern CONNECTION_FILE_NAME_PATTERN =
         Pattern.compile("(?i)^(kernel-|)(?<id>[^.]+)[.]json$");
 
-    private final ZMQ.Context context = ZMQ.context(8);
+    private final ZMQ.Context context = ZMQ.context(1);
     private final ConcurrentSkipListMap<String,Connection> connectionMap =
         new ConcurrentSkipListMap<>();
     private final Channel.Heartbeat heartbeat = new Channel.Heartbeat(this);
