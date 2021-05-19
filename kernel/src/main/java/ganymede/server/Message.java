@@ -344,10 +344,19 @@ public class Message {
     }
 
     /**
+     * Method to copy a {@link Message}.
+     *
+     * @return  A copy of {@link.this} {@link Message}.
+     */
+    public Message copy() { return new Copy(this); }
+
+    /**
      * Method to serialize a {@link Message}.
      *
      * @param   digester        The {@link HMACDigester} (may be
      *                          {@code null}).
+     *
+     * @return  The {@link List} of serialized frames.
      */
     public List<byte[]> serialize(HMACDigester digester) {
         var frames = new LinkedList<byte[]>();
@@ -536,6 +545,17 @@ public class Message {
         return string;
     }
 
+    private static class Copy extends Message {
+        public Copy(Message message) {
+            envelope().addAll(message.envelope());
+            header().setAll(message.header());
+            parentHeader().setAll(message.parentHeader());
+            metadata().setAll(message.metadata());
+            content().setAll(message.content());
+            buffers().addAll(message.buffers());
+        }
+    }
+
     private static abstract class Child extends Message {
         protected Child(String msg_type, Message request) {
             super();
@@ -567,10 +587,6 @@ public class Message {
     private static class Pub extends Child {
         public Pub(String msg_type, Message request) {
             super(msg_type, request);
-
-            var topic = msg_type;
-
-            envelope().add(topic.getBytes(ZMQ.CHARSET));
         }
     }
 }
