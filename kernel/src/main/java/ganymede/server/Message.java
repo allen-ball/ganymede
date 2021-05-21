@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
 import lombok.Data;
@@ -51,7 +52,8 @@ import static lombok.AccessLevel.PRIVATE;
 @NoArgsConstructor(access = PRIVATE) @Data @Accessors(fluent = true) @Log4j2
 public class Message {
     private static final String DELIMITER_STRING = "<IDS|MSG>";
-    private static final byte[] DELIMITER = DELIMITER_STRING.getBytes(ZMQ.CHARSET);
+    private static final byte[] DELIMITER_BYTES = DELIMITER_STRING.getBytes(ZMQ.CHARSET);
+    private static final ZData DELIMITER_ZDATA = new ZData(DELIMITER_BYTES);
 
     private static final StackWalker WALKER = StackWalker.getInstance();
 
@@ -362,7 +364,7 @@ public class Message {
         var frames = new LinkedList<byte[]>();
 
         frames.addAll(envelope());
-        frames.add(DELIMITER);
+        frames.add(DELIMITER_BYTES);
 
         var header = serialize(header());
         var parentHeader = serialize(parentHeader());
@@ -407,21 +409,21 @@ public class Message {
     public static Message receive(ZMQ.Socket socket, byte[] frame, HMACDigester digester) {
         var envelope = new LinkedList<byte[]>();
 
-        while (! new ZData(DELIMITER).equals(frame)) {
+        while (! DELIMITER_ZDATA.equals(frame)) {
             envelope.add(frame);
 
-            frame = socket.recv();
+            frame = recv(socket);
         }
 
-        var signature = socket.recv();
-        var header = socket.recv();
-        var parentHeader = socket.recv();
-        var metadata = socket.recv();
-        var content = socket.recv();
+        var signature = recv(socket);
+        var header = recv(socket);
+        var parentHeader = recv(socket);
+        var metadata = recv(socket);
+        var content = recv(socket);
         var buffers = new LinkedList<byte[]>();
 
         while (socket.hasReceiveMore()) {
-            buffers.add(socket.recv());
+            buffers.add(recv(socket));
         }
 
         if (digester != null) {
@@ -441,6 +443,10 @@ public class Message {
         message.buffers().addAll(buffers);
 
         return message;
+    }
+
+    private static byte[] recv(ZMQ.Socket socket) {
+        return Objects.requireNonNull(socket.recv(ZMQ.DONTWAIT));
     }
 
     private static ObjectNode deserialize(byte[] bytes) {
@@ -588,7 +594,17 @@ public class Message {
         public Pub(String msg_type, Message request) {
             super(msg_type, request);
 
+            envelope().clear();
+
             var topic = msg_type;
+
+            if (request != null) {
+                var session = request.session();
+
+                if (session != null) {
+                    topic = String.format("kernel.%s.%s", session, msg_type);
+                }
+            }
 
             envelope().add(topic.getBytes(ZMQ.CHARSET));
         }
