@@ -56,7 +56,7 @@ public class Connection {
      * {@link File} constructor.
      *
      * @param   id              The kernel ID.
-     * @param   node            The {@link File} describing the
+     * @param   file            The {@link File} describing the
      *                          {@link Connection}.
      */
     public Connection(String id, File file) throws IOException {
