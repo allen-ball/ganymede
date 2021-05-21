@@ -18,7 +18,6 @@ package ganymede.server;
  * limitations under the License.
  * ##########################################################################
  */
-import ball.annotation.CompileTimeCheck;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -32,7 +31,6 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -64,10 +62,6 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
         new ObjectMapper()
         .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_VALUES)
         .enable(SerializationFeature.INDENT_OUTPUT);
-
-    @CompileTimeCheck
-    private static final Pattern CONNECTION_FILE_NAME_PATTERN =
-        Pattern.compile("(?i)^(kernel-|)(?<id>[^.]+)[.]json$");
 
     private final ZMQ.Context context = ZMQ.context(1);
     private final ConcurrentSkipListMap<String,Connection> connectionMap =
@@ -102,7 +96,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
         var file = new File(path);
         var kernelId =
             Optional.of(file.getName())
-            .map(CONNECTION_FILE_NAME_PATTERN::matcher)
+            .map(Connection.FILE_NAME_PATTERN::matcher)
             .filter(t -> t.matches())
             .map(t -> t.group("id"))
             .orElse(null);

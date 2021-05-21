@@ -18,10 +18,16 @@ package ganymede.server;
  * limitations under the License.
  * ##########################################################################
  */
+import ball.annotation.CompileTimeCheck;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.File;
+import java.io.IOException;
+import java.util.regex.Pattern;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
+
+import static ganymede.server.Server.OBJECT_MAPPER;
 
 /**
  * Jupyter {@link Connection}.  See
@@ -33,12 +39,32 @@ import lombok.extern.log4j.Log4j2;
  */
 @Data @Log4j2
 public class Connection {
+
+    /**
+     * {@link Connection} file name {@link Pattern}.
+     * Provides named group "id".
+     */
+    @CompileTimeCheck
+    public static final Pattern FILE_NAME_PATTERN =
+        Pattern.compile("(?i)^(kernel-|)(?<id>[^.]+)[.]json$");
+
     @NonNull private final String id;
     @NonNull private final ObjectNode node;
     @NonNull private final HMACDigester digester;
 
     /**
-     * Sole constructor.
+     * {@link File} constructor.
+     *
+     * @param   id              The kernel ID.
+     * @param   node            The {@link File} describing the
+     *                          {@link Connection}.
+     */
+    public Connection(String id, File file) throws IOException {
+        this(id, (ObjectNode) OBJECT_MAPPER.readTree(file));
+    }
+
+    /**
+     * {@link ObjectNode} constructor.
      *
      * @param   id              The kernel ID.
      * @param   node            The {@link ObjectNode} describing the
@@ -76,7 +102,14 @@ public class Connection {
         heartbeat.connect(this, getAddress("hb_port"));
     }
 
-    private String getAddress(String portName) {
+    /**
+     * Method to get the address corresponding to port name (JSON field).
+     *
+     * @param   portName        The JSON field specifying the desired port.
+     *
+     * @return  The address (as a {@link String}).
+     */
+    public String getAddress(String portName) {
         String address =
             String.format("%s://%s:%d",
                           node.at("/transport").asText(),
