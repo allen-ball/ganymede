@@ -214,8 +214,6 @@ public class Kernel extends Server implements ApplicationContextAware,
         }
 
         OBJECT_MAPPER.writeValue(file, node);
-
-        file.deleteOnExit();
     }
 
     @Override
