@@ -13,8 +13,8 @@
   <parent>
     <groupId>ball</groupId>
     <artifactId>parent</artifactId>
-    <version>20210415.0</version>
-    <relativePath/>
+    <version>20210419-SNAPSHOT</version>
+    <relativePath>../ball/parent/pom.xml</relativePath>
   </parent>
   <distributionManagement>
     <downloadUrl>https://maven.pkg.github.com/allen-ball/ganymede/</downloadUrl>
@@ -49,24 +49,16 @@
     <license.skipUpdateProjectLicense>true</license.skipUpdateProjectLicense>
     <jse.target>11</jse.target>
     <maven.compiler.source>${jse.target}</maven.compiler.source>
+
     <commonmark.version>0.17.1</commonmark.version>
-    <groovy.version>3.0.8</groovy.version>
-    <jetty.version>9.4.41.v20210516</jetty.version>
-    <kotlin.version>1.5.0</kotlin.version>
-    <kotlin-coroutines.version>1.5.0</kotlin-coroutines.version>
-    <log4j2.version>2.14.1</log4j2.version>
-    <resolverVersion>1.7.0</resolverVersion>
-    <!-- Spark 3.1.1 -->
-    <spark.version>3.1.1</spark.version>
     <jackson-bom.version>2.10.5.20201202</jackson-bom.version>
     <scala.binary.version>2.12</scala.binary.version>
     <scala.version>${scala.binary.version}.10</scala.version>
-    <!-- Optional -->
+    <spark.version>3.1.1</spark.version>
     <tablesaw.version>0.38.2</tablesaw.version>
-    <!-- Javadoc Generation -->
+
     <ball-api.version>${ball-parent.version}</ball-api.version>
     <javadoc-offline-locations>${settings.localRepository}/javadoc-offline-locations</javadoc-offline-locations>
-
     <javadoc.io>https://javadoc.io/doc/</javadoc.io>
     <jeromq.apidocs>${javadoc.io}org.zeromq/jeromq/</jeromq.apidocs>
     <spdx.apidocs>${javadoc.io}org.spdx/spdx-tools/</spdx.apidocs>
@@ -92,51 +84,6 @@
         <groupId>info.picocli</groupId>
         <artifactId>picocli</artifactId>
         <version>4.6.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-api</artifactId>
-        <version>${resolverVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-spi</artifactId>
-        <version>${resolverVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-util</artifactId>
-        <version>${resolverVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-impl</artifactId>
-        <version>${resolverVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-connector-basic</artifactId>
-        <version>${resolverVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-transport-classpath</artifactId>
-        <version>${resolverVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-transport-file</artifactId>
-        <version>${resolverVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-transport-http</artifactId>
-        <version>${resolverVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-transport-wagon</artifactId>
-        <version>${resolverVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.velocity</groupId>
