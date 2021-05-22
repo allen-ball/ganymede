@@ -19,6 +19,7 @@ package ganymede.dependency;
  * ##########################################################################
  */
 import ganymede.shell.Shell;
+import ganymede.util.PathPropertyMap;
 import java.io.File;
 import java.io.PrintStream;
 import java.nio.file.Files;
@@ -88,6 +89,7 @@ public class Resolver extends Analyzer {
     private final POM pom;
     private final Set<File> classpath = new LinkedHashSet<>();
     private final RepositoryImpl repository = new RepositoryImpl();
+    private final PathPropertyMap pathMap = new PathPropertyMap();
     private RepositorySystem system = null;
 
     {
@@ -224,7 +226,8 @@ public class Resolver extends Analyzer {
                     } else {
                         log.debug("Ignored resolved artifact {}", artifact);
                         log.debug("    for {} @ {}",
-                                  installed.getVersion(), installed.getFile());
+                                  () -> installed.getVersion(),
+                                  () -> pathMap.shorten(installed.getFile()));
                     }
                 }
             }
@@ -323,7 +326,8 @@ public class Resolver extends Analyzer {
                             } else {
                                 log.debug("Ignored resolved artifact {}", artifact);
                                 log.debug("    for {} @ {}",
-                                          installed.getVersion(), installed.getFile());
+                                          () -> installed.getVersion(),
+                                          () -> pathMap.shorten(installed.getFile()));
                             }
                         }
                     }

@@ -21,11 +21,10 @@ package ganymede.shell.magic;
 import ball.annotation.ServiceProviderFor;
 import ganymede.shell.Magic;
 import ganymede.shell.Shell;
+import ganymede.util.PathPropertyMap;
 import java.io.File;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.Comparator;
-import java.util.TreeMap;
 import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -61,44 +60,12 @@ public class Classpath extends JShell {
 
             shell.addToClasspath(files);
         } else {
-            var map = new SubstitutionMap();
+            var map = new PathPropertyMap();
 
             shell.resolver().classpath().stream()
                 .map(Object::toString)
                 .map(map::shorten)
                 .forEach(out::println);
-        }
-    }
-
-    private static class SubstitutionMap extends TreeMap<String,String> {
-        private static final long serialVersionUID = -8831575361943474872L;
-
-        public SubstitutionMap() {
-            super(Comparator
-                  .comparingInt(String::length).reversed()
-                  .thenComparing(String::toString, Comparator.naturalOrder()));
-
-            Stream.of(System.getenv(), System.getProperties())
-                .flatMap(t -> t.entrySet().stream())
-                .filter(t -> (! t.getKey().toString().endsWith(".path")))
-                .filter(t -> t.getValue() != null)
-                .filter(t -> t.getValue().toString().length() > 1)
-                .filter(t -> (! t.getValue().toString().contains(SEPARATOR)))
-                .filter(t -> new File(t.getValue().toString()).isAbsolute())
-                .forEach(t -> put(t.getValue().toString(),
-                                  "${" + t.getKey().toString() + "}"));
-        }
-
-        public String shorten(String string) {
-            var shortened = string;
-
-            for (var entry : entrySet()) {
-                if (shortened.startsWith(entry.getKey())) {
-                    shortened = shortened.replace(entry.getKey(), entry.getValue());
-                }
-            }
-
-            return shortened;
         }
     }
 }
