@@ -35,6 +35,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.zeromq.ZMQ;
 
 import static lombok.AccessLevel.PROTECTED;
@@ -53,7 +54,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
      * The
      * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#versioning target=newtab Jupyter message specification version}.
      */
-    protected static final String PROTOCOL_VERSION = "5.3";
+    protected static final ComparableVersion PROTOCOL_VERSION = new ComparableVersion("5.3");
 
     /**
      * Common {@link Server} static {@link ObjectMapper} instance.
@@ -194,7 +195,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
      */
     protected Message stamp(Message message) {
         if (message.version() == null) {
-            message.version(PROTOCOL_VERSION);
+            message.version(PROTOCOL_VERSION.toString());
         }
 
         if (message.session() == null) {

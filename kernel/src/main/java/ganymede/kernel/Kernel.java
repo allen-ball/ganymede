@@ -229,7 +229,7 @@ public class Kernel extends Server implements ApplicationContextAware,
     protected ObjectNode getKernelInfo() {
         var content = OBJECT_MAPPER.createObjectNode();
 
-        content.put("protocol_version", PROTOCOL_VERSION);
+        content.put("protocol_version", PROTOCOL_VERSION.toString());
         content.put("implementation", "ganymede");
         content.put("implementation_version", project_version);
 
