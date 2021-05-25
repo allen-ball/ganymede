@@ -223,77 +223,75 @@
 <span class="sourceLineNo">214</span><a id="line.214">        }</a>
 <span class="sourceLineNo">215</span><a id="line.215"></a>
 <span class="sourceLineNo">216</span><a id="line.216">        OBJECT_MAPPER.writeValue(file, node);</a>
-<span class="sourceLineNo">217</span><a id="line.217"></a>
-<span class="sourceLineNo">218</span><a id="line.218">        file.deleteOnExit();</a>
-<span class="sourceLineNo">219</span><a id="line.219">    }</a>
-<span class="sourceLineNo">220</span><a id="line.220"></a>
-<span class="sourceLineNo">221</span><a id="line.221">    @Override</a>
-<span class="sourceLineNo">222</span><a id="line.222">    protected void restart() throws Exception {</a>
-<span class="sourceLineNo">223</span><a id="line.223">        super.restart();</a>
+<span class="sourceLineNo">217</span><a id="line.217">    }</a>
+<span class="sourceLineNo">218</span><a id="line.218"></a>
+<span class="sourceLineNo">219</span><a id="line.219">    @Override</a>
+<span class="sourceLineNo">220</span><a id="line.220">    protected void restart() throws Exception {</a>
+<span class="sourceLineNo">221</span><a id="line.221">        super.restart();</a>
+<span class="sourceLineNo">222</span><a id="line.222"></a>
+<span class="sourceLineNo">223</span><a id="line.223">        shell.restart(getIn(), getOut(), getErr());</a>
 <span class="sourceLineNo">224</span><a id="line.224"></a>
-<span class="sourceLineNo">225</span><a id="line.225">        shell.restart(getIn(), getOut(), getErr());</a>
-<span class="sourceLineNo">226</span><a id="line.226"></a>
-<span class="sourceLineNo">227</span><a id="line.227">        setSessionId(UUID.randomUUID().toString());</a>
-<span class="sourceLineNo">228</span><a id="line.228">    }</a>
-<span class="sourceLineNo">229</span><a id="line.229"></a>
-<span class="sourceLineNo">230</span><a id="line.230">    @Override</a>
-<span class="sourceLineNo">231</span><a id="line.231">    protected ObjectNode getKernelInfo() {</a>
-<span class="sourceLineNo">232</span><a id="line.232">        var content = OBJECT_MAPPER.createObjectNode();</a>
-<span class="sourceLineNo">233</span><a id="line.233"></a>
-<span class="sourceLineNo">234</span><a id="line.234">        content.put("protocol_version", PROTOCOL_VERSION);</a>
-<span class="sourceLineNo">235</span><a id="line.235">        content.put("implementation", "ganymede");</a>
-<span class="sourceLineNo">236</span><a id="line.236">        content.put("implementation_version", project_version);</a>
+<span class="sourceLineNo">225</span><a id="line.225">        setSessionId(UUID.randomUUID().toString());</a>
+<span class="sourceLineNo">226</span><a id="line.226">    }</a>
+<span class="sourceLineNo">227</span><a id="line.227"></a>
+<span class="sourceLineNo">228</span><a id="line.228">    @Override</a>
+<span class="sourceLineNo">229</span><a id="line.229">    protected ObjectNode getKernelInfo() {</a>
+<span class="sourceLineNo">230</span><a id="line.230">        var content = OBJECT_MAPPER.createObjectNode();</a>
+<span class="sourceLineNo">231</span><a id="line.231"></a>
+<span class="sourceLineNo">232</span><a id="line.232">        content.put("protocol_version", PROTOCOL_VERSION.toString());</a>
+<span class="sourceLineNo">233</span><a id="line.233">        content.put("implementation", "ganymede");</a>
+<span class="sourceLineNo">234</span><a id="line.234">        content.put("implementation_version", project_version);</a>
+<span class="sourceLineNo">235</span><a id="line.235"></a>
+<span class="sourceLineNo">236</span><a id="line.236">        var language_info = content.with("language_info");</a>
 <span class="sourceLineNo">237</span><a id="line.237"></a>
-<span class="sourceLineNo">238</span><a id="line.238">        var language_info = content.with("language_info");</a>
-<span class="sourceLineNo">239</span><a id="line.239"></a>
-<span class="sourceLineNo">240</span><a id="line.240">        language_info.put("name", "java");</a>
-<span class="sourceLineNo">241</span><a id="line.241">        language_info.put("version", System.getProperty("java.specification.version"));</a>
-<span class="sourceLineNo">242</span><a id="line.242">        language_info.put("mimetype", "text/x-java");</a>
-<span class="sourceLineNo">243</span><a id="line.243">        language_info.put("file_extension", ".java");</a>
+<span class="sourceLineNo">238</span><a id="line.238">        language_info.put("name", "java");</a>
+<span class="sourceLineNo">239</span><a id="line.239">        language_info.put("version", System.getProperty("java.specification.version"));</a>
+<span class="sourceLineNo">240</span><a id="line.240">        language_info.put("mimetype", "text/x-java");</a>
+<span class="sourceLineNo">241</span><a id="line.241">        language_info.put("file_extension", ".java");</a>
+<span class="sourceLineNo">242</span><a id="line.242"></a>
+<span class="sourceLineNo">243</span><a id="line.243">        var help_links = content.with("help_links");</a>
 <span class="sourceLineNo">244</span><a id="line.244"></a>
-<span class="sourceLineNo">245</span><a id="line.245">        var help_links = content.with("help_links");</a>
-<span class="sourceLineNo">246</span><a id="line.246"></a>
-<span class="sourceLineNo">247</span><a id="line.247">        return content;</a>
-<span class="sourceLineNo">248</span><a id="line.248">    }</a>
-<span class="sourceLineNo">249</span><a id="line.249"></a>
-<span class="sourceLineNo">250</span><a id="line.250">    @Override</a>
-<span class="sourceLineNo">251</span><a id="line.251">    protected void execute(String code) throws Exception {</a>
-<span class="sourceLineNo">252</span><a id="line.252">        shell.execute(code);</a>
-<span class="sourceLineNo">253</span><a id="line.253">    }</a>
-<span class="sourceLineNo">254</span><a id="line.254"></a>
-<span class="sourceLineNo">255</span><a id="line.255">    @Override</a>
-<span class="sourceLineNo">256</span><a id="line.256">    protected String evaluate(String expression) throws Exception {</a>
-<span class="sourceLineNo">257</span><a id="line.257">        return shell.evaluate(expression);</a>
-<span class="sourceLineNo">258</span><a id="line.258">    }</a>
-<span class="sourceLineNo">259</span><a id="line.259"></a>
-<span class="sourceLineNo">260</span><a id="line.260">    @Override</a>
-<span class="sourceLineNo">261</span><a id="line.261">    protected Message.completeness isComplete(String code) throws Exception {</a>
-<span class="sourceLineNo">262</span><a id="line.262">        return shell.isComplete(code);</a>
-<span class="sourceLineNo">263</span><a id="line.263">    }</a>
-<span class="sourceLineNo">264</span><a id="line.264"></a>
-<span class="sourceLineNo">265</span><a id="line.265">    @Override</a>
-<span class="sourceLineNo">266</span><a id="line.266">    protected void interrupt() {</a>
-<span class="sourceLineNo">267</span><a id="line.267">        var shell = this.shell;</a>
-<span class="sourceLineNo">268</span><a id="line.268"></a>
-<span class="sourceLineNo">269</span><a id="line.269">        if (shell != null) {</a>
-<span class="sourceLineNo">270</span><a id="line.270">            shell.stop();</a>
-<span class="sourceLineNo">271</span><a id="line.271">        }</a>
-<span class="sourceLineNo">272</span><a id="line.272">    }</a>
-<span class="sourceLineNo">273</span><a id="line.273"></a>
-<span class="sourceLineNo">274</span><a id="line.274">    @Override</a>
-<span class="sourceLineNo">275</span><a id="line.275">    public void shutdown() { SpringApplication.exit(context, () -&gt; 0); }</a>
-<span class="sourceLineNo">276</span><a id="line.276"></a>
-<span class="sourceLineNo">277</span><a id="line.277">    @Override</a>
-<span class="sourceLineNo">278</span><a id="line.278">    public void run(ApplicationArguments arguments) throws Exception {</a>
-<span class="sourceLineNo">279</span><a id="line.279">        try {</a>
-<span class="sourceLineNo">280</span><a id="line.280">            if (connection_file != null) {</a>
-<span class="sourceLineNo">281</span><a id="line.281">                bind(connection_file);</a>
-<span class="sourceLineNo">282</span><a id="line.282">            }</a>
-<span class="sourceLineNo">283</span><a id="line.283">        } catch (Exception exception) {</a>
-<span class="sourceLineNo">284</span><a id="line.284">            log.warn("{}", exception);</a>
-<span class="sourceLineNo">285</span><a id="line.285">        }</a>
-<span class="sourceLineNo">286</span><a id="line.286">    }</a>
-<span class="sourceLineNo">287</span><a id="line.287">}</a>
+<span class="sourceLineNo">245</span><a id="line.245">        return content;</a>
+<span class="sourceLineNo">246</span><a id="line.246">    }</a>
+<span class="sourceLineNo">247</span><a id="line.247"></a>
+<span class="sourceLineNo">248</span><a id="line.248">    @Override</a>
+<span class="sourceLineNo">249</span><a id="line.249">    protected void execute(String code) throws Exception {</a>
+<span class="sourceLineNo">250</span><a id="line.250">        shell.execute(code);</a>
+<span class="sourceLineNo">251</span><a id="line.251">    }</a>
+<span class="sourceLineNo">252</span><a id="line.252"></a>
+<span class="sourceLineNo">253</span><a id="line.253">    @Override</a>
+<span class="sourceLineNo">254</span><a id="line.254">    protected String evaluate(String expression) throws Exception {</a>
+<span class="sourceLineNo">255</span><a id="line.255">        return shell.evaluate(expression);</a>
+<span class="sourceLineNo">256</span><a id="line.256">    }</a>
+<span class="sourceLineNo">257</span><a id="line.257"></a>
+<span class="sourceLineNo">258</span><a id="line.258">    @Override</a>
+<span class="sourceLineNo">259</span><a id="line.259">    protected Message.completeness isComplete(String code) throws Exception {</a>
+<span class="sourceLineNo">260</span><a id="line.260">        return shell.isComplete(code);</a>
+<span class="sourceLineNo">261</span><a id="line.261">    }</a>
+<span class="sourceLineNo">262</span><a id="line.262"></a>
+<span class="sourceLineNo">263</span><a id="line.263">    @Override</a>
+<span class="sourceLineNo">264</span><a id="line.264">    protected void interrupt() {</a>
+<span class="sourceLineNo">265</span><a id="line.265">        var shell = this.shell;</a>
+<span class="sourceLineNo">266</span><a id="line.266"></a>
+<span class="sourceLineNo">267</span><a id="line.267">        if (shell != null) {</a>
+<span class="sourceLineNo">268</span><a id="line.268">            shell.stop();</a>
+<span class="sourceLineNo">269</span><a id="line.269">        }</a>
+<span class="sourceLineNo">270</span><a id="line.270">    }</a>
+<span class="sourceLineNo">271</span><a id="line.271"></a>
+<span class="sourceLineNo">272</span><a id="line.272">    @Override</a>
+<span class="sourceLineNo">273</span><a id="line.273">    public void shutdown() { SpringApplication.exit(context, () -&gt; 0); }</a>
+<span class="sourceLineNo">274</span><a id="line.274"></a>
+<span class="sourceLineNo">275</span><a id="line.275">    @Override</a>
+<span class="sourceLineNo">276</span><a id="line.276">    public void run(ApplicationArguments arguments) throws Exception {</a>
+<span class="sourceLineNo">277</span><a id="line.277">        try {</a>
+<span class="sourceLineNo">278</span><a id="line.278">            if (connection_file != null) {</a>
+<span class="sourceLineNo">279</span><a id="line.279">                bind(connection_file);</a>
+<span class="sourceLineNo">280</span><a id="line.280">            }</a>
+<span class="sourceLineNo">281</span><a id="line.281">        } catch (Exception exception) {</a>
+<span class="sourceLineNo">282</span><a id="line.282">            log.warn("{}", exception);</a>
+<span class="sourceLineNo">283</span><a id="line.283">        }</a>
+<span class="sourceLineNo">284</span><a id="line.284">    }</a>
+<span class="sourceLineNo">285</span><a id="line.285">}</a>
 
 
 
