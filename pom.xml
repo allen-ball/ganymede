@@ -16,6 +16,11 @@
     <version>20210419-SNAPSHOT</version>
     <relativePath>../ball/parent/pom.xml</relativePath>
   </parent>
+  <organization>
+    <name><![CDATA[<a href="mailto:ball@hcf.dev">Allen D. Ball</a>]]></name>
+    <url>https://github.com/allen-ball/ganymede</url>
+  </organization>
+  <inceptionYear>2021</inceptionYear>
   <distributionManagement>
     <downloadUrl>https://maven.pkg.github.com/allen-ball/ganymede/</downloadUrl>
     <repository>
@@ -37,7 +42,6 @@
       <layout>default</layout>
     </repository>
   </repositories>
-  <inceptionYear>2021</inceptionYear>
   <licenses>
     <license>
       <name>Apache-2.0</name>
