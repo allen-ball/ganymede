@@ -623,6 +623,10 @@
                 <url>https://www.thymeleaf.org/apidocs/thymeleaf/${thymeleaf.version}/</url>
                 <location>${javadoc-offline-locations}/thymeleaf-javadoc-jar/</location>
               </offlineLink>
+              <offlineLink>
+                <url>${javadoc.io}org.thymeleaf.extras/thymeleaf-extras-java8time/latest/</url>
+                <location>${javadoc-offline-locations}/thymeleaf-extras-java8time-javadoc-jar/</location>
+              </offlineLink>
             </offlineLinks>
             <quiet>true</quiet>
             <serialwarn>true</serialwarn>

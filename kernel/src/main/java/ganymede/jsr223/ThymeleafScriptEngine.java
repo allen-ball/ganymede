@@ -28,6 +28,7 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.StringTemplateResolver;
 import picocli.CommandLine.Command;
@@ -44,6 +45,7 @@ import static lombok.AccessLevel.PROTECTED;
  *
  * @see TemplateEngine
  * @see StringTemplateResolver
+ * @see Java8TimeDialect
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
@@ -65,6 +67,7 @@ public class ThymeleafScriptEngine extends AbstractScriptEngine {
             var engine = new TemplateEngine();
 
             engine.setTemplateResolver(resolver);
+            engine.addDialect(new Java8TimeDialect());
 
             var bindings = context.getBindings(ENGINE_SCOPE);
 

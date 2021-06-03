@@ -29,6 +29,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StreamUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.StringTemplateResolver;
 
@@ -39,6 +40,10 @@ import static org.springframework.util.MimeTypeUtils.TEXT_XML_VALUE;
 
 /**
  * Thymeleaf template {@link Renderer}.
+ *
+ * @see TemplateEngine
+ * @see StringTemplateResolver
+ * @see Java8TimeDialect
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
@@ -54,6 +59,7 @@ public class ThymeleafRenderer implements Renderer {
 
         ENGINE = new TemplateEngine();
         ENGINE.setTemplateResolver(RESOLVER);
+        ENGINE.addDialect(new Java8TimeDialect());
     }
 
     /**
