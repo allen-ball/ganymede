@@ -13,7 +13,7 @@
   <parent>
     <groupId>ball</groupId>
     <artifactId>parent</artifactId>
-    <version>20210419-SNAPSHOT</version>
+    <version>20210602.0</version>
     <relativePath>../ball/parent/pom.xml</relativePath>
   </parent>
   <organization>
@@ -61,7 +61,7 @@
     <spark.version>3.1.1</spark.version>
     <tablesaw.version>0.38.2</tablesaw.version>
 
-    <ball-api.version>20210415.0</ball-api.version><!-- ${ball-parent.version} -->
+    <ball-api.version>${ball-parent.version}</ball-api.version>
     <javadoc-offline-locations>${settings.localRepository}/javadoc-offline-locations</javadoc-offline-locations>
     <javadoc.io>https://javadoc.io/doc/</javadoc.io>
     <jeromq.apidocs>${javadoc.io}org.zeromq/jeromq/</jeromq.apidocs>
