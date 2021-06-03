@@ -350,6 +350,10 @@
       <artifactId>thymeleaf</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.thymeleaf.extras</groupId>
+      <artifactId>thymeleaf-extras-java8time</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.zeromq</groupId>
       <artifactId>jeromq</artifactId>
     </dependency>
