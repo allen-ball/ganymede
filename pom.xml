@@ -54,7 +54,7 @@
     <jse.target>11</jse.target>
     <maven.compiler.source>${jse.target}</maven.compiler.source>
 
-    <commonmark.version>0.17.1</commonmark.version>
+    <commonmark.version>0.17.2</commonmark.version>
     <jackson-bom.version>2.10.5.20201202</jackson-bom.version>
     <scala.binary.version>2.12</scala.binary.version>
     <scala.version>${scala.binary.version}.10</scala.version>
