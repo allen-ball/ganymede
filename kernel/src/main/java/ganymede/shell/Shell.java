@@ -64,7 +64,8 @@ import static org.apache.logging.log4j.Level.WARN;
 @ToString @Log4j2
 public class Shell implements AutoCloseable {
     private static final String[] VMOPTIONS =
-        Stream.of("--add-opens", "java.base/jdk.internal.misc=ALL-UNNAMED",
+        Stream.of("--illegal-access=permit",
+                  "--add-opens", "java.base/jdk.internal.misc=ALL-UNNAMED",
                   "-Dio.netty.tryReflectionSetAccessible=true",
                   "-Djava.awt.headless=true")
         .toArray(String[]::new);

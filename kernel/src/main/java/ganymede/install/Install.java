@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -158,13 +159,13 @@ public class Install implements ApplicationRunner {
                 jar = Paths.get(prefix, "kernels", id, name).toString();
             }
 
-            argv.add(java);
-            sysProperties.entrySet().stream()
-                .map(t -> "-D" + t)
-                .forEach(argv::add);
-            Stream.of("-jar", jar,
-                      "--runtime-dir=" + runtime_dir,
-                      "--connection-file={connection_file}")
+            Stream.of(Stream.of(java, "--illegal-access=permit",
+                                "--add-opens", "java.base/jdk.internal.misc=ALL-UNNAMED"),
+                      sysProperties.entrySet().stream().map(t -> "-D" + t),
+                      Stream.of("-jar", jar,
+                                "--runtime-dir=" + runtime_dir,
+                                "--connection-file={connection_file}"))
+                .flatMap(Function.identity())
                 .map(Object::toString)
                 .forEach(argv::add);
 
