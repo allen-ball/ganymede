@@ -598,4 +598,4 @@ Ibid.
 [NotebookFunction]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookFunction.html
 
 
-[sine.ipynb]: notebooks/sine.ipynb
+[sine.ipynb]: https://github.com/allen-ball/ganymede-notebooks/blob/trunk/sine.ipynb
