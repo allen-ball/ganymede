@@ -27,7 +27,7 @@
   <description>Parent POM</description>
   <groupId>ganymede</groupId>
   <artifactId>parent</artifactId>
-  <version>1.1.0-SNAPSHOT</version>
+  <version>1.1.0.20210614</version>
   <packaging>pom</packaging>
   <parent>
     <groupId>ball</groupId>

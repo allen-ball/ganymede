@@ -1,7 +1,7 @@
 [![Ganymede](README/ganymede.png)](https://images.nasa.gov/details-GSFC_20171208_Archive_e002091)
 
 
-# Ganymede: Jupyter  Notebook Java Kernel
+# Ganymede: Jupyter Notebook Java Kernel
 
 The [Ganymede Kernel] is a [Jupyter Notebook] Java [kernel][Jupyter Kernel].
 Java code is compiled and interpreted with the Java Shell tool, [JShell].
@@ -34,7 +34,7 @@ and `python` commands must be on the `${PATH}`.  Then the typical (and
 minimal) installation command line:
 
 ```bash
-$ java -jar ganymede-kernel-1.0.0.20210422.jar --install
+$ java -jar ganymede-kernel-1.1.0.20210614.jar --install
 ```
 
 The [kernel][Ganymede Kernel] will be configured to use the same `java`
@@ -71,20 +71,20 @@ user's local [Maven][Apache Maven] repository:
 ```bash
 $ export JAVA_HOME=$(/usr/libexec/java_home -v 11)
 $ ${JAVA_HOME}/bin/java \
-      -jar ${HOME}/.m2/repository/ganymede/ganymede-kernel/1.1.0-SNAPSHOT/ganymede-kernel-1.1.0-SNAPSHOT.jar \
+      -jar ${HOME}/.m2/repository/ganymede/ganymede-kernel/1.2.0-SNAPSHOT/ganymede-kernel-1.2.0-SNAPSHOT.jar \
       --install --sys-prefix --copy-jar=false \
-      --id-suffix=spark-3.1.1 --display-name-suffix="with Spark 3.1.1" \
-      --env=SPARK_HOME=/path/to/spark-3.1.1-bin-hadoop3.2
+      --id-suffix=spark-3.1.2 --display-name-suffix="with Spark 3.1.2" \
+      --env=SPARK_HOME=/path/to/spark-3.1.2-bin-hadoop3.2
 $ jupyter kernelspec list
 Loading .env environment variables...
 Available kernels:
 ...
-  ganymede-1.0.1-snapshot-java-11-spark-3.1.1    /.../share/jupyter/kernels/ganymede-1.0.1-snapshot-java-11-spark-3.1.1
+  ganymede-1.2.0-snapshot-java-11-spark-3.1.2    /.../share/jupyter/kernels/ganymede-1.2.0-snapshot-java-11-spark-3.1.2
 ...
 ```
 
 would result in the configured
-`${jupyter.data}/kernels/ganymede-1.0.0-snapshot-java-11-spark-3.1.1/kernel.json`
+`${jupyter.data}/kernels/ganymede-1.2.0-snapshot-java-11-spark-3.1.2/kernel.json`
 kernelspec:
 
 ```json
@@ -93,13 +93,13 @@ kernelspec:
     "/Library/Java/JavaVirtualMachines/graalvm-ce-java11-21.0.0/Contents/Home/bin/java",
     "-Dmaven.repo.local=/Users/jdoe/Notebooks/.venv/share/jupyter/repository",
     "-jar",
-    "/Users/jdoe/.m2/repository/ganymede/ganymede-kernel/1.0.0.20210422/ganymede-kernel-1.0.0.20210422.jar",
+    "/Users/jdoe/.m2/repository/ganymede/ganymede-kernel/1.1.0.20210614/ganymede-kernel-1.1.0.20210614.jar",
     "--runtime-dir=/Users/jdoe/Library/Jupyter/runtime",
     "--connection-file={connection_file}"
   ],
-  "display_name" : "Ganymede 1.0.0.20210422 (Java 11) with Spark 3.1.1",
+  "display_name" : "Ganymede 1.1.0.20210614 (Java 11) with Spark 3.1.2",
   "env" : {
-    "SPARK_HOME" : "/path/to/spark-3.1.1-bin-hadoop3.2"
+    "SPARK_HOME" : "/path/to/spark-3.1.2-bin-hadoop3.2"
   },
   "interrupt_mode" : "message",
   "language" : "java"
@@ -592,7 +592,7 @@ Ibid.
 
 
 [Ganymede Kernel]: https://github.com/allen-ball/ganymede
-[Ganymede Kernel download]: https://github.com/allen-ball/ganymede/releases/download/v1.0.0.20210422/ganymede-kernel-1.0.0.20210422.jar
+[Ganymede Kernel download]: https://github.com/allen-ball/ganymede/releases/download/v1.1.0.20210614/ganymede-kernel-1.1.0.20210614.jar
 [Ganymede API Javadoc]: https://allen-ball.github.io/ganymede/index.html?overview-summary.html
 [NotebookContext]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookContext.html
 [NotebookFunction]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookFunction.html
