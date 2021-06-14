@@ -73,500 +73,501 @@
 <span class="sourceLineNo">064</span><a id="line.64">@ToString @Log4j2</a>
 <span class="sourceLineNo">065</span><a id="line.65">public class Shell implements AutoCloseable {</a>
 <span class="sourceLineNo">066</span><a id="line.66">    private static final String[] VMOPTIONS =</a>
-<span class="sourceLineNo">067</span><a id="line.67">        Stream.of("--add-opens", "java.base/jdk.internal.misc=ALL-UNNAMED",</a>
-<span class="sourceLineNo">068</span><a id="line.68">                  "-Dio.netty.tryReflectionSetAccessible=true",</a>
-<span class="sourceLineNo">069</span><a id="line.69">                  "-Djava.awt.headless=true")</a>
-<span class="sourceLineNo">070</span><a id="line.70">        .toArray(String[]::new);</a>
-<span class="sourceLineNo">071</span><a id="line.71"></a>
-<span class="sourceLineNo">072</span><a id="line.72">    private final Kernel kernel;</a>
-<span class="sourceLineNo">073</span><a id="line.73">    private Locale locale = null;       /* TBD: Query Notebook server */</a>
-<span class="sourceLineNo">074</span><a id="line.74">    private final AtomicInteger restarts = new AtomicInteger(0);</a>
-<span class="sourceLineNo">075</span><a id="line.75">    private final MagicMap magics = new MagicMap(null);</a>
-<span class="sourceLineNo">076</span><a id="line.76">    private final Java java = new Java();</a>
-<span class="sourceLineNo">077</span><a id="line.77">    private JShell jshell = null;</a>
-<span class="sourceLineNo">078</span><a id="line.78">    private InputStream in = null;</a>
-<span class="sourceLineNo">079</span><a id="line.79">    private PrintStream out = null;</a>
-<span class="sourceLineNo">080</span><a id="line.80">    private PrintStream err = null;</a>
-<span class="sourceLineNo">081</span><a id="line.81">    private final Resolver resolver = new Resolver();</a>
-<span class="sourceLineNo">082</span><a id="line.82"></a>
-<span class="sourceLineNo">083</span><a id="line.83">    /**</a>
-<span class="sourceLineNo">084</span><a id="line.84">     * Sole constructor.</a>
-<span class="sourceLineNo">085</span><a id="line.85">     *</a>
-<span class="sourceLineNo">086</span><a id="line.86">     * @param   kernel          The {@link Kernel}.</a>
-<span class="sourceLineNo">087</span><a id="line.87">     */</a>
-<span class="sourceLineNo">088</span><a id="line.88">    public Shell(Kernel kernel) {</a>
-<span class="sourceLineNo">089</span><a id="line.89">        this.kernel = Objects.requireNonNull(kernel);</a>
-<span class="sourceLineNo">090</span><a id="line.90">    }</a>
-<span class="sourceLineNo">091</span><a id="line.91"></a>
-<span class="sourceLineNo">092</span><a id="line.92">    /**</a>
-<span class="sourceLineNo">093</span><a id="line.93">     * Method to start a {@link Shell}.</a>
-<span class="sourceLineNo">094</span><a id="line.94">     *</a>
-<span class="sourceLineNo">095</span><a id="line.95">     * @param   in              The {@code in} {@link InputStream}.</a>
-<span class="sourceLineNo">096</span><a id="line.96">     * @param   out             The {@code out} {@link PrintStream}.</a>
-<span class="sourceLineNo">097</span><a id="line.97">     * @param   err             The {@code err} {@link PrintStream}.</a>
-<span class="sourceLineNo">098</span><a id="line.98">     */</a>
-<span class="sourceLineNo">099</span><a id="line.99">    @Synchronized</a>
-<span class="sourceLineNo">100</span><a id="line.100">    public void start(InputStream in, PrintStream out, PrintStream err) {</a>
-<span class="sourceLineNo">101</span><a id="line.101">        this.in = in;</a>
-<span class="sourceLineNo">102</span><a id="line.102">        this.out = out;</a>
-<span class="sourceLineNo">103</span><a id="line.103">        this.err = err;</a>
-<span class="sourceLineNo">104</span><a id="line.104"></a>
-<span class="sourceLineNo">105</span><a id="line.105">        magics.clear();</a>
-<span class="sourceLineNo">106</span><a id="line.106">        magics.reload();</a>
-<span class="sourceLineNo">107</span><a id="line.107"></a>
-<span class="sourceLineNo">108</span><a id="line.108">        Stream.of(java.getMagicNames()).forEach(t -&gt; magics.put(t, java));</a>
-<span class="sourceLineNo">109</span><a id="line.109">    }</a>
-<span class="sourceLineNo">110</span><a id="line.110"></a>
-<span class="sourceLineNo">111</span><a id="line.111">    /**</a>
-<span class="sourceLineNo">112</span><a id="line.112">     * Method to restart a {@link Shell}.</a>
-<span class="sourceLineNo">113</span><a id="line.113">     *</a>
-<span class="sourceLineNo">114</span><a id="line.114">     * @param   in              The {@code in} {@link InputStream}.</a>
-<span class="sourceLineNo">115</span><a id="line.115">     * @param   out             The {@code out} {@link PrintStream}.</a>
-<span class="sourceLineNo">116</span><a id="line.116">     * @param   err             The {@code err} {@link PrintStream}.</a>
-<span class="sourceLineNo">117</span><a id="line.117">     */</a>
-<span class="sourceLineNo">118</span><a id="line.118">    @Synchronized</a>
-<span class="sourceLineNo">119</span><a id="line.119">    public void restart(InputStream in, PrintStream out, PrintStream err) {</a>
-<span class="sourceLineNo">120</span><a id="line.120">        /* stop(); */</a>
-<span class="sourceLineNo">121</span><a id="line.121">        close();</a>
-<span class="sourceLineNo">122</span><a id="line.122"></a>
-<span class="sourceLineNo">123</span><a id="line.123">        if (! kernel().isTerminating()) {</a>
-<span class="sourceLineNo">124</span><a id="line.124">            start(in, out, err);</a>
-<span class="sourceLineNo">125</span><a id="line.125">        }</a>
-<span class="sourceLineNo">126</span><a id="line.126">    }</a>
-<span class="sourceLineNo">127</span><a id="line.127"></a>
-<span class="sourceLineNo">128</span><a id="line.128">    /**</a>
-<span class="sourceLineNo">129</span><a id="line.129">     * Method to close (terminate) a {@link Shell}.</a>
-<span class="sourceLineNo">130</span><a id="line.130">     */</a>
-<span class="sourceLineNo">131</span><a id="line.131">    @Override</a>
-<span class="sourceLineNo">132</span><a id="line.132">    @Synchronized</a>
-<span class="sourceLineNo">133</span><a id="line.133">    public void close() {</a>
-<span class="sourceLineNo">134</span><a id="line.134">        Stream.of(java.getMagicNames()).forEach(t -&gt; magics.remove(t));</a>
-<span class="sourceLineNo">135</span><a id="line.135"></a>
-<span class="sourceLineNo">136</span><a id="line.136">        try (var jshell = this.jshell) {</a>
-<span class="sourceLineNo">137</span><a id="line.137">            this.jshell = null;</a>
-<span class="sourceLineNo">138</span><a id="line.138"></a>
-<span class="sourceLineNo">139</span><a id="line.139">            if (jshell != null) {</a>
-<span class="sourceLineNo">140</span><a id="line.140">                restarts.incrementAndGet();</a>
-<span class="sourceLineNo">141</span><a id="line.141">            }</a>
-<span class="sourceLineNo">142</span><a id="line.142">        }</a>
-<span class="sourceLineNo">143</span><a id="line.143">    }</a>
-<span class="sourceLineNo">144</span><a id="line.144"></a>
-<span class="sourceLineNo">145</span><a id="line.145">    /**</a>
-<span class="sourceLineNo">146</span><a id="line.146">     * Method to get the {@link Kernel}.</a>
-<span class="sourceLineNo">147</span><a id="line.147">     *</a>
-<span class="sourceLineNo">148</span><a id="line.148">     * @return  The {@link Kernel}.</a>
-<span class="sourceLineNo">149</span><a id="line.149">     */</a>
-<span class="sourceLineNo">150</span><a id="line.150">    public Kernel kernel() { return kernel; }</a>
-<span class="sourceLineNo">151</span><a id="line.151"></a>
-<span class="sourceLineNo">152</span><a id="line.152">    /**</a>
-<span class="sourceLineNo">153</span><a id="line.153">     * Method to get the {@link Map} of configured {@link Magic}s.</a>
-<span class="sourceLineNo">154</span><a id="line.154">     *</a>
-<span class="sourceLineNo">155</span><a id="line.155">     * @return  The {@link Map} of configured {@link Magic}s.</a>
-<span class="sourceLineNo">156</span><a id="line.156">     */</a>
-<span class="sourceLineNo">157</span><a id="line.157">    public Map&lt;String,Magic&gt; magics() { return magics; }</a>
-<span class="sourceLineNo">158</span><a id="line.158"></a>
-<span class="sourceLineNo">159</span><a id="line.159">    /**</a>
-<span class="sourceLineNo">160</span><a id="line.160">     * Method to get the {@link Resolver}.</a>
-<span class="sourceLineNo">161</span><a id="line.161">     *</a>
-<span class="sourceLineNo">162</span><a id="line.162">     * @return  The {@link Resolver}.</a>
-<span class="sourceLineNo">163</span><a id="line.163">     */</a>
-<span class="sourceLineNo">164</span><a id="line.164">    public Resolver resolver() { return resolver; }</a>
-<span class="sourceLineNo">165</span><a id="line.165"></a>
-<span class="sourceLineNo">166</span><a id="line.166">    /**</a>
-<span class="sourceLineNo">167</span><a id="line.167">     * Method to call</a>
-<span class="sourceLineNo">168</span><a id="line.168">     * {@link Resolver#resolve(Shell,PrintStream,PrintStream,POM)}.</a>
-<span class="sourceLineNo">169</span><a id="line.169">     *</a>
-<span class="sourceLineNo">170</span><a id="line.170">     * @param   pom             The {@link POM} to merge.</a>
-<span class="sourceLineNo">171</span><a id="line.171">     */</a>
-<span class="sourceLineNo">172</span><a id="line.172">    public void resolve(POM pom) {</a>
-<span class="sourceLineNo">173</span><a id="line.173">        for (var file : resolver().resolve(this, out, err, pom)) {</a>
-<span class="sourceLineNo">174</span><a id="line.174">            var jshell = this.jshell;</a>
-<span class="sourceLineNo">175</span><a id="line.175"></a>
-<span class="sourceLineNo">176</span><a id="line.176">            if (jshell != null) {</a>
-<span class="sourceLineNo">177</span><a id="line.177">                jshell.addToClasspath(file.toString());</a>
-<span class="sourceLineNo">178</span><a id="line.178">            } else {</a>
-<span class="sourceLineNo">179</span><a id="line.179">                break;</a>
-<span class="sourceLineNo">180</span><a id="line.180">            }</a>
-<span class="sourceLineNo">181</span><a id="line.181">        }</a>
-<span class="sourceLineNo">182</span><a id="line.182">    }</a>
-<span class="sourceLineNo">183</span><a id="line.183"></a>
-<span class="sourceLineNo">184</span><a id="line.184">    /**</a>
-<span class="sourceLineNo">185</span><a id="line.185">     * Method to add resolved paths to the {@link JShell} instance.  See</a>
-<span class="sourceLineNo">186</span><a id="line.186">     * {@link JShell#addToClasspath(String)}.</a>
-<span class="sourceLineNo">187</span><a id="line.187">     *</a>
-<span class="sourceLineNo">188</span><a id="line.188">     * @param   files           The {@link File}s to add.</a>
-<span class="sourceLineNo">189</span><a id="line.189">     */</a>
-<span class="sourceLineNo">190</span><a id="line.190">    @Synchronized</a>
-<span class="sourceLineNo">191</span><a id="line.191">    public void addToClasspath(File... files) {</a>
-<span class="sourceLineNo">192</span><a id="line.192">        for (var file : resolver.addToClasspath(files)) {</a>
-<span class="sourceLineNo">193</span><a id="line.193">            var jshell = this.jshell;</a>
-<span class="sourceLineNo">194</span><a id="line.194"></a>
-<span class="sourceLineNo">195</span><a id="line.195">            if (jshell != null) {</a>
-<span class="sourceLineNo">196</span><a id="line.196">                jshell.addToClasspath(file.toString());</a>
-<span class="sourceLineNo">197</span><a id="line.197">            } else {</a>
-<span class="sourceLineNo">198</span><a id="line.198">                break;</a>
-<span class="sourceLineNo">199</span><a id="line.199">            }</a>
-<span class="sourceLineNo">200</span><a id="line.200">        }</a>
-<span class="sourceLineNo">201</span><a id="line.201">    }</a>
-<span class="sourceLineNo">202</span><a id="line.202"></a>
-<span class="sourceLineNo">203</span><a id="line.203">    /**</a>
-<span class="sourceLineNo">204</span><a id="line.204">     * Method to add known dependencies found within a parent directory to</a>
-<span class="sourceLineNo">205</span><a id="line.205">     * the {@link Resolver#classpath()}.  See</a>
-<span class="sourceLineNo">206</span><a id="line.206">     * {@link Resolver#addKnownDependenciesToClasspath(File)}.</a>
-<span class="sourceLineNo">207</span><a id="line.207">     *</a>
-<span class="sourceLineNo">208</span><a id="line.208">     * @param   parent          The parent {@link File} to analyze.</a>
-<span class="sourceLineNo">209</span><a id="line.209">     */</a>
-<span class="sourceLineNo">210</span><a id="line.210">    @Synchronized</a>
-<span class="sourceLineNo">211</span><a id="line.211">    public void addKnownDependenciesToClasspath(File parent) {</a>
-<span class="sourceLineNo">212</span><a id="line.212">        for (var file : resolver.addKnownDependenciesToClasspath(parent)) {</a>
-<span class="sourceLineNo">213</span><a id="line.213">            var jshell = this.jshell;</a>
-<span class="sourceLineNo">214</span><a id="line.214"></a>
-<span class="sourceLineNo">215</span><a id="line.215">            if (jshell != null) {</a>
-<span class="sourceLineNo">216</span><a id="line.216">                jshell.addToClasspath(file.toString());</a>
-<span class="sourceLineNo">217</span><a id="line.217">            } else {</a>
-<span class="sourceLineNo">218</span><a id="line.218">                break;</a>
-<span class="sourceLineNo">219</span><a id="line.219">            }</a>
-<span class="sourceLineNo">220</span><a id="line.220">        }</a>
-<span class="sourceLineNo">221</span><a id="line.221">    }</a>
-<span class="sourceLineNo">222</span><a id="line.222"></a>
-<span class="sourceLineNo">223</span><a id="line.223">    /**</a>
-<span class="sourceLineNo">224</span><a id="line.224">     * Method to get the current classpath.  See</a>
-<span class="sourceLineNo">225</span><a id="line.225">     * {@link Resolver#classpath()}.</a>
-<span class="sourceLineNo">226</span><a id="line.226">     *</a>
-<span class="sourceLineNo">227</span><a id="line.227">     * @return  The {@link Set} of {@link File}s.</a>
-<span class="sourceLineNo">228</span><a id="line.228">     */</a>
-<span class="sourceLineNo">229</span><a id="line.229">    public Set&lt;File&gt; classpath() { return resolver.classpath(); }</a>
-<span class="sourceLineNo">230</span><a id="line.230"></a>
-<span class="sourceLineNo">231</span><a id="line.231">    /**</a>
-<span class="sourceLineNo">232</span><a id="line.232">     * Accessor to the {@link JShell} instance (created and initialized on</a>
-<span class="sourceLineNo">233</span><a id="line.233">     * first call).</a>
-<span class="sourceLineNo">234</span><a id="line.234">     *</a>
-<span class="sourceLineNo">235</span><a id="line.235">     * @return  The {@link JShell} instance.</a>
-<span class="sourceLineNo">236</span><a id="line.236">     */</a>
-<span class="sourceLineNo">237</span><a id="line.237">    @Synchronized</a>
-<span class="sourceLineNo">238</span><a id="line.238">    public JShell jshell() {</a>
-<span class="sourceLineNo">239</span><a id="line.239">        if (jshell == null) {</a>
-<span class="sourceLineNo">240</span><a id="line.240">            var options = new ArrayList&lt;String&gt;();</a>
-<span class="sourceLineNo">241</span><a id="line.241">            var definitions =</a>
-<span class="sourceLineNo">242</span><a id="line.242">                Stream.of(ProcessHandle.current().info().arguments())</a>
-<span class="sourceLineNo">243</span><a id="line.243">                .flatMap(Optional::stream)</a>
-<span class="sourceLineNo">244</span><a id="line.244">                .flatMap(Stream::of)</a>
-<span class="sourceLineNo">245</span><a id="line.245">                .takeWhile(t -&gt; (! Objects.equals(t, "-jar")))</a>
-<span class="sourceLineNo">246</span><a id="line.246">                .filter(t -&gt; t.startsWith("-D"))</a>
-<span class="sourceLineNo">247</span><a id="line.247">                .toArray(String[]::new);</a>
-<span class="sourceLineNo">248</span><a id="line.248"></a>
-<span class="sourceLineNo">249</span><a id="line.249">            Collections.addAll(options, definitions);</a>
-<span class="sourceLineNo">250</span><a id="line.250">            Collections.addAll(options, VMOPTIONS);</a>
-<span class="sourceLineNo">251</span><a id="line.251">            options.add("-D" + Map.entry(Kernel.PORT_PROPERTY, kernel.getPort()));</a>
-<span class="sourceLineNo">252</span><a id="line.252"></a>
-<span class="sourceLineNo">253</span><a id="line.253">            if (! kernel.isTerminating()) {</a>
-<span class="sourceLineNo">254</span><a id="line.254">                try {</a>
-<span class="sourceLineNo">255</span><a id="line.255">                    jshell =</a>
-<span class="sourceLineNo">256</span><a id="line.256">                        JShell.builder()</a>
-<span class="sourceLineNo">257</span><a id="line.257">                        .remoteVMOptions(options.toArray(new String[] { }))</a>
-<span class="sourceLineNo">258</span><a id="line.258">                        .in(in).out(out).err(err).build();</a>
-<span class="sourceLineNo">259</span><a id="line.259"></a>
-<span class="sourceLineNo">260</span><a id="line.260">                    resolver().classpath()</a>
-<span class="sourceLineNo">261</span><a id="line.261">                        .forEach(t -&gt; jshell.addToClasspath(t.toString()));</a>
-<span class="sourceLineNo">262</span><a id="line.262"></a>
-<span class="sourceLineNo">263</span><a id="line.263">                    var logIn =</a>
-<span class="sourceLineNo">264</span><a id="line.264">                        IoBuilder.forLogger(log)</a>
-<span class="sourceLineNo">265</span><a id="line.265">                        .setLevel(WARN)</a>
-<span class="sourceLineNo">266</span><a id="line.266">                        .filter(InputStream.nullInputStream())</a>
-<span class="sourceLineNo">267</span><a id="line.267">                        .buildInputStream();</a>
-<span class="sourceLineNo">268</span><a id="line.268">                    var logOut =</a>
-<span class="sourceLineNo">269</span><a id="line.269">                        IoBuilder.forLogger(log)</a>
-<span class="sourceLineNo">270</span><a id="line.270">                        .setLevel(WARN)</a>
-<span class="sourceLineNo">271</span><a id="line.271">                        .buildPrintStream();</a>
-<span class="sourceLineNo">272</span><a id="line.272"></a>
-<span class="sourceLineNo">273</span><a id="line.273">                    java.execute(jshell, logIn, logOut, logOut, NotebookContext.bootstrap());</a>
-<span class="sourceLineNo">274</span><a id="line.274">                } catch (Exception exception) {</a>
-<span class="sourceLineNo">275</span><a id="line.275">                    log.warn("{}", exception, exception);</a>
-<span class="sourceLineNo">276</span><a id="line.276">                }</a>
-<span class="sourceLineNo">277</span><a id="line.277">            }</a>
-<span class="sourceLineNo">278</span><a id="line.278">        }</a>
-<span class="sourceLineNo">279</span><a id="line.279"></a>
-<span class="sourceLineNo">280</span><a id="line.280">        return jshell;</a>
-<span class="sourceLineNo">281</span><a id="line.281">    }</a>
-<span class="sourceLineNo">282</span><a id="line.282"></a>
-<span class="sourceLineNo">283</span><a id="line.283">    /**</a>
-<span class="sourceLineNo">284</span><a id="line.284">     * Method to execute code (typically a cell's contents).</a>
-<span class="sourceLineNo">285</span><a id="line.285">     *</a>
-<span class="sourceLineNo">286</span><a id="line.286">     * @param   code            The code to execute.</a>
-<span class="sourceLineNo">287</span><a id="line.287">     */</a>
-<span class="sourceLineNo">288</span><a id="line.288">    public void execute(String code) {</a>
-<span class="sourceLineNo">289</span><a id="line.289">        try {</a>
-<span class="sourceLineNo">290</span><a id="line.290">            NotebookContext.preExecute(this);</a>
-<span class="sourceLineNo">291</span><a id="line.291"></a>
-<span class="sourceLineNo">292</span><a id="line.292">            var application = new Magic.Application(code);</a>
-<span class="sourceLineNo">293</span><a id="line.293">            var name = application.getMagicName();</a>
-<span class="sourceLineNo">294</span><a id="line.294"></a>
-<span class="sourceLineNo">295</span><a id="line.295">            if (name != null &amp;&amp; (! magics.containsKey(name))) {</a>
-<span class="sourceLineNo">296</span><a id="line.296">                throw new IllegalArgumentException(application.getLine0());</a>
-<span class="sourceLineNo">297</span><a id="line.297">            }</a>
-<span class="sourceLineNo">298</span><a id="line.298"></a>
-<span class="sourceLineNo">299</span><a id="line.299">            var magic = (name != null) ? magics.get(name) : java;</a>
-<span class="sourceLineNo">300</span><a id="line.300"></a>
-<span class="sourceLineNo">301</span><a id="line.301">            application.apply(magic, this, in, out, err);</a>
-<span class="sourceLineNo">302</span><a id="line.302">        } catch (Exception exception) {</a>
-<span class="sourceLineNo">303</span><a id="line.303">            exception.printStackTrace(err);</a>
-<span class="sourceLineNo">304</span><a id="line.304">        } finally {</a>
-<span class="sourceLineNo">305</span><a id="line.305">            NotebookContext.postExecute(this);</a>
-<span class="sourceLineNo">306</span><a id="line.306">        }</a>
-<span class="sourceLineNo">307</span><a id="line.307">    }</a>
-<span class="sourceLineNo">308</span><a id="line.308"></a>
-<span class="sourceLineNo">309</span><a id="line.309">    /**</a>
-<span class="sourceLineNo">310</span><a id="line.310">     * Method to evaluate an expression.</a>
-<span class="sourceLineNo">311</span><a id="line.311">     *</a>
-<span class="sourceLineNo">312</span><a id="line.312">     * @param   expression      The code to evaluate.</a>
-<span class="sourceLineNo">313</span><a id="line.313">     *</a>
-<span class="sourceLineNo">314</span><a id="line.314">     * @return  The result of evaluating the expression.</a>
-<span class="sourceLineNo">315</span><a id="line.315">     */</a>
-<span class="sourceLineNo">316</span><a id="line.316">    @Synchronized</a>
-<span class="sourceLineNo">317</span><a id="line.317">    public String evaluate(String expression) throws Exception {</a>
-<span class="sourceLineNo">318</span><a id="line.318">        var result = "";</a>
-<span class="sourceLineNo">319</span><a id="line.319">        var jshell = jshell();</a>
-<span class="sourceLineNo">320</span><a id="line.320"></a>
-<span class="sourceLineNo">321</span><a id="line.321">        if (jshell != null) {</a>
-<span class="sourceLineNo">322</span><a id="line.322">            var analyzer = jshell.sourceCodeAnalysis();</a>
-<span class="sourceLineNo">323</span><a id="line.323">            var info = analyzer.analyzeCompletion(expression);</a>
-<span class="sourceLineNo">324</span><a id="line.324"></a>
-<span class="sourceLineNo">325</span><a id="line.325">            if (! info.completeness().isComplete()) {</a>
-<span class="sourceLineNo">326</span><a id="line.326">                throw new IllegalArgumentException(expression);</a>
-<span class="sourceLineNo">327</span><a id="line.327">            }</a>
-<span class="sourceLineNo">328</span><a id="line.328"></a>
-<span class="sourceLineNo">329</span><a id="line.329">            result = unescape(jshell.eval(info.source()).get(0).value());</a>
-<span class="sourceLineNo">330</span><a id="line.330">        }</a>
-<span class="sourceLineNo">331</span><a id="line.331"></a>
-<span class="sourceLineNo">332</span><a id="line.332">        return result;</a>
-<span class="sourceLineNo">333</span><a id="line.333">    }</a>
-<span class="sourceLineNo">334</span><a id="line.334"></a>
-<span class="sourceLineNo">335</span><a id="line.335">    /**</a>
-<span class="sourceLineNo">336</span><a id="line.336">     * Method to determine code's {@link Message.completeness completeness}.</a>
-<span class="sourceLineNo">337</span><a id="line.337">     *</a>
-<span class="sourceLineNo">338</span><a id="line.338">     * @param   code            The code to execute.</a>
-<span class="sourceLineNo">339</span><a id="line.339">     *</a>
-<span class="sourceLineNo">340</span><a id="line.340">     * @return  The code's {@link Message.completeness completeness}.</a>
-<span class="sourceLineNo">341</span><a id="line.341">     */</a>
-<span class="sourceLineNo">342</span><a id="line.342">    public Message.completeness isComplete(String code) {</a>
-<span class="sourceLineNo">343</span><a id="line.343">        var completeness = Message.completeness.unknown;</a>
-<span class="sourceLineNo">344</span><a id="line.344">        var application = new Magic.Application(code);</a>
-<span class="sourceLineNo">345</span><a id="line.345">        var name = application.getMagicName();</a>
-<span class="sourceLineNo">346</span><a id="line.346"></a>
-<span class="sourceLineNo">347</span><a id="line.347">        if (name == null || magics.containsKey(name)) {</a>
-<span class="sourceLineNo">348</span><a id="line.348">            var magic = (name != null) ? magics.get(name) : java;</a>
-<span class="sourceLineNo">349</span><a id="line.349"></a>
-<span class="sourceLineNo">350</span><a id="line.350">            completeness = magic.isComplete(application.getLine0(), application.getCode());</a>
-<span class="sourceLineNo">351</span><a id="line.351">        } else {</a>
-<span class="sourceLineNo">352</span><a id="line.352">            completeness = Message.completeness.invalid;</a>
-<span class="sourceLineNo">353</span><a id="line.353">        }</a>
-<span class="sourceLineNo">354</span><a id="line.354"></a>
-<span class="sourceLineNo">355</span><a id="line.355">        return completeness;</a>
-<span class="sourceLineNo">356</span><a id="line.356">    }</a>
-<span class="sourceLineNo">357</span><a id="line.357"></a>
-<span class="sourceLineNo">358</span><a id="line.358">    /**</a>
-<span class="sourceLineNo">359</span><a id="line.359">     * Method to stop (interrupt) a {@link Shell}.</a>
-<span class="sourceLineNo">360</span><a id="line.360">     */</a>
-<span class="sourceLineNo">361</span><a id="line.361">    @Synchronized</a>
-<span class="sourceLineNo">362</span><a id="line.362">    public void stop() {</a>
-<span class="sourceLineNo">363</span><a id="line.363">        var jshell = this.jshell;</a>
-<span class="sourceLineNo">364</span><a id="line.364"></a>
-<span class="sourceLineNo">365</span><a id="line.365">        if (jshell != null) {</a>
-<span class="sourceLineNo">366</span><a id="line.366">            jshell.stop();</a>
-<span class="sourceLineNo">367</span><a id="line.367">        }</a>
-<span class="sourceLineNo">368</span><a id="line.368">    }</a>
-<span class="sourceLineNo">369</span><a id="line.369"></a>
-<span class="sourceLineNo">370</span><a id="line.370">    /**</a>
-<span class="sourceLineNo">371</span><a id="line.371">     * Method to get the number of times {@link.this} {@link Shell} has been</a>
-<span class="sourceLineNo">372</span><a id="line.372">     * restarted.</a>
-<span class="sourceLineNo">373</span><a id="line.373">     *</a>
-<span class="sourceLineNo">374</span><a id="line.374">     * @return  The restart count.</a>
-<span class="sourceLineNo">375</span><a id="line.375">     */</a>
-<span class="sourceLineNo">376</span><a id="line.376">    public int restarts() { return restarts.intValue(); }</a>
-<span class="sourceLineNo">377</span><a id="line.377"></a>
-<span class="sourceLineNo">378</span><a id="line.378">    @MagicNames({ "java" })</a>
-<span class="sourceLineNo">379</span><a id="line.379">    @Description("Execute code in Java REPL")</a>
-<span class="sourceLineNo">380</span><a id="line.380">    @NoArgsConstructor @ToString</a>
-<span class="sourceLineNo">381</span><a id="line.381">    private class Java implements AnnotatedMagic {</a>
-<span class="sourceLineNo">382</span><a id="line.382">        @Override</a>
-<span class="sourceLineNo">383</span><a id="line.383">        public void execute(Shell shell,</a>
-<span class="sourceLineNo">384</span><a id="line.384">                            InputStream in, PrintStream out, PrintStream err,</a>
-<span class="sourceLineNo">385</span><a id="line.385">                            String line0, String code) throws Exception {</a>
-<span class="sourceLineNo">386</span><a id="line.386">            if (! code.isBlank()) {</a>
-<span class="sourceLineNo">387</span><a id="line.387">                execute(shell.jshell(), in, out, err, code);</a>
-<span class="sourceLineNo">388</span><a id="line.388">            } else {</a>
-<span class="sourceLineNo">389</span><a id="line.389">                if (line0 != null) {</a>
-<span class="sourceLineNo">390</span><a id="line.390">                    AnnotatedMagic.super.execute(shell, in, out, err, line0, code);</a>
-<span class="sourceLineNo">391</span><a id="line.391">                }</a>
-<span class="sourceLineNo">392</span><a id="line.392">            }</a>
-<span class="sourceLineNo">393</span><a id="line.393">        }</a>
-<span class="sourceLineNo">394</span><a id="line.394"></a>
-<span class="sourceLineNo">395</span><a id="line.395">        @Override</a>
-<span class="sourceLineNo">396</span><a id="line.396">        public Message.completeness isComplete(String line0, String code) {</a>
-<span class="sourceLineNo">397</span><a id="line.397">            var completeness = Message.completeness.unknown;</a>
-<span class="sourceLineNo">398</span><a id="line.398"></a>
-<span class="sourceLineNo">399</span><a id="line.399">            if (! code.isBlank()) {</a>
-<span class="sourceLineNo">400</span><a id="line.400">                var jshell = Shell.this.jshell;</a>
-<span class="sourceLineNo">401</span><a id="line.401"></a>
-<span class="sourceLineNo">402</span><a id="line.402">                if (jshell != null) {</a>
-<span class="sourceLineNo">403</span><a id="line.403">                    try {</a>
-<span class="sourceLineNo">404</span><a id="line.404">                        if (! parse(jshell, code).isEmpty()) {</a>
-<span class="sourceLineNo">405</span><a id="line.405">                            completeness = Message.completeness.complete;</a>
-<span class="sourceLineNo">406</span><a id="line.406">                        } else {</a>
-<span class="sourceLineNo">407</span><a id="line.407">                            completeness = Message.completeness.incomplete;</a>
-<span class="sourceLineNo">408</span><a id="line.408">                        }</a>
-<span class="sourceLineNo">409</span><a id="line.409">                    } catch (ParseException exception) {</a>
-<span class="sourceLineNo">410</span><a id="line.410">                        completeness = Message.completeness.incomplete;</a>
-<span class="sourceLineNo">411</span><a id="line.411">                    }</a>
-<span class="sourceLineNo">412</span><a id="line.412">                }</a>
-<span class="sourceLineNo">413</span><a id="line.413">            } else {</a>
-<span class="sourceLineNo">414</span><a id="line.414">                completeness = Message.completeness.incomplete;</a>
-<span class="sourceLineNo">415</span><a id="line.415">            }</a>
-<span class="sourceLineNo">416</span><a id="line.416"></a>
-<span class="sourceLineNo">417</span><a id="line.417">            return completeness;</a>
-<span class="sourceLineNo">418</span><a id="line.418">        }</a>
-<span class="sourceLineNo">419</span><a id="line.419"></a>
-<span class="sourceLineNo">420</span><a id="line.420">        private SortedMap&lt;Integer,SourceCodeAnalysis.CompletionInfo&gt; parse(JShell jshell, String code) throws ParseException {</a>
-<span class="sourceLineNo">421</span><a id="line.421">            var map = new TreeMap&lt;Integer,SourceCodeAnalysis.CompletionInfo&gt;();</a>
-<span class="sourceLineNo">422</span><a id="line.422">            var analyzer = jshell.sourceCodeAnalysis();</a>
-<span class="sourceLineNo">423</span><a id="line.423">            var offset = 0;</a>
-<span class="sourceLineNo">424</span><a id="line.424">            var remaining = code;</a>
-<span class="sourceLineNo">425</span><a id="line.425"></a>
-<span class="sourceLineNo">426</span><a id="line.426">            while (! remaining.isEmpty()) {</a>
-<span class="sourceLineNo">427</span><a id="line.427">                var value = analyzer.analyzeCompletion(remaining);</a>
-<span class="sourceLineNo">428</span><a id="line.428"></a>
-<span class="sourceLineNo">429</span><a id="line.429">                switch (value.completeness()) {</a>
-<span class="sourceLineNo">430</span><a id="line.430">                case DEFINITELY_INCOMPLETE:</a>
-<span class="sourceLineNo">431</span><a id="line.431">                    throw new IncompleteParseException(offset);</a>
-<span class="sourceLineNo">432</span><a id="line.432">                    /* break; */</a>
-<span class="sourceLineNo">433</span><a id="line.433"></a>
-<span class="sourceLineNo">434</span><a id="line.434">                case UNKNOWN:</a>
-<span class="sourceLineNo">435</span><a id="line.435">                    throw new UnknownParseException(offset);</a>
-<span class="sourceLineNo">436</span><a id="line.436">                    /* break; */</a>
-<span class="sourceLineNo">437</span><a id="line.437"></a>
-<span class="sourceLineNo">438</span><a id="line.438">                default:</a>
-<span class="sourceLineNo">439</span><a id="line.439">                    map.put(offset, value);</a>
-<span class="sourceLineNo">440</span><a id="line.440"></a>
-<span class="sourceLineNo">441</span><a id="line.441">                    offset += value.source().length();</a>
-<span class="sourceLineNo">442</span><a id="line.442">                    remaining = remaining.substring(value.source().length());</a>
-<span class="sourceLineNo">443</span><a id="line.443">                    break;</a>
-<span class="sourceLineNo">444</span><a id="line.444">                }</a>
-<span class="sourceLineNo">445</span><a id="line.445"></a>
-<span class="sourceLineNo">446</span><a id="line.446">                if (remaining.isBlank()) {</a>
-<span class="sourceLineNo">447</span><a id="line.447">                    break;</a>
-<span class="sourceLineNo">448</span><a id="line.448">                }</a>
-<span class="sourceLineNo">449</span><a id="line.449">            }</a>
-<span class="sourceLineNo">450</span><a id="line.450"></a>
-<span class="sourceLineNo">451</span><a id="line.451">            return map;</a>
-<span class="sourceLineNo">452</span><a id="line.452">        }</a>
-<span class="sourceLineNo">453</span><a id="line.453"></a>
-<span class="sourceLineNo">454</span><a id="line.454">        @Override</a>
-<span class="sourceLineNo">455</span><a id="line.455">        public void configure(NotebookContext context) {</a>
-<span class="sourceLineNo">456</span><a id="line.456">            throw new IllegalStateException();</a>
-<span class="sourceLineNo">457</span><a id="line.457">        }</a>
-<span class="sourceLineNo">458</span><a id="line.458"></a>
-<span class="sourceLineNo">459</span><a id="line.459">        @Override</a>
-<span class="sourceLineNo">460</span><a id="line.460">        public void execute(String line0, String code) throws Exception {</a>
-<span class="sourceLineNo">461</span><a id="line.461">            throw new IllegalStateException();</a>
-<span class="sourceLineNo">462</span><a id="line.462">        }</a>
-<span class="sourceLineNo">463</span><a id="line.463"></a>
-<span class="sourceLineNo">464</span><a id="line.464">        protected void execute(JShell jshell,</a>
-<span class="sourceLineNo">465</span><a id="line.465">                               InputStream in, PrintStream out, PrintStream err,</a>
-<span class="sourceLineNo">466</span><a id="line.466">                               String code) {</a>
-<span class="sourceLineNo">467</span><a id="line.467">            try {</a>
-<span class="sourceLineNo">468</span><a id="line.468">                var iterator = parse(jshell, code).entrySet().iterator();</a>
-<span class="sourceLineNo">469</span><a id="line.469"></a>
-<span class="sourceLineNo">470</span><a id="line.470">                while (iterator.hasNext()) {</a>
-<span class="sourceLineNo">471</span><a id="line.471">                    var entry = iterator.next();</a>
-<span class="sourceLineNo">472</span><a id="line.472">                    var errored = false;</a>
-<span class="sourceLineNo">473</span><a id="line.473">                    var info = entry.getValue();</a>
-<span class="sourceLineNo">474</span><a id="line.474"></a>
-<span class="sourceLineNo">475</span><a id="line.475">                    switch (info.completeness()) {</a>
-<span class="sourceLineNo">476</span><a id="line.476">                    case EMPTY:</a>
-<span class="sourceLineNo">477</span><a id="line.477">                        break;</a>
-<span class="sourceLineNo">478</span><a id="line.478"></a>
-<span class="sourceLineNo">479</span><a id="line.479">                    case COMPLETE:</a>
-<span class="sourceLineNo">480</span><a id="line.480">                    case COMPLETE_WITH_SEMI:</a>
-<span class="sourceLineNo">481</span><a id="line.481">                    case CONSIDERED_INCOMPLETE:</a>
-<span class="sourceLineNo">482</span><a id="line.482">                        var events = jshell.eval(info.source());</a>
-<span class="sourceLineNo">483</span><a id="line.483"></a>
-<span class="sourceLineNo">484</span><a id="line.484">                        for (var event : events) {</a>
-<span class="sourceLineNo">485</span><a id="line.485">                            if (! event.status().equals(REJECTED)) {</a>
-<span class="sourceLineNo">486</span><a id="line.486">                                if (event.exception() != null) {</a>
-<span class="sourceLineNo">487</span><a id="line.487">                                    errored |= true;</a>
-<span class="sourceLineNo">488</span><a id="line.488"></a>
-<span class="sourceLineNo">489</span><a id="line.489">                                    event.exception().printStackTrace(err);</a>
-<span class="sourceLineNo">490</span><a id="line.490">                                }</a>
-<span class="sourceLineNo">491</span><a id="line.491">                            } else {</a>
-<span class="sourceLineNo">492</span><a id="line.492">                                errored |= true;</a>
-<span class="sourceLineNo">493</span><a id="line.493"></a>
-<span class="sourceLineNo">494</span><a id="line.494">                                err.format("%s %s\n%s\n",</a>
-<span class="sourceLineNo">495</span><a id="line.495">                                           event.status(),</a>
-<span class="sourceLineNo">496</span><a id="line.496">                                           event.snippet().kind(),</a>
-<span class="sourceLineNo">497</span><a id="line.497">                                           event.snippet().source());</a>
-<span class="sourceLineNo">498</span><a id="line.498">                                jshell.diagnostics(event.snippet())</a>
-<span class="sourceLineNo">499</span><a id="line.499">                                    .map(t -&gt; t.getMessage(locale))</a>
-<span class="sourceLineNo">500</span><a id="line.500">                                    .forEach(err::println);</a>
-<span class="sourceLineNo">501</span><a id="line.501">                            }</a>
-<span class="sourceLineNo">502</span><a id="line.502">                        }</a>
-<span class="sourceLineNo">503</span><a id="line.503"></a>
-<span class="sourceLineNo">504</span><a id="line.504">                        if (! iterator.hasNext()) {</a>
-<span class="sourceLineNo">505</span><a id="line.505">                            if (! events.isEmpty()) {</a>
-<span class="sourceLineNo">506</span><a id="line.506">                                var event = events.get(events.size() - 1);</a>
-<span class="sourceLineNo">507</span><a id="line.507"></a>
-<span class="sourceLineNo">508</span><a id="line.508">                                switch (event.snippet().subKind()) {</a>
-<span class="sourceLineNo">509</span><a id="line.509">                                case TEMP_VAR_EXPRESSION_SUBKIND:</a>
-<span class="sourceLineNo">510</span><a id="line.510">                                case VAR_VALUE_SUBKIND:</a>
-<span class="sourceLineNo">511</span><a id="line.511">                                    kernel.print(Message.mime_bundle(unescape(event.value())));</a>
-<span class="sourceLineNo">512</span><a id="line.512">                                    break;</a>
-<span class="sourceLineNo">513</span><a id="line.513"></a>
-<span class="sourceLineNo">514</span><a id="line.514">                                default:</a>
-<span class="sourceLineNo">515</span><a id="line.515">                                    break;</a>
-<span class="sourceLineNo">516</span><a id="line.516">                                }</a>
-<span class="sourceLineNo">517</span><a id="line.517">                            }</a>
-<span class="sourceLineNo">518</span><a id="line.518">                        }</a>
-<span class="sourceLineNo">519</span><a id="line.519">                        break;</a>
-<span class="sourceLineNo">520</span><a id="line.520"></a>
-<span class="sourceLineNo">521</span><a id="line.521">                    default:</a>
-<span class="sourceLineNo">522</span><a id="line.522">                        throw new IllegalStateException(String.valueOf(info.completeness()));</a>
-<span class="sourceLineNo">523</span><a id="line.523">                        /* break; */</a>
-<span class="sourceLineNo">524</span><a id="line.524">                    }</a>
-<span class="sourceLineNo">525</span><a id="line.525"></a>
-<span class="sourceLineNo">526</span><a id="line.526">                    if (errored) {</a>
-<span class="sourceLineNo">527</span><a id="line.527">                        break;</a>
-<span class="sourceLineNo">528</span><a id="line.528">                    }</a>
-<span class="sourceLineNo">529</span><a id="line.529">                }</a>
-<span class="sourceLineNo">530</span><a id="line.530">            } catch (IncompleteParseException exception) {</a>
-<span class="sourceLineNo">531</span><a id="line.531">                err.format("Incomplete input:\n%s\n",</a>
-<span class="sourceLineNo">532</span><a id="line.532">                           code.substring(exception.getErrorOffset()));</a>
-<span class="sourceLineNo">533</span><a id="line.533">            } catch (UnknownParseException exception) {</a>
-<span class="sourceLineNo">534</span><a id="line.534">                err.format("Unknown input:\n%s\n",</a>
-<span class="sourceLineNo">535</span><a id="line.535">                           code.substring(exception.getErrorOffset()));</a>
-<span class="sourceLineNo">536</span><a id="line.536">            } catch (Exception exception) {</a>
-<span class="sourceLineNo">537</span><a id="line.537">                exception.printStackTrace(err);</a>
-<span class="sourceLineNo">538</span><a id="line.538">            } finally {</a>
-<span class="sourceLineNo">539</span><a id="line.539">                out.flush();</a>
-<span class="sourceLineNo">540</span><a id="line.540">                err.flush();</a>
-<span class="sourceLineNo">541</span><a id="line.541">            }</a>
-<span class="sourceLineNo">542</span><a id="line.542">        }</a>
-<span class="sourceLineNo">543</span><a id="line.543">    }</a>
-<span class="sourceLineNo">544</span><a id="line.544"></a>
-<span class="sourceLineNo">545</span><a id="line.545">    private class IncompleteParseException extends ParseException {</a>
-<span class="sourceLineNo">546</span><a id="line.546">        private static final long serialVersionUID = 1L;</a>
-<span class="sourceLineNo">547</span><a id="line.547"></a>
-<span class="sourceLineNo">548</span><a id="line.548">        public IncompleteParseException(int offset) {</a>
-<span class="sourceLineNo">549</span><a id="line.549">            super("Incomplete input", offset);</a>
-<span class="sourceLineNo">550</span><a id="line.550">        }</a>
-<span class="sourceLineNo">551</span><a id="line.551">    }</a>
-<span class="sourceLineNo">552</span><a id="line.552"></a>
-<span class="sourceLineNo">553</span><a id="line.553">    private class UnknownParseException extends ParseException {</a>
-<span class="sourceLineNo">554</span><a id="line.554">        private static final long serialVersionUID = 2L;</a>
-<span class="sourceLineNo">555</span><a id="line.555"></a>
-<span class="sourceLineNo">556</span><a id="line.556">        public UnknownParseException(int offset) {</a>
-<span class="sourceLineNo">557</span><a id="line.557">            super("Unknown input", offset);</a>
-<span class="sourceLineNo">558</span><a id="line.558">        }</a>
-<span class="sourceLineNo">559</span><a id="line.559">    }</a>
-<span class="sourceLineNo">560</span><a id="line.560">}</a>
+<span class="sourceLineNo">067</span><a id="line.67">        Stream.of("--illegal-access=permit",</a>
+<span class="sourceLineNo">068</span><a id="line.68">                  "--add-opens", "java.base/jdk.internal.misc=ALL-UNNAMED",</a>
+<span class="sourceLineNo">069</span><a id="line.69">                  "-Dio.netty.tryReflectionSetAccessible=true",</a>
+<span class="sourceLineNo">070</span><a id="line.70">                  "-Djava.awt.headless=true")</a>
+<span class="sourceLineNo">071</span><a id="line.71">        .toArray(String[]::new);</a>
+<span class="sourceLineNo">072</span><a id="line.72"></a>
+<span class="sourceLineNo">073</span><a id="line.73">    private final Kernel kernel;</a>
+<span class="sourceLineNo">074</span><a id="line.74">    private Locale locale = null;       /* TBD: Query Notebook server */</a>
+<span class="sourceLineNo">075</span><a id="line.75">    private final AtomicInteger restarts = new AtomicInteger(0);</a>
+<span class="sourceLineNo">076</span><a id="line.76">    private final MagicMap magics = new MagicMap(null);</a>
+<span class="sourceLineNo">077</span><a id="line.77">    private final Java java = new Java();</a>
+<span class="sourceLineNo">078</span><a id="line.78">    private JShell jshell = null;</a>
+<span class="sourceLineNo">079</span><a id="line.79">    private InputStream in = null;</a>
+<span class="sourceLineNo">080</span><a id="line.80">    private PrintStream out = null;</a>
+<span class="sourceLineNo">081</span><a id="line.81">    private PrintStream err = null;</a>
+<span class="sourceLineNo">082</span><a id="line.82">    private final Resolver resolver = new Resolver();</a>
+<span class="sourceLineNo">083</span><a id="line.83"></a>
+<span class="sourceLineNo">084</span><a id="line.84">    /**</a>
+<span class="sourceLineNo">085</span><a id="line.85">     * Sole constructor.</a>
+<span class="sourceLineNo">086</span><a id="line.86">     *</a>
+<span class="sourceLineNo">087</span><a id="line.87">     * @param   kernel          The {@link Kernel}.</a>
+<span class="sourceLineNo">088</span><a id="line.88">     */</a>
+<span class="sourceLineNo">089</span><a id="line.89">    public Shell(Kernel kernel) {</a>
+<span class="sourceLineNo">090</span><a id="line.90">        this.kernel = Objects.requireNonNull(kernel);</a>
+<span class="sourceLineNo">091</span><a id="line.91">    }</a>
+<span class="sourceLineNo">092</span><a id="line.92"></a>
+<span class="sourceLineNo">093</span><a id="line.93">    /**</a>
+<span class="sourceLineNo">094</span><a id="line.94">     * Method to start a {@link Shell}.</a>
+<span class="sourceLineNo">095</span><a id="line.95">     *</a>
+<span class="sourceLineNo">096</span><a id="line.96">     * @param   in              The {@code in} {@link InputStream}.</a>
+<span class="sourceLineNo">097</span><a id="line.97">     * @param   out             The {@code out} {@link PrintStream}.</a>
+<span class="sourceLineNo">098</span><a id="line.98">     * @param   err             The {@code err} {@link PrintStream}.</a>
+<span class="sourceLineNo">099</span><a id="line.99">     */</a>
+<span class="sourceLineNo">100</span><a id="line.100">    @Synchronized</a>
+<span class="sourceLineNo">101</span><a id="line.101">    public void start(InputStream in, PrintStream out, PrintStream err) {</a>
+<span class="sourceLineNo">102</span><a id="line.102">        this.in = in;</a>
+<span class="sourceLineNo">103</span><a id="line.103">        this.out = out;</a>
+<span class="sourceLineNo">104</span><a id="line.104">        this.err = err;</a>
+<span class="sourceLineNo">105</span><a id="line.105"></a>
+<span class="sourceLineNo">106</span><a id="line.106">        magics.clear();</a>
+<span class="sourceLineNo">107</span><a id="line.107">        magics.reload();</a>
+<span class="sourceLineNo">108</span><a id="line.108"></a>
+<span class="sourceLineNo">109</span><a id="line.109">        Stream.of(java.getMagicNames()).forEach(t -&gt; magics.put(t, java));</a>
+<span class="sourceLineNo">110</span><a id="line.110">    }</a>
+<span class="sourceLineNo">111</span><a id="line.111"></a>
+<span class="sourceLineNo">112</span><a id="line.112">    /**</a>
+<span class="sourceLineNo">113</span><a id="line.113">     * Method to restart a {@link Shell}.</a>
+<span class="sourceLineNo">114</span><a id="line.114">     *</a>
+<span class="sourceLineNo">115</span><a id="line.115">     * @param   in              The {@code in} {@link InputStream}.</a>
+<span class="sourceLineNo">116</span><a id="line.116">     * @param   out             The {@code out} {@link PrintStream}.</a>
+<span class="sourceLineNo">117</span><a id="line.117">     * @param   err             The {@code err} {@link PrintStream}.</a>
+<span class="sourceLineNo">118</span><a id="line.118">     */</a>
+<span class="sourceLineNo">119</span><a id="line.119">    @Synchronized</a>
+<span class="sourceLineNo">120</span><a id="line.120">    public void restart(InputStream in, PrintStream out, PrintStream err) {</a>
+<span class="sourceLineNo">121</span><a id="line.121">        /* stop(); */</a>
+<span class="sourceLineNo">122</span><a id="line.122">        close();</a>
+<span class="sourceLineNo">123</span><a id="line.123"></a>
+<span class="sourceLineNo">124</span><a id="line.124">        if (! kernel().isTerminating()) {</a>
+<span class="sourceLineNo">125</span><a id="line.125">            start(in, out, err);</a>
+<span class="sourceLineNo">126</span><a id="line.126">        }</a>
+<span class="sourceLineNo">127</span><a id="line.127">    }</a>
+<span class="sourceLineNo">128</span><a id="line.128"></a>
+<span class="sourceLineNo">129</span><a id="line.129">    /**</a>
+<span class="sourceLineNo">130</span><a id="line.130">     * Method to close (terminate) a {@link Shell}.</a>
+<span class="sourceLineNo">131</span><a id="line.131">     */</a>
+<span class="sourceLineNo">132</span><a id="line.132">    @Override</a>
+<span class="sourceLineNo">133</span><a id="line.133">    @Synchronized</a>
+<span class="sourceLineNo">134</span><a id="line.134">    public void close() {</a>
+<span class="sourceLineNo">135</span><a id="line.135">        Stream.of(java.getMagicNames()).forEach(t -&gt; magics.remove(t));</a>
+<span class="sourceLineNo">136</span><a id="line.136"></a>
+<span class="sourceLineNo">137</span><a id="line.137">        try (var jshell = this.jshell) {</a>
+<span class="sourceLineNo">138</span><a id="line.138">            this.jshell = null;</a>
+<span class="sourceLineNo">139</span><a id="line.139"></a>
+<span class="sourceLineNo">140</span><a id="line.140">            if (jshell != null) {</a>
+<span class="sourceLineNo">141</span><a id="line.141">                restarts.incrementAndGet();</a>
+<span class="sourceLineNo">142</span><a id="line.142">            }</a>
+<span class="sourceLineNo">143</span><a id="line.143">        }</a>
+<span class="sourceLineNo">144</span><a id="line.144">    }</a>
+<span class="sourceLineNo">145</span><a id="line.145"></a>
+<span class="sourceLineNo">146</span><a id="line.146">    /**</a>
+<span class="sourceLineNo">147</span><a id="line.147">     * Method to get the {@link Kernel}.</a>
+<span class="sourceLineNo">148</span><a id="line.148">     *</a>
+<span class="sourceLineNo">149</span><a id="line.149">     * @return  The {@link Kernel}.</a>
+<span class="sourceLineNo">150</span><a id="line.150">     */</a>
+<span class="sourceLineNo">151</span><a id="line.151">    public Kernel kernel() { return kernel; }</a>
+<span class="sourceLineNo">152</span><a id="line.152"></a>
+<span class="sourceLineNo">153</span><a id="line.153">    /**</a>
+<span class="sourceLineNo">154</span><a id="line.154">     * Method to get the {@link Map} of configured {@link Magic}s.</a>
+<span class="sourceLineNo">155</span><a id="line.155">     *</a>
+<span class="sourceLineNo">156</span><a id="line.156">     * @return  The {@link Map} of configured {@link Magic}s.</a>
+<span class="sourceLineNo">157</span><a id="line.157">     */</a>
+<span class="sourceLineNo">158</span><a id="line.158">    public Map&lt;String,Magic&gt; magics() { return magics; }</a>
+<span class="sourceLineNo">159</span><a id="line.159"></a>
+<span class="sourceLineNo">160</span><a id="line.160">    /**</a>
+<span class="sourceLineNo">161</span><a id="line.161">     * Method to get the {@link Resolver}.</a>
+<span class="sourceLineNo">162</span><a id="line.162">     *</a>
+<span class="sourceLineNo">163</span><a id="line.163">     * @return  The {@link Resolver}.</a>
+<span class="sourceLineNo">164</span><a id="line.164">     */</a>
+<span class="sourceLineNo">165</span><a id="line.165">    public Resolver resolver() { return resolver; }</a>
+<span class="sourceLineNo">166</span><a id="line.166"></a>
+<span class="sourceLineNo">167</span><a id="line.167">    /**</a>
+<span class="sourceLineNo">168</span><a id="line.168">     * Method to call</a>
+<span class="sourceLineNo">169</span><a id="line.169">     * {@link Resolver#resolve(Shell,PrintStream,PrintStream,POM)}.</a>
+<span class="sourceLineNo">170</span><a id="line.170">     *</a>
+<span class="sourceLineNo">171</span><a id="line.171">     * @param   pom             The {@link POM} to merge.</a>
+<span class="sourceLineNo">172</span><a id="line.172">     */</a>
+<span class="sourceLineNo">173</span><a id="line.173">    public void resolve(POM pom) {</a>
+<span class="sourceLineNo">174</span><a id="line.174">        for (var file : resolver().resolve(this, out, err, pom)) {</a>
+<span class="sourceLineNo">175</span><a id="line.175">            var jshell = this.jshell;</a>
+<span class="sourceLineNo">176</span><a id="line.176"></a>
+<span class="sourceLineNo">177</span><a id="line.177">            if (jshell != null) {</a>
+<span class="sourceLineNo">178</span><a id="line.178">                jshell.addToClasspath(file.toString());</a>
+<span class="sourceLineNo">179</span><a id="line.179">            } else {</a>
+<span class="sourceLineNo">180</span><a id="line.180">                break;</a>
+<span class="sourceLineNo">181</span><a id="line.181">            }</a>
+<span class="sourceLineNo">182</span><a id="line.182">        }</a>
+<span class="sourceLineNo">183</span><a id="line.183">    }</a>
+<span class="sourceLineNo">184</span><a id="line.184"></a>
+<span class="sourceLineNo">185</span><a id="line.185">    /**</a>
+<span class="sourceLineNo">186</span><a id="line.186">     * Method to add resolved paths to the {@link JShell} instance.  See</a>
+<span class="sourceLineNo">187</span><a id="line.187">     * {@link JShell#addToClasspath(String)}.</a>
+<span class="sourceLineNo">188</span><a id="line.188">     *</a>
+<span class="sourceLineNo">189</span><a id="line.189">     * @param   files           The {@link File}s to add.</a>
+<span class="sourceLineNo">190</span><a id="line.190">     */</a>
+<span class="sourceLineNo">191</span><a id="line.191">    @Synchronized</a>
+<span class="sourceLineNo">192</span><a id="line.192">    public void addToClasspath(File... files) {</a>
+<span class="sourceLineNo">193</span><a id="line.193">        for (var file : resolver.addToClasspath(files)) {</a>
+<span class="sourceLineNo">194</span><a id="line.194">            var jshell = this.jshell;</a>
+<span class="sourceLineNo">195</span><a id="line.195"></a>
+<span class="sourceLineNo">196</span><a id="line.196">            if (jshell != null) {</a>
+<span class="sourceLineNo">197</span><a id="line.197">                jshell.addToClasspath(file.toString());</a>
+<span class="sourceLineNo">198</span><a id="line.198">            } else {</a>
+<span class="sourceLineNo">199</span><a id="line.199">                break;</a>
+<span class="sourceLineNo">200</span><a id="line.200">            }</a>
+<span class="sourceLineNo">201</span><a id="line.201">        }</a>
+<span class="sourceLineNo">202</span><a id="line.202">    }</a>
+<span class="sourceLineNo">203</span><a id="line.203"></a>
+<span class="sourceLineNo">204</span><a id="line.204">    /**</a>
+<span class="sourceLineNo">205</span><a id="line.205">     * Method to add known dependencies found within a parent directory to</a>
+<span class="sourceLineNo">206</span><a id="line.206">     * the {@link Resolver#classpath()}.  See</a>
+<span class="sourceLineNo">207</span><a id="line.207">     * {@link Resolver#addKnownDependenciesToClasspath(File)}.</a>
+<span class="sourceLineNo">208</span><a id="line.208">     *</a>
+<span class="sourceLineNo">209</span><a id="line.209">     * @param   parent          The parent {@link File} to analyze.</a>
+<span class="sourceLineNo">210</span><a id="line.210">     */</a>
+<span class="sourceLineNo">211</span><a id="line.211">    @Synchronized</a>
+<span class="sourceLineNo">212</span><a id="line.212">    public void addKnownDependenciesToClasspath(File parent) {</a>
+<span class="sourceLineNo">213</span><a id="line.213">        for (var file : resolver.addKnownDependenciesToClasspath(parent)) {</a>
+<span class="sourceLineNo">214</span><a id="line.214">            var jshell = this.jshell;</a>
+<span class="sourceLineNo">215</span><a id="line.215"></a>
+<span class="sourceLineNo">216</span><a id="line.216">            if (jshell != null) {</a>
+<span class="sourceLineNo">217</span><a id="line.217">                jshell.addToClasspath(file.toString());</a>
+<span class="sourceLineNo">218</span><a id="line.218">            } else {</a>
+<span class="sourceLineNo">219</span><a id="line.219">                break;</a>
+<span class="sourceLineNo">220</span><a id="line.220">            }</a>
+<span class="sourceLineNo">221</span><a id="line.221">        }</a>
+<span class="sourceLineNo">222</span><a id="line.222">    }</a>
+<span class="sourceLineNo">223</span><a id="line.223"></a>
+<span class="sourceLineNo">224</span><a id="line.224">    /**</a>
+<span class="sourceLineNo">225</span><a id="line.225">     * Method to get the current classpath.  See</a>
+<span class="sourceLineNo">226</span><a id="line.226">     * {@link Resolver#classpath()}.</a>
+<span class="sourceLineNo">227</span><a id="line.227">     *</a>
+<span class="sourceLineNo">228</span><a id="line.228">     * @return  The {@link Set} of {@link File}s.</a>
+<span class="sourceLineNo">229</span><a id="line.229">     */</a>
+<span class="sourceLineNo">230</span><a id="line.230">    public Set&lt;File&gt; classpath() { return resolver.classpath(); }</a>
+<span class="sourceLineNo">231</span><a id="line.231"></a>
+<span class="sourceLineNo">232</span><a id="line.232">    /**</a>
+<span class="sourceLineNo">233</span><a id="line.233">     * Accessor to the {@link JShell} instance (created and initialized on</a>
+<span class="sourceLineNo">234</span><a id="line.234">     * first call).</a>
+<span class="sourceLineNo">235</span><a id="line.235">     *</a>
+<span class="sourceLineNo">236</span><a id="line.236">     * @return  The {@link JShell} instance.</a>
+<span class="sourceLineNo">237</span><a id="line.237">     */</a>
+<span class="sourceLineNo">238</span><a id="line.238">    @Synchronized</a>
+<span class="sourceLineNo">239</span><a id="line.239">    public JShell jshell() {</a>
+<span class="sourceLineNo">240</span><a id="line.240">        if (jshell == null) {</a>
+<span class="sourceLineNo">241</span><a id="line.241">            var options = new ArrayList&lt;String&gt;();</a>
+<span class="sourceLineNo">242</span><a id="line.242">            var definitions =</a>
+<span class="sourceLineNo">243</span><a id="line.243">                Stream.of(ProcessHandle.current().info().arguments())</a>
+<span class="sourceLineNo">244</span><a id="line.244">                .flatMap(Optional::stream)</a>
+<span class="sourceLineNo">245</span><a id="line.245">                .flatMap(Stream::of)</a>
+<span class="sourceLineNo">246</span><a id="line.246">                .takeWhile(t -&gt; (! Objects.equals(t, "-jar")))</a>
+<span class="sourceLineNo">247</span><a id="line.247">                .filter(t -&gt; t.startsWith("-D"))</a>
+<span class="sourceLineNo">248</span><a id="line.248">                .toArray(String[]::new);</a>
+<span class="sourceLineNo">249</span><a id="line.249"></a>
+<span class="sourceLineNo">250</span><a id="line.250">            Collections.addAll(options, definitions);</a>
+<span class="sourceLineNo">251</span><a id="line.251">            Collections.addAll(options, VMOPTIONS);</a>
+<span class="sourceLineNo">252</span><a id="line.252">            options.add("-D" + Map.entry(Kernel.PORT_PROPERTY, kernel.getPort()));</a>
+<span class="sourceLineNo">253</span><a id="line.253"></a>
+<span class="sourceLineNo">254</span><a id="line.254">            if (! kernel.isTerminating()) {</a>
+<span class="sourceLineNo">255</span><a id="line.255">                try {</a>
+<span class="sourceLineNo">256</span><a id="line.256">                    jshell =</a>
+<span class="sourceLineNo">257</span><a id="line.257">                        JShell.builder()</a>
+<span class="sourceLineNo">258</span><a id="line.258">                        .remoteVMOptions(options.toArray(new String[] { }))</a>
+<span class="sourceLineNo">259</span><a id="line.259">                        .in(in).out(out).err(err).build();</a>
+<span class="sourceLineNo">260</span><a id="line.260"></a>
+<span class="sourceLineNo">261</span><a id="line.261">                    resolver().classpath()</a>
+<span class="sourceLineNo">262</span><a id="line.262">                        .forEach(t -&gt; jshell.addToClasspath(t.toString()));</a>
+<span class="sourceLineNo">263</span><a id="line.263"></a>
+<span class="sourceLineNo">264</span><a id="line.264">                    var logIn =</a>
+<span class="sourceLineNo">265</span><a id="line.265">                        IoBuilder.forLogger(log)</a>
+<span class="sourceLineNo">266</span><a id="line.266">                        .setLevel(WARN)</a>
+<span class="sourceLineNo">267</span><a id="line.267">                        .filter(InputStream.nullInputStream())</a>
+<span class="sourceLineNo">268</span><a id="line.268">                        .buildInputStream();</a>
+<span class="sourceLineNo">269</span><a id="line.269">                    var logOut =</a>
+<span class="sourceLineNo">270</span><a id="line.270">                        IoBuilder.forLogger(log)</a>
+<span class="sourceLineNo">271</span><a id="line.271">                        .setLevel(WARN)</a>
+<span class="sourceLineNo">272</span><a id="line.272">                        .buildPrintStream();</a>
+<span class="sourceLineNo">273</span><a id="line.273"></a>
+<span class="sourceLineNo">274</span><a id="line.274">                    java.execute(jshell, logIn, logOut, logOut, NotebookContext.bootstrap());</a>
+<span class="sourceLineNo">275</span><a id="line.275">                } catch (Exception exception) {</a>
+<span class="sourceLineNo">276</span><a id="line.276">                    log.warn("{}", exception, exception);</a>
+<span class="sourceLineNo">277</span><a id="line.277">                }</a>
+<span class="sourceLineNo">278</span><a id="line.278">            }</a>
+<span class="sourceLineNo">279</span><a id="line.279">        }</a>
+<span class="sourceLineNo">280</span><a id="line.280"></a>
+<span class="sourceLineNo">281</span><a id="line.281">        return jshell;</a>
+<span class="sourceLineNo">282</span><a id="line.282">    }</a>
+<span class="sourceLineNo">283</span><a id="line.283"></a>
+<span class="sourceLineNo">284</span><a id="line.284">    /**</a>
+<span class="sourceLineNo">285</span><a id="line.285">     * Method to execute code (typically a cell's contents).</a>
+<span class="sourceLineNo">286</span><a id="line.286">     *</a>
+<span class="sourceLineNo">287</span><a id="line.287">     * @param   code            The code to execute.</a>
+<span class="sourceLineNo">288</span><a id="line.288">     */</a>
+<span class="sourceLineNo">289</span><a id="line.289">    public void execute(String code) {</a>
+<span class="sourceLineNo">290</span><a id="line.290">        try {</a>
+<span class="sourceLineNo">291</span><a id="line.291">            NotebookContext.preExecute(this);</a>
+<span class="sourceLineNo">292</span><a id="line.292"></a>
+<span class="sourceLineNo">293</span><a id="line.293">            var application = new Magic.Application(code);</a>
+<span class="sourceLineNo">294</span><a id="line.294">            var name = application.getMagicName();</a>
+<span class="sourceLineNo">295</span><a id="line.295"></a>
+<span class="sourceLineNo">296</span><a id="line.296">            if (name != null &amp;&amp; (! magics.containsKey(name))) {</a>
+<span class="sourceLineNo">297</span><a id="line.297">                throw new IllegalArgumentException(application.getLine0());</a>
+<span class="sourceLineNo">298</span><a id="line.298">            }</a>
+<span class="sourceLineNo">299</span><a id="line.299"></a>
+<span class="sourceLineNo">300</span><a id="line.300">            var magic = (name != null) ? magics.get(name) : java;</a>
+<span class="sourceLineNo">301</span><a id="line.301"></a>
+<span class="sourceLineNo">302</span><a id="line.302">            application.apply(magic, this, in, out, err);</a>
+<span class="sourceLineNo">303</span><a id="line.303">        } catch (Exception exception) {</a>
+<span class="sourceLineNo">304</span><a id="line.304">            exception.printStackTrace(err);</a>
+<span class="sourceLineNo">305</span><a id="line.305">        } finally {</a>
+<span class="sourceLineNo">306</span><a id="line.306">            NotebookContext.postExecute(this);</a>
+<span class="sourceLineNo">307</span><a id="line.307">        }</a>
+<span class="sourceLineNo">308</span><a id="line.308">    }</a>
+<span class="sourceLineNo">309</span><a id="line.309"></a>
+<span class="sourceLineNo">310</span><a id="line.310">    /**</a>
+<span class="sourceLineNo">311</span><a id="line.311">     * Method to evaluate an expression.</a>
+<span class="sourceLineNo">312</span><a id="line.312">     *</a>
+<span class="sourceLineNo">313</span><a id="line.313">     * @param   expression      The code to evaluate.</a>
+<span class="sourceLineNo">314</span><a id="line.314">     *</a>
+<span class="sourceLineNo">315</span><a id="line.315">     * @return  The result of evaluating the expression.</a>
+<span class="sourceLineNo">316</span><a id="line.316">     */</a>
+<span class="sourceLineNo">317</span><a id="line.317">    @Synchronized</a>
+<span class="sourceLineNo">318</span><a id="line.318">    public String evaluate(String expression) throws Exception {</a>
+<span class="sourceLineNo">319</span><a id="line.319">        var result = "";</a>
+<span class="sourceLineNo">320</span><a id="line.320">        var jshell = jshell();</a>
+<span class="sourceLineNo">321</span><a id="line.321"></a>
+<span class="sourceLineNo">322</span><a id="line.322">        if (jshell != null) {</a>
+<span class="sourceLineNo">323</span><a id="line.323">            var analyzer = jshell.sourceCodeAnalysis();</a>
+<span class="sourceLineNo">324</span><a id="line.324">            var info = analyzer.analyzeCompletion(expression);</a>
+<span class="sourceLineNo">325</span><a id="line.325"></a>
+<span class="sourceLineNo">326</span><a id="line.326">            if (! info.completeness().isComplete()) {</a>
+<span class="sourceLineNo">327</span><a id="line.327">                throw new IllegalArgumentException(expression);</a>
+<span class="sourceLineNo">328</span><a id="line.328">            }</a>
+<span class="sourceLineNo">329</span><a id="line.329"></a>
+<span class="sourceLineNo">330</span><a id="line.330">            result = unescape(jshell.eval(info.source()).get(0).value());</a>
+<span class="sourceLineNo">331</span><a id="line.331">        }</a>
+<span class="sourceLineNo">332</span><a id="line.332"></a>
+<span class="sourceLineNo">333</span><a id="line.333">        return result;</a>
+<span class="sourceLineNo">334</span><a id="line.334">    }</a>
+<span class="sourceLineNo">335</span><a id="line.335"></a>
+<span class="sourceLineNo">336</span><a id="line.336">    /**</a>
+<span class="sourceLineNo">337</span><a id="line.337">     * Method to determine code's {@link Message.completeness completeness}.</a>
+<span class="sourceLineNo">338</span><a id="line.338">     *</a>
+<span class="sourceLineNo">339</span><a id="line.339">     * @param   code            The code to execute.</a>
+<span class="sourceLineNo">340</span><a id="line.340">     *</a>
+<span class="sourceLineNo">341</span><a id="line.341">     * @return  The code's {@link Message.completeness completeness}.</a>
+<span class="sourceLineNo">342</span><a id="line.342">     */</a>
+<span class="sourceLineNo">343</span><a id="line.343">    public Message.completeness isComplete(String code) {</a>
+<span class="sourceLineNo">344</span><a id="line.344">        var completeness = Message.completeness.unknown;</a>
+<span class="sourceLineNo">345</span><a id="line.345">        var application = new Magic.Application(code);</a>
+<span class="sourceLineNo">346</span><a id="line.346">        var name = application.getMagicName();</a>
+<span class="sourceLineNo">347</span><a id="line.347"></a>
+<span class="sourceLineNo">348</span><a id="line.348">        if (name == null || magics.containsKey(name)) {</a>
+<span class="sourceLineNo">349</span><a id="line.349">            var magic = (name != null) ? magics.get(name) : java;</a>
+<span class="sourceLineNo">350</span><a id="line.350"></a>
+<span class="sourceLineNo">351</span><a id="line.351">            completeness = magic.isComplete(application.getLine0(), application.getCode());</a>
+<span class="sourceLineNo">352</span><a id="line.352">        } else {</a>
+<span class="sourceLineNo">353</span><a id="line.353">            completeness = Message.completeness.invalid;</a>
+<span class="sourceLineNo">354</span><a id="line.354">        }</a>
+<span class="sourceLineNo">355</span><a id="line.355"></a>
+<span class="sourceLineNo">356</span><a id="line.356">        return completeness;</a>
+<span class="sourceLineNo">357</span><a id="line.357">    }</a>
+<span class="sourceLineNo">358</span><a id="line.358"></a>
+<span class="sourceLineNo">359</span><a id="line.359">    /**</a>
+<span class="sourceLineNo">360</span><a id="line.360">     * Method to stop (interrupt) a {@link Shell}.</a>
+<span class="sourceLineNo">361</span><a id="line.361">     */</a>
+<span class="sourceLineNo">362</span><a id="line.362">    @Synchronized</a>
+<span class="sourceLineNo">363</span><a id="line.363">    public void stop() {</a>
+<span class="sourceLineNo">364</span><a id="line.364">        var jshell = this.jshell;</a>
+<span class="sourceLineNo">365</span><a id="line.365"></a>
+<span class="sourceLineNo">366</span><a id="line.366">        if (jshell != null) {</a>
+<span class="sourceLineNo">367</span><a id="line.367">            jshell.stop();</a>
+<span class="sourceLineNo">368</span><a id="line.368">        }</a>
+<span class="sourceLineNo">369</span><a id="line.369">    }</a>
+<span class="sourceLineNo">370</span><a id="line.370"></a>
+<span class="sourceLineNo">371</span><a id="line.371">    /**</a>
+<span class="sourceLineNo">372</span><a id="line.372">     * Method to get the number of times {@link.this} {@link Shell} has been</a>
+<span class="sourceLineNo">373</span><a id="line.373">     * restarted.</a>
+<span class="sourceLineNo">374</span><a id="line.374">     *</a>
+<span class="sourceLineNo">375</span><a id="line.375">     * @return  The restart count.</a>
+<span class="sourceLineNo">376</span><a id="line.376">     */</a>
+<span class="sourceLineNo">377</span><a id="line.377">    public int restarts() { return restarts.intValue(); }</a>
+<span class="sourceLineNo">378</span><a id="line.378"></a>
+<span class="sourceLineNo">379</span><a id="line.379">    @MagicNames({ "java" })</a>
+<span class="sourceLineNo">380</span><a id="line.380">    @Description("Execute code in Java REPL")</a>
+<span class="sourceLineNo">381</span><a id="line.381">    @NoArgsConstructor @ToString</a>
+<span class="sourceLineNo">382</span><a id="line.382">    private class Java implements AnnotatedMagic {</a>
+<span class="sourceLineNo">383</span><a id="line.383">        @Override</a>
+<span class="sourceLineNo">384</span><a id="line.384">        public void execute(Shell shell,</a>
+<span class="sourceLineNo">385</span><a id="line.385">                            InputStream in, PrintStream out, PrintStream err,</a>
+<span class="sourceLineNo">386</span><a id="line.386">                            String line0, String code) throws Exception {</a>
+<span class="sourceLineNo">387</span><a id="line.387">            if (! code.isBlank()) {</a>
+<span class="sourceLineNo">388</span><a id="line.388">                execute(shell.jshell(), in, out, err, code);</a>
+<span class="sourceLineNo">389</span><a id="line.389">            } else {</a>
+<span class="sourceLineNo">390</span><a id="line.390">                if (line0 != null) {</a>
+<span class="sourceLineNo">391</span><a id="line.391">                    AnnotatedMagic.super.execute(shell, in, out, err, line0, code);</a>
+<span class="sourceLineNo">392</span><a id="line.392">                }</a>
+<span class="sourceLineNo">393</span><a id="line.393">            }</a>
+<span class="sourceLineNo">394</span><a id="line.394">        }</a>
+<span class="sourceLineNo">395</span><a id="line.395"></a>
+<span class="sourceLineNo">396</span><a id="line.396">        @Override</a>
+<span class="sourceLineNo">397</span><a id="line.397">        public Message.completeness isComplete(String line0, String code) {</a>
+<span class="sourceLineNo">398</span><a id="line.398">            var completeness = Message.completeness.unknown;</a>
+<span class="sourceLineNo">399</span><a id="line.399"></a>
+<span class="sourceLineNo">400</span><a id="line.400">            if (! code.isBlank()) {</a>
+<span class="sourceLineNo">401</span><a id="line.401">                var jshell = Shell.this.jshell;</a>
+<span class="sourceLineNo">402</span><a id="line.402"></a>
+<span class="sourceLineNo">403</span><a id="line.403">                if (jshell != null) {</a>
+<span class="sourceLineNo">404</span><a id="line.404">                    try {</a>
+<span class="sourceLineNo">405</span><a id="line.405">                        if (! parse(jshell, code).isEmpty()) {</a>
+<span class="sourceLineNo">406</span><a id="line.406">                            completeness = Message.completeness.complete;</a>
+<span class="sourceLineNo">407</span><a id="line.407">                        } else {</a>
+<span class="sourceLineNo">408</span><a id="line.408">                            completeness = Message.completeness.incomplete;</a>
+<span class="sourceLineNo">409</span><a id="line.409">                        }</a>
+<span class="sourceLineNo">410</span><a id="line.410">                    } catch (ParseException exception) {</a>
+<span class="sourceLineNo">411</span><a id="line.411">                        completeness = Message.completeness.incomplete;</a>
+<span class="sourceLineNo">412</span><a id="line.412">                    }</a>
+<span class="sourceLineNo">413</span><a id="line.413">                }</a>
+<span class="sourceLineNo">414</span><a id="line.414">            } else {</a>
+<span class="sourceLineNo">415</span><a id="line.415">                completeness = Message.completeness.incomplete;</a>
+<span class="sourceLineNo">416</span><a id="line.416">            }</a>
+<span class="sourceLineNo">417</span><a id="line.417"></a>
+<span class="sourceLineNo">418</span><a id="line.418">            return completeness;</a>
+<span class="sourceLineNo">419</span><a id="line.419">        }</a>
+<span class="sourceLineNo">420</span><a id="line.420"></a>
+<span class="sourceLineNo">421</span><a id="line.421">        private SortedMap&lt;Integer,SourceCodeAnalysis.CompletionInfo&gt; parse(JShell jshell, String code) throws ParseException {</a>
+<span class="sourceLineNo">422</span><a id="line.422">            var map = new TreeMap&lt;Integer,SourceCodeAnalysis.CompletionInfo&gt;();</a>
+<span class="sourceLineNo">423</span><a id="line.423">            var analyzer = jshell.sourceCodeAnalysis();</a>
+<span class="sourceLineNo">424</span><a id="line.424">            var offset = 0;</a>
+<span class="sourceLineNo">425</span><a id="line.425">            var remaining = code;</a>
+<span class="sourceLineNo">426</span><a id="line.426"></a>
+<span class="sourceLineNo">427</span><a id="line.427">            while (! remaining.isEmpty()) {</a>
+<span class="sourceLineNo">428</span><a id="line.428">                var value = analyzer.analyzeCompletion(remaining);</a>
+<span class="sourceLineNo">429</span><a id="line.429"></a>
+<span class="sourceLineNo">430</span><a id="line.430">                switch (value.completeness()) {</a>
+<span class="sourceLineNo">431</span><a id="line.431">                case DEFINITELY_INCOMPLETE:</a>
+<span class="sourceLineNo">432</span><a id="line.432">                    throw new IncompleteParseException(offset);</a>
+<span class="sourceLineNo">433</span><a id="line.433">                    /* break; */</a>
+<span class="sourceLineNo">434</span><a id="line.434"></a>
+<span class="sourceLineNo">435</span><a id="line.435">                case UNKNOWN:</a>
+<span class="sourceLineNo">436</span><a id="line.436">                    throw new UnknownParseException(offset);</a>
+<span class="sourceLineNo">437</span><a id="line.437">                    /* break; */</a>
+<span class="sourceLineNo">438</span><a id="line.438"></a>
+<span class="sourceLineNo">439</span><a id="line.439">                default:</a>
+<span class="sourceLineNo">440</span><a id="line.440">                    map.put(offset, value);</a>
+<span class="sourceLineNo">441</span><a id="line.441"></a>
+<span class="sourceLineNo">442</span><a id="line.442">                    offset += value.source().length();</a>
+<span class="sourceLineNo">443</span><a id="line.443">                    remaining = remaining.substring(value.source().length());</a>
+<span class="sourceLineNo">444</span><a id="line.444">                    break;</a>
+<span class="sourceLineNo">445</span><a id="line.445">                }</a>
+<span class="sourceLineNo">446</span><a id="line.446"></a>
+<span class="sourceLineNo">447</span><a id="line.447">                if (remaining.isBlank()) {</a>
+<span class="sourceLineNo">448</span><a id="line.448">                    break;</a>
+<span class="sourceLineNo">449</span><a id="line.449">                }</a>
+<span class="sourceLineNo">450</span><a id="line.450">            }</a>
+<span class="sourceLineNo">451</span><a id="line.451"></a>
+<span class="sourceLineNo">452</span><a id="line.452">            return map;</a>
+<span class="sourceLineNo">453</span><a id="line.453">        }</a>
+<span class="sourceLineNo">454</span><a id="line.454"></a>
+<span class="sourceLineNo">455</span><a id="line.455">        @Override</a>
+<span class="sourceLineNo">456</span><a id="line.456">        public void configure(NotebookContext context) {</a>
+<span class="sourceLineNo">457</span><a id="line.457">            throw new IllegalStateException();</a>
+<span class="sourceLineNo">458</span><a id="line.458">        }</a>
+<span class="sourceLineNo">459</span><a id="line.459"></a>
+<span class="sourceLineNo">460</span><a id="line.460">        @Override</a>
+<span class="sourceLineNo">461</span><a id="line.461">        public void execute(String line0, String code) throws Exception {</a>
+<span class="sourceLineNo">462</span><a id="line.462">            throw new IllegalStateException();</a>
+<span class="sourceLineNo">463</span><a id="line.463">        }</a>
+<span class="sourceLineNo">464</span><a id="line.464"></a>
+<span class="sourceLineNo">465</span><a id="line.465">        protected void execute(JShell jshell,</a>
+<span class="sourceLineNo">466</span><a id="line.466">                               InputStream in, PrintStream out, PrintStream err,</a>
+<span class="sourceLineNo">467</span><a id="line.467">                               String code) {</a>
+<span class="sourceLineNo">468</span><a id="line.468">            try {</a>
+<span class="sourceLineNo">469</span><a id="line.469">                var iterator = parse(jshell, code).entrySet().iterator();</a>
+<span class="sourceLineNo">470</span><a id="line.470"></a>
+<span class="sourceLineNo">471</span><a id="line.471">                while (iterator.hasNext()) {</a>
+<span class="sourceLineNo">472</span><a id="line.472">                    var entry = iterator.next();</a>
+<span class="sourceLineNo">473</span><a id="line.473">                    var errored = false;</a>
+<span class="sourceLineNo">474</span><a id="line.474">                    var info = entry.getValue();</a>
+<span class="sourceLineNo">475</span><a id="line.475"></a>
+<span class="sourceLineNo">476</span><a id="line.476">                    switch (info.completeness()) {</a>
+<span class="sourceLineNo">477</span><a id="line.477">                    case EMPTY:</a>
+<span class="sourceLineNo">478</span><a id="line.478">                        break;</a>
+<span class="sourceLineNo">479</span><a id="line.479"></a>
+<span class="sourceLineNo">480</span><a id="line.480">                    case COMPLETE:</a>
+<span class="sourceLineNo">481</span><a id="line.481">                    case COMPLETE_WITH_SEMI:</a>
+<span class="sourceLineNo">482</span><a id="line.482">                    case CONSIDERED_INCOMPLETE:</a>
+<span class="sourceLineNo">483</span><a id="line.483">                        var events = jshell.eval(info.source());</a>
+<span class="sourceLineNo">484</span><a id="line.484"></a>
+<span class="sourceLineNo">485</span><a id="line.485">                        for (var event : events) {</a>
+<span class="sourceLineNo">486</span><a id="line.486">                            if (! event.status().equals(REJECTED)) {</a>
+<span class="sourceLineNo">487</span><a id="line.487">                                if (event.exception() != null) {</a>
+<span class="sourceLineNo">488</span><a id="line.488">                                    errored |= true;</a>
+<span class="sourceLineNo">489</span><a id="line.489"></a>
+<span class="sourceLineNo">490</span><a id="line.490">                                    event.exception().printStackTrace(err);</a>
+<span class="sourceLineNo">491</span><a id="line.491">                                }</a>
+<span class="sourceLineNo">492</span><a id="line.492">                            } else {</a>
+<span class="sourceLineNo">493</span><a id="line.493">                                errored |= true;</a>
+<span class="sourceLineNo">494</span><a id="line.494"></a>
+<span class="sourceLineNo">495</span><a id="line.495">                                err.format("%s %s\n%s\n",</a>
+<span class="sourceLineNo">496</span><a id="line.496">                                           event.status(),</a>
+<span class="sourceLineNo">497</span><a id="line.497">                                           event.snippet().kind(),</a>
+<span class="sourceLineNo">498</span><a id="line.498">                                           event.snippet().source());</a>
+<span class="sourceLineNo">499</span><a id="line.499">                                jshell.diagnostics(event.snippet())</a>
+<span class="sourceLineNo">500</span><a id="line.500">                                    .map(t -&gt; t.getMessage(locale))</a>
+<span class="sourceLineNo">501</span><a id="line.501">                                    .forEach(err::println);</a>
+<span class="sourceLineNo">502</span><a id="line.502">                            }</a>
+<span class="sourceLineNo">503</span><a id="line.503">                        }</a>
+<span class="sourceLineNo">504</span><a id="line.504"></a>
+<span class="sourceLineNo">505</span><a id="line.505">                        if (! iterator.hasNext()) {</a>
+<span class="sourceLineNo">506</span><a id="line.506">                            if (! events.isEmpty()) {</a>
+<span class="sourceLineNo">507</span><a id="line.507">                                var event = events.get(events.size() - 1);</a>
+<span class="sourceLineNo">508</span><a id="line.508"></a>
+<span class="sourceLineNo">509</span><a id="line.509">                                switch (event.snippet().subKind()) {</a>
+<span class="sourceLineNo">510</span><a id="line.510">                                case TEMP_VAR_EXPRESSION_SUBKIND:</a>
+<span class="sourceLineNo">511</span><a id="line.511">                                case VAR_VALUE_SUBKIND:</a>
+<span class="sourceLineNo">512</span><a id="line.512">                                    kernel.print(Message.mime_bundle(unescape(event.value())));</a>
+<span class="sourceLineNo">513</span><a id="line.513">                                    break;</a>
+<span class="sourceLineNo">514</span><a id="line.514"></a>
+<span class="sourceLineNo">515</span><a id="line.515">                                default:</a>
+<span class="sourceLineNo">516</span><a id="line.516">                                    break;</a>
+<span class="sourceLineNo">517</span><a id="line.517">                                }</a>
+<span class="sourceLineNo">518</span><a id="line.518">                            }</a>
+<span class="sourceLineNo">519</span><a id="line.519">                        }</a>
+<span class="sourceLineNo">520</span><a id="line.520">                        break;</a>
+<span class="sourceLineNo">521</span><a id="line.521"></a>
+<span class="sourceLineNo">522</span><a id="line.522">                    default:</a>
+<span class="sourceLineNo">523</span><a id="line.523">                        throw new IllegalStateException(String.valueOf(info.completeness()));</a>
+<span class="sourceLineNo">524</span><a id="line.524">                        /* break; */</a>
+<span class="sourceLineNo">525</span><a id="line.525">                    }</a>
+<span class="sourceLineNo">526</span><a id="line.526"></a>
+<span class="sourceLineNo">527</span><a id="line.527">                    if (errored) {</a>
+<span class="sourceLineNo">528</span><a id="line.528">                        break;</a>
+<span class="sourceLineNo">529</span><a id="line.529">                    }</a>
+<span class="sourceLineNo">530</span><a id="line.530">                }</a>
+<span class="sourceLineNo">531</span><a id="line.531">            } catch (IncompleteParseException exception) {</a>
+<span class="sourceLineNo">532</span><a id="line.532">                err.format("Incomplete input:\n%s\n",</a>
+<span class="sourceLineNo">533</span><a id="line.533">                           code.substring(exception.getErrorOffset()));</a>
+<span class="sourceLineNo">534</span><a id="line.534">            } catch (UnknownParseException exception) {</a>
+<span class="sourceLineNo">535</span><a id="line.535">                err.format("Unknown input:\n%s\n",</a>
+<span class="sourceLineNo">536</span><a id="line.536">                           code.substring(exception.getErrorOffset()));</a>
+<span class="sourceLineNo">537</span><a id="line.537">            } catch (Exception exception) {</a>
+<span class="sourceLineNo">538</span><a id="line.538">                exception.printStackTrace(err);</a>
+<span class="sourceLineNo">539</span><a id="line.539">            } finally {</a>
+<span class="sourceLineNo">540</span><a id="line.540">                out.flush();</a>
+<span class="sourceLineNo">541</span><a id="line.541">                err.flush();</a>
+<span class="sourceLineNo">542</span><a id="line.542">            }</a>
+<span class="sourceLineNo">543</span><a id="line.543">        }</a>
+<span class="sourceLineNo">544</span><a id="line.544">    }</a>
+<span class="sourceLineNo">545</span><a id="line.545"></a>
+<span class="sourceLineNo">546</span><a id="line.546">    private class IncompleteParseException extends ParseException {</a>
+<span class="sourceLineNo">547</span><a id="line.547">        private static final long serialVersionUID = 1L;</a>
+<span class="sourceLineNo">548</span><a id="line.548"></a>
+<span class="sourceLineNo">549</span><a id="line.549">        public IncompleteParseException(int offset) {</a>
+<span class="sourceLineNo">550</span><a id="line.550">            super("Incomplete input", offset);</a>
+<span class="sourceLineNo">551</span><a id="line.551">        }</a>
+<span class="sourceLineNo">552</span><a id="line.552">    }</a>
+<span class="sourceLineNo">553</span><a id="line.553"></a>
+<span class="sourceLineNo">554</span><a id="line.554">    private class UnknownParseException extends ParseException {</a>
+<span class="sourceLineNo">555</span><a id="line.555">        private static final long serialVersionUID = 2L;</a>
+<span class="sourceLineNo">556</span><a id="line.556"></a>
+<span class="sourceLineNo">557</span><a id="line.557">        public UnknownParseException(int offset) {</a>
+<span class="sourceLineNo">558</span><a id="line.558">            super("Unknown input", offset);</a>
+<span class="sourceLineNo">559</span><a id="line.559">        }</a>
+<span class="sourceLineNo">560</span><a id="line.560">    }</a>
+<span class="sourceLineNo">561</span><a id="line.561">}</a>
 
 
 

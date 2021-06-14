@@ -37,65 +37,68 @@
 <span class="sourceLineNo">028</span><a id="line.28">import lombok.extern.log4j.Log4j2;</a>
 <span class="sourceLineNo">029</span><a id="line.29">import org.thymeleaf.TemplateEngine;</a>
 <span class="sourceLineNo">030</span><a id="line.30">import org.thymeleaf.context.Context;</a>
-<span class="sourceLineNo">031</span><a id="line.31">import org.thymeleaf.templatemode.TemplateMode;</a>
-<span class="sourceLineNo">032</span><a id="line.32">import org.thymeleaf.templateresolver.StringTemplateResolver;</a>
-<span class="sourceLineNo">033</span><a id="line.33">import picocli.CommandLine.Command;</a>
-<span class="sourceLineNo">034</span><a id="line.34">import picocli.CommandLine.ParameterException;</a>
-<span class="sourceLineNo">035</span><a id="line.35">import picocli.CommandLine.Parameters;</a>
-<span class="sourceLineNo">036</span><a id="line.36"></a>
-<span class="sourceLineNo">037</span><a id="line.37">import static javax.script.ScriptContext.ENGINE_SCOPE;</a>
-<span class="sourceLineNo">038</span><a id="line.38">import static lombok.AccessLevel.PROTECTED;</a>
-<span class="sourceLineNo">039</span><a id="line.39"></a>
-<span class="sourceLineNo">040</span><a id="line.40">/**</a>
-<span class="sourceLineNo">041</span><a id="line.41"> * Thymeleaf {@link javax.script.ScriptEngine}.</a>
-<span class="sourceLineNo">042</span><a id="line.42"> *</a>
-<span class="sourceLineNo">043</span><a id="line.43"> * {@bean.info}</a>
-<span class="sourceLineNo">044</span><a id="line.44"> *</a>
-<span class="sourceLineNo">045</span><a id="line.45"> * @see TemplateEngine</a>
-<span class="sourceLineNo">046</span><a id="line.46"> * @see StringTemplateResolver</a>
-<span class="sourceLineNo">047</span><a id="line.47"> *</a>
-<span class="sourceLineNo">048</span><a id="line.48"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
-<span class="sourceLineNo">049</span><a id="line.49"> */</a>
-<span class="sourceLineNo">050</span><a id="line.50">@RequiredArgsConstructor(access = PROTECTED) @Getter @ToString @Log4j2</a>
-<span class="sourceLineNo">051</span><a id="line.51">public class ThymeleafScriptEngine extends AbstractScriptEngine {</a>
-<span class="sourceLineNo">052</span><a id="line.52">    private final ThymeleafScriptEngineFactory factory;</a>
-<span class="sourceLineNo">053</span><a id="line.53">    private final StringTemplateResolver resolver = new StringTemplateResolver();</a>
-<span class="sourceLineNo">054</span><a id="line.54"></a>
-<span class="sourceLineNo">055</span><a id="line.55">    @Override</a>
-<span class="sourceLineNo">056</span><a id="line.56">    public String eval(String script, ScriptContext context) throws ScriptException {</a>
-<span class="sourceLineNo">057</span><a id="line.57">        var out = "";</a>
-<span class="sourceLineNo">058</span><a id="line.58"></a>
-<span class="sourceLineNo">059</span><a id="line.59">        try {</a>
-<span class="sourceLineNo">060</span><a id="line.60">            var arguments = new Arguments();</a>
-<span class="sourceLineNo">061</span><a id="line.61">            var result = parse(context, arguments);</a>
-<span class="sourceLineNo">062</span><a id="line.62"></a>
-<span class="sourceLineNo">063</span><a id="line.63">            resolver.setTemplateMode(arguments.getMode());</a>
+<span class="sourceLineNo">031</span><a id="line.31">import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;</a>
+<span class="sourceLineNo">032</span><a id="line.32">import org.thymeleaf.templatemode.TemplateMode;</a>
+<span class="sourceLineNo">033</span><a id="line.33">import org.thymeleaf.templateresolver.StringTemplateResolver;</a>
+<span class="sourceLineNo">034</span><a id="line.34">import picocli.CommandLine.Command;</a>
+<span class="sourceLineNo">035</span><a id="line.35">import picocli.CommandLine.ParameterException;</a>
+<span class="sourceLineNo">036</span><a id="line.36">import picocli.CommandLine.Parameters;</a>
+<span class="sourceLineNo">037</span><a id="line.37"></a>
+<span class="sourceLineNo">038</span><a id="line.38">import static javax.script.ScriptContext.ENGINE_SCOPE;</a>
+<span class="sourceLineNo">039</span><a id="line.39">import static lombok.AccessLevel.PROTECTED;</a>
+<span class="sourceLineNo">040</span><a id="line.40"></a>
+<span class="sourceLineNo">041</span><a id="line.41">/**</a>
+<span class="sourceLineNo">042</span><a id="line.42"> * Thymeleaf {@link javax.script.ScriptEngine}.</a>
+<span class="sourceLineNo">043</span><a id="line.43"> *</a>
+<span class="sourceLineNo">044</span><a id="line.44"> * {@bean.info}</a>
+<span class="sourceLineNo">045</span><a id="line.45"> *</a>
+<span class="sourceLineNo">046</span><a id="line.46"> * @see TemplateEngine</a>
+<span class="sourceLineNo">047</span><a id="line.47"> * @see StringTemplateResolver</a>
+<span class="sourceLineNo">048</span><a id="line.48"> * @see Java8TimeDialect</a>
+<span class="sourceLineNo">049</span><a id="line.49"> *</a>
+<span class="sourceLineNo">050</span><a id="line.50"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
+<span class="sourceLineNo">051</span><a id="line.51"> */</a>
+<span class="sourceLineNo">052</span><a id="line.52">@RequiredArgsConstructor(access = PROTECTED) @Getter @ToString @Log4j2</a>
+<span class="sourceLineNo">053</span><a id="line.53">public class ThymeleafScriptEngine extends AbstractScriptEngine {</a>
+<span class="sourceLineNo">054</span><a id="line.54">    private final ThymeleafScriptEngineFactory factory;</a>
+<span class="sourceLineNo">055</span><a id="line.55">    private final StringTemplateResolver resolver = new StringTemplateResolver();</a>
+<span class="sourceLineNo">056</span><a id="line.56"></a>
+<span class="sourceLineNo">057</span><a id="line.57">    @Override</a>
+<span class="sourceLineNo">058</span><a id="line.58">    public String eval(String script, ScriptContext context) throws ScriptException {</a>
+<span class="sourceLineNo">059</span><a id="line.59">        var out = "";</a>
+<span class="sourceLineNo">060</span><a id="line.60"></a>
+<span class="sourceLineNo">061</span><a id="line.61">        try {</a>
+<span class="sourceLineNo">062</span><a id="line.62">            var arguments = new Arguments();</a>
+<span class="sourceLineNo">063</span><a id="line.63">            var result = parse(context, arguments);</a>
 <span class="sourceLineNo">064</span><a id="line.64"></a>
-<span class="sourceLineNo">065</span><a id="line.65">            var engine = new TemplateEngine();</a>
+<span class="sourceLineNo">065</span><a id="line.65">            resolver.setTemplateMode(arguments.getMode());</a>
 <span class="sourceLineNo">066</span><a id="line.66"></a>
-<span class="sourceLineNo">067</span><a id="line.67">            engine.setTemplateResolver(resolver);</a>
+<span class="sourceLineNo">067</span><a id="line.67">            var engine = new TemplateEngine();</a>
 <span class="sourceLineNo">068</span><a id="line.68"></a>
-<span class="sourceLineNo">069</span><a id="line.69">            var bindings = context.getBindings(ENGINE_SCOPE);</a>
-<span class="sourceLineNo">070</span><a id="line.70"></a>
-<span class="sourceLineNo">071</span><a id="line.71">            out = engine.process(script, new Context(null, bindings));</a>
-<span class="sourceLineNo">072</span><a id="line.72">        } catch (ParameterException exception) {</a>
-<span class="sourceLineNo">073</span><a id="line.73">            System.err.println(exception.getMessage());</a>
-<span class="sourceLineNo">074</span><a id="line.74">            System.err.println();</a>
-<span class="sourceLineNo">075</span><a id="line.75">            exception.getCommandLine().usage(System.err);</a>
-<span class="sourceLineNo">076</span><a id="line.76">        } catch (Exception exception) {</a>
-<span class="sourceLineNo">077</span><a id="line.77">            exception.printStackTrace(System.err);</a>
-<span class="sourceLineNo">078</span><a id="line.78">        }</a>
-<span class="sourceLineNo">079</span><a id="line.79"></a>
-<span class="sourceLineNo">080</span><a id="line.80">        return out;</a>
-<span class="sourceLineNo">081</span><a id="line.81">    }</a>
+<span class="sourceLineNo">069</span><a id="line.69">            engine.setTemplateResolver(resolver);</a>
+<span class="sourceLineNo">070</span><a id="line.70">            engine.addDialect(new Java8TimeDialect());</a>
+<span class="sourceLineNo">071</span><a id="line.71"></a>
+<span class="sourceLineNo">072</span><a id="line.72">            var bindings = context.getBindings(ENGINE_SCOPE);</a>
+<span class="sourceLineNo">073</span><a id="line.73"></a>
+<span class="sourceLineNo">074</span><a id="line.74">            out = engine.process(script, new Context(null, bindings));</a>
+<span class="sourceLineNo">075</span><a id="line.75">        } catch (ParameterException exception) {</a>
+<span class="sourceLineNo">076</span><a id="line.76">            System.err.println(exception.getMessage());</a>
+<span class="sourceLineNo">077</span><a id="line.77">            System.err.println();</a>
+<span class="sourceLineNo">078</span><a id="line.78">            exception.getCommandLine().usage(System.err);</a>
+<span class="sourceLineNo">079</span><a id="line.79">        } catch (Exception exception) {</a>
+<span class="sourceLineNo">080</span><a id="line.80">            exception.printStackTrace(System.err);</a>
+<span class="sourceLineNo">081</span><a id="line.81">        }</a>
 <span class="sourceLineNo">082</span><a id="line.82"></a>
-<span class="sourceLineNo">083</span><a id="line.83">    @Command @Data</a>
-<span class="sourceLineNo">084</span><a id="line.84">    private class Arguments {</a>
-<span class="sourceLineNo">085</span><a id="line.85">        @Parameters(index = "0", arity = "0..1", defaultValue = "HTML",</a>
-<span class="sourceLineNo">086</span><a id="line.86">                    description = { "One of: ${COMPLETION-CANDIDATES} (default: ${DEFAULT-VALUE})" })</a>
-<span class="sourceLineNo">087</span><a id="line.87">        private TemplateMode mode = StringTemplateResolver.DEFAULT_TEMPLATE_MODE;</a>
-<span class="sourceLineNo">088</span><a id="line.88">    }</a>
-<span class="sourceLineNo">089</span><a id="line.89">}</a>
+<span class="sourceLineNo">083</span><a id="line.83">        return out;</a>
+<span class="sourceLineNo">084</span><a id="line.84">    }</a>
+<span class="sourceLineNo">085</span><a id="line.85"></a>
+<span class="sourceLineNo">086</span><a id="line.86">    @Command @Data</a>
+<span class="sourceLineNo">087</span><a id="line.87">    private class Arguments {</a>
+<span class="sourceLineNo">088</span><a id="line.88">        @Parameters(index = "0", arity = "0..1", defaultValue = "HTML",</a>
+<span class="sourceLineNo">089</span><a id="line.89">                    description = { "One of: ${COMPLETION-CANDIDATES} (default: ${DEFAULT-VALUE})" })</a>
+<span class="sourceLineNo">090</span><a id="line.90">        private TemplateMode mode = StringTemplateResolver.DEFAULT_TEMPLATE_MODE;</a>
+<span class="sourceLineNo">091</span><a id="line.91">    }</a>
+<span class="sourceLineNo">092</span><a id="line.92">}</a>
 
 
 
