@@ -153,7 +153,7 @@ plot objects include:
 
 * [XChart]
 
-The [sine.ipynb] notebook demonstrates rendering of an [XChart].
+The [trig.ipynb] notebook demonstrates rendering of an [XChart].
 
 
 ### Magics
@@ -249,7 +249,7 @@ The `classpath` magic adds JAR and directory paths to the [JShell]
 classpath.  The `pom` magic resolves and downloads [Maven][Apache Maven]
 artifacts and then adds those artifacts to the classpath.
 
-The [sine.ipynb] notebook demonstrates the use of the `pom` magic to resolve
+The [trig.ipynb] notebook demonstrates the use of the `pom` magic to resolve
 the `org.knowm.xchart:xchart:3.8.0` artifact and its transient dependencies.
 
 ```yaml
@@ -598,4 +598,4 @@ Ibid.
 [NotebookFunction]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookFunction.html
 
 
-[sine.ipynb]: https://github.com/allen-ball/ganymede-notebooks/blob/trunk/sine.ipynb
+[trig.ipynb]: https://github.com/allen-ball/ganymede-notebooks/blob/trunk/trig.ipynb
