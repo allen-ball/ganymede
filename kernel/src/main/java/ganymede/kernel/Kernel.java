@@ -91,8 +91,8 @@ public class Kernel extends Server implements ApplicationContextAware,
     @Value("${spark-home:#{null}}")
     private String spark_home = null;
 
-    @Value("${project.version}")
-    private String project_version = null;
+    @Value("${kernel.version}")
+    private String kernel_version = null;
 
     private final Shell shell = new Shell(this);
     private ApplicationContext context = null;
@@ -231,7 +231,7 @@ public class Kernel extends Server implements ApplicationContextAware,
 
         content.put("protocol_version", PROTOCOL_VERSION.toString());
         content.put("implementation", "ganymede");
-        content.put("implementation_version", project_version);
+        content.put("implementation_version", kernel_version);
 
         var language_info = content.with("language_info");
 
