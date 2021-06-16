@@ -76,33 +76,38 @@ $ ${JAVA_HOME}/bin/java \
       --id-suffix=spark-3.1.2 --display-name-suffix="with Spark 3.1.2" \
       --env=SPARK_HOME=/path/to/spark-3.1.2-bin-hadoop3.2
 $ jupyter kernelspec list
-Loading .env environment variables...
 Available kernels:
 ...
-  ganymede-1.2.0-snapshot-java-11-spark-3.1.2    /.../share/jupyter/kernels/ganymede-1.2.0-snapshot-java-11-spark-3.1.2
+  ganymede-1.2.0-java-11-spark-3.1.2             /.../share/jupyter/kernels/ganymede-1.2.0-java-11-spark-3.1.2
 ...
 ```
 
 would result in the configured
-`${jupyter.data}/kernels/ganymede-1.2.0-snapshot-java-11-spark-3.1.2/kernel.json`
+`${jupyter.data}/kernels/ganymede-1.2.0-java-11-spark-3.1.2/kernel.json`
 kernelspec:
 
 ```json
 {
-  "argv" : [
-    "/Library/Java/JavaVirtualMachines/graalvm-ce-java11-21.0.0/Contents/Home/bin/java",
-    "-Dmaven.repo.local=/Users/jdoe/Notebooks/.venv/share/jupyter/repository",
-    "-jar",
-    "/Users/jdoe/.m2/repository/ganymede/ganymede-kernel/1.1.0.20210614/ganymede-kernel-1.1.0.20210614.jar",
-    "--runtime-dir=/Users/jdoe/Library/Jupyter/runtime",
-    "--connection-file={connection_file}"
-  ],
-  "display_name" : "Ganymede 1.1.0.20210614 (Java 11) with Spark 3.1.2",
-  "env" : {
-    "SPARK_HOME" : "/path/to/spark-3.1.2-bin-hadoop3.2"
-  },
-  "interrupt_mode" : "message",
-  "language" : "java"
+    "argv" :
+    [
+        "/Library/Java/JavaVirtualMachines/adoptopenjdk-11.jdk/Contents/Home/bin/java",
+        "--add-opens",
+        "java.base/jdk.internal.misc=ALL-UNNAMED",
+        "--illegal-access=permit",
+        "-Djava.awt.headless=true",
+        "-Djdk.disableLastUsageTracking=true",
+        "-Dmaven.repo.local=/Users/jdoe/Notebooks/.venv/share/jupyter/repository",
+        "-jar",
+        "/Users/jdoe/.m2/repository/ganymede/ganymede-kernel/1.2.0-SNAPSHOT/ganymede-kernel-1.2.0-SNAPSHOT.jar",
+        "--runtime-dir=/Users/jdoe/Library/Jupyter/runtime",
+        "--connection-file={connection_file}"
+    ],
+    "display_name" : "Ganymede 1.2.0 (Java 11) with Spark 3.1.2",
+    "env" : {
+        "SPARK_HOME" : "/path/to/spark-3.1.2-bin-hadoop3.2"
+    },
+    "interrupt_mode" : "message",
+    "language" : "java"
 }
 ```
 
