@@ -52,22 +52,14 @@ import static org.springframework.util.FileSystemUtils.deleteRecursively;
 @SpringBootApplication
 @NoArgsConstructor @ToString @Log4j2
 public class Install implements ApplicationRunner {
-    @Value("${id-prefix:}")
-    private String id_prefix = null;
-    @Value("${id:ganymede-${project.version}-java-${java.specification.version}}")
-    private String id = null;
-    @Value("${id-suffix:}")
-    private String id_suffix = null;
-    @Value("${display-name-prefix:}")
-    private String display_name_prefix = null;
-    @Value("${display-name:Ganymede ${project.version} (Java ${java.specification.version})}")
-    private String display_name = null;
-    @Value("${display-name-suffix:}")
-    private String display_name_suffix = null;
-    @Value("${env:}")
-    private List<String> envvars = null;
-    @Value("${copy-jar:true}")
-    private boolean copy_jar = true;
+    @Value("${id-prefix}")              private String id_prefix = null;
+    @Value("${id}")                     private String id = null;
+    @Value("${id-suffix}")              private String id_suffix = null;
+    @Value("${display-name-prefix}")    private String display_name_prefix = null;
+    @Value("${display-name}")           private String display_name = null;
+    @Value("${display-name-suffix}")    private String display_name_suffix = null;
+    @Value("${env:}")                   private List<String> envvars = null;
+    @Value("${copy-jar:true}")          private boolean copy_jar = true;
 
     @Override
     public void run(ApplicationArguments arguments) throws Exception {
