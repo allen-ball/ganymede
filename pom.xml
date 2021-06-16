@@ -32,7 +32,7 @@
   <parent>
     <groupId>ball</groupId>
     <artifactId>parent</artifactId>
-    <version>20210611.0</version>
+    <version>20210616-SNAPSHOT</version>
     <relativePath/>
   </parent>
   <organization>
@@ -96,8 +96,6 @@
     <scala.version>${scala.binary.version}.10</scala.version>
     <spark.version>3.1.2</spark.version>
     <tablesaw.version>0.38.2</tablesaw.version>
-
-    <maven-dependency-plugin.version>3.2.0</maven-dependency-plugin.version>
 
     <ball-api.version>${ball-parent.version}</ball-api.version>
     <javadoc-offline-locations>${settings.localRepository}/javadoc-offline-locations</javadoc-offline-locations>
