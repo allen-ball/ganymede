@@ -159,8 +159,11 @@ public class Install implements ApplicationRunner {
                 jar = Paths.get(prefix, "kernels", id, name).toString();
             }
 
-            Stream.of(Stream.of(java, "--illegal-access=permit",
-                                "--add-opens", "java.base/jdk.internal.misc=ALL-UNNAMED"),
+            Stream.of(Stream.of(java,
+                                "--add-opens", "java.base/jdk.internal.misc=ALL-UNNAMED",
+                                "--illegal-access=permit",
+                                "-Djava.awt.headless=true",
+                                "-Djdk.disableLastUsageTracking=true"),
                       sysProperties.entrySet().stream().map(t -> "-D" + t),
                       Stream.of("-jar", jar,
                                 "--runtime-dir=" + runtime_dir,
