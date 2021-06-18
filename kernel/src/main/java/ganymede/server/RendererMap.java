@@ -21,6 +21,7 @@ package ganymede.server;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.server.renderer.ForClass;
 import ganymede.server.renderer.ForClassName;
+import ganymede.server.renderer.RequiredClassNames;
 import ganymede.util.ServiceProviderMap;
 import java.util.Comparator;
 import java.util.Optional;
@@ -82,6 +83,7 @@ public class RendererMap extends TreeMap<Class<?>,Renderer> {
             getRenderType(provider);
         } catch (Exception exception) {
             accept = false;
+exception.printStackTrace(System.err);
         }
 
         return accept;
@@ -89,6 +91,16 @@ public class RendererMap extends TreeMap<Class<?>,Renderer> {
 
     private Class<?> getRenderType(Class<?> provider) throws Exception {
         Class<?> type = null;
+
+        if (provider.isAnnotationPresent(RequiredClassNames.class)) {
+            var names = provider.getAnnotation(RequiredClassNames.class).value();
+
+            if (names != null) {
+                for (var name : names) {
+                    Class.forName(name, false, map.getClassLoader());
+                }
+            }
+        }
 
         if (provider.isAnnotationPresent(ForClassName.class)) {
             var name = provider.getAnnotation(ForClassName.class).value();
