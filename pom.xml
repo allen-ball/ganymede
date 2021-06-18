@@ -83,6 +83,16 @@
       <url>https://repo.hcf.dev/maven/release/</url>
     </pluginRepository>
   </pluginRepositories>
+  <profiles>
+    <profile>
+      <id>jdk9-and-later</id>
+      <activation><jdk>[9,)</jdk></activation>
+      <properties>
+        <!-- https://github.com/spring-projects/spring-boot/issues/26847 -->
+        <!-- <jetty.version>10.0.5</jetty.version> -->
+      </properties>
+    </profile>
+  </profiles>
   <properties>
     <license.skipUpdateProjectLicense>true</license.skipUpdateProjectLicense>
     <jse.target>11</jse.target>
