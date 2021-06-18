@@ -340,6 +340,8 @@
               <link>${jeromq.apidocs}jeromq/latest/</link>
               <!-- JFreeChart -->
               <link>https://www.jfree.org/jfreechart/api/javadoc/</link>
+              <!-- picocli -->
+              <link>https://picocli.info/apidocs/</link>
               <!-- Spring -->
               <link>https://docs.spring.io/spring/docs/${spring-framework.version}/javadoc-api/</link>
               <link>https://docs.spring.io/spring-boot/docs/${spring-boot.version}/api/</link>

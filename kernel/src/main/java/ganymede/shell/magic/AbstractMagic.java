@@ -23,8 +23,11 @@ import ganymede.server.Message;
 import ganymede.shell.Shell;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
 import org.springframework.util.PropertyPlaceholderHelper;
+import picocli.CommandLine;
+import picocli.CommandLine.ParseResult;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -58,4 +61,37 @@ public abstract class AbstractMagic implements AnnotatedMagic {
 
     @Override
     public void configure(NotebookContext context) { this.context = context; }
+
+    /**
+     * Method to parse {@code argv} value to an annotated command
+     * {@link Object}.
+     *
+     * @param   argv            The argument vector (array of
+     *                          {@link String}s).
+     * @param   command         The annotated command {@link Object}.
+     *
+     * @return  The {@link ParseResult}.
+     *
+     * @see CommandLine
+     * @see CommandLine.Command
+     * @see CommandLine.Option
+     * @see CommandLine.Parameters
+     */
+    protected <T> ParseResult parse(String[] argv, T command) {
+        var name = (String) null;
+
+        if (argv.length > 0) {
+            name = argv[0];
+            argv = Stream.of(argv).skip(1).toArray(String[]::new);
+        }
+
+        var line =
+            new CommandLine(command)
+            .setCommandName(name)
+            .setCaseInsensitiveEnumValuesAllowed(true)
+            .setUnmatchedArgumentsAllowed(false);
+        var result = line.parseArgs(argv);
+
+        return result;
+    }
 }

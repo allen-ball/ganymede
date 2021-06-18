@@ -83,7 +83,6 @@ public class RendererMap extends TreeMap<Class<?>,Renderer> {
             getRenderType(provider);
         } catch (Exception exception) {
             accept = false;
-exception.printStackTrace(System.err);
         }
 
         return accept;

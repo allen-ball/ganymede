@@ -24,7 +24,6 @@ import ganymede.shell.Magic;
 import ganymede.shell.Shell;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;

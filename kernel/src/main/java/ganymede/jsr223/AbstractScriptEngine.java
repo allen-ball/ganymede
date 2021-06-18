@@ -74,9 +74,11 @@ public abstract class AbstractScriptEngine extends javax.script.AbstractScriptEn
         var line =
             new CommandLine(command)
             .setCommandName(name)
-            .setCaseInsensitiveEnumValuesAllowed(true);
+            .setCaseInsensitiveEnumValuesAllowed(true)
+            .setUnmatchedArgumentsAllowed(false);
+        var result = line.parseArgs(argv);
 
-        return line.parseArgs(argv);
+        return result;
     }
 
     @Override

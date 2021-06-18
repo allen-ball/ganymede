@@ -85,8 +85,8 @@ public class ThymeleafScriptEngine extends AbstractScriptEngine {
 
     @Command @Data
     private class Arguments {
-        @Parameters(index = "0", arity = "0..1", defaultValue = "HTML",
-                    description = { "One of: ${COMPLETION-CANDIDATES} (default: ${DEFAULT-VALUE})" })
+        @Parameters(description = { "One of: ${COMPLETION-CANDIDATES} (default: ${DEFAULT-VALUE})" },
+                    index = "0", arity = "0..1", defaultValue = "HTML")
         private TemplateMode mode = StringTemplateResolver.DEFAULT_TEMPLATE_MODE;
     }
 }
