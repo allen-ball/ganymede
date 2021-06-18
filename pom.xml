@@ -320,20 +320,6 @@
               <link>https://commons.apache.org/proper/commons-lang/apidocs/</link>
               <!-- Apache FreeMarker -->
               <link>https://freemarker.apache.org/docs/api/</link>
-              <!-- Apache Maven -->
-              <link>https://maven.apache.org/ref/${maven.version}/apidocs/</link>
-              <link>https://maven.apache.org/ref/${maven.version}/maven-plugin-api/apidocs/</link>
-              <link>https://maven.apache.org/plugin-tools/maven-plugin-annotations/apidocs/</link>
-              <link>https://maven.apache.org/shared/maven-artifact-transfer/apidocs/</link>
-              <link>https://maven.apache.org/wagon/wagon-provider-api/apidocs/</link>
-              <link>https://maven.apache.org/components/wagon/wagon-providers/wagon-file/apidocs/</link>
-              <link>https://maven.apache.org/components/wagon/wagon-providers/wagon-ftp/apidocs/</link>
-              <link>https://maven.apache.org/components/wagon/wagon-providers/wagon-http/apidocs/</link>
-              <link>https://maven.apache.org/components/wagon/wagon-providers/wagon-http-lightweight/apidocs/</link>
-              <link>https://maven.apache.org/components/wagon/wagon-providers/wagon-scm/apidocs/</link>
-              <link>https://maven.apache.org/components/wagon/wagon-providers/wagon-ssh/apidocs/</link>
-              <link>https://maven.apache.org/components/wagon/wagon-providers/wagon-ssh-external/apidocs/</link>
-              <link>https://maven.apache.org/components/wagon/wagon-providers/wagon-webdav-jackrabbit/apidocs/</link>
               <!-- Apache Spark -->
               <link>https://spark.apache.org/docs/latest/api/java/</link>
               <!-- Jackson -->
@@ -370,6 +356,11 @@
               <offlineLink>
                 <url>${javadoc.io}org.apache.httpcomponents/httpcore/latest/</url>
                 <location>${javadoc-offline-locations}/httpcore-javadoc-jar/</location>
+              </offlineLink>
+              <!-- Apache Maven Artifact Resolver -->
+              <offlineLink>
+                <url>${javadoc.io}org.apache.maven.resolver/maven-resolver-api/latest/</url>
+                <location>${javadoc-offline-locations}/maven-resolver-api-javadoc-jar/</location>
               </offlineLink>
               <!-- Apache Velocity -->
               <offlineLink>
