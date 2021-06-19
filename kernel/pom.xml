@@ -149,6 +149,14 @@
       <artifactId>freemarker</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.jooq</groupId>
+      <artifactId>jooq</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jooq</groupId>
+      <artifactId>jooq-meta</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
       <artifactId>kotlin-scripting-jsr223</artifactId>
       <version>${kotlin.version}</version>
@@ -194,7 +202,7 @@
       <groupId>org.zeromq</groupId>
       <artifactId>jeromq</artifactId>
     </dependency>
-    <!-- Required for compilation and users must add to classpath at runtime -->
+    <!-- Compilation-only: Not distributed in shaded JAR -->
     <dependency>
       <groupId>ball</groupId>
       <artifactId>ball-util</artifactId>
@@ -235,7 +243,18 @@
       <artifactId>tablesaw-jsplot</artifactId>
       <scope>provided</scope>
     </dependency>
-    <!-- Always excluded from shaded JAR -->
+    <!-- Runtime (Distributed in shaded JAR) -->
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Never distributed in shaded JAR -->
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>

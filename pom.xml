@@ -434,6 +434,11 @@
                 <url>${javadoc.io}com.github.jknack/handlebars/latest/</url>
                 <location>${javadoc-offline-locations}/handlebars-javadoc-jar/</location>
               </offlineLink>
+              <!-- jOOQ -->
+              <offlineLink>
+                <url>https://www.jooq.org/javadoc/latest/org.jooq/</url>
+                <location>${javadoc-offline-locations}/jooq-javadoc-jar/</location>
+              </offlineLink>
               <!-- Scala -->
 <!--
               <offlineLink>

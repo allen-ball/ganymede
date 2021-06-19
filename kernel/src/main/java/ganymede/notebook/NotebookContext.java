@@ -34,7 +34,9 @@ import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,6 +49,10 @@ import javax.script.SimpleScriptContext;
 import jdk.jshell.JShell;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.jooq.DSLContext;
+import org.jooq.Query;
+import org.jooq.Record;
+import org.jooq.Result;
 
 import static java.lang.reflect.Modifier.isPublic;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -113,6 +119,12 @@ public class NotebookContext {
      * {@link Map} of known bindings' {@link Class types}.
      */
     public final Map<String,String> types = new ConcurrentSkipListMap<>();
+
+    /**
+     * {@link ganymede.shell.magic.SQL}-specific context.
+     * See {@link NotebookContext.SQL SQL}.
+     */
+    public final SQL sql = new SQL();
 
     private final MagicMap magics = new MagicMap(t -> t.configure(this));
 
@@ -379,5 +391,30 @@ public class NotebookContext {
 
     private static String encode(String string) {
         return ENCODER.encodeToString(((string != null) ? string : "").getBytes(UTF_8));
+    }
+
+    /**
+     * {@link ganymede.shell.magic.SQL}-specific context.  Implements
+     * {@link Map} of JDBC URLs to {@link DSLContext}s.
+     */
+    @NoArgsConstructor
+    public class SQL extends LinkedHashMap<String,DSLContext> {
+        private static final long serialVersionUID = -4901551333824542142L;
+
+        /**
+         * {@link List} of most recent {@link ganymede.shell.magic.SQL}
+         * {@link Query Queries}.
+         *
+         * @serial
+         */
+        public final List<Query> queries = new ArrayList<>();
+
+        /**
+         * {@link List} of most recent {@link ganymede.shell.magic.SQL}
+         * {@link Result}s.
+         *
+         * @serial
+         */
+        public final List<Result<Record>> results = new ArrayList<>();
     }
 }

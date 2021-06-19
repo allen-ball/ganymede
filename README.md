@@ -8,7 +8,10 @@ Java code is compiled and interpreted with the Java Shell tool, [JShell].
 This kernel offers the following additional features:
 
 * Integrated Project Object Model (POM) for [Apache Maven] artifact
-    dependency resolution<sup id="ref1">[1](#endnote1)</sup>
+  dependency resolution<sup id="ref1">[1](#endnote1)</sup>
+
+* Integrated support for [Structured Query Language] (SQL) through [JDBC]
+  and [jOOQ]
 
 * Integrated support for [JSR 223] scripting languages including:
 
@@ -228,6 +231,9 @@ cell magic is `java`.
         <td>sh</td><td>Execute script with &#39;sh&#39; command</td>
       </tr>
       <tr>
+        <td>sql</td><td>Execute code in SQL REPL</td>
+      </tr>
+      <tr>
         <td>thymeleaf</td><td>Thymeleaf template evaluator</td>
       </tr>
       <tr>
@@ -330,6 +336,78 @@ dependencies and then resolves the dependencies from the `${SPARK_HOME}`
 hierarchy with the heuristics described above.
 
 
+### SQL
+
+The [SQL] [Magic] provides the client interface to database servers through
+[JDBC] and [jOOQ].  Its usage is as follows:
+
+```
+    Usage: sql [--[no-]print] [<url>] [<username>] [<password>]
+          [<url>]        JDBC Connection URL
+          [<username>]   JDBC Connection Username
+          [<password>]   JDBC Connection Password
+          --[no-]print   Print query results.  true by default
+```
+
+For example:
+
+```sql
+%%sql jdbc:mysql://127.0.0.1:33061/epg?serverTimezone=UTC
+SELECT * FROM schedules LIMIT 3;
+```
+
+<table><thead><tr><th>airDateTime</th><th>stationID</th><th>json</th><th>duration</th><th>md5</th><th>programID</th></tr></thead><tbody><tr><td>1533945600</td><td>10139</td><td>{
+  &quot;programID&quot; : &quot;EP009370080215&quot;,
+  &quot;airDateTime&quot; : &quot;2018-08-11T00:00:00Z&quot;,
+  &quot;duration&quot; : 3600,
+  &quot;md5&quot; : &quot;S1UDH1R60Eagc1E3V5Qslw&quot;,
+  &quot;audioProperties&quot; : [ &quot;cc&quot; ],
+  &quot;ratings&quot; : [ {
+    &quot;body&quot; : &quot;USA Parental Rating&quot;,
+    &quot;code&quot; : &quot;TVPG&quot;
+  } ]
+}</td><td>3600</td><td>S1UDH1R60Eagc1E3V5Qslw</td><td>EP009370080215</td></tr><tr><td>1533945600</td><td>10142</td><td>{
+  &quot;programID&quot; : &quot;EP006062993248&quot;,
+  &quot;airDateTime&quot; : &quot;2018-08-11T00:00:00Z&quot;,
+  &quot;duration&quot; : 3600,
+  &quot;md5&quot; : &quot;2FQ8y5PsXl1vtxcmUBeppg&quot;,
+  &quot;new&quot; : true,
+  &quot;audioProperties&quot; : [ &quot;cc&quot; ],
+  &quot;ratings&quot; : [ {
+    &quot;body&quot; : &quot;USA Parental Rating&quot;,
+    &quot;code&quot; : &quot;TVPG&quot;
+  } ]
+}</td><td>3600</td><td>2FQ8y5PsXl1vtxcmUBeppg</td><td>EP006062993248</td></tr><tr><td>1533945600</td><td>10145</td><td>{
+  &quot;programID&quot; : &quot;EP022439260394&quot;,
+  &quot;airDateTime&quot; : &quot;2018-08-11T00:00:00Z&quot;,
+  &quot;duration&quot; : 1800,
+  &quot;md5&quot; : &quot;mUewfiqM8+dh24WQg2WfpQ&quot;,
+  &quot;audioProperties&quot; : [ &quot;cc&quot; ]
+}</td><td>1800</td><td>mUewfiqM8+dh24WQg2WfpQ</td><td>EP022439260394</td></tr></tbody></table>
+
+The [SQL] [Magic] accepts the `--print`/`--no-print` options to print or
+suppress query results.  If no JDBC URL is specified, the most recently used
+connection will be used.  The [List] of most recent [jOOQ] [Queries][Query]
+are stored in [$$.sql.queries][NotebookContext.SQL.queries] with
+[$$.sql.results][NotebookContext.SQL.results] containing the corresponding
+[Result]s.  For example:
+
+```sql
+%%sql --no-print
+SELECT COUNT(*) FROM programs;
+```
+
+```java
+%%java
+print($$.sql.results.get(0));
+```
+
+<table>
+  <thead><tr><th>count(*)</th></tr></thead>
+  <tbody><tr><td>1024495</td></tr></tbody>
+</table>
+
+
 ### Other Laguages ([JSR 223])
 
 The [kernel][Ganymede Kernel] leverages the [java.scripting API] to provide
@@ -339,7 +417,7 @@ The [kernel][Ganymede Kernel] leverages the [java.scripting API] to provide
 
 ### Shells
 
-The `script` magic (with the alias `!`) maybe used to run an operating
+The `script` magic (with the alias `!`) may be used to run an operating
 system command with the remaining code in the cell fed to the [Process]'s
 standard input.  `bash`, `perl`, `ruby`, and `sh` are provided as aliases
 for `%%!bash`, `%%!perl`, etc., respectively.
@@ -560,11 +638,19 @@ Ibid.
 
 [Handlebars.java]: https://github.com/jknack/handlebars.java
 
+[Java API]: https://docs.oracle.com/en/java/javase/11/docs/api
+[JShell]: https://docs.oracle.com/en/java/javase/11/docs/api/jdk.jshell/jdk/jshell/JShell.html?is-external=true
+[List]: https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html?is-external=true
+
 [Javascript]: https://www.oracle.com/technical-resources/articles/java/jf14-nashorn.html
+
+[JDBC]: https://docs.oracle.com/javase/8/docs/technotes/guides/jdbc/
 
 [JFreeChart]: https://github.com/jfree/jfreechart
 
-[JShell]: https://docs.oracle.com/en/java/javase/11/docs/api/jdk.jshell/jdk/jshell/JShell.html?is-external=true
+[jOOQ]: https://www.jooq.org/doc/latest/manual
+[Query]: https://www.jooq.org/javadoc/latest/org.jooq/org/jooq/Query.html?is-external=true
+[Result]: https://www.jooq.org/javadoc/latest/org.jooq/org/jooq/Result.html?is-external=true
 
 [JSR 223]: https://jcp.org/en/jsr/detail?id=223
 [java.scripting API]: https://docs.oracle.com/en/java/javase/11/docs/api/java.scripting/module-summary.html
@@ -584,6 +670,8 @@ Ibid.
 
 [Scala]: https://www.scala-lang.org/
 
+[Structured Query Language]: https://en.wikipedia.org/wiki/SQL
+
 [Tablesaw]: https://github.com/jfree/jfreechart
 
 [Thymeleaf]: https://www.thymeleaf.org/index.html
@@ -599,8 +687,13 @@ Ibid.
 [Ganymede Kernel]: https://github.com/allen-ball/ganymede
 [Ganymede Kernel download]: https://github.com/allen-ball/ganymede/releases/download/v1.1.0.20210614/ganymede-kernel-1.1.0.20210614.jar
 [Ganymede API Javadoc]: https://allen-ball.github.io/ganymede/index.html?overview-summary.html
+[Magic]: https://allen-ball.github.io/ganymede/ganymede/shell/Magic.html
 [NotebookContext]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookContext.html
+[NotebookContext.SQL]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookContext.SQL.html
+[NotebookContext.SQL.queries]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookContext.SQL.html#queries
+[NotebookContext.SQL.results]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookContext.SQL.html#results
 [NotebookFunction]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookFunction.html
+[SQL]: https://allen-ball.github.io/ganymede/ganymede/shell/magic/SQL.html
 
 
 [trig.ipynb]: https://github.com/allen-ball/ganymede-notebooks/blob/trunk/trig.ipynb
