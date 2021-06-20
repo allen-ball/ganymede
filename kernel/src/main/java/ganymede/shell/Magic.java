@@ -22,15 +22,9 @@ import ganymede.notebook.NotebookContext;
 import ganymede.server.Message;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.io.StreamTokenizer;
-import java.io.StringReader;
-import java.util.LinkedList;
-import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import lombok.Data;
-
-import static java.io.StreamTokenizer.TT_EOF;
-import static java.io.StreamTokenizer.TT_EOL;
-import static java.io.StreamTokenizer.TT_WORD;
+import org.codehaus.plexus.util.cli.CommandLineUtils;
 
 /**
  * {@link Magic} service interface.
@@ -43,6 +37,11 @@ public interface Magic {
      * Cell {@link Magic} indicator.
      */
     public static final String CELL = "%%";
+
+    /**
+     * Special-case {@link Magic} name.
+     */
+    public static final String BANG = "!";
 
     /**
      * Method to get the names associated with {@link.this} {@link Magic}.
@@ -127,70 +126,35 @@ public interface Magic {
      *                          If the magic line can't be parsed.
      */
     public static String[] getCellMagicCommand(String code) {
-        var list = new LinkedList<String>();
+        var line0 = code.split("\\R", 2)[0];
+        var argv = new String[] { line0 };
 
-        try (var reader = new StringReader(code)) {
-            var tokenizer = new StreamTokenizer(reader);
+        try {
+            argv = CommandLineUtils.translateCommandline(argv[0]);
 
-            tokenizer.eolIsSignificant(true);
-            tokenizer.lowerCaseMode(false);
-            tokenizer.commentChar('#');
-            tokenizer.wordChars('0', '9');
+            if (argv[0].startsWith(CELL)) {
+                argv[0] = argv[0].substring(CELL.length()).trim();
 
-            for (int i = 0; i < CELL.length(); i += 1) {
-                tokenizer.nextToken();
-
-                if (tokenizer.ttype != CELL.charAt(i)) {
-                    throw new IllegalArgumentException();
+                if (argv[0].isBlank()) {
+                    argv = Stream.of(argv).skip(1).toArray(String[]::new);
                 }
-            }
 
-            tokenizer.nextToken();
-
-            switch (tokenizer.ttype) {
-            case TT_WORD:
-                list.add(tokenizer.sval);
-                break;
-
-            default:
-                list.add(Character.toString(tokenizer.ttype));
-                break;
-
-            case TT_EOF:
-            case TT_EOL:
+                if (argv[0].startsWith(BANG) && argv[0].length() > BANG.length()) {
+                    argv =
+                        Stream.concat(Stream.of(BANG, argv[0].substring(BANG.length())),
+                                      Stream.of(argv).skip(1))
+                        .toArray(String[]::new);
+                }
+            } else {
                 throw new IllegalArgumentException();
-                /* break; */
-            }
-
-            IntStream.range(0, 256)
-                .filter(t -> "\"\\#".indexOf(t) == -1)
-                .filter(t -> (! Character.isWhitespace(t)))
-                .forEach(t -> tokenizer.wordChars(t, t));
-
-            for (;;) {
-                tokenizer.nextToken();
-
-                if (tokenizer.ttype == TT_EOF || tokenizer.ttype == TT_EOL) {
-                    break;
-                }
-
-                switch (tokenizer.ttype) {
-                case TT_WORD:
-                    list.add(tokenizer.sval);
-                    break;
-
-                default:
-                    list.add(Character.toString(tokenizer.ttype));
-                    break;
-                }
             }
         } catch (IllegalStateException exception) {
             throw exception;
         } catch (Exception exception) {
-            throw new IllegalArgumentException(code.split("\\R", 2)[0]);
+            throw new IllegalArgumentException(line0);
         }
 
-        return list.toArray(new String[] { });
+        return argv;
     }
 
     /**

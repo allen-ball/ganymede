@@ -34,7 +34,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 @ServiceProviderFor({ Magic.class })
-@MagicNames({ "!", "script" })
+@MagicNames({ Magic.BANG, "script" })
 @Description("Execute script with the argument command")
 @NoArgsConstructor @ToString @Log4j2
 public class Script extends AbstractMagic {
