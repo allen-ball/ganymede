@@ -129,6 +129,13 @@ public class NotebookContext {
     private final MagicMap magics = new MagicMap(t -> t.configure(this));
 
     /**
+     * Provide access to the {@link NotebookContext} {@link MagicMap}.
+     *
+     * @return  The {@link MagicMap}.
+     */
+    public MagicMap magics() { return magics; }
+
+    /**
      * Method to receive a {@link ganymede.shell.Magic} request in the
      * {@link JShell} instance.  See
      * {@link magic(Shell,String,String,String)}.

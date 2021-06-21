@@ -33,11 +33,13 @@
   </style>
   <table border="1" class="magics">
     <thead>
-      <tr><th>Name(s)</th><th>Description</th></tr>
+      <tr><th>Name(s)</th><th>Description</th><!--/* <th>Usage</th> */--></tr>
     </thead>
     <tbody>
       <tr th:each="entry : ${magics.entrySet()}">
-        <td th:text="${entry.getKey()}"/><td th:text="${entry.getValue()}"/>
+        <td th:text="${entry.key}"/>
+        <td th:text="${entry.value.description}"/>
+        <!--/* <td><pre th:text="${entry.value.usage}"/></td> */-->
       </tr>
     </tbody>
   </table>

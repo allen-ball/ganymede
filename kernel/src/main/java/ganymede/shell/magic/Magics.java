@@ -19,13 +19,10 @@ package ganymede.shell.magic;
  * ##########################################################################
  */
 import ball.annotation.ServiceProviderFor;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import ganymede.kernel.KernelRestClient;
 import ganymede.server.Message;
 import ganymede.server.renderer.ThymeleafRenderer;
 import ganymede.shell.Magic;
-import ganymede.shell.Shell;
-import java.io.InputStream;
-import java.io.PrintStream;
 import java.util.Map;
 import java.util.TreeMap;
 import lombok.NoArgsConstructor;
@@ -44,25 +41,17 @@ import static java.util.stream.Collectors.toMap;
 @NoArgsConstructor @ToString @Log4j2
 public class Magics extends AbstractMagic {
     @Override
-    public void execute(Shell shell,
-                        InputStream in, PrintStream out, PrintStream err,
-                        String line0, String code) throws Exception {
-        var magics =
-            shell.magics().values().stream()
-            .distinct()
-            .collect(toMap(k -> String.join(", ", k.getMagicNames()),
-                           v -> v.getDescription(),
-                           (t, u) -> t, () -> new TreeMap<>()));
+    public void execute(String line0, String code) throws Exception {
         var resource = getClass().getSimpleName();
+        var magics =
+            context.magics().values().stream()
+            .distinct()
+            .collect(toMap(k -> String.join(", ", k.getMagicNames()), v -> v,
+                           (t, u) -> t, () -> new TreeMap<>()));
         var map = Map.<String,Object>of("magics", magics);
         var html = ThymeleafRenderer.process(getClass(), resource + ".html", "html", map);
         var text = ThymeleafRenderer.process(getClass(), resource + ".text", "text", map);
 
-        shell.kernel().print(Message.mime_bundle(html, text));
-    }
-
-    @Override
-    public void execute(String line0, String code) throws Exception {
-        throw new IllegalArgumentException(line0);
+        new KernelRestClient().print(Message.mime_bundle(html, text));
     }
 }

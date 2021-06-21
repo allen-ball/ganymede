@@ -16,5 +16,5 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   ##########################################################################
-  -]*/[# th:each="entry : ${magics.entrySet()}"][(${entry.key})]	[(${entry.value})]
+  -]*/[# th:each="entry : ${magics.entrySet()}"][(${entry.key})]	[(${entry.value.description})]
 [/]
