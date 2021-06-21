@@ -49,4 +49,12 @@ public interface AnnotatedMagic extends Magic {
 
         return value;
     }
+
+    @Override
+    default String getUsage() {
+        var annotation = getClass().getAnnotation(Usage.class);
+        var value = (annotation != null) ? annotation.value() : null;
+
+        return (value != null) ? String.join("\n", value) : null;
+    }
 }

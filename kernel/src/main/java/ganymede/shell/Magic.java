@@ -58,6 +58,13 @@ public interface Magic {
     public String getDescription();
 
     /**
+     * Method to get the usage of {@link.this} {@link Magic}.
+     *
+     * @return  The usage.
+     */
+    public String getUsage();
+
+    /**
      * {@link ganymede.shell.Shell} execution method.  Default
      * implementation sends to the {@link #execute(String,String)} method in
      * the {@link jdk.jshell.JShell} instance.
