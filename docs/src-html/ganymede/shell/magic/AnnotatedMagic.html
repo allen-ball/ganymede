@@ -58,7 +58,15 @@
 <span class="sourceLineNo">049</span><a id="line.49"></a>
 <span class="sourceLineNo">050</span><a id="line.50">        return value;</a>
 <span class="sourceLineNo">051</span><a id="line.51">    }</a>
-<span class="sourceLineNo">052</span><a id="line.52">}</a>
+<span class="sourceLineNo">052</span><a id="line.52"></a>
+<span class="sourceLineNo">053</span><a id="line.53">    @Override</a>
+<span class="sourceLineNo">054</span><a id="line.54">    default String getUsage() {</a>
+<span class="sourceLineNo">055</span><a id="line.55">        var annotation = getClass().getAnnotation(Usage.class);</a>
+<span class="sourceLineNo">056</span><a id="line.56">        var value = (annotation != null) ? annotation.value() : null;</a>
+<span class="sourceLineNo">057</span><a id="line.57"></a>
+<span class="sourceLineNo">058</span><a id="line.58">        return (value != null) ? String.join("\n", value) : null;</a>
+<span class="sourceLineNo">059</span><a id="line.59">    }</a>
+<span class="sourceLineNo">060</span><a id="line.60">}</a>
 
 
 
