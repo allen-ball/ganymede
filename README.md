@@ -407,6 +407,9 @@ print($$.sql.results.get(0));
   <tbody><tr><td>1024495</td></tr></tbody>
 </table>
 
+[MySQL][MySQL Connectors] and [PostgreSQL][PostgreSQL JDBC Driver] [JDBC]
+drivers are provided in the [Ganymede][Ganymede Kernel] runtime.
+
 
 ### Other Laguages ([JSR 223])
 
@@ -666,7 +669,11 @@ Ibid.
 [Markdown]: https://en.wikipedia.org/wiki/Markdown
 [CommonMark]: https://commonmark.org/
 
+[MySQL Connectors]: https://www.mysql.com/products/connector/
+
 [Plotly]: https://github.com/plotly
+
+[PostgreSQL JDBC Driver]: https://jdbc.postgresql.org/
 
 [Scala]: https://www.scala-lang.org/
 
