@@ -34,6 +34,8 @@ import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.LinkedHashMap;
@@ -53,6 +55,7 @@ import org.jooq.DSLContext;
 import org.jooq.Query;
 import org.jooq.Record;
 import org.jooq.Result;
+import org.jooq.impl.DSL;
 
 import static java.lang.reflect.Modifier.isPublic;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -423,5 +426,60 @@ public class NotebookContext {
          * @serial
          */
         public final List<Result<Record>> results = new ArrayList<>();
+
+        /**
+         * Target of the {@link ganymede.shell.magic.SQL}
+         * {@link ganymede.shell.Magic}.
+         *
+         * @param       url             The JDBC URL.
+         * @param       username        The JDBC Username.
+         * @param       password        The JDBC Password.
+         *
+         * @return      The {@link DSLContext} corresponding to the URL.
+         */
+        public DSLContext connect(String url, String username, String password) {
+            return computeIfAbsent(toKey(url), k -> DSL.using(url, username, password));
+        }
+
+        private String toKey(String url) {
+            var key = url;
+
+            if (key != null) {
+                try {
+                    var list = new LinkedList<URI>();
+
+                    list.add(URI.create(key));
+
+                    for (;;) {
+                        var last = list.getLast();
+                        var ssp = last.getSchemeSpecificPart();
+
+                        if (last.isOpaque() && ssp.contains(":")) {
+                            list.add(URI.create(ssp));
+                        } else {
+                            break;
+                        }
+                    }
+
+                    var uri = list.removeLast();
+
+                    if (uri.isOpaque()) {
+                        uri = new URI(uri.getScheme(), uri.getSchemeSpecificPart().split(";", 2)[0], null);
+                    } else {
+                        uri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), uri.getPath(), null, null);
+                    }
+
+                    while (! list.isEmpty()) {
+                        uri = new URI(list.removeLast().getScheme(), uri.toString(), null);
+                    }
+
+                    key = uri.toString();
+                } catch (URISyntaxException exception) {
+                    throw new IllegalArgumentException(exception);
+                }
+            }
+
+            return key;
+        }
     }
 }

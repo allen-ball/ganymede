@@ -28,7 +28,6 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.jooq.DSLContext;
 import org.jooq.exception.DataAccessException;
-import org.jooq.impl.DSL;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParameterException;
@@ -38,7 +37,6 @@ import picocli.CommandLine.Parameters;
  * {@link SQL} {@link Magic}.
  *
  * @see ganymede.notebook.NotebookContext#sql
- * @see DSL
  * @see DSLContext
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
@@ -123,10 +121,7 @@ public class SQL extends AbstractMagic {
         private boolean print = true;
 
         public DSLContext dsl() {
-            return context.sql.computeIfAbsent(getUrl(),
-                                               k -> DSL.using(k,
-                                                              getUsername(),
-                                                              getPassword()));
+            return context.sql.connect(getUrl(), getUsername(), getPassword());
         }
     }
 }
