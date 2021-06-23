@@ -42,13 +42,13 @@ public class Connection {
 
     /**
      * {@link Connection} file name {@link Pattern}.
-     * Provides named group "id".
+     * Provides named group "kernelId".
      */
     @CompileTimeCheck
     public static final Pattern FILE_NAME_PATTERN =
-        Pattern.compile("(?i)^(kernel-|)(?<id>[^.]+)[.]json$");
+        Pattern.compile("(?i)^(kernel-|)(?<kernelId>[^.]+)[.]json$");
 
-    @NonNull private final String id;
+    @NonNull private final String kernelId;
     @NonNull private final ObjectNode node;
     @NonNull private final HMACDigester digester;
 
@@ -66,12 +66,12 @@ public class Connection {
     /**
      * {@link ObjectNode} constructor.
      *
-     * @param   id              The kernel ID.
+     * @param   kernelId        The kernel ID.
      * @param   node            The {@link ObjectNode} describing the
      *                          {@link Connection}.
      */
-    public Connection(String id, ObjectNode node) {
-        this.id = id;
+    public Connection(String kernelId, ObjectNode node) {
+        this.kernelId = kernelId;
         this.node = node;
         this.digester = new HMACDigesterImpl();
     }

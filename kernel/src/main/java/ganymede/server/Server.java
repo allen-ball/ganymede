@@ -99,7 +99,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
             Optional.of(file.getName())
             .map(Connection.FILE_NAME_PATTERN::matcher)
             .filter(t -> t.matches())
-            .map(t -> t.group("id"))
+            .map(t -> t.group("kernelId"))
             .orElse(null);
 
         bind(kernelId, file);
@@ -118,12 +118,12 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
         var node = OBJECT_MAPPER.readTree(file);
         var connection = new Connection(kernelId, (ObjectNode) node);
 
-        connectionMap.put(connection.getId(), connection);
+        connectionMap.put(connection.getKernelId(), connection);
 
         connection.connect(shell, control, iopub, stdin, heartbeat);
 
         log.info("Connected to {} {}",
-                 connection.getId(), connection.getNode().toPrettyString());
+                 connection.getKernelId(), connection.getNode().toPrettyString());
     }
 
     /**
