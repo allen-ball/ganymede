@@ -21,7 +21,7 @@ package ganymede.server;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.Base64;
 
-import static ganymede.server.Server.OBJECT_MAPPER;
+import static ganymede.server.Server.JSON_OBJECT_MAPPER;
 
 /**
  * {@link Message#mime_bundle(Object,Object...)} output {@link Renderer}.
@@ -61,7 +61,7 @@ public interface Renderer {
      * @return  The {@link Message} {@code mime-bundle}.
      */
     public static ObjectNode render(Object object, Object... alternates) {
-        var bundle = OBJECT_MAPPER.createObjectNode();
+        var bundle = JSON_OBJECT_MAPPER.createObjectNode();
 
         MAP.renderTo(bundle, object, alternates);
 

@@ -35,7 +35,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.system.ApplicationHome;
 
-import static ganymede.server.Server.OBJECT_MAPPER;
+import static ganymede.server.Server.JSON_OBJECT_MAPPER;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
 import static org.springframework.util.FileCopyUtils.copy;
@@ -137,7 +137,7 @@ public class Install implements ApplicationRunner {
             /*
              * kernel.json
              */
-            var kernel = OBJECT_MAPPER.createObjectNode();
+            var kernel = JSON_OBJECT_MAPPER.createObjectNode();
             var argv = kernel.withArray("argv");
             var jar = jarPath.toAbsolutePath().toString();
 
@@ -177,7 +177,7 @@ public class Install implements ApplicationRunner {
             kernel.put("interrupt_mode", "message");
             kernel.put("language", "java");
 
-            OBJECT_MAPPER.writeValue(kernelspec.resolve("kernel.json").toFile(), kernel);
+            JSON_OBJECT_MAPPER.writeValue(kernelspec.resolve("kernel.json").toFile(), kernel);
             /*
              * logo-16x16.png and logo-32x32.png
              */
@@ -234,7 +234,7 @@ public class Install implements ApplicationRunner {
     }
 
     private JsonNode getOutputAsJson(String... argv) throws Exception {
-        var node = OBJECT_MAPPER.nullNode();
+        var node = JSON_OBJECT_MAPPER.nullNode();
         var process =
             new ProcessBuilder(argv)
             .inheritIO()
@@ -243,7 +243,7 @@ public class Install implements ApplicationRunner {
             .start();
 
         try (var in = process.getInputStream()) {
-            node = OBJECT_MAPPER.readTree(in);
+            node = JSON_OBJECT_MAPPER.readTree(in);
 
             var status = process.waitFor();
 

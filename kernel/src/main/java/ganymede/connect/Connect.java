@@ -30,7 +30,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
-import static ganymede.server.Server.OBJECT_MAPPER;
+import static ganymede.server.Server.JSON_OBJECT_MAPPER;
 
 /**
  * Ganymede Jupyter {@link ganymede.kernel.Kernel} {@link Connect} CLI.
@@ -55,7 +55,7 @@ public class Connect implements ApplicationRunner {
     public void run(ApplicationArguments arguments) throws Exception {
         try {
             var file = new File(connection_file);
-            var node = OBJECT_MAPPER.readTree(file);
+            var node = JSON_OBJECT_MAPPER.readTree(file);
             var isAlive =
                 Optional.of("pid")
                 .filter(t -> node.hasNonNull(t))

@@ -114,7 +114,7 @@ public class Kernel extends Server implements ApplicationContextAware,
             try (var stream = Files.newDirectoryStream(Paths.get(runtime_dir), glob)) {
                 var path = stream.iterator().next();
 
-                client = new JupyterRestClient(OBJECT_MAPPER.readTree(path.toFile()));
+                client = new JupyterRestClient(JSON_OBJECT_MAPPER.readTree(path.toFile()));
             } catch (NoSuchElementException exception) {
                 log.warn("{}: No match found for '{}'", runtime_dir, glob);
             } catch (Exception exception) {
@@ -139,7 +139,7 @@ public class Kernel extends Server implements ApplicationContextAware,
      */
     @RequestMapping(method = { GET }, value = { "kernel/classpath" })
     public ResponseEntity<String> classpath() throws Exception {
-        var json = OBJECT_MAPPER.writeValueAsString(shell.classpath());
+        var json = JSON_OBJECT_MAPPER.writeValueAsString(shell.classpath());
 
         return new ResponseEntity<>(json, HttpStatus.OK);
     }
@@ -205,7 +205,7 @@ public class Kernel extends Server implements ApplicationContextAware,
     protected void bind(String kernelId, File file) throws IOException {
         super.bind(kernelId, file);
 
-        var node = (ObjectNode) OBJECT_MAPPER.readTree(file);
+        var node = (ObjectNode) JSON_OBJECT_MAPPER.readTree(file);
 
         node.put("pid", ProcessHandle.current().pid());
 
@@ -213,7 +213,7 @@ public class Kernel extends Server implements ApplicationContextAware,
             node.put("port", port);
         }
 
-        OBJECT_MAPPER.writeValue(file, node);
+        JSON_OBJECT_MAPPER.writeValue(file, node);
     }
 
     @Override
@@ -227,7 +227,7 @@ public class Kernel extends Server implements ApplicationContextAware,
 
     @Override
     protected ObjectNode getKernelInfo() {
-        var content = OBJECT_MAPPER.createObjectNode();
+        var content = JSON_OBJECT_MAPPER.createObjectNode();
 
         content.put("protocol_version", PROTOCOL_VERSION.toString());
         content.put("implementation", "ganymede");

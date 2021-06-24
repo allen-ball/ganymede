@@ -36,7 +36,7 @@ import lombok.extern.log4j.Log4j2;
 import org.zeromq.ZMQ;
 import org.zeromq.util.ZData;
 
-import static ganymede.server.Server.OBJECT_MAPPER;
+import static ganymede.server.Server.JSON_OBJECT_MAPPER;
 import static java.time.ZoneOffset.UTC;
 import static java.time.ZonedDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
@@ -390,7 +390,7 @@ public class Message {
         var string = "{}";
 
         try {
-            string = OBJECT_MAPPER.writeValueAsString(node);
+            string = JSON_OBJECT_MAPPER.writeValueAsString(node);
         } catch (Exception exception) {
             log.warn("{}", exception);
         }
@@ -453,7 +453,7 @@ public class Message {
         ObjectNode value = null;
 
         try {
-            value = (ObjectNode) OBJECT_MAPPER.readTree(new String(bytes, ZMQ.CHARSET));
+            value = (ObjectNode) JSON_OBJECT_MAPPER.readTree(new String(bytes, ZMQ.CHARSET));
         } catch (Exception exception) {
             log.warn("{}", exception);
         }
@@ -472,7 +472,7 @@ public class Message {
      * @return  The corresponding {@link ObjectNode}.
      */
     public static ObjectNode content(Throwable throwable, String evalue) {
-        var node = OBJECT_MAPPER.createObjectNode();
+        var node = JSON_OBJECT_MAPPER.createObjectNode();
 
         if (throwable != null || evalue != null) {
             node.put("status", "error");

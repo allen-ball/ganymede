@@ -18,10 +18,13 @@ package ganymede.server;
  * limitations under the License.
  * ##########################################################################
  */
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import ganymede.io.PrintStreamBuffer;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -57,10 +60,23 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
     protected static final ComparableVersion PROTOCOL_VERSION = new ComparableVersion("5.3");
 
     /**
-     * Common {@link Server} static {@link ObjectMapper} instance.
+     * Common {@link Server} static JSON {@link ObjectMapper} instance.
      */
-    public static final ObjectMapper OBJECT_MAPPER =
+    public static final ObjectMapper JSON_OBJECT_MAPPER =
         new ObjectMapper()
+        .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_VALUES)
+        .enable(SerializationFeature.INDENT_OUTPUT);
+
+    public static final YAMLFactory YAML_FACTORY =
+        new YAMLFactory()
+        .enable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER);
+
+    /**
+     * Common {@link Server} static YAML {@link ObjectMapper} instance.
+     */
+    public static final ObjectMapper YAML_OBJECT_MAPPER =
+        new ObjectMapper(YAML_FACTORY)
+        .setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
         .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_VALUES)
         .enable(SerializationFeature.INDENT_OUTPUT);
 
@@ -115,7 +131,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
      *                          parsed.
      */
     protected void bind(String kernelId, File file) throws IOException {
-        var node = OBJECT_MAPPER.readTree(file);
+        var node = JSON_OBJECT_MAPPER.readTree(file);
         var connection = new Connection(kernelId, (ObjectNode) node);
 
         connectionMap.put(connection.getKernelId(), connection);
