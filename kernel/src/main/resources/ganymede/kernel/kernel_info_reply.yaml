@@ -9,6 +9,8 @@ content:
     version: "@java.specification.version@"
     mimetype: "text/x-java"
     file_extension: ".java"
+  banner: >-
+    Ganymede @project.majorVersion@.@project.minorVersion@.@project.incrementalVersion@ (Java @java.specification.version@)
   help_links:
     - text: "Ganymede Reference"
       url: "https://github.com/allen-ball/ganymede"
