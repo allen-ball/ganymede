@@ -44,7 +44,7 @@
 <span class="sourceLineNo">035</span><a id="line.35">import org.springframework.boot.autoconfigure.SpringBootApplication;</a>
 <span class="sourceLineNo">036</span><a id="line.36">import org.springframework.boot.system.ApplicationHome;</a>
 <span class="sourceLineNo">037</span><a id="line.37"></a>
-<span class="sourceLineNo">038</span><a id="line.38">import static ganymede.server.Server.OBJECT_MAPPER;</a>
+<span class="sourceLineNo">038</span><a id="line.38">import static ganymede.server.Server.JSON_OBJECT_MAPPER;</a>
 <span class="sourceLineNo">039</span><a id="line.39">import static java.nio.charset.StandardCharsets.UTF_8;</a>
 <span class="sourceLineNo">040</span><a id="line.40">import static java.util.stream.Collectors.joining;</a>
 <span class="sourceLineNo">041</span><a id="line.41">import static org.springframework.util.FileCopyUtils.copy;</a>
@@ -146,7 +146,7 @@
 <span class="sourceLineNo">137</span><a id="line.137">            /*</a>
 <span class="sourceLineNo">138</span><a id="line.138">             * kernel.json</a>
 <span class="sourceLineNo">139</span><a id="line.139">             */</a>
-<span class="sourceLineNo">140</span><a id="line.140">            var kernel = OBJECT_MAPPER.createObjectNode();</a>
+<span class="sourceLineNo">140</span><a id="line.140">            var kernel = JSON_OBJECT_MAPPER.createObjectNode();</a>
 <span class="sourceLineNo">141</span><a id="line.141">            var argv = kernel.withArray("argv");</a>
 <span class="sourceLineNo">142</span><a id="line.142">            var jar = jarPath.toAbsolutePath().toString();</a>
 <span class="sourceLineNo">143</span><a id="line.143"></a>
@@ -186,7 +186,7 @@
 <span class="sourceLineNo">177</span><a id="line.177">            kernel.put("interrupt_mode", "message");</a>
 <span class="sourceLineNo">178</span><a id="line.178">            kernel.put("language", "java");</a>
 <span class="sourceLineNo">179</span><a id="line.179"></a>
-<span class="sourceLineNo">180</span><a id="line.180">            OBJECT_MAPPER.writeValue(kernelspec.resolve("kernel.json").toFile(), kernel);</a>
+<span class="sourceLineNo">180</span><a id="line.180">            JSON_OBJECT_MAPPER.writeValue(kernelspec.resolve("kernel.json").toFile(), kernel);</a>
 <span class="sourceLineNo">181</span><a id="line.181">            /*</a>
 <span class="sourceLineNo">182</span><a id="line.182">             * logo-16x16.png and logo-32x32.png</a>
 <span class="sourceLineNo">183</span><a id="line.183">             */</a>
@@ -243,7 +243,7 @@
 <span class="sourceLineNo">234</span><a id="line.234">    }</a>
 <span class="sourceLineNo">235</span><a id="line.235"></a>
 <span class="sourceLineNo">236</span><a id="line.236">    private JsonNode getOutputAsJson(String... argv) throws Exception {</a>
-<span class="sourceLineNo">237</span><a id="line.237">        var node = OBJECT_MAPPER.nullNode();</a>
+<span class="sourceLineNo">237</span><a id="line.237">        var node = JSON_OBJECT_MAPPER.nullNode();</a>
 <span class="sourceLineNo">238</span><a id="line.238">        var process =</a>
 <span class="sourceLineNo">239</span><a id="line.239">            new ProcessBuilder(argv)</a>
 <span class="sourceLineNo">240</span><a id="line.240">            .inheritIO()</a>
@@ -252,7 +252,7 @@
 <span class="sourceLineNo">243</span><a id="line.243">            .start();</a>
 <span class="sourceLineNo">244</span><a id="line.244"></a>
 <span class="sourceLineNo">245</span><a id="line.245">        try (var in = process.getInputStream()) {</a>
-<span class="sourceLineNo">246</span><a id="line.246">            node = OBJECT_MAPPER.readTree(in);</a>
+<span class="sourceLineNo">246</span><a id="line.246">            node = JSON_OBJECT_MAPPER.readTree(in);</a>
 <span class="sourceLineNo">247</span><a id="line.247"></a>
 <span class="sourceLineNo">248</span><a id="line.248">            var status = process.waitFor();</a>
 <span class="sourceLineNo">249</span><a id="line.249"></a>

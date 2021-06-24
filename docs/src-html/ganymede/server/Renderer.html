@@ -30,7 +30,7 @@
 <span class="sourceLineNo">021</span><a id="line.21">import com.fasterxml.jackson.databind.node.ObjectNode;</a>
 <span class="sourceLineNo">022</span><a id="line.22">import java.util.Base64;</a>
 <span class="sourceLineNo">023</span><a id="line.23"></a>
-<span class="sourceLineNo">024</span><a id="line.24">import static ganymede.server.Server.OBJECT_MAPPER;</a>
+<span class="sourceLineNo">024</span><a id="line.24">import static ganymede.server.Server.JSON_OBJECT_MAPPER;</a>
 <span class="sourceLineNo">025</span><a id="line.25"></a>
 <span class="sourceLineNo">026</span><a id="line.26">/**</a>
 <span class="sourceLineNo">027</span><a id="line.27"> * {@link Message#mime_bundle(Object,Object...)} output {@link Renderer}.</a>
@@ -70,7 +70,7 @@
 <span class="sourceLineNo">061</span><a id="line.61">     * @return  The {@link Message} {@code mime-bundle}.</a>
 <span class="sourceLineNo">062</span><a id="line.62">     */</a>
 <span class="sourceLineNo">063</span><a id="line.63">    public static ObjectNode render(Object object, Object... alternates) {</a>
-<span class="sourceLineNo">064</span><a id="line.64">        var bundle = OBJECT_MAPPER.createObjectNode();</a>
+<span class="sourceLineNo">064</span><a id="line.64">        var bundle = JSON_OBJECT_MAPPER.createObjectNode();</a>
 <span class="sourceLineNo">065</span><a id="line.65"></a>
 <span class="sourceLineNo">066</span><a id="line.66">        MAP.renderTo(bundle, object, alternates);</a>
 <span class="sourceLineNo">067</span><a id="line.67"></a>
