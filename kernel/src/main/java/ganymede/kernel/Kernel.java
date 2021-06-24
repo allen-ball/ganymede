@@ -98,6 +98,16 @@ public class Kernel extends Server implements ApplicationContextAware,
     private ApplicationContext context = null;
     private int port = -1;
     private JupyterRestClient client = null;
+    private final ObjectNode kernel_info_reply_content;
+
+    {
+        try (var in = getClass().getResourceAsStream("kernel_info_reply.yaml")) {
+            kernel_info_reply_content = (ObjectNode) YAML_OBJECT_MAPPER.readTree(in).with("content");
+            kernel_info_reply_content.put("protocol_version", PROTOCOL_VERSION.toString());
+        } catch (Exception exception) {
+            throw new ExceptionInInitializerError(exception);
+        }
+    }
 
     /**
      * Method to get the {@link Kernel} REST server port.
@@ -226,24 +236,7 @@ public class Kernel extends Server implements ApplicationContextAware,
     }
 
     @Override
-    protected ObjectNode getKernelInfo() {
-        var content = JSON_OBJECT_MAPPER.createObjectNode();
-
-        content.put("protocol_version", PROTOCOL_VERSION.toString());
-        content.put("implementation", "ganymede");
-        content.put("implementation_version", kernel_version);
-
-        var language_info = content.with("language_info");
-
-        language_info.put("name", "java");
-        language_info.put("version", System.getProperty("java.specification.version"));
-        language_info.put("mimetype", "text/x-java");
-        language_info.put("file_extension", ".java");
-
-        var help_links = content.with("help_links");
-
-        return content;
-    }
+    protected ObjectNode getKernelInfo() { return kernel_info_reply_content; }
 
     @Override
     protected void execute(String code) throws Exception {

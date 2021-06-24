@@ -1,0 +1,16 @@
+# kernel_info_reply.yml
+---
+content:
+  protocol_version: "5.3"
+  implementation: "ganymede"
+  implementation_version: "@kernel.version@"
+  language_info:
+    name: "java"
+    version: "@java.specification.version@"
+    mimetype: "text/x-java"
+    file_extension: ".java"
+  help_links:
+    - text: "Ganymede Reference"
+      url: "https://github.com/allen-ball/ganymede"
+    - text: "Ganymede API Javadoc"
+      url: "https://allen-ball.github.io/ganymede/index.html?overview-summary.html"
