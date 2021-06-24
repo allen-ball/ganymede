@@ -18,8 +18,8 @@ package ganymede.server;
  * limitations under the License.
  * ##########################################################################
  */
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
@@ -42,7 +42,7 @@ public class Dispatcher implements Runnable {
     @NonNull private final Channel channel;
     @NonNull private final Connection connection;
     @NonNull private final String address;
-    private final BlockingDeque<Message> outgoing = new LinkedBlockingDeque<>();
+    private final BlockingQueue<Message> outgoing = new SynchronousQueue<>();
 
     /**
      * Callback method to dispatch a received message.  Default
@@ -78,7 +78,11 @@ public class Dispatcher implements Runnable {
 
         switch (type) {
         case PUB:
-            outgoing.offer(message);
+            try {
+                outgoing.put(message);
+            } catch (InterruptedException exception) {
+                log.warn("{}", exception);
+            }
             break;
 
         default:
