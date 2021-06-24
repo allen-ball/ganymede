@@ -3,7 +3,7 @@
 content:
   protocol_version: "5.3"
   implementation: "ganymede"
-  implementation_version: "@kernel.version@"
+  implementation_version: "@project.majorVersion@.@project.minorVersion@.@project.incrementalVersion@"
   language_info:
     name: "java"
     version: "@java.specification.version@"
