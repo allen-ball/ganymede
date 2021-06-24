@@ -67,7 +67,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
         .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_VALUES)
         .enable(SerializationFeature.INDENT_OUTPUT);
 
-    public static final YAMLFactory YAML_FACTORY =
+    private static final YAMLFactory YAML_FACTORY =
         new YAMLFactory()
         .enable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER);
 
