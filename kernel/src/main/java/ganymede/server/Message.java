@@ -40,6 +40,7 @@ import static ganymede.server.Server.JSON_OBJECT_MAPPER;
 import static java.time.ZoneOffset.UTC;
 import static java.time.ZonedDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
+import static java.time.temporal.ChronoUnit.MILLIS;
 import static java.util.stream.Collectors.joining;
 import static lombok.AccessLevel.PRIVATE;
 
@@ -340,7 +341,7 @@ public class Message {
      */
     public Message timestamp() {
         if (date() == null) {
-            date(now(UTC).format(ISO_INSTANT));
+            date(now(UTC).truncatedTo(MILLIS).format(ISO_INSTANT));
         }
 
         return this;
