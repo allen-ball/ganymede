@@ -369,6 +369,11 @@
                 <url>${javadoc.io}org.apache.httpcomponents/httpcore/latest/</url>
                 <location>${javadoc-offline-locations}/httpcore-javadoc-jar/</location>
               </offlineLink>
+              <!-- Apache Maven -->
+              <offlineLink>
+                <url>https://maven.apache.org/ref/${maven.version}/maven-artifact/apidocs/</url>
+                <location>${javadoc-offline-locations}/maven-artifact-javadoc-jar/</location>
+              </offlineLink>
               <!-- Apache Maven Artifact Resolver -->
               <offlineLink>
                 <url>${javadoc.io}org.apache.maven.resolver/maven-resolver-api/latest/</url>
