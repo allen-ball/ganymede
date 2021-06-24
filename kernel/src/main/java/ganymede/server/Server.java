@@ -295,7 +295,15 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
         }
 
         private void execute(Dispatcher dispatcher, Message request, Message reply) throws Exception {
-            var cellId = request.metadata().at("/cellId").asText();
+            /*
+             * jupyter lab populates execute_request metadata.  E.g.,
+             *
+             * metadata: {
+             *   "deletedCells" : [ ],
+             *   "recordTiming" : false,
+             *   "cellId" : "4cf407d2"
+             * }
+             */
             var code = request.content().at("/code").asText();
             var silent = request.content().at("/silent").asBoolean();
             var store_history = request.content().at("/store_history").asBoolean();
