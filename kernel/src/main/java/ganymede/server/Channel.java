@@ -88,7 +88,7 @@ public abstract class Channel {
 
         log.debug("{}\n{}", dispatcher.getAddress(), message);
 
-        message.send(socket, dispatcher.getConnection().getDigester());
+        message.send(dispatcher.getConnection(), socket);
     }
 
     /**
@@ -145,8 +145,7 @@ public abstract class Channel {
         @Override
         protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, byte[] frame) {
             try {
-                var message =
-                    Message.receive(socket, frame, dispatcher.getConnection().getDigester());
+                var message = Message.receive(dispatcher.getConnection(), socket, frame);
 
                 log.debug("{}\n{}", dispatcher.getAddress(), message);
 

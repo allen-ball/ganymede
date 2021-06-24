@@ -30,7 +30,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j2;
 import org.zeromq.ZMQ;
@@ -49,7 +49,7 @@ import static lombok.AccessLevel.PRIVATE;
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
-@NoArgsConstructor(access = PRIVATE) @Data @Accessors(fluent = true) @Log4j2
+@RequiredArgsConstructor(access = PRIVATE) @Data @Accessors(fluent = true) @Log4j2
 public class Message {
     private static final String DELIMITER_STRING = "<IDS|MSG>";
     private static final byte[] DELIMITER_BYTES = DELIMITER_STRING.getBytes(ZMQ.CHARSET);
@@ -59,6 +59,7 @@ public class Message {
 
     /* private enum Status { ok, error } */
 
+    private final Connection connection;
     protected final List<byte[]> envelope = new LinkedList<>();
     protected ObjectNode header = new ObjectNode(JsonNodeFactory.instance);
     protected ObjectNode parentHeader = new ObjectNode(JsonNodeFactory.instance);
@@ -401,12 +402,11 @@ public class Message {
     /**
      * Method to receive a {@link Message} on a {@link ZMQ.Socket}.
      *
+     * param    connection      The {@link Connection}.
      * @param   socket          The {@link ZMQ.Socket}.
      * @param   frame           The first message frame.
-     * @param   digester        The {@link HMACDigester} (may be
-     *                          {@code null}).
      */
-    public static Message receive(ZMQ.Socket socket, byte[] frame, HMACDigester digester) {
+    public static Message receive(Connection connection, ZMQ.Socket socket, byte[] frame) {
         var envelope = new LinkedList<byte[]>();
 
         while (! DELIMITER_ZDATA.equals(frame)) {
@@ -426,6 +426,8 @@ public class Message {
             buffers.add(recv(socket));
         }
 
+        var digester = connection.getDigester();
+
         if (digester != null) {
             if (! digester.verify(new String(signature, ZMQ.CHARSET),
                                   header, parentHeader, metadata, content)) {
@@ -433,7 +435,7 @@ public class Message {
             }
         }
 
-        var message = new Message();
+        var message = new Message(connection);
 
         message.envelope().addAll(envelope);
         message.header().setAll(deserialize(header));
@@ -521,12 +523,11 @@ public class Message {
     /**
      * Method to send a {@link Message}.
      *
+     * param    connection      The {@link Connection}.
      * @param   socket          The {@link ZMQ.Socket}.
-     * @param   digester        The {@link HMACDigester} (may be
-     *                          {@code null}).
      */
-    public void send(ZMQ.Socket socket, HMACDigester digester) {
-        var list = serialize(digester);
+    public void send(Connection connection, ZMQ.Socket socket) {
+        var list = serialize(connection.getDigester());
         var iterator = list.iterator();
 
         while (iterator.hasNext()) {
@@ -553,6 +554,8 @@ public class Message {
 
     private static class Copy extends Message {
         public Copy(Message message) {
+            super(null);
+
             envelope().addAll(message.envelope());
             header().setAll(message.header());
             parentHeader().setAll(message.parentHeader());
@@ -564,7 +567,7 @@ public class Message {
 
     private static abstract class Child extends Message {
         protected Child(String msg_type, Message request) {
-            super();
+            super(null);
 
             if (msg_type != null) {
                 msg_type(msg_type);
@@ -598,15 +601,17 @@ public class Message {
 
             var topic = msg_type;
 
-            if (request != null) {
-                var session = request.session();
+            if (request != null && request.connection != null) {
+                var kernelId = request.connection.getKernelId();
 
-                if (session != null) {
-                    topic = String.format("kernel.%s.%s", session, msg_type);
+                if (kernelId != null) {
+                    topic = String.format("kernel.%s.%s", kernelId, msg_type);
                 }
             }
 
-            envelope().add(topic.getBytes(ZMQ.CHARSET));
+            if (topic != null) {
+                envelope().add(topic.getBytes(ZMQ.CHARSET));
+            }
         }
     }
 }
