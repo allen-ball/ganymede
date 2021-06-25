@@ -303,7 +303,6 @@ public abstract class Channel {
 
             if (isStarting) {
                 iopub.pub(Message.status(Message.status.starting, null));
-                iopub.pub(Message.status(Message.status.idle, null));
             }
         }
 
