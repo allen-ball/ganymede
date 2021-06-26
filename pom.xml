@@ -31,7 +31,7 @@
   <parent>
     <groupId>ball</groupId>
     <artifactId>parent</artifactId>
-    <version>20210622.0</version>
+    <version>20210625.0</version>
     <relativePath/>
   </parent>
   <organization>
