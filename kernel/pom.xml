@@ -57,10 +57,6 @@
       <artifactId>handlebars</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-    </dependency>
-    <dependency>
       <groupId>info.picocli</groupId>
       <artifactId>picocli</artifactId>
     </dependency>
@@ -79,6 +75,12 @@
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-impl</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.annotation</groupId>
+          <artifactId>javax.annotation-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
@@ -151,6 +153,12 @@
     <dependency>
       <groupId>org.jooq</groupId>
       <artifactId>jooq</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.xml.bind</groupId>
+          <artifactId>jaxb-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jooq</groupId>
@@ -160,11 +168,6 @@
       <groupId>org.jetbrains.kotlin</groupId>
       <artifactId>kotlin-scripting-jsr223</artifactId>
       <version>${kotlin.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.spark-project.spark</groupId>
-      <artifactId>unused</artifactId>
-      <version>1.0.0</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
@@ -178,6 +181,16 @@
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-logging</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-classic</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
       <exclusions>
         <exclusion>
@@ -185,10 +198,6 @@
           <artifactId>spring-boot-starter-tomcat</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-jetty</artifactId>
     </dependency>
     <dependency>
       <groupId>org.thymeleaf</groupId>
@@ -211,6 +220,11 @@
     <dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-sql_${scala.binary.version}</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.graalvm</groupId>
+      <artifactId>graal-sdk</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -241,29 +255,6 @@
     <dependency>
       <groupId>tech.tablesaw</groupId>
       <artifactId>tablesaw-jsplot</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <!-- Runtime (Distributed in shaded JAR) -->
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- Never distributed in shaded JAR -->
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.17</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.graalvm</groupId>
-      <artifactId>graal-sdk</artifactId>
       <scope>provided</scope>
     </dependency>
   </dependencies>
