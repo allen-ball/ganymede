@@ -44,10 +44,6 @@
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
         </exclusion>
-        <exclusion>
-          <groupId>log4j</groupId>
-          <artifactId>log4j</artifactId>
-        </exclusion>
       </exclusions>
     </dependency>
     <!-- Servlet Container -->
@@ -78,6 +74,10 @@
       <scope>runtime</scope>
     </dependency>
     <!-- Ganymede Runtime -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
@@ -163,7 +163,6 @@
           <artifactSet>
             <excludes>
               <exclude>commons-logging:commons-logging</exclude>
-              <exclude>log4j:log4j</exclude>
             </excludes>
           </artifactSet>
           <filters>
