@@ -24,12 +24,12 @@ import ganymede.server.Message;
 import ganymede.server.renderer.ThymeleafRenderer;
 import ganymede.shell.Magic;
 import java.util.Map;
-import java.util.TreeMap;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
-import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toList;
 
 /**
  * {@link Magics} {@link Magic}: List configured {@link Magic}s.
@@ -43,15 +43,23 @@ public class Magics extends AbstractMagic {
     @Override
     public void execute(String line0, String code) throws Exception {
         var resource = getClass().getSimpleName();
-        var magics =
+        var rows =
             context.magics().values().stream()
             .distinct()
-            .collect(toMap(k -> String.join(", ", k.getMagicNames()), v -> v,
-                           (t, u) -> t, () -> new TreeMap<>()));
-        var map = Map.<String,Object>of("magics", magics);
+            .map(t -> new Row(String.join(", ", t.getMagicNames()),
+                              t.getDescription(), t.getUsage()))
+            .collect(toList());
+        var map = Map.<String,Object>of("rows", rows);
         var html = ThymeleafRenderer.process(getClass(), resource + ".html", "html", map);
         var text = ThymeleafRenderer.process(getClass(), resource + ".text", "text", map);
 
         new KernelRestClient().print(Message.mime_bundle(html, text));
+    }
+
+    @Data
+    private class Row {
+        private final String names;
+        private final String description;
+        private final String usage;
     }
 }
