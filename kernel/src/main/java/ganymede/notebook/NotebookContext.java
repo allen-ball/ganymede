@@ -147,13 +147,17 @@ public class NotebookContext {
      * @param   line0           The initial magic line.
      * @param   code            The remainder of the cell.
      */
-    public void magic(String name, String line0, String code) throws Exception {
-        magics.reload();
+    public void magic(String name, String line0, String code) {
+        try {
+            magics.reload();
 
-        if (magics.containsKey(name)) {
-            magics.get(name).execute(decode(line0), decode(code));
-        } else {
-            throw new IllegalStateException("Magic '" + name + "' not found");
+            if (magics.containsKey(name)) {
+                magics.get(name).execute(decode(line0), decode(code));
+            } else {
+                throw new IllegalStateException(String.format("Magic '%s' not found", name));
+            }
+        } catch (Throwable throwable) {
+            throwable.printStackTrace(System.err);
         }
     }
 
