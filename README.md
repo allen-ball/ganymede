@@ -59,14 +59,15 @@ command line options are supported.
 The following Java system properties may be configured.
 
 | System Properties | Action                                | Default(s)                                                                                                                          |
-| ---               | ---                                   | ---                                                                                                                                 |
+|-------------------|---------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
 | maven.repo.local  | Configures the local Maven repository | <table><tr><td>--sys-prefix</td><td>${jupyter.data}/repository/</td></tr><tr><td>--user</td><td>${user.home}/.m2/</td></tr></table> |
 
 The following OS environment variables may be configured:
 
-| Environment Variable | Action                                                                       |
-| ---                  | ---                                                                          |
-| SPARK_HOME           | If configured, the kernel will add the Spark JARs to the kernel's classpath. |
+| Environment Variable | Action                                                                                |
+|----------------------|---------------------------------------------------------------------------------------|
+| SPARK_HOME           | If configured, the kernel will add the [Apache Spark] JARs to the kernel's classpath. |
+| HIVE_HOME            | If configured, the kernel will add the [Apache Hive] JARs to the kernel's classpath.  |
 
 For example, a sophisticated configuration to test a snapshot out of a
 user's local [Maven][Apache Maven] repository:
@@ -145,7 +146,7 @@ annotated with [@NotebookFunction][NotebookFunction].  These functions
 include:
 
 | Method          | Description                            |
-| ---             | ---                                    |
+|-----------------|----------------------------------------|
 | print(Object)   | Render the Object to a Notebook format |
 | display(Object) | Render the Object to a Notebook format |
 | toJson(Object)  | Convert argument to JsonNode           |
@@ -177,67 +178,92 @@ cell magic is `java`.
     </thead>
     <tbody>
       <tr>
-        <td>!, script</td><td>Execute script with the argument command</td>
+        <td>!, script</td>
+        <td>Execute script with the argument command</td>
       </tr>
       <tr>
-        <td>bash</td><td>Execute script with &#39;bash&#39; command</td>
+        <td>bash</td>
+        <td>Execute script with &#39;bash&#39; command</td>
       </tr>
       <tr>
-        <td>classpath</td><td>Add to or print JShell classpath</td>
+        <td>classpath</td>
+        <td>Add to or print JShell classpath</td>
       </tr>
       <tr>
-        <td>env</td><td>Add/Update or print the environment</td>
+        <td>env</td>
+        <td>Add/Update or print the environment</td>
       </tr>
       <tr>
-        <td>freemarker</td><td>FreeMarker template evaluator</td>
+        <td>freemarker</td>
+        <td>FreeMarker template evaluator</td>
       </tr>
       <tr>
-        <td>groovy</td><td>Execute code in groovy REPL</td>
+        <td>groovy</td>
+        <td>Execute code in groovy REPL</td>
       </tr>
       <tr>
-        <td>handlebars</td><td>Handlebars template evaluator</td>
+        <td>handlebars</td>
+        <td>Handlebars template evaluator</td>
       </tr>
       <tr>
-        <td>html</td><td>HTML template evaluator</td>
+        <td>html</td>
+        <td>HTML template evaluator</td>
       </tr>
       <tr>
-        <td>java</td><td>Execute code in Java REPL</td>
+        <td>java</td>
+        <td>Execute code in Java REPL</td>
       </tr>
       <tr>
-        <td>javascript, js</td><td>Execute code in javascript REPL</td>
+        <td>javascript, js</td>
+        <td>Execute code in javascript REPL</td>
       </tr>
       <tr>
-        <td>kotlin</td><td>Execute code in kotlin REPL</td>
+        <td>kotlin</td>
+        <td>Execute code in kotlin REPL</td>
       </tr>
       <tr>
-        <td>magics</td><td>Lists available cell magics</td>
+        <td>magics</td>
+        <td>Lists available cell magics</td>
       </tr>
       <tr>
-        <td>markdown</td><td>Markdown template evaluator</td>
+        <td>markdown</td>
+        <td>Markdown template evaluator</td>
       </tr>
       <tr>
-        <td>perl</td><td>Execute script with &#39;perl&#39; command</td>
+        <td>perl</td>
+        <td>Execute script with &#39;perl&#39; command</td>
       </tr>
       <tr>
-        <td>pom</td><td>Define the Notebook&#39;s Project Object Model</td>
+        <td>pom</td>
+        <td>Define the Notebook&#39;s Project Object Model</td>
       </tr>
       <tr>
-        <td>ruby</td><td>Execute script with &#39;ruby&#39; command</td>
+        <td>ruby</td>
+        <td>Execute script with &#39;ruby&#39; command</td>
       </tr>
       <tr>
-        <td>scala</td><td>Execute code in scala REPL</td>
+        <td>scala</td>
+        <td>Execute code in scala REPL</td>
       </tr>
       <tr>
-        <td>sh</td><td>Execute script with &#39;sh&#39; command</td>
+        <td>sh</td>
+        <td>Execute script with &#39;sh&#39; command</td>
       </tr>
       <tr>
-        <td>sql</td><td>Execute code in SQL REPL</td>
+        <td>spark-session</td>
+        <td>Configure and start a Spark session</td>
       </tr>
       <tr>
-        <td>thymeleaf</td><td>Thymeleaf template evaluator</td>
+        <td>sql</td>
+        <td>Execute code in SQL REPL</td>
       </tr>
       <tr>
-        <td>velocity</td><td>Velocity template evaluator</td>
+        <td>thymeleaf</td>
+        <td>Thymeleaf template evaluator</td>
+      </tr>
+      <tr>
+        <td>velocity</td>
+        <td>Velocity template evaluator</td>
       </tr>
     </tbody>
   </table>
@@ -411,6 +437,44 @@ print($$.sql.results.get(0));
 drivers are provided in the [Ganymede][Ganymede Kernel] runtime.
 
 
+### Spark
+
+The `spark-session` magic is provided to initialize [Apache Spark]
+[sessions][SparkSession].
+
+```
+    Usage: spark-session [--[no-]enable-hive-if-available] [<master>] [<appName>]
+          [<master>]    Spark master
+          [<appName>]   Spark appName
+          --[no-]enable-hive-if-available
+                        Enable Hive if available.  true by default
+```
+
+Its typical usage:
+
+```
+%%spark-session local[*] covid-19
+# Optional name/value pairs parsed as Properties
+```
+
+is roughly equivalent to:
+
+```java
+var config = new SparkConf();
+/*
+ * Properties copied to SparkConf instance.
+ */
+var session =
+    SparkSession.builder()
+    .config(config)
+    .master("local").appName("covid-19")
+    .getOrCreate();
+```
+
+The [SparkSession] can then be accessed in Java and other JVM code with the
+[SparkSession.active()] static method.
+
+
 ### Other Laguages ([JSR 223])
 
 The [kernel][Ganymede Kernel] leverages the [java.scripting API] to provide
@@ -471,54 +535,21 @@ var fib =
 ```
 
 <table>
-<thead>
-<tr>
-<th>Index</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>0</td>
-<td>0</td>
-</tr>
-<tr>
-<td>1</td>
-<td>1</td>
-</tr>
-<tr>
-<td>2</td>
-<td>1</td>
-</tr>
-<tr>
-<td>3</td>
-<td>2</td>
-</tr>
-<tr>
-<td>4</td>
-<td>3</td>
-</tr>
-<tr>
-<td>5</td>
-<td>5</td>
-</tr>
-<tr>
-<td>6</td>
-<td>8</td>
-</tr>
-<tr>
-<td>7</td>
-<td>13</td>
-</tr>
-<tr>
-<td>8</td>
-<td>21</td>
-</tr>
-<tr>
-<td>9</td>
-<td>34</td>
-</tr>
-</tbody>
+  <thead>
+    <tr><th>Index</th><th>Value</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>0</td><td>0</td></tr>
+    <tr><td>1</td><td>1</td></tr>
+    <tr><td>2</td><td>1</td></tr>
+    <tr><td>3</td><td>2</td></tr>
+    <tr><td>4</td><td>3</td></tr>
+    <tr><td>5</td><td>5</td></tr>
+    <tr><td>6</td><td>8</td></tr>
+    <tr><td>7</td><td>13</td></tr>
+    <tr><td>8</td><td>21</td></tr>
+    <tr><td>9</td><td>34</td></tr>
+  </tbody>
 </table>
 
 
@@ -624,6 +655,8 @@ Ibid.
 
 [Apache FreeMarker]: https://freemarker.apache.org/
 
+[Apache Hive]: https://hive.apache.org/
+
 [Apache Maven]: https://maven.apache.org/
 [Maven coordinates]: https://maven.apache.org/pom.html#Maven_Coordinates
 
@@ -634,6 +667,8 @@ Ibid.
 
 [Apache Spark]: http://spark.apache.org/
 [Apache Spark SQL]: https://spark.apache.org/sql/
+[SparkSession]: https://spark.apache.org/docs/latest/api/java/org/apache/spark/sql/SparkSession.html
+[SparkSession.active()]: https://spark.apache.org/docs/latest/api/java/org/apache/spark/sql/SparkSession.html#active--
 
 [Apache Velocity]: https://velocity.apache.org/
 
