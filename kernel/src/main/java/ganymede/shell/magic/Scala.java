@@ -85,9 +85,9 @@ public class Scala extends AbstractScriptEngineMagic {
                 if (initialize(scripted)) {
                     engine = scripted;
                 }
-            } catch (NoClassDefFoundError exception) {
-            } catch (Exception exception) {
-                exception.printStackTrace(System.err);
+            } catch (NoClassDefFoundError error) {
+            } catch (Throwable throwable) {
+                throwable.printStackTrace(System.err);
             }
         }
 
