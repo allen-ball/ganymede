@@ -33,12 +33,12 @@
 <span class="sourceLineNo">024</span><a id="line.24">import ganymede.server.renderer.ThymeleafRenderer;</a>
 <span class="sourceLineNo">025</span><a id="line.25">import ganymede.shell.Magic;</a>
 <span class="sourceLineNo">026</span><a id="line.26">import java.util.Map;</a>
-<span class="sourceLineNo">027</span><a id="line.27">import java.util.TreeMap;</a>
+<span class="sourceLineNo">027</span><a id="line.27">import lombok.Data;</a>
 <span class="sourceLineNo">028</span><a id="line.28">import lombok.NoArgsConstructor;</a>
 <span class="sourceLineNo">029</span><a id="line.29">import lombok.ToString;</a>
 <span class="sourceLineNo">030</span><a id="line.30">import lombok.extern.log4j.Log4j2;</a>
 <span class="sourceLineNo">031</span><a id="line.31"></a>
-<span class="sourceLineNo">032</span><a id="line.32">import static java.util.stream.Collectors.toMap;</a>
+<span class="sourceLineNo">032</span><a id="line.32">import static java.util.stream.Collectors.toList;</a>
 <span class="sourceLineNo">033</span><a id="line.33"></a>
 <span class="sourceLineNo">034</span><a id="line.34">/**</a>
 <span class="sourceLineNo">035</span><a id="line.35"> * {@link Magics} {@link Magic}: List configured {@link Magic}s.</a>
@@ -52,18 +52,26 @@
 <span class="sourceLineNo">043</span><a id="line.43">    @Override</a>
 <span class="sourceLineNo">044</span><a id="line.44">    public void execute(String line0, String code) throws Exception {</a>
 <span class="sourceLineNo">045</span><a id="line.45">        var resource = getClass().getSimpleName();</a>
-<span class="sourceLineNo">046</span><a id="line.46">        var magics =</a>
+<span class="sourceLineNo">046</span><a id="line.46">        var rows =</a>
 <span class="sourceLineNo">047</span><a id="line.47">            context.magics().values().stream()</a>
 <span class="sourceLineNo">048</span><a id="line.48">            .distinct()</a>
-<span class="sourceLineNo">049</span><a id="line.49">            .collect(toMap(k -&gt; String.join(", ", k.getMagicNames()), v -&gt; v,</a>
-<span class="sourceLineNo">050</span><a id="line.50">                           (t, u) -&gt; t, () -&gt; new TreeMap&lt;&gt;()));</a>
-<span class="sourceLineNo">051</span><a id="line.51">        var map = Map.&lt;String,Object&gt;of("magics", magics);</a>
-<span class="sourceLineNo">052</span><a id="line.52">        var html = ThymeleafRenderer.process(getClass(), resource + ".html", "html", map);</a>
-<span class="sourceLineNo">053</span><a id="line.53">        var text = ThymeleafRenderer.process(getClass(), resource + ".text", "text", map);</a>
-<span class="sourceLineNo">054</span><a id="line.54"></a>
-<span class="sourceLineNo">055</span><a id="line.55">        new KernelRestClient().print(Message.mime_bundle(html, text));</a>
-<span class="sourceLineNo">056</span><a id="line.56">    }</a>
-<span class="sourceLineNo">057</span><a id="line.57">}</a>
+<span class="sourceLineNo">049</span><a id="line.49">            .map(t -&gt; new Row(String.join(", ", t.getMagicNames()),</a>
+<span class="sourceLineNo">050</span><a id="line.50">                              t.getDescription(), t.getUsage()))</a>
+<span class="sourceLineNo">051</span><a id="line.51">            .collect(toList());</a>
+<span class="sourceLineNo">052</span><a id="line.52">        var map = Map.&lt;String,Object&gt;of("rows", rows);</a>
+<span class="sourceLineNo">053</span><a id="line.53">        var html = ThymeleafRenderer.process(getClass(), resource + ".html", "html", map);</a>
+<span class="sourceLineNo">054</span><a id="line.54">        var text = ThymeleafRenderer.process(getClass(), resource + ".text", "text", map);</a>
+<span class="sourceLineNo">055</span><a id="line.55"></a>
+<span class="sourceLineNo">056</span><a id="line.56">        new KernelRestClient().print(Message.mime_bundle(html, text));</a>
+<span class="sourceLineNo">057</span><a id="line.57">    }</a>
+<span class="sourceLineNo">058</span><a id="line.58"></a>
+<span class="sourceLineNo">059</span><a id="line.59">    @Data</a>
+<span class="sourceLineNo">060</span><a id="line.60">    private class Row {</a>
+<span class="sourceLineNo">061</span><a id="line.61">        private final String names;</a>
+<span class="sourceLineNo">062</span><a id="line.62">        private final String description;</a>
+<span class="sourceLineNo">063</span><a id="line.63">        private final String usage;</a>
+<span class="sourceLineNo">064</span><a id="line.64">    }</a>
+<span class="sourceLineNo">065</span><a id="line.65">}</a>
 
 
 

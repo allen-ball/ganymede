@@ -89,403 +89,406 @@
 <span class="sourceLineNo">080</span><a id="line.80">    private static final Set&lt;String&gt; LOGGING_IGNORE =</a>
 <span class="sourceLineNo">081</span><a id="line.81">        Set.of("commons-logging:commons-logging:jar");</a>
 <span class="sourceLineNo">082</span><a id="line.82">    private static final Set&lt;String&gt; JCL_BRIDGES =</a>
-<span class="sourceLineNo">083</span><a id="line.83">        Set.of("org.slf4j:jcl-over-slf4j:jar", "org.springframework:spring-jcl:jar");</a>
-<span class="sourceLineNo">084</span><a id="line.84">    private static final Set&lt;String&gt; SLF4J_BINDINGS =</a>
-<span class="sourceLineNo">085</span><a id="line.85">        Set.of("org.slf4j:slf4j-log4j12:jar", "ch.qos.logback:logback-classic:jar");</a>
-<span class="sourceLineNo">086</span><a id="line.86"></a>
-<span class="sourceLineNo">087</span><a id="line.87">    private static final String DEPENDENCIES_FORMAT = "/META-INF/%s.dependencies";</a>
-<span class="sourceLineNo">088</span><a id="line.88"></a>
-<span class="sourceLineNo">089</span><a id="line.89">    private final POM pom;</a>
-<span class="sourceLineNo">090</span><a id="line.90">    private final Set&lt;File&gt; classpath = new LinkedHashSet&lt;&gt;();</a>
-<span class="sourceLineNo">091</span><a id="line.91">    private final RepositoryImpl repository = new RepositoryImpl();</a>
-<span class="sourceLineNo">092</span><a id="line.92">    private final PathPropertyMap pathMap = new PathPropertyMap();</a>
-<span class="sourceLineNo">093</span><a id="line.93">    private RepositorySystem system = null;</a>
-<span class="sourceLineNo">094</span><a id="line.94"></a>
-<span class="sourceLineNo">095</span><a id="line.95">    {</a>
-<span class="sourceLineNo">096</span><a id="line.96">        try {</a>
-<span class="sourceLineNo">097</span><a id="line.97">            pom = POM.getDefault();</a>
-<span class="sourceLineNo">098</span><a id="line.98"></a>
-<span class="sourceLineNo">099</span><a id="line.99">            classpath.add(new ApplicationHome(getClass()).getSource());</a>
-<span class="sourceLineNo">100</span><a id="line.100">            classpath.stream()</a>
-<span class="sourceLineNo">101</span><a id="line.101">                .flatMap(t -&gt; getShadedArtifactSet(t).stream())</a>
-<span class="sourceLineNo">102</span><a id="line.102">                .forEach(repository::resolve);</a>
-<span class="sourceLineNo">103</span><a id="line.103">        } catch (Exception exception) {</a>
-<span class="sourceLineNo">104</span><a id="line.104">            throw new ExceptionInInitializerError(exception);</a>
-<span class="sourceLineNo">105</span><a id="line.105">        }</a>
-<span class="sourceLineNo">106</span><a id="line.106">    }</a>
-<span class="sourceLineNo">107</span><a id="line.107"></a>
-<span class="sourceLineNo">108</span><a id="line.108">    /**</a>
-<span class="sourceLineNo">109</span><a id="line.109">     * Method to get the current {@link POM}.</a>
-<span class="sourceLineNo">110</span><a id="line.110">     *</a>
-<span class="sourceLineNo">111</span><a id="line.111">     * @return  The current {@link POM}.</a>
-<span class="sourceLineNo">112</span><a id="line.112">     */</a>
-<span class="sourceLineNo">113</span><a id="line.113">    public POM pom() { return pom; }</a>
-<span class="sourceLineNo">114</span><a id="line.114"></a>
-<span class="sourceLineNo">115</span><a id="line.115">    /**</a>
-<span class="sourceLineNo">116</span><a id="line.116">     * Method to get the current classpath.</a>
-<span class="sourceLineNo">117</span><a id="line.117">     *</a>
-<span class="sourceLineNo">118</span><a id="line.118">     * @return  The {@link Set} of {@link File}s.</a>
-<span class="sourceLineNo">119</span><a id="line.119">     */</a>
-<span class="sourceLineNo">120</span><a id="line.120">    public Set&lt;File&gt; classpath() { return classpath; }</a>
-<span class="sourceLineNo">121</span><a id="line.121"></a>
-<span class="sourceLineNo">122</span><a id="line.122">    /**</a>
-<span class="sourceLineNo">123</span><a id="line.123">     * Method to add a {@link File}(s) to the repository</a>
-<span class="sourceLineNo">124</span><a id="line.124">     * ({@link WorkspaceReader}).</a>
-<span class="sourceLineNo">125</span><a id="line.125">     *</a>
-<span class="sourceLineNo">126</span><a id="line.126">     * @param   files           The {@link File}(s).</a>
-<span class="sourceLineNo">127</span><a id="line.127">     */</a>
-<span class="sourceLineNo">128</span><a id="line.128">    public void addToRepository(File... files) {</a>
-<span class="sourceLineNo">129</span><a id="line.129">        Stream.of(files)</a>
-<span class="sourceLineNo">130</span><a id="line.130">            .map(File::getAbsoluteFile)</a>
-<span class="sourceLineNo">131</span><a id="line.131">            .map(this::getShadedArtifactSet)</a>
-<span class="sourceLineNo">132</span><a id="line.132">            .forEach(repository::resolve);</a>
-<span class="sourceLineNo">133</span><a id="line.133">    }</a>
-<span class="sourceLineNo">134</span><a id="line.134"></a>
-<span class="sourceLineNo">135</span><a id="line.135">    /**</a>
-<span class="sourceLineNo">136</span><a id="line.136">     * Method to add a {@link File}(s) to the {@link #classpath()}.  May</a>
-<span class="sourceLineNo">137</span><a id="line.137">     * quietly ignore requests to add {@link File}s that violate internal</a>
-<span class="sourceLineNo">138</span><a id="line.138">     * heuristics (e.g.,</a>
-<span class="sourceLineNo">139</span><a id="line.139">     * {@link.uri http://www.slf4j.org/codes.html#multiple_bindings target=newtab multiple SLF4J bindings}).</a>
-<span class="sourceLineNo">140</span><a id="line.140">     *</a>
-<span class="sourceLineNo">141</span><a id="line.141">     * @param   files           The {@link File}(s).</a>
-<span class="sourceLineNo">142</span><a id="line.142">     *</a>
-<span class="sourceLineNo">143</span><a id="line.143">     * @return  The {@link List} of {@link File}s added to the</a>
-<span class="sourceLineNo">144</span><a id="line.144">     *          {@link #classpath()}.</a>
-<span class="sourceLineNo">145</span><a id="line.145">     */</a>
-<span class="sourceLineNo">146</span><a id="line.146">    public List&lt;File&gt; addToClasspath(File... files) {</a>
-<span class="sourceLineNo">147</span><a id="line.147">        var list = new LinkedList&lt;File&gt;();</a>
-<span class="sourceLineNo">148</span><a id="line.148"></a>
-<span class="sourceLineNo">149</span><a id="line.149">        for (var file : files) {</a>
-<span class="sourceLineNo">150</span><a id="line.150">            file = file.getAbsoluteFile();</a>
+<span class="sourceLineNo">083</span><a id="line.83">        Set.of("org.slf4j:jcl-over-slf4j:jar",</a>
+<span class="sourceLineNo">084</span><a id="line.84">               "org.springframework:spring-jcl:jar");</a>
+<span class="sourceLineNo">085</span><a id="line.85">    private static final Set&lt;String&gt; SLF4J_BINDINGS =</a>
+<span class="sourceLineNo">086</span><a id="line.86">        Set.of("ch.qos.logback:logback-classic:jar",</a>
+<span class="sourceLineNo">087</span><a id="line.87">               "org.apache.logging.log4j:log4j-slf4j-impl:jar",</a>
+<span class="sourceLineNo">088</span><a id="line.88">               "org.slf4j:slf4j-log4j12:jar");</a>
+<span class="sourceLineNo">089</span><a id="line.89"></a>
+<span class="sourceLineNo">090</span><a id="line.90">    private static final String DEPENDENCIES_FORMAT = "/META-INF/%s.dependencies";</a>
+<span class="sourceLineNo">091</span><a id="line.91"></a>
+<span class="sourceLineNo">092</span><a id="line.92">    private final POM pom;</a>
+<span class="sourceLineNo">093</span><a id="line.93">    private final Set&lt;File&gt; classpath = new LinkedHashSet&lt;&gt;();</a>
+<span class="sourceLineNo">094</span><a id="line.94">    private final RepositoryImpl repository = new RepositoryImpl();</a>
+<span class="sourceLineNo">095</span><a id="line.95">    private final PathPropertyMap pathMap = new PathPropertyMap();</a>
+<span class="sourceLineNo">096</span><a id="line.96">    private RepositorySystem system = null;</a>
+<span class="sourceLineNo">097</span><a id="line.97"></a>
+<span class="sourceLineNo">098</span><a id="line.98">    {</a>
+<span class="sourceLineNo">099</span><a id="line.99">        try {</a>
+<span class="sourceLineNo">100</span><a id="line.100">            pom = POM.getDefault();</a>
+<span class="sourceLineNo">101</span><a id="line.101"></a>
+<span class="sourceLineNo">102</span><a id="line.102">            classpath.add(new ApplicationHome(getClass()).getSource());</a>
+<span class="sourceLineNo">103</span><a id="line.103">            classpath.stream()</a>
+<span class="sourceLineNo">104</span><a id="line.104">                .flatMap(t -&gt; getShadedArtifactSet(t).stream())</a>
+<span class="sourceLineNo">105</span><a id="line.105">                .forEach(repository::resolve);</a>
+<span class="sourceLineNo">106</span><a id="line.106">        } catch (Exception exception) {</a>
+<span class="sourceLineNo">107</span><a id="line.107">            throw new ExceptionInInitializerError(exception);</a>
+<span class="sourceLineNo">108</span><a id="line.108">        }</a>
+<span class="sourceLineNo">109</span><a id="line.109">    }</a>
+<span class="sourceLineNo">110</span><a id="line.110"></a>
+<span class="sourceLineNo">111</span><a id="line.111">    /**</a>
+<span class="sourceLineNo">112</span><a id="line.112">     * Method to get the current {@link POM}.</a>
+<span class="sourceLineNo">113</span><a id="line.113">     *</a>
+<span class="sourceLineNo">114</span><a id="line.114">     * @return  The current {@link POM}.</a>
+<span class="sourceLineNo">115</span><a id="line.115">     */</a>
+<span class="sourceLineNo">116</span><a id="line.116">    public POM pom() { return pom; }</a>
+<span class="sourceLineNo">117</span><a id="line.117"></a>
+<span class="sourceLineNo">118</span><a id="line.118">    /**</a>
+<span class="sourceLineNo">119</span><a id="line.119">     * Method to get the current classpath.</a>
+<span class="sourceLineNo">120</span><a id="line.120">     *</a>
+<span class="sourceLineNo">121</span><a id="line.121">     * @return  The {@link Set} of {@link File}s.</a>
+<span class="sourceLineNo">122</span><a id="line.122">     */</a>
+<span class="sourceLineNo">123</span><a id="line.123">    public Set&lt;File&gt; classpath() { return classpath; }</a>
+<span class="sourceLineNo">124</span><a id="line.124"></a>
+<span class="sourceLineNo">125</span><a id="line.125">    /**</a>
+<span class="sourceLineNo">126</span><a id="line.126">     * Method to add a {@link File}(s) to the repository</a>
+<span class="sourceLineNo">127</span><a id="line.127">     * ({@link WorkspaceReader}).</a>
+<span class="sourceLineNo">128</span><a id="line.128">     *</a>
+<span class="sourceLineNo">129</span><a id="line.129">     * @param   files           The {@link File}(s).</a>
+<span class="sourceLineNo">130</span><a id="line.130">     */</a>
+<span class="sourceLineNo">131</span><a id="line.131">    public void addToRepository(File... files) {</a>
+<span class="sourceLineNo">132</span><a id="line.132">        Stream.of(files)</a>
+<span class="sourceLineNo">133</span><a id="line.133">            .map(File::getAbsoluteFile)</a>
+<span class="sourceLineNo">134</span><a id="line.134">            .map(this::getShadedArtifactSet)</a>
+<span class="sourceLineNo">135</span><a id="line.135">            .forEach(repository::resolve);</a>
+<span class="sourceLineNo">136</span><a id="line.136">    }</a>
+<span class="sourceLineNo">137</span><a id="line.137"></a>
+<span class="sourceLineNo">138</span><a id="line.138">    /**</a>
+<span class="sourceLineNo">139</span><a id="line.139">     * Method to add a {@link File}(s) to the {@link #classpath()}.  May</a>
+<span class="sourceLineNo">140</span><a id="line.140">     * quietly ignore requests to add {@link File}s that violate internal</a>
+<span class="sourceLineNo">141</span><a id="line.141">     * heuristics (e.g.,</a>
+<span class="sourceLineNo">142</span><a id="line.142">     * {@link.uri http://www.slf4j.org/codes.html#multiple_bindings target=newtab multiple SLF4J bindings}).</a>
+<span class="sourceLineNo">143</span><a id="line.143">     *</a>
+<span class="sourceLineNo">144</span><a id="line.144">     * @param   files           The {@link File}(s).</a>
+<span class="sourceLineNo">145</span><a id="line.145">     *</a>
+<span class="sourceLineNo">146</span><a id="line.146">     * @return  The {@link List} of {@link File}s added to the</a>
+<span class="sourceLineNo">147</span><a id="line.147">     *          {@link #classpath()}.</a>
+<span class="sourceLineNo">148</span><a id="line.148">     */</a>
+<span class="sourceLineNo">149</span><a id="line.149">    public List&lt;File&gt; addToClasspath(File... files) {</a>
+<span class="sourceLineNo">150</span><a id="line.150">        var list = new LinkedList&lt;File&gt;();</a>
 <span class="sourceLineNo">151</span><a id="line.151"></a>
-<span class="sourceLineNo">152</span><a id="line.152">            var artifacts =</a>
-<span class="sourceLineNo">153</span><a id="line.153">                getShadedArtifactSet(file).stream()</a>
-<span class="sourceLineNo">154</span><a id="line.154">                .map(repository::resolve)</a>
-<span class="sourceLineNo">155</span><a id="line.155">                .collect(toSet());</a>
-<span class="sourceLineNo">156</span><a id="line.156"></a>
-<span class="sourceLineNo">157</span><a id="line.157">            if (! artifacts.isEmpty()) {</a>
-<span class="sourceLineNo">158</span><a id="line.158">                var array = artifacts.toArray(new Artifact[] { });</a>
+<span class="sourceLineNo">152</span><a id="line.152">        for (var file : files) {</a>
+<span class="sourceLineNo">153</span><a id="line.153">            file = file.getAbsoluteFile();</a>
+<span class="sourceLineNo">154</span><a id="line.154"></a>
+<span class="sourceLineNo">155</span><a id="line.155">            var artifacts =</a>
+<span class="sourceLineNo">156</span><a id="line.156">                getShadedArtifactSet(file).stream()</a>
+<span class="sourceLineNo">157</span><a id="line.157">                .map(repository::resolve)</a>
+<span class="sourceLineNo">158</span><a id="line.158">                .collect(toSet());</a>
 <span class="sourceLineNo">159</span><a id="line.159"></a>
-<span class="sourceLineNo">160</span><a id="line.160">                list.addAll(addToClasspath(array));</a>
-<span class="sourceLineNo">161</span><a id="line.161">            } else {</a>
-<span class="sourceLineNo">162</span><a id="line.162">                if (classpath.add(file)) {</a>
-<span class="sourceLineNo">163</span><a id="line.163">                    list.add(file);</a>
-<span class="sourceLineNo">164</span><a id="line.164">                }</a>
-<span class="sourceLineNo">165</span><a id="line.165">            }</a>
-<span class="sourceLineNo">166</span><a id="line.166">        }</a>
-<span class="sourceLineNo">167</span><a id="line.167"></a>
-<span class="sourceLineNo">168</span><a id="line.168">        return list;</a>
-<span class="sourceLineNo">169</span><a id="line.169">    }</a>
+<span class="sourceLineNo">160</span><a id="line.160">            if (! artifacts.isEmpty()) {</a>
+<span class="sourceLineNo">161</span><a id="line.161">                var array = artifacts.toArray(new Artifact[] { });</a>
+<span class="sourceLineNo">162</span><a id="line.162"></a>
+<span class="sourceLineNo">163</span><a id="line.163">                list.addAll(addToClasspath(array));</a>
+<span class="sourceLineNo">164</span><a id="line.164">            } else {</a>
+<span class="sourceLineNo">165</span><a id="line.165">                if (classpath.add(file)) {</a>
+<span class="sourceLineNo">166</span><a id="line.166">                    list.add(file);</a>
+<span class="sourceLineNo">167</span><a id="line.167">                }</a>
+<span class="sourceLineNo">168</span><a id="line.168">            }</a>
+<span class="sourceLineNo">169</span><a id="line.169">        }</a>
 <span class="sourceLineNo">170</span><a id="line.170"></a>
-<span class="sourceLineNo">171</span><a id="line.171">    /**</a>
-<span class="sourceLineNo">172</span><a id="line.172">     * Method to add a {@link Artifact}(s) to the {@link #classpath()}.</a>
-<span class="sourceLineNo">173</span><a id="line.173">     * May quietly ignore requests to add {@link Artifact}s that violate</a>
-<span class="sourceLineNo">174</span><a id="line.174">     * internal heuristics (e.g.,</a>
-<span class="sourceLineNo">175</span><a id="line.175">     * {@link.uri http://www.slf4j.org/codes.html#multiple_bindings target=newtab multiple SLF4J bindings}).</a>
-<span class="sourceLineNo">176</span><a id="line.176">     *</a>
-<span class="sourceLineNo">177</span><a id="line.177">     * @param   artifacts       The {@link Artifact}(s).</a>
-<span class="sourceLineNo">178</span><a id="line.178">     *</a>
-<span class="sourceLineNo">179</span><a id="line.179">     * @return  The {@link List} of {@link File}s added to the</a>
-<span class="sourceLineNo">180</span><a id="line.180">     *          {@link #classpath()}.</a>
-<span class="sourceLineNo">181</span><a id="line.181">     */</a>
-<span class="sourceLineNo">182</span><a id="line.182">    public List&lt;File&gt; addToClasspath(Artifact... artifacts) {</a>
-<span class="sourceLineNo">183</span><a id="line.183">        var list = new LinkedList&lt;File&gt;();</a>
-<span class="sourceLineNo">184</span><a id="line.184">        var resolved =</a>
-<span class="sourceLineNo">185</span><a id="line.185">            Stream.of(artifacts)</a>
-<span class="sourceLineNo">186</span><a id="line.186">            .map(repository::resolve)</a>
-<span class="sourceLineNo">187</span><a id="line.187">            .collect(toList());</a>
-<span class="sourceLineNo">188</span><a id="line.188"></a>
-<span class="sourceLineNo">189</span><a id="line.189">        for (var artifact : resolved) {</a>
-<span class="sourceLineNo">190</span><a id="line.190">            var ignore = false;</a>
-<span class="sourceLineNo">191</span><a id="line.191">            var id = ArtifactIdUtils.toVersionlessId(artifact);</a>
-<span class="sourceLineNo">192</span><a id="line.192"></a>
-<span class="sourceLineNo">193</span><a id="line.193">            if (! ignore) {</a>
-<span class="sourceLineNo">194</span><a id="line.194">                ignore |= LOGGING_IGNORE.contains(id);</a>
-<span class="sourceLineNo">195</span><a id="line.195">            }</a>
-<span class="sourceLineNo">196</span><a id="line.196"></a>
-<span class="sourceLineNo">197</span><a id="line.197">            if (! ignore) {</a>
-<span class="sourceLineNo">198</span><a id="line.198">                if (SLF4J_BINDINGS.contains(id)) {</a>
-<span class="sourceLineNo">199</span><a id="line.199">                    ignore |=</a>
-<span class="sourceLineNo">200</span><a id="line.200">                        repository.getArtifactsOn(classpath)</a>
-<span class="sourceLineNo">201</span><a id="line.201">                        .map(ArtifactIdUtils::toVersionlessId)</a>
-<span class="sourceLineNo">202</span><a id="line.202">                        .anyMatch(t -&gt; SLF4J_BINDINGS.contains(t));</a>
-<span class="sourceLineNo">203</span><a id="line.203">                }</a>
-<span class="sourceLineNo">204</span><a id="line.204">            }</a>
-<span class="sourceLineNo">205</span><a id="line.205"></a>
-<span class="sourceLineNo">206</span><a id="line.206">            if (! ignore) {</a>
-<span class="sourceLineNo">207</span><a id="line.207">                if (JCL_BRIDGES.contains(id)) {</a>
-<span class="sourceLineNo">208</span><a id="line.208">                    ignore |=</a>
-<span class="sourceLineNo">209</span><a id="line.209">                        repository.getArtifactsOn(classpath)</a>
-<span class="sourceLineNo">210</span><a id="line.210">                        .map(ArtifactIdUtils::toVersionlessId)</a>
-<span class="sourceLineNo">211</span><a id="line.211">                        .anyMatch(t -&gt; JCL_BRIDGES.contains(t));</a>
-<span class="sourceLineNo">212</span><a id="line.212">                }</a>
-<span class="sourceLineNo">213</span><a id="line.213">            }</a>
-<span class="sourceLineNo">214</span><a id="line.214"></a>
-<span class="sourceLineNo">215</span><a id="line.215">            if (! ignore) {</a>
-<span class="sourceLineNo">216</span><a id="line.216">                if (! classpath.contains(artifact.getFile())) {</a>
-<span class="sourceLineNo">217</span><a id="line.217">                    var installed =</a>
-<span class="sourceLineNo">218</span><a id="line.218">                        repository.getArtifactsOn(classpath)</a>
-<span class="sourceLineNo">219</span><a id="line.219">                        .filter(t -&gt; ArtifactIdUtils.equalsVersionlessId(artifact, t))</a>
-<span class="sourceLineNo">220</span><a id="line.220">                        .findFirst().orElse(null);</a>
-<span class="sourceLineNo">221</span><a id="line.221"></a>
-<span class="sourceLineNo">222</span><a id="line.222">                    if (installed == null) {</a>
-<span class="sourceLineNo">223</span><a id="line.223">                        if (classpath.add(artifact.getFile())) {</a>
-<span class="sourceLineNo">224</span><a id="line.224">                            list.add(artifact.getFile());</a>
-<span class="sourceLineNo">225</span><a id="line.225">                        }</a>
-<span class="sourceLineNo">226</span><a id="line.226">                    } else {</a>
-<span class="sourceLineNo">227</span><a id="line.227">                        log.debug("Ignored resolved artifact {}", artifact);</a>
-<span class="sourceLineNo">228</span><a id="line.228">                        log.debug("    for {} @ {}",</a>
-<span class="sourceLineNo">229</span><a id="line.229">                                  () -&gt; installed.getVersion(),</a>
-<span class="sourceLineNo">230</span><a id="line.230">                                  () -&gt; pathMap.shorten(installed.getFile()));</a>
-<span class="sourceLineNo">231</span><a id="line.231">                    }</a>
-<span class="sourceLineNo">232</span><a id="line.232">                }</a>
-<span class="sourceLineNo">233</span><a id="line.233">            }</a>
-<span class="sourceLineNo">234</span><a id="line.234">        }</a>
-<span class="sourceLineNo">235</span><a id="line.235"></a>
-<span class="sourceLineNo">236</span><a id="line.236">        return list;</a>
-<span class="sourceLineNo">237</span><a id="line.237">    }</a>
+<span class="sourceLineNo">171</span><a id="line.171">        return list;</a>
+<span class="sourceLineNo">172</span><a id="line.172">    }</a>
+<span class="sourceLineNo">173</span><a id="line.173"></a>
+<span class="sourceLineNo">174</span><a id="line.174">    /**</a>
+<span class="sourceLineNo">175</span><a id="line.175">     * Method to add a {@link Artifact}(s) to the {@link #classpath()}.</a>
+<span class="sourceLineNo">176</span><a id="line.176">     * May quietly ignore requests to add {@link Artifact}s that violate</a>
+<span class="sourceLineNo">177</span><a id="line.177">     * internal heuristics (e.g.,</a>
+<span class="sourceLineNo">178</span><a id="line.178">     * {@link.uri http://www.slf4j.org/codes.html#multiple_bindings target=newtab multiple SLF4J bindings}).</a>
+<span class="sourceLineNo">179</span><a id="line.179">     *</a>
+<span class="sourceLineNo">180</span><a id="line.180">     * @param   artifacts       The {@link Artifact}(s).</a>
+<span class="sourceLineNo">181</span><a id="line.181">     *</a>
+<span class="sourceLineNo">182</span><a id="line.182">     * @return  The {@link List} of {@link File}s added to the</a>
+<span class="sourceLineNo">183</span><a id="line.183">     *          {@link #classpath()}.</a>
+<span class="sourceLineNo">184</span><a id="line.184">     */</a>
+<span class="sourceLineNo">185</span><a id="line.185">    public List&lt;File&gt; addToClasspath(Artifact... artifacts) {</a>
+<span class="sourceLineNo">186</span><a id="line.186">        var list = new LinkedList&lt;File&gt;();</a>
+<span class="sourceLineNo">187</span><a id="line.187">        var resolved =</a>
+<span class="sourceLineNo">188</span><a id="line.188">            Stream.of(artifacts)</a>
+<span class="sourceLineNo">189</span><a id="line.189">            .map(repository::resolve)</a>
+<span class="sourceLineNo">190</span><a id="line.190">            .collect(toList());</a>
+<span class="sourceLineNo">191</span><a id="line.191"></a>
+<span class="sourceLineNo">192</span><a id="line.192">        for (var artifact : resolved) {</a>
+<span class="sourceLineNo">193</span><a id="line.193">            var ignore = false;</a>
+<span class="sourceLineNo">194</span><a id="line.194">            var id = ArtifactIdUtils.toVersionlessId(artifact);</a>
+<span class="sourceLineNo">195</span><a id="line.195"></a>
+<span class="sourceLineNo">196</span><a id="line.196">            if (! ignore) {</a>
+<span class="sourceLineNo">197</span><a id="line.197">                ignore |= LOGGING_IGNORE.contains(id);</a>
+<span class="sourceLineNo">198</span><a id="line.198">            }</a>
+<span class="sourceLineNo">199</span><a id="line.199"></a>
+<span class="sourceLineNo">200</span><a id="line.200">            if (! ignore) {</a>
+<span class="sourceLineNo">201</span><a id="line.201">                if (SLF4J_BINDINGS.contains(id)) {</a>
+<span class="sourceLineNo">202</span><a id="line.202">                    ignore |=</a>
+<span class="sourceLineNo">203</span><a id="line.203">                        repository.getArtifactsOn(classpath)</a>
+<span class="sourceLineNo">204</span><a id="line.204">                        .map(ArtifactIdUtils::toVersionlessId)</a>
+<span class="sourceLineNo">205</span><a id="line.205">                        .anyMatch(t -&gt; SLF4J_BINDINGS.contains(t));</a>
+<span class="sourceLineNo">206</span><a id="line.206">                }</a>
+<span class="sourceLineNo">207</span><a id="line.207">            }</a>
+<span class="sourceLineNo">208</span><a id="line.208"></a>
+<span class="sourceLineNo">209</span><a id="line.209">            if (! ignore) {</a>
+<span class="sourceLineNo">210</span><a id="line.210">                if (JCL_BRIDGES.contains(id)) {</a>
+<span class="sourceLineNo">211</span><a id="line.211">                    ignore |=</a>
+<span class="sourceLineNo">212</span><a id="line.212">                        repository.getArtifactsOn(classpath)</a>
+<span class="sourceLineNo">213</span><a id="line.213">                        .map(ArtifactIdUtils::toVersionlessId)</a>
+<span class="sourceLineNo">214</span><a id="line.214">                        .anyMatch(t -&gt; JCL_BRIDGES.contains(t));</a>
+<span class="sourceLineNo">215</span><a id="line.215">                }</a>
+<span class="sourceLineNo">216</span><a id="line.216">            }</a>
+<span class="sourceLineNo">217</span><a id="line.217"></a>
+<span class="sourceLineNo">218</span><a id="line.218">            if (! ignore) {</a>
+<span class="sourceLineNo">219</span><a id="line.219">                if (! classpath.contains(artifact.getFile())) {</a>
+<span class="sourceLineNo">220</span><a id="line.220">                    var installed =</a>
+<span class="sourceLineNo">221</span><a id="line.221">                        repository.getArtifactsOn(classpath)</a>
+<span class="sourceLineNo">222</span><a id="line.222">                        .filter(t -&gt; ArtifactIdUtils.equalsVersionlessId(artifact, t))</a>
+<span class="sourceLineNo">223</span><a id="line.223">                        .findFirst().orElse(null);</a>
+<span class="sourceLineNo">224</span><a id="line.224"></a>
+<span class="sourceLineNo">225</span><a id="line.225">                    if (installed == null) {</a>
+<span class="sourceLineNo">226</span><a id="line.226">                        if (classpath.add(artifact.getFile())) {</a>
+<span class="sourceLineNo">227</span><a id="line.227">                            list.add(artifact.getFile());</a>
+<span class="sourceLineNo">228</span><a id="line.228">                        }</a>
+<span class="sourceLineNo">229</span><a id="line.229">                    } else {</a>
+<span class="sourceLineNo">230</span><a id="line.230">                        log.debug("Ignored resolved artifact {}", artifact);</a>
+<span class="sourceLineNo">231</span><a id="line.231">                        log.debug("    for {} @ {}",</a>
+<span class="sourceLineNo">232</span><a id="line.232">                                  () -&gt; installed.getVersion(),</a>
+<span class="sourceLineNo">233</span><a id="line.233">                                  () -&gt; pathMap.shorten(installed.getFile()));</a>
+<span class="sourceLineNo">234</span><a id="line.234">                    }</a>
+<span class="sourceLineNo">235</span><a id="line.235">                }</a>
+<span class="sourceLineNo">236</span><a id="line.236">            }</a>
+<span class="sourceLineNo">237</span><a id="line.237">        }</a>
 <span class="sourceLineNo">238</span><a id="line.238"></a>
-<span class="sourceLineNo">239</span><a id="line.239">    /**</a>
-<span class="sourceLineNo">240</span><a id="line.240">     * Method to add known dependencies found within a parent directory to</a>
-<span class="sourceLineNo">241</span><a id="line.241">     * the {@link #classpath()}.  An artifact</a>
-<span class="sourceLineNo">242</span><a id="line.242">     * {@code artifactId-version.packaging} is a known artifact if there is</a>
-<span class="sourceLineNo">243</span><a id="line.243">     * {@code META-INF/artifactId-version.packaging.dependencies} file on</a>
-<span class="sourceLineNo">244</span><a id="line.244">     * the classpath which contains the artifact's dependencies.</a>
-<span class="sourceLineNo">245</span><a id="line.245">     *</a>
-<span class="sourceLineNo">246</span><a id="line.246">     * @param   parent          The parent {@link File} to analyze.</a>
-<span class="sourceLineNo">247</span><a id="line.247">     *</a>
-<span class="sourceLineNo">248</span><a id="line.248">     * @return  The {@link List} of {@link File}s added to the</a>
-<span class="sourceLineNo">249</span><a id="line.249">     *          {@link #classpath()}.</a>
-<span class="sourceLineNo">250</span><a id="line.250">     */</a>
-<span class="sourceLineNo">251</span><a id="line.251">    public List&lt;File&gt; addKnownDependenciesToClasspath(File parent) {</a>
-<span class="sourceLineNo">252</span><a id="line.252">        var list = new LinkedList&lt;File&gt;();</a>
-<span class="sourceLineNo">253</span><a id="line.253"></a>
-<span class="sourceLineNo">254</span><a id="line.254">        try (var stream = Files.newDirectoryStream(parent.toPath(), "*.jar")) {</a>
-<span class="sourceLineNo">255</span><a id="line.255">            for (var entry : stream) {</a>
-<span class="sourceLineNo">256</span><a id="line.256">                var resource = String.format(DEPENDENCIES_FORMAT, entry.getFileName());</a>
-<span class="sourceLineNo">257</span><a id="line.257"></a>
-<span class="sourceLineNo">258</span><a id="line.258">                try (var in = getClass().getResourceAsStream(resource)) {</a>
-<span class="sourceLineNo">259</span><a id="line.259">                    if (in != null) {</a>
-<span class="sourceLineNo">260</span><a id="line.260">                        var artifacts =</a>
-<span class="sourceLineNo">261</span><a id="line.261">                            parse(in)</a>
-<span class="sourceLineNo">262</span><a id="line.262">                            .map(t -&gt; t.setFile(new File(parent,</a>
-<span class="sourceLineNo">263</span><a id="line.263">                                                         t.getArtifactId()</a>
-<span class="sourceLineNo">264</span><a id="line.264">                                                         + "-" + t.getVersion()</a>
-<span class="sourceLineNo">265</span><a id="line.265">                                                         + "." + t.getExtension())</a>
-<span class="sourceLineNo">266</span><a id="line.266">                                                .getAbsoluteFile()))</a>
-<span class="sourceLineNo">267</span><a id="line.267">                            .filter(t -&gt; t.getFile().exists())</a>
-<span class="sourceLineNo">268</span><a id="line.268">                            .toArray(Artifact[]::new);</a>
-<span class="sourceLineNo">269</span><a id="line.269"></a>
-<span class="sourceLineNo">270</span><a id="line.270">                        list.addAll(addToClasspath(artifacts));</a>
-<span class="sourceLineNo">271</span><a id="line.271">                    }</a>
-<span class="sourceLineNo">272</span><a id="line.272">                } catch (Exception exception) {</a>
-<span class="sourceLineNo">273</span><a id="line.273">                    log.warn("Could not read {}", resource, exception);</a>
-<span class="sourceLineNo">274</span><a id="line.274">                }</a>
-<span class="sourceLineNo">275</span><a id="line.275">            }</a>
-<span class="sourceLineNo">276</span><a id="line.276">        } catch (Exception exception) {</a>
-<span class="sourceLineNo">277</span><a id="line.277">            log.warn("{}: {}", parent, exception);</a>
-<span class="sourceLineNo">278</span><a id="line.278">        }</a>
-<span class="sourceLineNo">279</span><a id="line.279"></a>
-<span class="sourceLineNo">280</span><a id="line.280">        return list;</a>
-<span class="sourceLineNo">281</span><a id="line.281">    }</a>
+<span class="sourceLineNo">239</span><a id="line.239">        return list;</a>
+<span class="sourceLineNo">240</span><a id="line.240">    }</a>
+<span class="sourceLineNo">241</span><a id="line.241"></a>
+<span class="sourceLineNo">242</span><a id="line.242">    /**</a>
+<span class="sourceLineNo">243</span><a id="line.243">     * Method to add known dependencies found within a parent directory to</a>
+<span class="sourceLineNo">244</span><a id="line.244">     * the {@link #classpath()}.  An artifact</a>
+<span class="sourceLineNo">245</span><a id="line.245">     * {@code artifactId-version.packaging} is a known artifact if there is</a>
+<span class="sourceLineNo">246</span><a id="line.246">     * {@code META-INF/artifactId-version.packaging.dependencies} file on</a>
+<span class="sourceLineNo">247</span><a id="line.247">     * the classpath which contains the artifact's dependencies.</a>
+<span class="sourceLineNo">248</span><a id="line.248">     *</a>
+<span class="sourceLineNo">249</span><a id="line.249">     * @param   parent          The parent {@link File} to analyze.</a>
+<span class="sourceLineNo">250</span><a id="line.250">     *</a>
+<span class="sourceLineNo">251</span><a id="line.251">     * @return  The {@link List} of {@link File}s added to the</a>
+<span class="sourceLineNo">252</span><a id="line.252">     *          {@link #classpath()}.</a>
+<span class="sourceLineNo">253</span><a id="line.253">     */</a>
+<span class="sourceLineNo">254</span><a id="line.254">    public List&lt;File&gt; addKnownDependenciesToClasspath(File parent) {</a>
+<span class="sourceLineNo">255</span><a id="line.255">        var list = new LinkedList&lt;File&gt;();</a>
+<span class="sourceLineNo">256</span><a id="line.256"></a>
+<span class="sourceLineNo">257</span><a id="line.257">        try (var stream = Files.newDirectoryStream(parent.toPath(), "*.jar")) {</a>
+<span class="sourceLineNo">258</span><a id="line.258">            for (var entry : stream) {</a>
+<span class="sourceLineNo">259</span><a id="line.259">                var resource = String.format(DEPENDENCIES_FORMAT, entry.getFileName());</a>
+<span class="sourceLineNo">260</span><a id="line.260"></a>
+<span class="sourceLineNo">261</span><a id="line.261">                try (var in = getClass().getResourceAsStream(resource)) {</a>
+<span class="sourceLineNo">262</span><a id="line.262">                    if (in != null) {</a>
+<span class="sourceLineNo">263</span><a id="line.263">                        var artifacts =</a>
+<span class="sourceLineNo">264</span><a id="line.264">                            parse(in)</a>
+<span class="sourceLineNo">265</span><a id="line.265">                            .map(t -&gt; t.setFile(new File(parent,</a>
+<span class="sourceLineNo">266</span><a id="line.266">                                                         t.getArtifactId()</a>
+<span class="sourceLineNo">267</span><a id="line.267">                                                         + "-" + t.getVersion()</a>
+<span class="sourceLineNo">268</span><a id="line.268">                                                         + "." + t.getExtension())</a>
+<span class="sourceLineNo">269</span><a id="line.269">                                                .getAbsoluteFile()))</a>
+<span class="sourceLineNo">270</span><a id="line.270">                            .filter(t -&gt; t.getFile().exists())</a>
+<span class="sourceLineNo">271</span><a id="line.271">                            .toArray(Artifact[]::new);</a>
+<span class="sourceLineNo">272</span><a id="line.272"></a>
+<span class="sourceLineNo">273</span><a id="line.273">                        list.addAll(addToClasspath(artifacts));</a>
+<span class="sourceLineNo">274</span><a id="line.274">                    }</a>
+<span class="sourceLineNo">275</span><a id="line.275">                } catch (Exception exception) {</a>
+<span class="sourceLineNo">276</span><a id="line.276">                    log.warn("Could not read {}", resource, exception);</a>
+<span class="sourceLineNo">277</span><a id="line.277">                }</a>
+<span class="sourceLineNo">278</span><a id="line.278">            }</a>
+<span class="sourceLineNo">279</span><a id="line.279">        } catch (Exception exception) {</a>
+<span class="sourceLineNo">280</span><a id="line.280">            log.warn("{}: {}", parent, exception);</a>
+<span class="sourceLineNo">281</span><a id="line.281">        }</a>
 <span class="sourceLineNo">282</span><a id="line.282"></a>
-<span class="sourceLineNo">283</span><a id="line.283">    /**</a>
-<span class="sourceLineNo">284</span><a id="line.284">     * Merge the argument {@link POM} and resolve any dependencies.</a>
-<span class="sourceLineNo">285</span><a id="line.285">     *</a>
-<span class="sourceLineNo">286</span><a id="line.286">     * @param   shell           The {@link Shell}.</a>
-<span class="sourceLineNo">287</span><a id="line.287">     * @param   out             The {@code stdout} {@link PrintStream}.</a>
-<span class="sourceLineNo">288</span><a id="line.288">     * @param   err             The {@code stderr} {@link PrintStream}.</a>
-<span class="sourceLineNo">289</span><a id="line.289">     * @param   pom             The {@link POM} to merge.</a>
-<span class="sourceLineNo">290</span><a id="line.290">     *</a>
-<span class="sourceLineNo">291</span><a id="line.291">     * @return  The {@link List} of {@link File}s added to the</a>
-<span class="sourceLineNo">292</span><a id="line.292">     *          {@link #classpath()}.</a>
-<span class="sourceLineNo">293</span><a id="line.293">     */</a>
-<span class="sourceLineNo">294</span><a id="line.294">    public List&lt;File&gt; resolve(Shell shell, PrintStream out, PrintStream err, POM pom) {</a>
-<span class="sourceLineNo">295</span><a id="line.295">        var files = new ArrayList&lt;File&gt;();</a>
-<span class="sourceLineNo">296</span><a id="line.296"></a>
-<span class="sourceLineNo">297</span><a id="line.297">        pom().merge(pom);</a>
-<span class="sourceLineNo">298</span><a id="line.298"></a>
-<span class="sourceLineNo">299</span><a id="line.299">        var system = system();</a>
-<span class="sourceLineNo">300</span><a id="line.300">        var session = session();</a>
-<span class="sourceLineNo">301</span><a id="line.301">        var repositories = pom().getRepositories().stream().collect(toList());</a>
-<span class="sourceLineNo">302</span><a id="line.302">        var scope = JavaScopes.RUNTIME;</a>
-<span class="sourceLineNo">303</span><a id="line.303">        var filter = DependencyFilterUtils.classpathFilter(scope);</a>
-<span class="sourceLineNo">304</span><a id="line.304">        var iterator = pom().getDependencies().iterator();</a>
-<span class="sourceLineNo">305</span><a id="line.305"></a>
-<span class="sourceLineNo">306</span><a id="line.306">        while (iterator.hasNext()) {</a>
-<span class="sourceLineNo">307</span><a id="line.307">            var dependency = iterator.next();</a>
+<span class="sourceLineNo">283</span><a id="line.283">        return list;</a>
+<span class="sourceLineNo">284</span><a id="line.284">    }</a>
+<span class="sourceLineNo">285</span><a id="line.285"></a>
+<span class="sourceLineNo">286</span><a id="line.286">    /**</a>
+<span class="sourceLineNo">287</span><a id="line.287">     * Merge the argument {@link POM} and resolve any dependencies.</a>
+<span class="sourceLineNo">288</span><a id="line.288">     *</a>
+<span class="sourceLineNo">289</span><a id="line.289">     * @param   shell           The {@link Shell}.</a>
+<span class="sourceLineNo">290</span><a id="line.290">     * @param   out             The {@code stdout} {@link PrintStream}.</a>
+<span class="sourceLineNo">291</span><a id="line.291">     * @param   err             The {@code stderr} {@link PrintStream}.</a>
+<span class="sourceLineNo">292</span><a id="line.292">     * @param   pom             The {@link POM} to merge.</a>
+<span class="sourceLineNo">293</span><a id="line.293">     *</a>
+<span class="sourceLineNo">294</span><a id="line.294">     * @return  The {@link List} of {@link File}s added to the</a>
+<span class="sourceLineNo">295</span><a id="line.295">     *          {@link #classpath()}.</a>
+<span class="sourceLineNo">296</span><a id="line.296">     */</a>
+<span class="sourceLineNo">297</span><a id="line.297">    public List&lt;File&gt; resolve(Shell shell, PrintStream out, PrintStream err, POM pom) {</a>
+<span class="sourceLineNo">298</span><a id="line.298">        var files = new ArrayList&lt;File&gt;();</a>
+<span class="sourceLineNo">299</span><a id="line.299"></a>
+<span class="sourceLineNo">300</span><a id="line.300">        pom().merge(pom);</a>
+<span class="sourceLineNo">301</span><a id="line.301"></a>
+<span class="sourceLineNo">302</span><a id="line.302">        var system = system();</a>
+<span class="sourceLineNo">303</span><a id="line.303">        var session = session();</a>
+<span class="sourceLineNo">304</span><a id="line.304">        var repositories = pom().getRepositories().stream().collect(toList());</a>
+<span class="sourceLineNo">305</span><a id="line.305">        var scope = JavaScopes.RUNTIME;</a>
+<span class="sourceLineNo">306</span><a id="line.306">        var filter = DependencyFilterUtils.classpathFilter(scope);</a>
+<span class="sourceLineNo">307</span><a id="line.307">        var iterator = pom().getDependencies().iterator();</a>
 <span class="sourceLineNo">308</span><a id="line.308"></a>
-<span class="sourceLineNo">309</span><a id="line.309">            try {</a>
-<span class="sourceLineNo">310</span><a id="line.310">                var request = new DependencyRequest(new CollectRequest(dependency, repositories), filter);</a>
+<span class="sourceLineNo">309</span><a id="line.309">        while (iterator.hasNext()) {</a>
+<span class="sourceLineNo">310</span><a id="line.310">            var dependency = iterator.next();</a>
 <span class="sourceLineNo">311</span><a id="line.311"></a>
-<span class="sourceLineNo">312</span><a id="line.312">                for (var result :</a>
-<span class="sourceLineNo">313</span><a id="line.313">                         system.resolveDependencies(session, request)</a>
-<span class="sourceLineNo">314</span><a id="line.314">                         .getArtifactResults()) {</a>
-<span class="sourceLineNo">315</span><a id="line.315">                    if (result.isResolved()) {</a>
-<span class="sourceLineNo">316</span><a id="line.316">                        var artifact = repository.resolve(result.getArtifact());</a>
-<span class="sourceLineNo">317</span><a id="line.317"></a>
-<span class="sourceLineNo">318</span><a id="line.318">                        if (! classpath.contains(artifact.getFile())) {</a>
-<span class="sourceLineNo">319</span><a id="line.319">                            var installed =</a>
-<span class="sourceLineNo">320</span><a id="line.320">                                repository.getArtifactsOn(classpath)</a>
-<span class="sourceLineNo">321</span><a id="line.321">                                .filter(t -&gt; ArtifactIdUtils.equalsVersionlessId(artifact, t))</a>
-<span class="sourceLineNo">322</span><a id="line.322">                                .findFirst().orElse(null);</a>
-<span class="sourceLineNo">323</span><a id="line.323"></a>
-<span class="sourceLineNo">324</span><a id="line.324">                            if (installed == null) {</a>
-<span class="sourceLineNo">325</span><a id="line.325">                                files.addAll(addToClasspath(artifact));</a>
-<span class="sourceLineNo">326</span><a id="line.326">                            } else {</a>
-<span class="sourceLineNo">327</span><a id="line.327">                                log.debug("Ignored resolved artifact {}", artifact);</a>
-<span class="sourceLineNo">328</span><a id="line.328">                                log.debug("    for {} @ {}",</a>
-<span class="sourceLineNo">329</span><a id="line.329">                                          () -&gt; installed.getVersion(),</a>
-<span class="sourceLineNo">330</span><a id="line.330">                                          () -&gt; pathMap.shorten(installed.getFile()));</a>
-<span class="sourceLineNo">331</span><a id="line.331">                            }</a>
-<span class="sourceLineNo">332</span><a id="line.332">                        }</a>
-<span class="sourceLineNo">333</span><a id="line.333">                    }</a>
-<span class="sourceLineNo">334</span><a id="line.334"></a>
-<span class="sourceLineNo">335</span><a id="line.335">                    if (result.isMissing()) {</a>
-<span class="sourceLineNo">336</span><a id="line.336">                        result.getExceptions().stream()</a>
-<span class="sourceLineNo">337</span><a id="line.337">                            .forEach(t -&gt; err.println(t.getMessage()));</a>
-<span class="sourceLineNo">338</span><a id="line.338">                    }</a>
-<span class="sourceLineNo">339</span><a id="line.339">                }</a>
-<span class="sourceLineNo">340</span><a id="line.340">                continue;</a>
-<span class="sourceLineNo">341</span><a id="line.341">            } catch (DependencyResolutionException exception) {</a>
-<span class="sourceLineNo">342</span><a id="line.342">                err.println(exception.getMessage());</a>
-<span class="sourceLineNo">343</span><a id="line.343">            } catch (Exception exception) {</a>
-<span class="sourceLineNo">344</span><a id="line.344">                exception.printStackTrace(err);</a>
-<span class="sourceLineNo">345</span><a id="line.345">            }</a>
-<span class="sourceLineNo">346</span><a id="line.346"></a>
-<span class="sourceLineNo">347</span><a id="line.347">            iterator.remove();</a>
-<span class="sourceLineNo">348</span><a id="line.348">        }</a>
+<span class="sourceLineNo">312</span><a id="line.312">            try {</a>
+<span class="sourceLineNo">313</span><a id="line.313">                var request = new DependencyRequest(new CollectRequest(dependency, repositories), filter);</a>
+<span class="sourceLineNo">314</span><a id="line.314"></a>
+<span class="sourceLineNo">315</span><a id="line.315">                for (var result :</a>
+<span class="sourceLineNo">316</span><a id="line.316">                         system.resolveDependencies(session, request)</a>
+<span class="sourceLineNo">317</span><a id="line.317">                         .getArtifactResults()) {</a>
+<span class="sourceLineNo">318</span><a id="line.318">                    if (result.isResolved()) {</a>
+<span class="sourceLineNo">319</span><a id="line.319">                        var artifact = repository.resolve(result.getArtifact());</a>
+<span class="sourceLineNo">320</span><a id="line.320"></a>
+<span class="sourceLineNo">321</span><a id="line.321">                        if (! classpath.contains(artifact.getFile())) {</a>
+<span class="sourceLineNo">322</span><a id="line.322">                            var installed =</a>
+<span class="sourceLineNo">323</span><a id="line.323">                                repository.getArtifactsOn(classpath)</a>
+<span class="sourceLineNo">324</span><a id="line.324">                                .filter(t -&gt; ArtifactIdUtils.equalsVersionlessId(artifact, t))</a>
+<span class="sourceLineNo">325</span><a id="line.325">                                .findFirst().orElse(null);</a>
+<span class="sourceLineNo">326</span><a id="line.326"></a>
+<span class="sourceLineNo">327</span><a id="line.327">                            if (installed == null) {</a>
+<span class="sourceLineNo">328</span><a id="line.328">                                files.addAll(addToClasspath(artifact));</a>
+<span class="sourceLineNo">329</span><a id="line.329">                            } else {</a>
+<span class="sourceLineNo">330</span><a id="line.330">                                log.debug("Ignored resolved artifact {}", artifact);</a>
+<span class="sourceLineNo">331</span><a id="line.331">                                log.debug("    for {} @ {}",</a>
+<span class="sourceLineNo">332</span><a id="line.332">                                          () -&gt; installed.getVersion(),</a>
+<span class="sourceLineNo">333</span><a id="line.333">                                          () -&gt; pathMap.shorten(installed.getFile()));</a>
+<span class="sourceLineNo">334</span><a id="line.334">                            }</a>
+<span class="sourceLineNo">335</span><a id="line.335">                        }</a>
+<span class="sourceLineNo">336</span><a id="line.336">                    }</a>
+<span class="sourceLineNo">337</span><a id="line.337"></a>
+<span class="sourceLineNo">338</span><a id="line.338">                    if (result.isMissing()) {</a>
+<span class="sourceLineNo">339</span><a id="line.339">                        result.getExceptions().stream()</a>
+<span class="sourceLineNo">340</span><a id="line.340">                            .forEach(t -&gt; err.println(t.getMessage()));</a>
+<span class="sourceLineNo">341</span><a id="line.341">                    }</a>
+<span class="sourceLineNo">342</span><a id="line.342">                }</a>
+<span class="sourceLineNo">343</span><a id="line.343">                continue;</a>
+<span class="sourceLineNo">344</span><a id="line.344">            } catch (DependencyResolutionException exception) {</a>
+<span class="sourceLineNo">345</span><a id="line.345">                err.println(exception.getMessage());</a>
+<span class="sourceLineNo">346</span><a id="line.346">            } catch (Exception exception) {</a>
+<span class="sourceLineNo">347</span><a id="line.347">                exception.printStackTrace(err);</a>
+<span class="sourceLineNo">348</span><a id="line.348">            }</a>
 <span class="sourceLineNo">349</span><a id="line.349"></a>
-<span class="sourceLineNo">350</span><a id="line.350">        return files;</a>
-<span class="sourceLineNo">351</span><a id="line.351">    }</a>
+<span class="sourceLineNo">350</span><a id="line.350">            iterator.remove();</a>
+<span class="sourceLineNo">351</span><a id="line.351">        }</a>
 <span class="sourceLineNo">352</span><a id="line.352"></a>
-<span class="sourceLineNo">353</span><a id="line.353">    @Synchronized</a>
-<span class="sourceLineNo">354</span><a id="line.354">    private RepositorySystem system() {</a>
-<span class="sourceLineNo">355</span><a id="line.355">        if (system == null) {</a>
-<span class="sourceLineNo">356</span><a id="line.356">            var locator = MavenRepositorySystemUtils.newServiceLocator();</a>
-<span class="sourceLineNo">357</span><a id="line.357"></a>
-<span class="sourceLineNo">358</span><a id="line.358">            locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);</a>
-<span class="sourceLineNo">359</span><a id="line.359">            locator.addService(TransporterFactory.class, FileTransporterFactory.class);</a>
-<span class="sourceLineNo">360</span><a id="line.360">            locator.addService(TransporterFactory.class, HttpTransporterFactory.class);</a>
-<span class="sourceLineNo">361</span><a id="line.361">            locator.addService(TransporterFactory.class, ClasspathTransporterFactory.class);</a>
-<span class="sourceLineNo">362</span><a id="line.362"></a>
-<span class="sourceLineNo">363</span><a id="line.363">            system = locator.getService(RepositorySystem.class);</a>
-<span class="sourceLineNo">364</span><a id="line.364">        }</a>
+<span class="sourceLineNo">353</span><a id="line.353">        return files;</a>
+<span class="sourceLineNo">354</span><a id="line.354">    }</a>
+<span class="sourceLineNo">355</span><a id="line.355"></a>
+<span class="sourceLineNo">356</span><a id="line.356">    @Synchronized</a>
+<span class="sourceLineNo">357</span><a id="line.357">    private RepositorySystem system() {</a>
+<span class="sourceLineNo">358</span><a id="line.358">        if (system == null) {</a>
+<span class="sourceLineNo">359</span><a id="line.359">            var locator = MavenRepositorySystemUtils.newServiceLocator();</a>
+<span class="sourceLineNo">360</span><a id="line.360"></a>
+<span class="sourceLineNo">361</span><a id="line.361">            locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);</a>
+<span class="sourceLineNo">362</span><a id="line.362">            locator.addService(TransporterFactory.class, FileTransporterFactory.class);</a>
+<span class="sourceLineNo">363</span><a id="line.363">            locator.addService(TransporterFactory.class, HttpTransporterFactory.class);</a>
+<span class="sourceLineNo">364</span><a id="line.364">            locator.addService(TransporterFactory.class, ClasspathTransporterFactory.class);</a>
 <span class="sourceLineNo">365</span><a id="line.365"></a>
-<span class="sourceLineNo">366</span><a id="line.366">        return system;</a>
-<span class="sourceLineNo">367</span><a id="line.367">    }</a>
+<span class="sourceLineNo">366</span><a id="line.366">            system = locator.getService(RepositorySystem.class);</a>
+<span class="sourceLineNo">367</span><a id="line.367">        }</a>
 <span class="sourceLineNo">368</span><a id="line.368"></a>
-<span class="sourceLineNo">369</span><a id="line.369">    @Synchronized</a>
-<span class="sourceLineNo">370</span><a id="line.370">    private RepositorySystemSession session() {</a>
-<span class="sourceLineNo">371</span><a id="line.371">        var session = MavenRepositorySystemUtils.newSession();</a>
-<span class="sourceLineNo">372</span><a id="line.372">        var properties = new LinkedHashMap&lt;Object,Object&gt;();</a>
-<span class="sourceLineNo">373</span><a id="line.373"></a>
-<span class="sourceLineNo">374</span><a id="line.374">        properties.put(ConfigurationProperties.USER_AGENT,</a>
-<span class="sourceLineNo">375</span><a id="line.375">                       String.format("Ganymede/(Java %s; %s)",</a>
-<span class="sourceLineNo">376</span><a id="line.376">                                     System.getProperty("java.version"),</a>
-<span class="sourceLineNo">377</span><a id="line.377">                                     System.getProperty("os.version")));</a>
-<span class="sourceLineNo">378</span><a id="line.378">        /*</a>
-<span class="sourceLineNo">379</span><a id="line.379">         * properties.putAll((Map&lt;?,?&gt;) project.getProperties());</a>
-<span class="sourceLineNo">380</span><a id="line.380">         */</a>
+<span class="sourceLineNo">369</span><a id="line.369">        return system;</a>
+<span class="sourceLineNo">370</span><a id="line.370">    }</a>
+<span class="sourceLineNo">371</span><a id="line.371"></a>
+<span class="sourceLineNo">372</span><a id="line.372">    @Synchronized</a>
+<span class="sourceLineNo">373</span><a id="line.373">    private RepositorySystemSession session() {</a>
+<span class="sourceLineNo">374</span><a id="line.374">        var session = MavenRepositorySystemUtils.newSession();</a>
+<span class="sourceLineNo">375</span><a id="line.375">        var properties = new LinkedHashMap&lt;Object,Object&gt;();</a>
+<span class="sourceLineNo">376</span><a id="line.376"></a>
+<span class="sourceLineNo">377</span><a id="line.377">        properties.put(ConfigurationProperties.USER_AGENT,</a>
+<span class="sourceLineNo">378</span><a id="line.378">                       String.format("Ganymede/(Java %s; %s)",</a>
+<span class="sourceLineNo">379</span><a id="line.379">                                     System.getProperty("java.version"),</a>
+<span class="sourceLineNo">380</span><a id="line.380">                                     System.getProperty("os.version")));</a>
 <span class="sourceLineNo">381</span><a id="line.381">        /*</a>
-<span class="sourceLineNo">382</span><a id="line.382">         * ${settings.servers}</a>
-<span class="sourceLineNo">383</span><a id="line.383">         * AntRepoSys: processServerConfiguration(properties);</a>
-<span class="sourceLineNo">384</span><a id="line.384">         */</a>
-<span class="sourceLineNo">385</span><a id="line.385">        session.setConfigProperties(properties);</a>
-<span class="sourceLineNo">386</span><a id="line.386">        session.setOffline(Objects.requireNonNullElse(pom().getOffline(), false));</a>
-<span class="sourceLineNo">387</span><a id="line.387">        /*</a>
-<span class="sourceLineNo">388</span><a id="line.388">         * AntRepoSys: session.setUserProperties(project.getUserProperties());</a>
-<span class="sourceLineNo">389</span><a id="line.389">         */</a>
+<span class="sourceLineNo">382</span><a id="line.382">         * properties.putAll((Map&lt;?,?&gt;) project.getProperties());</a>
+<span class="sourceLineNo">383</span><a id="line.383">         */</a>
+<span class="sourceLineNo">384</span><a id="line.384">        /*</a>
+<span class="sourceLineNo">385</span><a id="line.385">         * ${settings.servers}</a>
+<span class="sourceLineNo">386</span><a id="line.386">         * AntRepoSys: processServerConfiguration(properties);</a>
+<span class="sourceLineNo">387</span><a id="line.387">         */</a>
+<span class="sourceLineNo">388</span><a id="line.388">        session.setConfigProperties(properties);</a>
+<span class="sourceLineNo">389</span><a id="line.389">        session.setOffline(Objects.requireNonNullElse(pom().getOffline(), false));</a>
 <span class="sourceLineNo">390</span><a id="line.390">        /*</a>
-<span class="sourceLineNo">391</span><a id="line.391">         * ${settings.servers}, ${settings.mirrors}</a>
-<span class="sourceLineNo">392</span><a id="line.392">         * session.setProxySelector(getProxySelector());</a>
-<span class="sourceLineNo">393</span><a id="line.393">         * session.setMirrorSelector(getMirrorSelector());</a>
-<span class="sourceLineNo">394</span><a id="line.394">         * session.setAuthenticationSelector(getAuthSelector());</a>
-<span class="sourceLineNo">395</span><a id="line.395">         */</a>
-<span class="sourceLineNo">396</span><a id="line.396">        session.setCache(new DefaultRepositoryCache());</a>
-<span class="sourceLineNo">397</span><a id="line.397">        session.setLocalRepositoryManager(getLocalRepositoryManager(session));</a>
-<span class="sourceLineNo">398</span><a id="line.398">        session.setRepositoryListener(new RepositoryListener());</a>
-<span class="sourceLineNo">399</span><a id="line.399">        session.setTransferListener(new TransferListener());</a>
-<span class="sourceLineNo">400</span><a id="line.400">        session.setWorkspaceReader(repository);</a>
-<span class="sourceLineNo">401</span><a id="line.401"></a>
-<span class="sourceLineNo">402</span><a id="line.402">        return session;</a>
-<span class="sourceLineNo">403</span><a id="line.403">    }</a>
+<span class="sourceLineNo">391</span><a id="line.391">         * AntRepoSys: session.setUserProperties(project.getUserProperties());</a>
+<span class="sourceLineNo">392</span><a id="line.392">         */</a>
+<span class="sourceLineNo">393</span><a id="line.393">        /*</a>
+<span class="sourceLineNo">394</span><a id="line.394">         * ${settings.servers}, ${settings.mirrors}</a>
+<span class="sourceLineNo">395</span><a id="line.395">         * session.setProxySelector(getProxySelector());</a>
+<span class="sourceLineNo">396</span><a id="line.396">         * session.setMirrorSelector(getMirrorSelector());</a>
+<span class="sourceLineNo">397</span><a id="line.397">         * session.setAuthenticationSelector(getAuthSelector());</a>
+<span class="sourceLineNo">398</span><a id="line.398">         */</a>
+<span class="sourceLineNo">399</span><a id="line.399">        session.setCache(new DefaultRepositoryCache());</a>
+<span class="sourceLineNo">400</span><a id="line.400">        session.setLocalRepositoryManager(getLocalRepositoryManager(session));</a>
+<span class="sourceLineNo">401</span><a id="line.401">        session.setRepositoryListener(new RepositoryListener());</a>
+<span class="sourceLineNo">402</span><a id="line.402">        session.setTransferListener(new TransferListener());</a>
+<span class="sourceLineNo">403</span><a id="line.403">        session.setWorkspaceReader(repository);</a>
 <span class="sourceLineNo">404</span><a id="line.404"></a>
-<span class="sourceLineNo">405</span><a id="line.405">    private LocalRepositoryManager getLocalRepositoryManager(RepositorySystemSession session) {</a>
-<span class="sourceLineNo">406</span><a id="line.406">        var path =</a>
-<span class="sourceLineNo">407</span><a id="line.407">            Stream.of(pom().getLocalRepository(),</a>
-<span class="sourceLineNo">408</span><a id="line.408">                      System.getProperty("maven.repo.local"))</a>
-<span class="sourceLineNo">409</span><a id="line.409">            .filter(Objects::nonNull)</a>
-<span class="sourceLineNo">410</span><a id="line.410">            .map(Paths::get)</a>
-<span class="sourceLineNo">411</span><a id="line.411">            .findFirst()</a>
-<span class="sourceLineNo">412</span><a id="line.412">            .orElse(Paths.get(System.getProperty("user.home"), ".m2", "repository"));</a>
-<span class="sourceLineNo">413</span><a id="line.413">        var repository = new LocalRepository(path.toFile());</a>
-<span class="sourceLineNo">414</span><a id="line.414"></a>
-<span class="sourceLineNo">415</span><a id="line.415">        return system().newLocalRepositoryManager(session, repository);</a>
-<span class="sourceLineNo">416</span><a id="line.416">    }</a>
+<span class="sourceLineNo">405</span><a id="line.405">        return session;</a>
+<span class="sourceLineNo">406</span><a id="line.406">    }</a>
+<span class="sourceLineNo">407</span><a id="line.407"></a>
+<span class="sourceLineNo">408</span><a id="line.408">    private LocalRepositoryManager getLocalRepositoryManager(RepositorySystemSession session) {</a>
+<span class="sourceLineNo">409</span><a id="line.409">        var path =</a>
+<span class="sourceLineNo">410</span><a id="line.410">            Stream.of(pom().getLocalRepository(),</a>
+<span class="sourceLineNo">411</span><a id="line.411">                      System.getProperty("maven.repo.local"))</a>
+<span class="sourceLineNo">412</span><a id="line.412">            .filter(Objects::nonNull)</a>
+<span class="sourceLineNo">413</span><a id="line.413">            .map(Paths::get)</a>
+<span class="sourceLineNo">414</span><a id="line.414">            .findFirst()</a>
+<span class="sourceLineNo">415</span><a id="line.415">            .orElse(Paths.get(System.getProperty("user.home"), ".m2", "repository"));</a>
+<span class="sourceLineNo">416</span><a id="line.416">        var repository = new LocalRepository(path.toFile());</a>
 <span class="sourceLineNo">417</span><a id="line.417"></a>
-<span class="sourceLineNo">418</span><a id="line.418">    @NoArgsConstructor</a>
-<span class="sourceLineNo">419</span><a id="line.419">    private class RepositoryImpl extends TreeMap&lt;String,Artifact&gt; implements WorkspaceReader {</a>
-<span class="sourceLineNo">420</span><a id="line.420">        private static final long serialVersionUID = -1L;</a>
-<span class="sourceLineNo">421</span><a id="line.421"></a>
-<span class="sourceLineNo">422</span><a id="line.422">        public Set&lt;Artifact&gt; resolve(Set&lt;Artifact&gt; set) {</a>
-<span class="sourceLineNo">423</span><a id="line.423">            var resolved =</a>
-<span class="sourceLineNo">424</span><a id="line.424">                set.stream()</a>
-<span class="sourceLineNo">425</span><a id="line.425">                .map(this::resolve)</a>
-<span class="sourceLineNo">426</span><a id="line.426">                .collect(toCollection(LinkedHashSet::new));</a>
-<span class="sourceLineNo">427</span><a id="line.427"></a>
-<span class="sourceLineNo">428</span><a id="line.428">            return resolved;</a>
-<span class="sourceLineNo">429</span><a id="line.429">        }</a>
+<span class="sourceLineNo">418</span><a id="line.418">        return system().newLocalRepositoryManager(session, repository);</a>
+<span class="sourceLineNo">419</span><a id="line.419">    }</a>
+<span class="sourceLineNo">420</span><a id="line.420"></a>
+<span class="sourceLineNo">421</span><a id="line.421">    @NoArgsConstructor</a>
+<span class="sourceLineNo">422</span><a id="line.422">    private class RepositoryImpl extends TreeMap&lt;String,Artifact&gt; implements WorkspaceReader {</a>
+<span class="sourceLineNo">423</span><a id="line.423">        private static final long serialVersionUID = -1L;</a>
+<span class="sourceLineNo">424</span><a id="line.424"></a>
+<span class="sourceLineNo">425</span><a id="line.425">        public Set&lt;Artifact&gt; resolve(Set&lt;Artifact&gt; set) {</a>
+<span class="sourceLineNo">426</span><a id="line.426">            var resolved =</a>
+<span class="sourceLineNo">427</span><a id="line.427">                set.stream()</a>
+<span class="sourceLineNo">428</span><a id="line.428">                .map(this::resolve)</a>
+<span class="sourceLineNo">429</span><a id="line.429">                .collect(toCollection(LinkedHashSet::new));</a>
 <span class="sourceLineNo">430</span><a id="line.430"></a>
-<span class="sourceLineNo">431</span><a id="line.431">        public Artifact resolve(Artifact artifact) {</a>
-<span class="sourceLineNo">432</span><a id="line.432">            if (artifact.getFile() == null) {</a>
-<span class="sourceLineNo">433</span><a id="line.433">                throw new IllegalArgumentException();</a>
-<span class="sourceLineNo">434</span><a id="line.434">            }</a>
-<span class="sourceLineNo">435</span><a id="line.435"></a>
-<span class="sourceLineNo">436</span><a id="line.436">            return computeIfAbsent(ArtifactIdUtils.toId(artifact), k -&gt; artifact);</a>
-<span class="sourceLineNo">437</span><a id="line.437">        }</a>
+<span class="sourceLineNo">431</span><a id="line.431">            return resolved;</a>
+<span class="sourceLineNo">432</span><a id="line.432">        }</a>
+<span class="sourceLineNo">433</span><a id="line.433"></a>
+<span class="sourceLineNo">434</span><a id="line.434">        public Artifact resolve(Artifact artifact) {</a>
+<span class="sourceLineNo">435</span><a id="line.435">            if (artifact.getFile() == null) {</a>
+<span class="sourceLineNo">436</span><a id="line.436">                throw new IllegalArgumentException();</a>
+<span class="sourceLineNo">437</span><a id="line.437">            }</a>
 <span class="sourceLineNo">438</span><a id="line.438"></a>
-<span class="sourceLineNo">439</span><a id="line.439">        public Stream&lt;Artifact&gt; getArtifactsOn(Set&lt;File&gt; classpath) {</a>
-<span class="sourceLineNo">440</span><a id="line.440">            return values().stream().filter(t -&gt; classpath.contains(t.getFile()));</a>
-<span class="sourceLineNo">441</span><a id="line.441">        }</a>
-<span class="sourceLineNo">442</span><a id="line.442"></a>
-<span class="sourceLineNo">443</span><a id="line.443">        @Override</a>
-<span class="sourceLineNo">444</span><a id="line.444">        public WorkspaceRepository getRepository() {</a>
-<span class="sourceLineNo">445</span><a id="line.445">            return new WorkspaceRepository(getClass().getPackage().getName());</a>
-<span class="sourceLineNo">446</span><a id="line.446">        }</a>
-<span class="sourceLineNo">447</span><a id="line.447"></a>
-<span class="sourceLineNo">448</span><a id="line.448">        @Override</a>
-<span class="sourceLineNo">449</span><a id="line.449">        public File findArtifact(Artifact artifact) {</a>
-<span class="sourceLineNo">450</span><a id="line.450">            var id = ArtifactIdUtils.toId(artifact);</a>
-<span class="sourceLineNo">451</span><a id="line.451">            var file =</a>
-<span class="sourceLineNo">452</span><a id="line.452">                values().stream()</a>
-<span class="sourceLineNo">453</span><a id="line.453">                .filter(t -&gt; Objects.equals(id, ArtifactIdUtils.toId(t)))</a>
-<span class="sourceLineNo">454</span><a id="line.454">                .map(Artifact::getFile)</a>
-<span class="sourceLineNo">455</span><a id="line.455">                .findFirst().orElse(null);</a>
-<span class="sourceLineNo">456</span><a id="line.456"></a>
-<span class="sourceLineNo">457</span><a id="line.457">            return file;</a>
-<span class="sourceLineNo">458</span><a id="line.458">        }</a>
+<span class="sourceLineNo">439</span><a id="line.439">            return computeIfAbsent(ArtifactIdUtils.toId(artifact), k -&gt; artifact);</a>
+<span class="sourceLineNo">440</span><a id="line.440">        }</a>
+<span class="sourceLineNo">441</span><a id="line.441"></a>
+<span class="sourceLineNo">442</span><a id="line.442">        public Stream&lt;Artifact&gt; getArtifactsOn(Set&lt;File&gt; classpath) {</a>
+<span class="sourceLineNo">443</span><a id="line.443">            return values().stream().filter(t -&gt; classpath.contains(t.getFile()));</a>
+<span class="sourceLineNo">444</span><a id="line.444">        }</a>
+<span class="sourceLineNo">445</span><a id="line.445"></a>
+<span class="sourceLineNo">446</span><a id="line.446">        @Override</a>
+<span class="sourceLineNo">447</span><a id="line.447">        public WorkspaceRepository getRepository() {</a>
+<span class="sourceLineNo">448</span><a id="line.448">            return new WorkspaceRepository(getClass().getPackage().getName());</a>
+<span class="sourceLineNo">449</span><a id="line.449">        }</a>
+<span class="sourceLineNo">450</span><a id="line.450"></a>
+<span class="sourceLineNo">451</span><a id="line.451">        @Override</a>
+<span class="sourceLineNo">452</span><a id="line.452">        public File findArtifact(Artifact artifact) {</a>
+<span class="sourceLineNo">453</span><a id="line.453">            var id = ArtifactIdUtils.toId(artifact);</a>
+<span class="sourceLineNo">454</span><a id="line.454">            var file =</a>
+<span class="sourceLineNo">455</span><a id="line.455">                values().stream()</a>
+<span class="sourceLineNo">456</span><a id="line.456">                .filter(t -&gt; Objects.equals(id, ArtifactIdUtils.toId(t)))</a>
+<span class="sourceLineNo">457</span><a id="line.457">                .map(Artifact::getFile)</a>
+<span class="sourceLineNo">458</span><a id="line.458">                .findFirst().orElse(null);</a>
 <span class="sourceLineNo">459</span><a id="line.459"></a>
-<span class="sourceLineNo">460</span><a id="line.460">        @Override</a>
-<span class="sourceLineNo">461</span><a id="line.461">        public List&lt;String&gt; findVersions(Artifact artifact) {</a>
-<span class="sourceLineNo">462</span><a id="line.462">            var list =</a>
-<span class="sourceLineNo">463</span><a id="line.463">                values().stream()</a>
-<span class="sourceLineNo">464</span><a id="line.464">                .filter(t -&gt; ArtifactIdUtils.equalsVersionlessId(artifact, t))</a>
-<span class="sourceLineNo">465</span><a id="line.465">                .map(Artifact::getVersion)</a>
-<span class="sourceLineNo">466</span><a id="line.466">                .collect(toList());</a>
-<span class="sourceLineNo">467</span><a id="line.467"></a>
-<span class="sourceLineNo">468</span><a id="line.468">            return list;</a>
-<span class="sourceLineNo">469</span><a id="line.469">        }</a>
-<span class="sourceLineNo">470</span><a id="line.470">    }</a>
-<span class="sourceLineNo">471</span><a id="line.471"></a>
-<span class="sourceLineNo">472</span><a id="line.472">    @NoArgsConstructor @ToString</a>
-<span class="sourceLineNo">473</span><a id="line.473">    private class RepositoryListener extends AbstractRepositoryListener {</a>
-<span class="sourceLineNo">474</span><a id="line.474">    }</a>
-<span class="sourceLineNo">475</span><a id="line.475"></a>
-<span class="sourceLineNo">476</span><a id="line.476">    @NoArgsConstructor @ToString</a>
-<span class="sourceLineNo">477</span><a id="line.477">    private class TransferListener extends AbstractTransferListener {</a>
-<span class="sourceLineNo">478</span><a id="line.478">    }</a>
-<span class="sourceLineNo">479</span><a id="line.479">}</a>
+<span class="sourceLineNo">460</span><a id="line.460">            return file;</a>
+<span class="sourceLineNo">461</span><a id="line.461">        }</a>
+<span class="sourceLineNo">462</span><a id="line.462"></a>
+<span class="sourceLineNo">463</span><a id="line.463">        @Override</a>
+<span class="sourceLineNo">464</span><a id="line.464">        public List&lt;String&gt; findVersions(Artifact artifact) {</a>
+<span class="sourceLineNo">465</span><a id="line.465">            var list =</a>
+<span class="sourceLineNo">466</span><a id="line.466">                values().stream()</a>
+<span class="sourceLineNo">467</span><a id="line.467">                .filter(t -&gt; ArtifactIdUtils.equalsVersionlessId(artifact, t))</a>
+<span class="sourceLineNo">468</span><a id="line.468">                .map(Artifact::getVersion)</a>
+<span class="sourceLineNo">469</span><a id="line.469">                .collect(toList());</a>
+<span class="sourceLineNo">470</span><a id="line.470"></a>
+<span class="sourceLineNo">471</span><a id="line.471">            return list;</a>
+<span class="sourceLineNo">472</span><a id="line.472">        }</a>
+<span class="sourceLineNo">473</span><a id="line.473">    }</a>
+<span class="sourceLineNo">474</span><a id="line.474"></a>
+<span class="sourceLineNo">475</span><a id="line.475">    @NoArgsConstructor @ToString</a>
+<span class="sourceLineNo">476</span><a id="line.476">    private class RepositoryListener extends AbstractRepositoryListener {</a>
+<span class="sourceLineNo">477</span><a id="line.477">    }</a>
+<span class="sourceLineNo">478</span><a id="line.478"></a>
+<span class="sourceLineNo">479</span><a id="line.479">    @NoArgsConstructor @ToString</a>
+<span class="sourceLineNo">480</span><a id="line.480">    private class TransferListener extends AbstractTransferListener {</a>
+<span class="sourceLineNo">481</span><a id="line.481">    }</a>
+<span class="sourceLineNo">482</span><a id="line.482">}</a>
 
 
 
