@@ -17,9 +17,6 @@
   limitations under the License.
   ##########################################################################
   */-->
-<div th:with="href = ${session.sparkContext().uiWebUrl().get()}">
-  <a th:href="${href}" th:target="_newtab">
-    [(${session.conf().get('spark.master')})]
-    [(${session.conf().get('spark.app.name')})]
-  </a>
+<div th:with="context = ${session.sparkContext()}">
+  <a th:href="${context.uiWebUrl().get()}" th:target="_newtab" th:text="${context.master()}"/>
 </div>
