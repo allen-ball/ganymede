@@ -8,7 +8,7 @@ for artifact in ${*}; do
     A="${GAV[1]}"
     V="${GAV[2]}"
 
-    mvn -B dependency:get -Dtransitive=false -Dartifact="${G}:${A}:${V}"
+    mvn -B dependency:get -Dartifact="${G}:${A}:${V}"
 
     name="${A}-${V}"
 
