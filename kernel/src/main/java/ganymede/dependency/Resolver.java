@@ -80,9 +80,12 @@ public class Resolver extends Analyzer {
     private static final Set<String> LOGGING_IGNORE =
         Set.of("commons-logging:commons-logging:jar");
     private static final Set<String> JCL_BRIDGES =
-        Set.of("org.slf4j:jcl-over-slf4j:jar", "org.springframework:spring-jcl:jar");
+        Set.of("org.slf4j:jcl-over-slf4j:jar",
+               "org.springframework:spring-jcl:jar");
     private static final Set<String> SLF4J_BINDINGS =
-        Set.of("ch.qos.logback:logback-classic:jar", "org.slf4j:slf4j-log4j12:jar");
+        Set.of("ch.qos.logback:logback-classic:jar",
+               "org.apache.logging.log4j:log4j-slf4j-impl:jar",
+               "org.slf4j:slf4j-log4j12:jar");
 
     private static final String DEPENDENCIES_FORMAT = "/META-INF/%s.dependencies";
 

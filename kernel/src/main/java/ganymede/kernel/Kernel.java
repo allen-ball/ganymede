@@ -91,6 +91,9 @@ public class Kernel extends Server implements ApplicationContextAware,
     @Value("${spark-home:#{null}}")
     private String spark_home = null;
 
+    @Value("${hive-home:#{null}}")
+    private String hive_home = null;
+
     @Value("${kernel.version}")
     private String kernel_version = null;
 
@@ -134,6 +137,12 @@ public class Kernel extends Server implements ApplicationContextAware,
 
         if (spark_home != null) {
             var parent = Paths.get(spark_home, "jars").toFile();
+
+            shell.addKnownDependenciesToClasspath(parent);
+        }
+
+        if (hive_home != null) {
+            var parent = Paths.get(hive_home, "lib").toFile();
 
             shell.addKnownDependenciesToClasspath(parent);
         }

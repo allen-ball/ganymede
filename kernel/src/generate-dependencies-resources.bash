@@ -8,7 +8,7 @@ for artifact in ${*}; do
     A="${GAV[1]}"
     V="${GAV[2]}"
 
-    mvn -B dependency:get -DgroupId="${G}" -DartifactId="${A}" -Dversion="${V}"
+    mvn -B dependency:get -Dtransitive=false -Dartifact="${G}:${A}:${V}"
 
     name="${A}-${V}"
 
@@ -16,6 +16,6 @@ for artifact in ${*}; do
     outputFile="${PWD}/main/resources/META-INF/${name}.jar.dependencies"
 
     mvn -B -f "${pom}" dependency:tree \
-        -DoutputScope=false -Dscope=runtime \
-        -Dtokens=whitespace -DoutputFile="${outputFile}"
+        -DoutputScope=false -Dscope=runtime -Dtokens=whitespace \
+        -DoutputFile="${outputFile}"
 done
