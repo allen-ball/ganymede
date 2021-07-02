@@ -24,6 +24,7 @@ import ganymede.server.renderer.ForClassName;
 import ganymede.util.ServiceProviderMap;
 import java.util.Comparator;
 import java.util.Optional;
+import java.util.ServiceLoader;
 import java.util.TreeMap;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -41,15 +42,48 @@ public class RendererMap extends TreeMap<Class<?>,Renderer> {
 
     /** @serial */
     private final ServiceProviderMap<Renderer> map =
-        new ServiceProviderMap<>(Renderer.class);
+        new ServiceProviderMap<>(Renderer.class, this::compute);
 
     /**
      * Sole constructor.
      */
-    public RendererMap() {
-        super(COMPARATOR);
+    public RendererMap() { super(COMPARATOR); }
 
-        reload();
+    private Renderer compute(ServiceLoader.Provider<Renderer> provider) {
+        Class<?> renderType = null;
+
+        if (renderType == null) {
+            try {
+                renderType = getRenderType(provider.getClass());
+            } catch (Exception exception) {
+            }
+        }
+
+        if (renderType == null) {
+            try {
+                renderType = getRenderType(provider.type());
+            } catch (Exception exception) {
+            }
+        }
+
+        return (renderType != null) ? computeIfAbsent(renderType, k -> provider.get()) : null;
+    }
+
+    private Class<?> getRenderType(Class<?> type) throws Exception {
+        Class<?> renderType = null;
+
+        try {
+            if (type.isAnnotationPresent(ForClassName.class)) {
+                var name = type.getAnnotation(ForClassName.class).value();
+
+                renderType = Class.forName(name, false, map.getClassLoader());
+            } else {
+                renderType = type.getAnnotation(ForClass.class).value();
+            }
+        } catch (Exception exception) {
+        }
+
+        return renderType;
     }
 
     /**
@@ -59,46 +93,9 @@ public class RendererMap extends TreeMap<Class<?>,Renderer> {
      * @return  {@link.this}
      */
     public RendererMap reload() {
-        var iterator = map.reload(this::accept).values().iterator();
-
-        while (iterator.hasNext()) {
-            var renderer = iterator.next();
-
-            try {
-                var key = getRenderType(renderer.getClass());
-
-                computeIfAbsent(key, k -> renderer);
-            } catch (Exception exception) {
-            }
-        }
+        map.reload();
 
         return this;
-    }
-
-    private boolean accept(Class<?> provider) {
-        boolean accept = true;
-
-        try {
-            getRenderType(provider);
-        } catch (Exception exception) {
-            accept = false;
-        }
-
-        return accept;
-    }
-
-    private Class<?> getRenderType(Class<?> provider) throws Exception {
-        Class<?> type = null;
-
-        if (provider.isAnnotationPresent(ForClassName.class)) {
-            var name = provider.getAnnotation(ForClassName.class).value();
-
-            type = Class.forName(name, false, map.getClassLoader());
-        } else {
-            type = provider.getAnnotation(ForClass.class).value();
-        }
-
-        return type;
     }
 
     /**

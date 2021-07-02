@@ -19,21 +19,20 @@ package ganymede.shell;
  * ##########################################################################
  */
 import ganymede.util.ServiceProviderMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
- * {@link Magic} {@link Map}.
+ * {@link Magic} {@link java.util.Map}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 public class MagicMap extends TreeMap<String,Magic> {
     private static final long serialVersionUID = 6930042409603983399L;
 
-    /** @serial */ private final ServiceProviderMap<Magic> map = new ServiceProviderMap<>(Magic.class);
+    /** @serial */ private final ServiceProviderMap<Magic> map = new ServiceProviderMap<>(Magic.class, null);
     /** @serial */ private final Consumer<Magic> initializer;
 
     /**
@@ -65,10 +64,10 @@ public class MagicMap extends TreeMap<String,Magic> {
                     if (initializer != null) {
                         initializer.accept(magic);
                     }
+                }
 
-                    for (var key : keys) {
-                        computeIfAbsent(key, k -> magic);
-                    }
+                for (var key : keys) {
+                    computeIfAbsent(key, k -> magic);
                 }
             } catch (Exception exception) {
             }

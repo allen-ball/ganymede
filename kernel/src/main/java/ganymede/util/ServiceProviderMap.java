@@ -19,12 +19,11 @@ package ganymede.util;
  * ##########################################################################
  */
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.TreeMap;
-import java.util.function.Predicate;
-
-import static java.util.stream.Collectors.toList;
+import java.util.function.Function;
 
 /**
  * {@link ServiceLoader Service} {@link java.util.Map}.
@@ -34,23 +33,32 @@ import static java.util.stream.Collectors.toList;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 public class ServiceProviderMap<T> extends TreeMap<Class<? extends T>,T> {
-    private static final long serialVersionUID = 1150156295503292563L;
+    private static final long serialVersionUID = 5423712518719767597L;
+
+    private static final Comparator<Class<?>> COMPARATOR = Comparator.comparing(Class::getName);
 
     /** @serial */ private final Class<T> service;
     /** @serial */ private final ServiceLoader<T> loader;
+    /** @serial */ private Function<ServiceLoader.Provider<T>,T> compute;
 
     /**
      * Sole constructor.
      *
      * @param   service         The service {@link Class type}.
+     * @param   compute         The {@link Function} to obtain a value
+     *                          instance from a
+     *                          {@link ServiceLoader.Provider}.
      */
-    public ServiceProviderMap(Class<T> service) {
-        super(Comparator.comparing(Class::getName));
+    public ServiceProviderMap(Class<T> service, Function<ServiceLoader.Provider<T>,T> compute) {
+        super(COMPARATOR);
 
         this.service = service;
         this.loader = ServiceLoader.load(service, service.getClassLoader());
+        this.compute = Objects.requireNonNullElse(compute, this::compute);
+    }
 
-        reload();
+    private T compute(ServiceLoader.Provider<T> provider) {
+        return provider.get();
     }
 
     /**
@@ -66,33 +74,16 @@ public class ServiceProviderMap<T> extends TreeMap<Class<? extends T>,T> {
      *
      * @return  {@link.this}
      */
-    public ServiceProviderMap<T> reload() { return reload(t -> true); }
-
-    /**
-     * Reload {@link ServiceLoader} and {@link #put(Object,Object)} newly
-     * discovered entries.  A {@link Predicate} may be supplied to test a
-     * provider {@link Class} before attempting to load and might be used to
-     * test that other required {@link Class}es are loaded before attempting
-     * to load.
-     *
-     * @param   predicate       A {@link Predicate} to test whether or not
-     *                          the provider {@link Class} should be
-     *                          loaded.
-     *
-     * @return  {@link.this}
-     */
-    public ServiceProviderMap<T> reload(Predicate<Class<?>> predicate) {
+    public ServiceProviderMap<T> reload() {
         loader.reload();
 
-        var providers = loader.stream().collect(toList());
+        var iterator = loader.stream().iterator();
 
-        for (var provider : providers) {
+        while (iterator.hasNext()) {
+            var provider = iterator.next();
+
             try {
-                var type = provider.type();
-
-                if (predicate.test(type)) {
-                    computeIfAbsent(type, k -> provider.get());
-                }
+                computeIfAbsent(provider.type(), k -> compute.apply(provider));
             } catch (ServiceConfigurationError error) {
             }
         }
