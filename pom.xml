@@ -90,7 +90,7 @@
 
     <start-class>ganymede.Launcher</start-class>
 
-    <commonmark.version>0.17.2</commonmark.version>
+    <commonmark.version>0.18.0</commonmark.version>
     <graal-sdk.version>0.33</graal-sdk.version>
     <jackson-bom.version>2.10.5.20201202</jackson-bom.version>
     <scala.binary.version>2.12</scala.binary.version>
