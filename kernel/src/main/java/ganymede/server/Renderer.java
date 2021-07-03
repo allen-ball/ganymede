@@ -19,9 +19,10 @@ package ganymede.server;
  * ##########################################################################
  */
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import ganymede.server.renderer.ForClass;
+import ganymede.server.renderer.ForClassName;
 import java.util.Base64;
-
-import static ganymede.server.Server.JSON_OBJECT_MAPPER;
+import java.util.Optional;
 
 /**
  * {@link Message#mime_bundle(Object,Object...)} output {@link Renderer}.
@@ -33,9 +34,38 @@ public interface Renderer {
     public static final String METADATA = "metadata";
 
     /**
+     * Singleton {@link RendererMap} instance.
+     */
+    public static final RendererMap MAP = new RendererMap();
+
+    /**
      * {@link Base64.Encoder} instance.
      */
     public static final Base64.Encoder BASE64_ENCODER = Base64.getEncoder();
+
+    /**
+     * Method to get a configured instance of this {@link Renderer}.
+     * Subclasses may override to return an instance that requires
+     * additional resources and/or configuration.  Default implementaion
+     * returns {@link.this}.
+     *
+     * @return  An {@link Optional} containing the configured instance.
+     */
+    public default Optional<? extends Renderer> instance() {
+        return Optional.of(this);
+    }
+
+    /**
+     * Default method to analyze {@link.this} instance for {@link ForClass}
+     * and {@link ForClassName} annotations.  May return {@code null} if a
+     * {@link Class} cannot be loaded.
+     *
+     * @return  The {@link Class type} the argument renders (may be
+     *          {@code null}).
+     */
+    public default Class<?> getRenderType() {
+        return getRenderType(getClass());
+    }
 
     /**
      * Method to render an {@link Object} to a {@code mime-bundle}.
@@ -46,25 +76,39 @@ public interface Renderer {
     public void renderTo(ObjectNode bundle, Object object);
 
     /**
-     * Static {@link RendererMap} instance used by
-     * {@link #render(Object,Object...)}.
-     */
-    public static RendererMap MAP = new RendererMap();
-
-    /**
-     * Method to render an {@link Object} to an
-     * {@link Message#execute_result(int,ObjectNode)}.
+     * Static method to analyze a class for {@link ForClass} and
+     * {@link ForClassName} annotations.  May return {@code null} if a
+     * {@link Class} cannot be loaded.
      *
-     * @param   object          The {@link Object} to encode.
-     * @param   alternates      Optional alternate representations.
+     * @param   type            The {@link Class} to analyze.
      *
-     * @return  The {@link Message} {@code mime-bundle}.
+     * @return  The {@link Class type} the argument renders (may be
+     *          {@code null}).
      */
-    public static ObjectNode render(Object object, Object... alternates) {
-        var bundle = JSON_OBJECT_MAPPER.createObjectNode();
+    public static Class<?> getRenderType(Class<?> type) {
+        Class<?> renderType = null;
 
-        MAP.renderTo(bundle, object, alternates);
+        if (type != null) {
+            try {
+                if (type.isAnnotationPresent(ForClassName.class)) {
+                    var name = type.getAnnotation(ForClassName.class).value();
 
-        return bundle;
+                    renderType = Class.forName(name, false, type.getClassLoader());
+                } else {
+                    renderType = type.getAnnotation(ForClass.class).value();
+                }
+            } catch (Throwable throwable) {
+            }
+
+            if (renderType == null) {
+                var superType = type.getSuperclass();
+
+                if (superType != null && Renderer.class.isAssignableFrom(superType)) {
+                    renderType = getRenderType(superType);
+                }
+            }
+        }
+
+        return renderType;
     }
 }

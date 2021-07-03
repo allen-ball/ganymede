@@ -508,7 +508,7 @@ public class Message {
      * @return  The {@link Message} {@code mime-bundle}.
      */
     public static ObjectNode mime_bundle(Object object, Object... alternates) {
-        return Renderer.render(object, alternates);
+        return Renderer.MAP.render(object, alternates);
     }
 
     private static String getCallingMethodName(int skip) {

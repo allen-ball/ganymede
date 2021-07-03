@@ -29,61 +29,36 @@ import java.util.TreeMap;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import static ganymede.server.Server.JSON_OBJECT_MAPPER;
+
 /**
  * {@link Renderer} {@link java.util.Map}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 public class RendererMap extends TreeMap<Class<?>,Renderer> {
-    private static final long serialVersionUID = 5660512908511151101L;
+    private static final long serialVersionUID = -4671844929939171131L;
 
     private static final Comparator<Class<?>> COMPARATOR =
         new IsAssignableFromOrder().thenComparing(Class::getName);
 
     /** @serial */
-    private final ServiceProviderMap<Renderer> map =
-        new ServiceProviderMap<>(Renderer.class, this::compute);
+    private final ServiceProviderMap<Renderer> map;
 
     /**
      * Sole constructor.
      */
-    public RendererMap() { super(COMPARATOR); }
+    public RendererMap() {
+        super(COMPARATOR);
 
-    private Renderer compute(ServiceLoader.Provider<Renderer> provider) {
-        Class<?> renderType = null;
-
-        if (renderType == null) {
-            try {
-                renderType = getRenderType(provider.getClass());
-            } catch (Exception exception) {
-            }
-        }
-
-        if (renderType == null) {
-            try {
-                renderType = getRenderType(provider.type());
-            } catch (Exception exception) {
-            }
-        }
-
-        return (renderType != null) ? computeIfAbsent(renderType, k -> provider.get()) : null;
+        this.map = new ServiceProviderMap<>(Renderer.class, this::compute);
     }
 
-    private Class<?> getRenderType(Class<?> type) throws Exception {
-        Class<?> renderType = null;
+    private Renderer compute(ServiceLoader.Provider<Renderer> provider) {
+        var value = provider.get().instance().orElse(null);
+        var key = (value != null) ? value.getRenderType() : null;
 
-        try {
-            if (type.isAnnotationPresent(ForClassName.class)) {
-                var name = type.getAnnotation(ForClassName.class).value();
-
-                renderType = Class.forName(name, false, map.getClassLoader());
-            } else {
-                renderType = type.getAnnotation(ForClass.class).value();
-            }
-        } catch (Exception exception) {
-        }
-
-        return renderType;
+        return (key != null) ? computeIfAbsent(key, k -> value) : null;
     }
 
     /**
@@ -96,6 +71,24 @@ public class RendererMap extends TreeMap<Class<?>,Renderer> {
         map.reload();
 
         return this;
+    }
+
+    /**
+     * Method to create a
+     * {@link Message#execute_result(int,ObjectNode) mime bundle} and render
+     * an {@link Object} and any alternatives.
+     *
+     * @param   object          The {@link Object} to encode.
+     * @param   alternates      Optional alternate representations.
+     *
+     * @return  The {@link Message} {@code mime-bundle}.
+     */
+    public ObjectNode render(Object object, Object... alternates) {
+        var bundle = JSON_OBJECT_MAPPER.createObjectNode();
+
+        renderTo(bundle, object, alternates);
+
+        return bundle;
     }
 
     /**
