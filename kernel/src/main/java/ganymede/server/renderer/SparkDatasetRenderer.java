@@ -22,6 +22,7 @@ import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.server.Renderer;
 import java.util.Map;
+import java.util.Optional;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.spark.sql.Dataset;
@@ -36,11 +37,25 @@ import org.apache.spark.sql.Dataset;
 @NoArgsConstructor @ToString
 public class SparkDatasetRenderer implements Renderer {
     @Override
-    public void renderTo(ObjectNode bundle, Object object) {
-        var resource = getClass().getSimpleName() + ".html";
-        var map = Map.<String,Object>of("dataset", (Dataset) object, "view", 50);
-        var output = ThymeleafRenderer.process(getClass(), resource, "html", map);
+    public Optional<SparkDatasetRenderer> instance() {
+        return Optional.ofNullable(getRenderType()).map(t -> new Impl());
+    }
 
-        MAP.renderTo(bundle, output);
+    @Override
+    public void renderTo(ObjectNode bundle, Object object) {
+        throw new IllegalStateException();
+    }
+
+    @NoArgsConstructor @ToString
+    public class Impl extends SparkDatasetRenderer {
+        @Override
+        public void renderTo(ObjectNode bundle, Object object) {
+            var type = getClass().getEnclosingClass();
+            var resource = type.getSimpleName() + ".html";
+            var map = Map.<String,Object>of("dataset", (Dataset) object, "view", 50);
+            var output = ThymeleafRenderer.process(type, resource, "html", map);
+
+            MAP.renderTo(bundle, output);
+        }
     }
 }

@@ -22,6 +22,7 @@ import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.server.Renderer;
 import java.io.IOException;
+import java.util.Optional;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.knowm.xchart.BitmapEncoder;
@@ -41,13 +42,26 @@ import static org.knowm.xchart.BitmapEncoder.BitmapFormat.PNG;
 @NoArgsConstructor @ToString
 public class XChartRenderer implements Renderer {
     @Override
-    public void renderTo(ObjectNode bundle, Object object) {
-        try {
-            var bytes = BitmapEncoder.getBitmapBytes((Chart) object, PNG);
+    public Optional<XChartRenderer> instance() {
+        return Optional.ofNullable(getRenderType()).map(t -> new Impl());
+    }
 
-            MAP.renderTo(bundle, bytes);
-        } catch (IOException exception) {
-            exception.printStackTrace(System.err);
+    @Override
+    public void renderTo(ObjectNode bundle, Object object) {
+        throw new IllegalStateException();
+    }
+
+    @NoArgsConstructor @ToString
+    public class Impl extends XChartRenderer {
+        @Override
+        public void renderTo(ObjectNode bundle, Object object) {
+            try {
+                var bytes = BitmapEncoder.getBitmapBytes((Chart) object, PNG);
+
+                MAP.renderTo(bundle, bytes);
+            } catch (IOException exception) {
+                exception.printStackTrace(System.err);
+            }
         }
     }
 }

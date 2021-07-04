@@ -22,6 +22,7 @@ import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.server.Renderer;
 import java.util.Map;
+import java.util.Optional;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import tech.tablesaw.plotly.components.Figure;
@@ -38,11 +39,25 @@ import tech.tablesaw.plotly.components.Figure;
 @NoArgsConstructor @ToString
 public class TablesawPlotlyFigureRenderer implements Renderer {
     @Override
-    public void renderTo(ObjectNode bundle, Object object) {
-        var resource = getClass().getSimpleName() + ".html";
-        var map = Map.<String,Object>of("figure", (Figure) object);
-        var output = ThymeleafRenderer.process(getClass(), resource, "html", map);
+    public Optional<TablesawPlotlyFigureRenderer> instance() {
+        return Optional.ofNullable(getRenderType()).map(t -> new Impl());
+    }
 
-        MAP.renderTo(bundle, output);
+    @Override
+    public void renderTo(ObjectNode bundle, Object object) {
+        throw new IllegalStateException();
+    }
+
+    @NoArgsConstructor @ToString
+    public class Impl extends TablesawPlotlyFigureRenderer {
+        @Override
+        public void renderTo(ObjectNode bundle, Object object) {
+            var type = getClass().getEnclosingClass();
+            var resource = type.getSimpleName() + ".html";
+            var map = Map.<String,Object>of("figure", (Figure) object);
+            var output = ThymeleafRenderer.process(type, resource, "html", map);
+
+            MAP.renderTo(bundle, output);
+        }
     }
 }
