@@ -21,11 +21,20 @@ package ganymede.server.renderer;
 import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.server.Renderer;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.entity.StandardEntityCollection;
+
+import static org.springframework.util.MimeTypeUtils.TEXT_HTML_VALUE;
 
 /**
  * {@link.uri https://github.com/jfree/jfreechart target=newtab JFreeChart}
@@ -41,24 +50,54 @@ import org.jfree.chart.JFreeChart;
 @NoArgsConstructor @ToString
 public class JFreeChartRenderer implements Renderer {
     @Override
+    public Optional<JFreeChartRenderer> instance() {
+        return Optional.ofNullable(getRenderType()).map(t -> new Impl());
+    }
+
+    @Override
     public void renderTo(ObjectNode bundle, Object object) {
-        try {
+        throw new IllegalStateException();
+    }
+
+    @NoArgsConstructor @ToString
+    public class Impl extends JFreeChartRenderer {
+        @Override
+        public Optional<JFreeChartRenderer> instance() {
+            return Optional.of(this);
+        }
+
+        @Override
+        public void renderTo(ObjectNode bundle, Object object) {
             var chart = (JFreeChart) object;
             var width = 800;
             var height = 600;
-            var bytes = ChartUtils.encodeAsPNG(chart.createBufferedImage(width, height));
 
-            MAP.renderTo(bundle, bytes);
-            /*
-             * HTML
-             *
-             * ChartUtils.writeImageMap(PrintWriter writer,
-             *                          String name,
-             *                          ChartRenderingInfo info,
-             *                          false);
-             */
-        } catch (IOException exception) {
-            exception.printStackTrace(System.err);
+            try (var out = new ByteArrayOutputStream()) {
+                var info = new ChartRenderingInfo(new StandardEntityCollection());
+
+                ChartUtils.writeChartAsPNG(out, chart, width, height, info);
+
+                var image = out.toByteArray();
+
+                MAP.renderTo(bundle, image);
+
+                if (! bundle.with(DATA).has(TEXT_HTML_VALUE)) {
+                    var html = new StringWriter();
+                    var name = UUID.randomUUID().toString();
+                    var mimeType = bundle.with(METADATA).fieldNames().next();
+                    var base64 = bundle.with(DATA).get(mimeType).asText();
+
+                    try (var writer = new PrintWriter(html)) {
+                        writer.format("<img usemap=\"#%s\" src=\"data:%s;base64,%s\"/>\n",
+                                      name, mimeType, base64);
+                        ChartUtils.writeImageMap(writer, name, info, false);
+                    }
+
+                    bundle.with(DATA).put(TEXT_HTML_VALUE, html.toString());
+                }
+            } catch (Throwable throwable) {
+                throwable.printStackTrace(System.err);
+            }
         }
     }
 }
