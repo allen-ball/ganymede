@@ -149,12 +149,12 @@ public class NotebookContext {
      */
     public void magic(String name, String line0, String code) {
         try {
-            magics.reload();
+            var magic = magics.reload().get(name);
 
-            if (magics.containsKey(name)) {
-                magics.get(name).execute(decode(line0), decode(code));
+            if (magic != null) {
+                magic.execute(decode(line0), decode(code));
             } else {
-                throw new IllegalStateException(String.format("Magic '%s' not found", name));
+                System.err.format("Magic '%s' not found\n", name);
             }
         } catch (Throwable throwable) {
             throwable.printStackTrace(System.err);

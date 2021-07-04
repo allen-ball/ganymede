@@ -292,14 +292,13 @@ public class Shell implements AutoCloseable {
 
             var application = new Magic.Application(code);
             var name = application.getMagicName();
+            var magic = (name != null) ? magics.reload().get(name) : java;
 
-            if (name != null && (! magics.containsKey(name))) {
-                throw new IllegalArgumentException(application.getLine0());
+            if (magic != null) {
+                application.apply(this, magic, in, out, err);
+            } else {
+                application.apply(this);
             }
-
-            var magic = (name != null) ? magics.get(name) : java;
-
-            application.apply(magic, this, in, out, err);
         } catch (Exception exception) {
             exception.printStackTrace(err);
         } finally {

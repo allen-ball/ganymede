@@ -226,16 +226,25 @@ public interface Magic {
         }
 
         /**
-         * Method to invoke the {@link Magic}.
+         * Method to invoke the {@link Magic} locally.
          *
-         * @param       magic   The {@link Magic} to apply.
          * @param       shell   The {@link Shell}.
+         * @param       magic   The {@link Magic} to apply.
          * @param       in      The {@code in} {@link InputStream}.
          * @param       out     The {@code out} {@link PrintStream}.
          * @param       err     The {@code err} {@link PrintStream}.
          */
-        public void apply(Magic magic, Shell shell, InputStream in, PrintStream out, PrintStream err) throws Exception {
+        public void apply(Shell shell, Magic magic, InputStream in, PrintStream out, PrintStream err) throws Exception {
             magic.execute(shell, in, out, err, getLine0(), getCode());
+        }
+
+        /**
+         * Method to invoke the {@link Magic} remotely.
+         *
+         * @param       shell   The {@link Shell}.
+         */
+        public void apply(Shell shell) {
+            NotebookContext.magic(shell, getMagicName(), getLine0(), getCode());
         }
     }
 }
