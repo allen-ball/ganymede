@@ -475,7 +475,7 @@ public class Message {
      * @return  The corresponding {@link ObjectNode}.
      */
     public static ObjectNode content(Throwable throwable, String evalue) {
-        var node = JSON_OBJECT_MAPPER.createObjectNode();
+        var node = new ObjectNode(JsonNodeFactory.instance);
 
         if (throwable != null || evalue != null) {
             node.put("status", "error");

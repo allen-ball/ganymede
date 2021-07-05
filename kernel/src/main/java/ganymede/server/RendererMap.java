@@ -18,6 +18,7 @@ package ganymede.server;
  * limitations under the License.
  * ##########################################################################
  */
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.server.renderer.ForClass;
 import ganymede.server.renderer.ForClassName;
@@ -28,8 +29,6 @@ import java.util.ServiceLoader;
 import java.util.TreeMap;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-
-import static ganymede.server.Server.JSON_OBJECT_MAPPER;
 
 /**
  * {@link Renderer} {@link java.util.Map}.
@@ -84,7 +83,7 @@ public class RendererMap extends TreeMap<Class<?>,Renderer> {
      * @return  The {@link Message} {@code mime-bundle}.
      */
     public ObjectNode render(Object object, Object... alternates) {
-        var bundle = JSON_OBJECT_MAPPER.createObjectNode();
+        var bundle = new ObjectNode(JsonNodeFactory.instance);
 
         renderTo(bundle, object, alternates);
 
