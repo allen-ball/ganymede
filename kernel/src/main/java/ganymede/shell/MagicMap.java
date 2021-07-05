@@ -19,6 +19,7 @@ package ganymede.shell;
  * ##########################################################################
  */
 import ganymede.util.ServiceProviderMap;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Consumer;
@@ -32,8 +33,8 @@ import java.util.stream.Stream;
 public class MagicMap extends TreeMap<String,Magic> {
     private static final long serialVersionUID = 6930042409603983399L;
 
-    /** @serial */ private final ServiceProviderMap<Magic> map = new ServiceProviderMap<>(Magic.class, null);
     /** @serial */ private final Consumer<Magic> initializer;
+    /** @serial */ private final ServiceProviderMap<Magic> map;
 
     /**
      * Sole constructor.
@@ -43,6 +44,22 @@ public class MagicMap extends TreeMap<String,Magic> {
      */
     public MagicMap(Consumer<Magic> initializer) {
         this.initializer = initializer;
+        this.map = new ServiceProviderMap<>(Magic.class, this::compute);
+    }
+
+    private Magic compute(ServiceLoader.Provider<Magic> provider) {
+        var value = provider.get().instance().orElse(null);
+
+        if (value != null) {
+            if (initializer != null) {
+                initializer.accept(value);
+            }
+
+            Set.of(value.getMagicNames()).stream()
+                .forEach(t -> computeIfAbsent(t, k -> value));
+        }
+
+        return value;
     }
 
     /**
@@ -52,26 +69,7 @@ public class MagicMap extends TreeMap<String,Magic> {
      * @return  {@link.this}
      */
     public MagicMap reload() {
-        var iterator = map.reload().values().iterator();
-
-        while (iterator.hasNext()) {
-            var magic = iterator.next();
-
-            try {
-                var keys = Set.of(magic.getMagicNames());
-
-                if (! keySet().containsAll(keys)) {
-                    if (initializer != null) {
-                        initializer.accept(magic);
-                    }
-                }
-
-                for (var key : keys) {
-                    computeIfAbsent(key, k -> magic);
-                }
-            } catch (Exception exception) {
-            }
-        }
+        map.reload();
 
         return this;
     }

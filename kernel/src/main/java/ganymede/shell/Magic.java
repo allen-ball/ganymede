@@ -22,6 +22,7 @@ import ganymede.notebook.NotebookContext;
 import ganymede.server.Message;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.Data;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
@@ -42,6 +43,18 @@ public interface Magic {
      * Special-case {@link Magic} name.
      */
     public static final String BANG = "!";
+
+    /**
+     * Method to get a configured instance of this {@link Magic}.
+     * Subclasses may override to return an instance that requires
+     * additional resources and/or configuration.  Default implementaion
+     * returns {@link.this}.
+     *
+     * @return  An {@link Optional} containing the configured instance.
+     */
+    public default Optional<? extends Magic> instance() {
+        return Optional.of(this);
+    }
 
     /**
      * Method to get the names associated with {@link.this} {@link Magic}.
