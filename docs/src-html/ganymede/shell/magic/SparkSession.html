@@ -108,21 +108,24 @@
 <span class="sourceLineNo">099</span><a id="line.99">        }</a>
 <span class="sourceLineNo">100</span><a id="line.100">    }</a>
 <span class="sourceLineNo">101</span><a id="line.101"></a>
-<span class="sourceLineNo">102</span><a id="line.102">    @Command @Data</a>
-<span class="sourceLineNo">103</span><a id="line.103">    private class Arguments {</a>
-<span class="sourceLineNo">104</span><a id="line.104">        @Parameters(description = { "Spark master" },</a>
-<span class="sourceLineNo">105</span><a id="line.105">                    index = "0", arity = "0..1")</a>
-<span class="sourceLineNo">106</span><a id="line.106">        private String master = null;</a>
-<span class="sourceLineNo">107</span><a id="line.107"></a>
-<span class="sourceLineNo">108</span><a id="line.108">        @Parameters(description = { "Spark appName" },</a>
-<span class="sourceLineNo">109</span><a id="line.109">                    index = "1", arity = "0..1", defaultValue = "root")</a>
-<span class="sourceLineNo">110</span><a id="line.110">        private String appName = null;</a>
-<span class="sourceLineNo">111</span><a id="line.111"></a>
-<span class="sourceLineNo">112</span><a id="line.112">        @Option(description = { "Enable Hive if available.  true by default" },</a>
-<span class="sourceLineNo">113</span><a id="line.113">                names = "--no-enable-hive-if-available", negatable = true)</a>
-<span class="sourceLineNo">114</span><a id="line.114">        private boolean enableHiveIfAvailable = true;</a>
-<span class="sourceLineNo">115</span><a id="line.115">    }</a>
-<span class="sourceLineNo">116</span><a id="line.116">}</a>
+<span class="sourceLineNo">102</span><a id="line.102">    @Override</a>
+<span class="sourceLineNo">103</span><a id="line.103">    public String getUsage() { return getUsage(new Arguments()); }</a>
+<span class="sourceLineNo">104</span><a id="line.104"></a>
+<span class="sourceLineNo">105</span><a id="line.105">    @Command @Data</a>
+<span class="sourceLineNo">106</span><a id="line.106">    private class Arguments {</a>
+<span class="sourceLineNo">107</span><a id="line.107">        @Parameters(description = { "Spark master" },</a>
+<span class="sourceLineNo">108</span><a id="line.108">                    index = "0", arity = "0..1")</a>
+<span class="sourceLineNo">109</span><a id="line.109">        private String master = null;</a>
+<span class="sourceLineNo">110</span><a id="line.110"></a>
+<span class="sourceLineNo">111</span><a id="line.111">        @Parameters(description = { "Spark appName" },</a>
+<span class="sourceLineNo">112</span><a id="line.112">                    index = "1", arity = "0..1", defaultValue = "root")</a>
+<span class="sourceLineNo">113</span><a id="line.113">        private String appName = null;</a>
+<span class="sourceLineNo">114</span><a id="line.114"></a>
+<span class="sourceLineNo">115</span><a id="line.115">        @Option(description = { "Enable Hive if available.  true by default" },</a>
+<span class="sourceLineNo">116</span><a id="line.116">                names = "--no-enable-hive-if-available", negatable = true)</a>
+<span class="sourceLineNo">117</span><a id="line.117">        private boolean enableHiveIfAvailable = true;</a>
+<span class="sourceLineNo">118</span><a id="line.118">    }</a>
+<span class="sourceLineNo">119</span><a id="line.119">}</a>
 
 
 

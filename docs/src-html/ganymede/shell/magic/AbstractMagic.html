@@ -103,7 +103,29 @@
 <span class="sourceLineNo">094</span><a id="line.94"></a>
 <span class="sourceLineNo">095</span><a id="line.95">        return result;</a>
 <span class="sourceLineNo">096</span><a id="line.96">    }</a>
-<span class="sourceLineNo">097</span><a id="line.97">}</a>
+<span class="sourceLineNo">097</span><a id="line.97"></a>
+<span class="sourceLineNo">098</span><a id="line.98">    /**</a>
+<span class="sourceLineNo">099</span><a id="line.99">     * Method to get usage message from an annotated command {@link Object}.</a>
+<span class="sourceLineNo">100</span><a id="line.100">     *</a>
+<span class="sourceLineNo">101</span><a id="line.101">     * @param   command         The annotated command {@link Object}.</a>
+<span class="sourceLineNo">102</span><a id="line.102">     *</a>
+<span class="sourceLineNo">103</span><a id="line.103">     * @return  The usage message.</a>
+<span class="sourceLineNo">104</span><a id="line.104">     *</a>
+<span class="sourceLineNo">105</span><a id="line.105">     * @see CommandLine</a>
+<span class="sourceLineNo">106</span><a id="line.106">     * @see CommandLine.Command</a>
+<span class="sourceLineNo">107</span><a id="line.107">     * @see CommandLine.Option</a>
+<span class="sourceLineNo">108</span><a id="line.108">     * @see CommandLine.Parameters</a>
+<span class="sourceLineNo">109</span><a id="line.109">     */</a>
+<span class="sourceLineNo">110</span><a id="line.110">    protected String getUsage(Object command) {</a>
+<span class="sourceLineNo">111</span><a id="line.111">        var line =</a>
+<span class="sourceLineNo">112</span><a id="line.112">            new CommandLine(command)</a>
+<span class="sourceLineNo">113</span><a id="line.113">            .setCommandName(getMagicNames()[0])</a>
+<span class="sourceLineNo">114</span><a id="line.114">            .setCaseInsensitiveEnumValuesAllowed(true)</a>
+<span class="sourceLineNo">115</span><a id="line.115">            .setUnmatchedArgumentsAllowed(false);</a>
+<span class="sourceLineNo">116</span><a id="line.116"></a>
+<span class="sourceLineNo">117</span><a id="line.117">        return line.getUsageMessage();</a>
+<span class="sourceLineNo">118</span><a id="line.118">    }</a>
+<span class="sourceLineNo">119</span><a id="line.119">}</a>
 
 
 

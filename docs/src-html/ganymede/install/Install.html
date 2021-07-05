@@ -28,242 +28,244 @@
 <span class="sourceLineNo">019</span><a id="line.19"> * ##########################################################################</a>
 <span class="sourceLineNo">020</span><a id="line.20"> */</a>
 <span class="sourceLineNo">021</span><a id="line.21">import com.fasterxml.jackson.databind.JsonNode;</a>
-<span class="sourceLineNo">022</span><a id="line.22">import java.io.IOException;</a>
-<span class="sourceLineNo">023</span><a id="line.23">import java.nio.file.Files;</a>
-<span class="sourceLineNo">024</span><a id="line.24">import java.nio.file.Paths;</a>
-<span class="sourceLineNo">025</span><a id="line.25">import java.util.LinkedHashMap;</a>
-<span class="sourceLineNo">026</span><a id="line.26">import java.util.List;</a>
-<span class="sourceLineNo">027</span><a id="line.27">import java.util.function.Function;</a>
-<span class="sourceLineNo">028</span><a id="line.28">import java.util.stream.Stream;</a>
-<span class="sourceLineNo">029</span><a id="line.29">import lombok.NoArgsConstructor;</a>
-<span class="sourceLineNo">030</span><a id="line.30">import lombok.ToString;</a>
-<span class="sourceLineNo">031</span><a id="line.31">import lombok.extern.log4j.Log4j2;</a>
-<span class="sourceLineNo">032</span><a id="line.32">import org.springframework.beans.factory.annotation.Value;</a>
-<span class="sourceLineNo">033</span><a id="line.33">import org.springframework.boot.ApplicationArguments;</a>
-<span class="sourceLineNo">034</span><a id="line.34">import org.springframework.boot.ApplicationRunner;</a>
-<span class="sourceLineNo">035</span><a id="line.35">import org.springframework.boot.autoconfigure.SpringBootApplication;</a>
-<span class="sourceLineNo">036</span><a id="line.36">import org.springframework.boot.system.ApplicationHome;</a>
-<span class="sourceLineNo">037</span><a id="line.37"></a>
-<span class="sourceLineNo">038</span><a id="line.38">import static ganymede.server.Server.JSON_OBJECT_MAPPER;</a>
-<span class="sourceLineNo">039</span><a id="line.39">import static java.nio.charset.StandardCharsets.UTF_8;</a>
-<span class="sourceLineNo">040</span><a id="line.40">import static java.util.stream.Collectors.joining;</a>
-<span class="sourceLineNo">041</span><a id="line.41">import static org.springframework.util.FileCopyUtils.copy;</a>
-<span class="sourceLineNo">042</span><a id="line.42">import static org.springframework.util.FileCopyUtils.copyToByteArray;</a>
-<span class="sourceLineNo">043</span><a id="line.43">import static org.springframework.util.FileSystemUtils.deleteRecursively;</a>
-<span class="sourceLineNo">044</span><a id="line.44"></a>
-<span class="sourceLineNo">045</span><a id="line.45">/**</a>
-<span class="sourceLineNo">046</span><a id="line.46"> * Ganymede Jupyter {@link ganymede.kernel.Kernel} {@link Install}er.</a>
-<span class="sourceLineNo">047</span><a id="line.47"> *</a>
-<span class="sourceLineNo">048</span><a id="line.48"> * {@injected.fields}</a>
+<span class="sourceLineNo">022</span><a id="line.22">import com.fasterxml.jackson.databind.node.JsonNodeFactory;</a>
+<span class="sourceLineNo">023</span><a id="line.23">import com.fasterxml.jackson.databind.node.ObjectNode;</a>
+<span class="sourceLineNo">024</span><a id="line.24">import java.io.IOException;</a>
+<span class="sourceLineNo">025</span><a id="line.25">import java.nio.file.Files;</a>
+<span class="sourceLineNo">026</span><a id="line.26">import java.nio.file.Paths;</a>
+<span class="sourceLineNo">027</span><a id="line.27">import java.util.LinkedHashMap;</a>
+<span class="sourceLineNo">028</span><a id="line.28">import java.util.List;</a>
+<span class="sourceLineNo">029</span><a id="line.29">import java.util.function.Function;</a>
+<span class="sourceLineNo">030</span><a id="line.30">import java.util.stream.Stream;</a>
+<span class="sourceLineNo">031</span><a id="line.31">import lombok.NoArgsConstructor;</a>
+<span class="sourceLineNo">032</span><a id="line.32">import lombok.ToString;</a>
+<span class="sourceLineNo">033</span><a id="line.33">import lombok.extern.log4j.Log4j2;</a>
+<span class="sourceLineNo">034</span><a id="line.34">import org.springframework.beans.factory.annotation.Value;</a>
+<span class="sourceLineNo">035</span><a id="line.35">import org.springframework.boot.ApplicationArguments;</a>
+<span class="sourceLineNo">036</span><a id="line.36">import org.springframework.boot.ApplicationRunner;</a>
+<span class="sourceLineNo">037</span><a id="line.37">import org.springframework.boot.autoconfigure.SpringBootApplication;</a>
+<span class="sourceLineNo">038</span><a id="line.38">import org.springframework.boot.system.ApplicationHome;</a>
+<span class="sourceLineNo">039</span><a id="line.39"></a>
+<span class="sourceLineNo">040</span><a id="line.40">import static ganymede.server.Server.JSON_OBJECT_MAPPER;</a>
+<span class="sourceLineNo">041</span><a id="line.41">import static java.nio.charset.StandardCharsets.UTF_8;</a>
+<span class="sourceLineNo">042</span><a id="line.42">import static java.util.stream.Collectors.joining;</a>
+<span class="sourceLineNo">043</span><a id="line.43">import static org.springframework.util.FileCopyUtils.copy;</a>
+<span class="sourceLineNo">044</span><a id="line.44">import static org.springframework.util.FileCopyUtils.copyToByteArray;</a>
+<span class="sourceLineNo">045</span><a id="line.45">import static org.springframework.util.FileSystemUtils.deleteRecursively;</a>
+<span class="sourceLineNo">046</span><a id="line.46"></a>
+<span class="sourceLineNo">047</span><a id="line.47">/**</a>
+<span class="sourceLineNo">048</span><a id="line.48"> * Ganymede Jupyter {@link ganymede.kernel.Kernel} {@link Install}er.</a>
 <span class="sourceLineNo">049</span><a id="line.49"> *</a>
-<span class="sourceLineNo">050</span><a id="line.50"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
-<span class="sourceLineNo">051</span><a id="line.51"> */</a>
-<span class="sourceLineNo">052</span><a id="line.52">@SpringBootApplication</a>
-<span class="sourceLineNo">053</span><a id="line.53">@NoArgsConstructor @ToString @Log4j2</a>
-<span class="sourceLineNo">054</span><a id="line.54">public class Install implements ApplicationRunner {</a>
-<span class="sourceLineNo">055</span><a id="line.55">    @Value("${id-prefix}")              private String id_prefix = null;</a>
-<span class="sourceLineNo">056</span><a id="line.56">    @Value("${id}")                     private String id = null;</a>
-<span class="sourceLineNo">057</span><a id="line.57">    @Value("${id-suffix}")              private String id_suffix = null;</a>
-<span class="sourceLineNo">058</span><a id="line.58">    @Value("${display-name-prefix}")    private String display_name_prefix = null;</a>
-<span class="sourceLineNo">059</span><a id="line.59">    @Value("${display-name}")           private String display_name = null;</a>
-<span class="sourceLineNo">060</span><a id="line.60">    @Value("${display-name-suffix}")    private String display_name_suffix = null;</a>
-<span class="sourceLineNo">061</span><a id="line.61">    @Value("${env:}")                   private List&lt;String&gt; envvars = null;</a>
-<span class="sourceLineNo">062</span><a id="line.62">    @Value("${copy-jar:true}")          private boolean copy_jar = true;</a>
-<span class="sourceLineNo">063</span><a id="line.63"></a>
-<span class="sourceLineNo">064</span><a id="line.64">    @Override</a>
-<span class="sourceLineNo">065</span><a id="line.65">    public void run(ApplicationArguments arguments) throws Exception {</a>
-<span class="sourceLineNo">066</span><a id="line.66">        id =</a>
-<span class="sourceLineNo">067</span><a id="line.67">            Stream.of(id_prefix, id, id_suffix)</a>
-<span class="sourceLineNo">068</span><a id="line.68">            .map(String::strip)</a>
-<span class="sourceLineNo">069</span><a id="line.69">            .filter(t -&gt; (! t.isEmpty()))</a>
-<span class="sourceLineNo">070</span><a id="line.70">            .collect(joining("-"));</a>
-<span class="sourceLineNo">071</span><a id="line.71"></a>
-<span class="sourceLineNo">072</span><a id="line.72">        display_name =</a>
-<span class="sourceLineNo">073</span><a id="line.73">            Stream.of(display_name_prefix, display_name, display_name_suffix)</a>
-<span class="sourceLineNo">074</span><a id="line.74">            .map(String::strip)</a>
-<span class="sourceLineNo">075</span><a id="line.75">            .filter(t -&gt; (! t.isEmpty()))</a>
-<span class="sourceLineNo">076</span><a id="line.76">            .collect(joining(" "));</a>
-<span class="sourceLineNo">077</span><a id="line.77"></a>
-<span class="sourceLineNo">078</span><a id="line.78">        var sysPrefix = false;</a>
+<span class="sourceLineNo">050</span><a id="line.50"> * {@injected.fields}</a>
+<span class="sourceLineNo">051</span><a id="line.51"> *</a>
+<span class="sourceLineNo">052</span><a id="line.52"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
+<span class="sourceLineNo">053</span><a id="line.53"> */</a>
+<span class="sourceLineNo">054</span><a id="line.54">@SpringBootApplication</a>
+<span class="sourceLineNo">055</span><a id="line.55">@NoArgsConstructor @ToString @Log4j2</a>
+<span class="sourceLineNo">056</span><a id="line.56">public class Install implements ApplicationRunner {</a>
+<span class="sourceLineNo">057</span><a id="line.57">    @Value("${id-prefix}")              private String id_prefix = null;</a>
+<span class="sourceLineNo">058</span><a id="line.58">    @Value("${id}")                     private String id = null;</a>
+<span class="sourceLineNo">059</span><a id="line.59">    @Value("${id-suffix}")              private String id_suffix = null;</a>
+<span class="sourceLineNo">060</span><a id="line.60">    @Value("${display-name-prefix}")    private String display_name_prefix = null;</a>
+<span class="sourceLineNo">061</span><a id="line.61">    @Value("${display-name}")           private String display_name = null;</a>
+<span class="sourceLineNo">062</span><a id="line.62">    @Value("${display-name-suffix}")    private String display_name_suffix = null;</a>
+<span class="sourceLineNo">063</span><a id="line.63">    @Value("${env:}")                   private List&lt;String&gt; envvars = null;</a>
+<span class="sourceLineNo">064</span><a id="line.64">    @Value("${copy-jar:true}")          private boolean copy_jar = true;</a>
+<span class="sourceLineNo">065</span><a id="line.65"></a>
+<span class="sourceLineNo">066</span><a id="line.66">    @Override</a>
+<span class="sourceLineNo">067</span><a id="line.67">    public void run(ApplicationArguments arguments) throws Exception {</a>
+<span class="sourceLineNo">068</span><a id="line.68">        id =</a>
+<span class="sourceLineNo">069</span><a id="line.69">            Stream.of(id_prefix, id, id_suffix)</a>
+<span class="sourceLineNo">070</span><a id="line.70">            .map(String::strip)</a>
+<span class="sourceLineNo">071</span><a id="line.71">            .filter(t -&gt; (! t.isEmpty()))</a>
+<span class="sourceLineNo">072</span><a id="line.72">            .collect(joining("-"));</a>
+<span class="sourceLineNo">073</span><a id="line.73"></a>
+<span class="sourceLineNo">074</span><a id="line.74">        display_name =</a>
+<span class="sourceLineNo">075</span><a id="line.75">            Stream.of(display_name_prefix, display_name, display_name_suffix)</a>
+<span class="sourceLineNo">076</span><a id="line.76">            .map(String::strip)</a>
+<span class="sourceLineNo">077</span><a id="line.77">            .filter(t -&gt; (! t.isEmpty()))</a>
+<span class="sourceLineNo">078</span><a id="line.78">            .collect(joining(" "));</a>
 <span class="sourceLineNo">079</span><a id="line.79"></a>
-<span class="sourceLineNo">080</span><a id="line.80">        for (var argument : arguments.getSourceArgs()) {</a>
-<span class="sourceLineNo">081</span><a id="line.81">            if (argument.equals("--sys-prefix")) {</a>
-<span class="sourceLineNo">082</span><a id="line.82">                sysPrefix = true;</a>
-<span class="sourceLineNo">083</span><a id="line.83">            } else if (argument.equals("--user")) {</a>
-<span class="sourceLineNo">084</span><a id="line.84">                sysPrefix = false;</a>
-<span class="sourceLineNo">085</span><a id="line.85">            }</a>
-<span class="sourceLineNo">086</span><a id="line.86">        }</a>
-<span class="sourceLineNo">087</span><a id="line.87"></a>
-<span class="sourceLineNo">088</span><a id="line.88">        var sysProperties = new LinkedHashMap&lt;String,Object&gt;();</a>
-<span class="sourceLineNo">089</span><a id="line.89">        var tmp = Files.createTempDirectory(getClass().getPackage().getName() + "-");</a>
-<span class="sourceLineNo">090</span><a id="line.90"></a>
-<span class="sourceLineNo">091</span><a id="line.91">        try {</a>
-<span class="sourceLineNo">092</span><a id="line.92">            /*</a>
-<span class="sourceLineNo">093</span><a id="line.93">             * java</a>
-<span class="sourceLineNo">094</span><a id="line.94">             */</a>
-<span class="sourceLineNo">095</span><a id="line.95">            var java = ProcessHandle.current().info().command().orElse("java");</a>
-<span class="sourceLineNo">096</span><a id="line.96">            /*</a>
-<span class="sourceLineNo">097</span><a id="line.97">             * kernel.jar</a>
-<span class="sourceLineNo">098</span><a id="line.98">             */</a>
-<span class="sourceLineNo">099</span><a id="line.99">            var jarPath = new ApplicationHome(getClass()).getSource().toPath();</a>
-<span class="sourceLineNo">100</span><a id="line.100">            /*</a>
-<span class="sourceLineNo">101</span><a id="line.101">             * which python</a>
-<span class="sourceLineNo">102</span><a id="line.102">             */</a>
-<span class="sourceLineNo">103</span><a id="line.103">            var python = which("python");</a>
-<span class="sourceLineNo">104</span><a id="line.104">            /*</a>
-<span class="sourceLineNo">105</span><a id="line.105">             * which jupyter</a>
-<span class="sourceLineNo">106</span><a id="line.106">             */</a>
-<span class="sourceLineNo">107</span><a id="line.107">            var jupyter = which("jupyter");</a>
-<span class="sourceLineNo">108</span><a id="line.108">            /*</a>
-<span class="sourceLineNo">109</span><a id="line.109">             * jupyter --paths --json</a>
-<span class="sourceLineNo">110</span><a id="line.110">             */</a>
-<span class="sourceLineNo">111</span><a id="line.111">            var paths = getOutputAsJson(jupyter, "--paths", "--json");</a>
-<span class="sourceLineNo">112</span><a id="line.112">            /*</a>
-<span class="sourceLineNo">113</span><a id="line.113">             * jupyter --runtime-dir</a>
-<span class="sourceLineNo">114</span><a id="line.114">             */</a>
-<span class="sourceLineNo">115</span><a id="line.115">            var runtime_dir = getOutputAsString(jupyter, "--runtime-dir");</a>
-<span class="sourceLineNo">116</span><a id="line.116">            /*</a>
-<span class="sourceLineNo">117</span><a id="line.117">             * Maven local repository</a>
-<span class="sourceLineNo">118</span><a id="line.118">             */</a>
-<span class="sourceLineNo">119</span><a id="line.119">            if (sysPrefix) {</a>
-<span class="sourceLineNo">120</span><a id="line.120">                var repository =</a>
-<span class="sourceLineNo">121</span><a id="line.121">                    Paths.get(paths.at("/data").get(1).asText(), "repository");</a>
-<span class="sourceLineNo">122</span><a id="line.122"></a>
-<span class="sourceLineNo">123</span><a id="line.123">                sysProperties.put("maven.repo.local", repository);</a>
+<span class="sourceLineNo">080</span><a id="line.80">        var sysPrefix = false;</a>
+<span class="sourceLineNo">081</span><a id="line.81"></a>
+<span class="sourceLineNo">082</span><a id="line.82">        for (var argument : arguments.getSourceArgs()) {</a>
+<span class="sourceLineNo">083</span><a id="line.83">            if (argument.equals("--sys-prefix")) {</a>
+<span class="sourceLineNo">084</span><a id="line.84">                sysPrefix = true;</a>
+<span class="sourceLineNo">085</span><a id="line.85">            } else if (argument.equals("--user")) {</a>
+<span class="sourceLineNo">086</span><a id="line.86">                sysPrefix = false;</a>
+<span class="sourceLineNo">087</span><a id="line.87">            }</a>
+<span class="sourceLineNo">088</span><a id="line.88">        }</a>
+<span class="sourceLineNo">089</span><a id="line.89"></a>
+<span class="sourceLineNo">090</span><a id="line.90">        var sysProperties = new LinkedHashMap&lt;String,Object&gt;();</a>
+<span class="sourceLineNo">091</span><a id="line.91">        var tmp = Files.createTempDirectory(getClass().getPackage().getName() + "-");</a>
+<span class="sourceLineNo">092</span><a id="line.92"></a>
+<span class="sourceLineNo">093</span><a id="line.93">        try {</a>
+<span class="sourceLineNo">094</span><a id="line.94">            /*</a>
+<span class="sourceLineNo">095</span><a id="line.95">             * java</a>
+<span class="sourceLineNo">096</span><a id="line.96">             */</a>
+<span class="sourceLineNo">097</span><a id="line.97">            var java = ProcessHandle.current().info().command().orElse("java");</a>
+<span class="sourceLineNo">098</span><a id="line.98">            /*</a>
+<span class="sourceLineNo">099</span><a id="line.99">             * kernel.jar</a>
+<span class="sourceLineNo">100</span><a id="line.100">             */</a>
+<span class="sourceLineNo">101</span><a id="line.101">            var jarPath = new ApplicationHome(getClass()).getSource().toPath();</a>
+<span class="sourceLineNo">102</span><a id="line.102">            /*</a>
+<span class="sourceLineNo">103</span><a id="line.103">             * which python</a>
+<span class="sourceLineNo">104</span><a id="line.104">             */</a>
+<span class="sourceLineNo">105</span><a id="line.105">            var python = which("python");</a>
+<span class="sourceLineNo">106</span><a id="line.106">            /*</a>
+<span class="sourceLineNo">107</span><a id="line.107">             * which jupyter</a>
+<span class="sourceLineNo">108</span><a id="line.108">             */</a>
+<span class="sourceLineNo">109</span><a id="line.109">            var jupyter = which("jupyter");</a>
+<span class="sourceLineNo">110</span><a id="line.110">            /*</a>
+<span class="sourceLineNo">111</span><a id="line.111">             * jupyter --paths --json</a>
+<span class="sourceLineNo">112</span><a id="line.112">             */</a>
+<span class="sourceLineNo">113</span><a id="line.113">            var paths = getOutputAsJson(jupyter, "--paths", "--json");</a>
+<span class="sourceLineNo">114</span><a id="line.114">            /*</a>
+<span class="sourceLineNo">115</span><a id="line.115">             * jupyter --runtime-dir</a>
+<span class="sourceLineNo">116</span><a id="line.116">             */</a>
+<span class="sourceLineNo">117</span><a id="line.117">            var runtime_dir = getOutputAsString(jupyter, "--runtime-dir");</a>
+<span class="sourceLineNo">118</span><a id="line.118">            /*</a>
+<span class="sourceLineNo">119</span><a id="line.119">             * Maven local repository</a>
+<span class="sourceLineNo">120</span><a id="line.120">             */</a>
+<span class="sourceLineNo">121</span><a id="line.121">            if (sysPrefix) {</a>
+<span class="sourceLineNo">122</span><a id="line.122">                var repository =</a>
+<span class="sourceLineNo">123</span><a id="line.123">                    Paths.get(paths.at("/data").get(1).asText(), "repository");</a>
 <span class="sourceLineNo">124</span><a id="line.124"></a>
-<span class="sourceLineNo">125</span><a id="line.125">                try {</a>
-<span class="sourceLineNo">126</span><a id="line.126">                    Files.createDirectories(repository);</a>
-<span class="sourceLineNo">127</span><a id="line.127">                } catch (Exception exception) {</a>
-<span class="sourceLineNo">128</span><a id="line.128">                    log.warn("{}: Could not create", repository, exception);</a>
-<span class="sourceLineNo">129</span><a id="line.129">                }</a>
-<span class="sourceLineNo">130</span><a id="line.130">            }</a>
-<span class="sourceLineNo">131</span><a id="line.131">            /*</a>
-<span class="sourceLineNo">132</span><a id="line.132">             * kernelspec</a>
-<span class="sourceLineNo">133</span><a id="line.133">             */</a>
-<span class="sourceLineNo">134</span><a id="line.134">            var kernelspec = tmp.resolve(id);</a>
-<span class="sourceLineNo">135</span><a id="line.135"></a>
-<span class="sourceLineNo">136</span><a id="line.136">            Files.createDirectory(kernelspec);</a>
-<span class="sourceLineNo">137</span><a id="line.137">            /*</a>
-<span class="sourceLineNo">138</span><a id="line.138">             * kernel.json</a>
-<span class="sourceLineNo">139</span><a id="line.139">             */</a>
-<span class="sourceLineNo">140</span><a id="line.140">            var kernel = JSON_OBJECT_MAPPER.createObjectNode();</a>
-<span class="sourceLineNo">141</span><a id="line.141">            var argv = kernel.withArray("argv");</a>
-<span class="sourceLineNo">142</span><a id="line.142">            var jar = jarPath.toAbsolutePath().toString();</a>
-<span class="sourceLineNo">143</span><a id="line.143"></a>
-<span class="sourceLineNo">144</span><a id="line.144">            if (copy_jar) {</a>
-<span class="sourceLineNo">145</span><a id="line.145">                var name = "kernel.jar";</a>
-<span class="sourceLineNo">146</span><a id="line.146"></a>
-<span class="sourceLineNo">147</span><a id="line.147">                copy(jarPath.toFile(), kernelspec.resolve(name).toFile());</a>
+<span class="sourceLineNo">125</span><a id="line.125">                sysProperties.put("maven.repo.local", repository);</a>
+<span class="sourceLineNo">126</span><a id="line.126"></a>
+<span class="sourceLineNo">127</span><a id="line.127">                try {</a>
+<span class="sourceLineNo">128</span><a id="line.128">                    Files.createDirectories(repository);</a>
+<span class="sourceLineNo">129</span><a id="line.129">                } catch (Exception exception) {</a>
+<span class="sourceLineNo">130</span><a id="line.130">                    log.warn("{}: Could not create", repository, exception);</a>
+<span class="sourceLineNo">131</span><a id="line.131">                }</a>
+<span class="sourceLineNo">132</span><a id="line.132">            }</a>
+<span class="sourceLineNo">133</span><a id="line.133">            /*</a>
+<span class="sourceLineNo">134</span><a id="line.134">             * kernelspec</a>
+<span class="sourceLineNo">135</span><a id="line.135">             */</a>
+<span class="sourceLineNo">136</span><a id="line.136">            var kernelspec = tmp.resolve(id);</a>
+<span class="sourceLineNo">137</span><a id="line.137"></a>
+<span class="sourceLineNo">138</span><a id="line.138">            Files.createDirectory(kernelspec);</a>
+<span class="sourceLineNo">139</span><a id="line.139">            /*</a>
+<span class="sourceLineNo">140</span><a id="line.140">             * kernel.json</a>
+<span class="sourceLineNo">141</span><a id="line.141">             */</a>
+<span class="sourceLineNo">142</span><a id="line.142">            var kernel = new ObjectNode(JsonNodeFactory.instance);</a>
+<span class="sourceLineNo">143</span><a id="line.143">            var argv = kernel.withArray("argv");</a>
+<span class="sourceLineNo">144</span><a id="line.144">            var jar = jarPath.toAbsolutePath().toString();</a>
+<span class="sourceLineNo">145</span><a id="line.145"></a>
+<span class="sourceLineNo">146</span><a id="line.146">            if (copy_jar) {</a>
+<span class="sourceLineNo">147</span><a id="line.147">                var name = "kernel.jar";</a>
 <span class="sourceLineNo">148</span><a id="line.148"></a>
-<span class="sourceLineNo">149</span><a id="line.149">                var prefix = paths.at("/data").get(sysPrefix ? 1 : 0).asText();</a>
+<span class="sourceLineNo">149</span><a id="line.149">                copy(jarPath.toFile(), kernelspec.resolve(name).toFile());</a>
 <span class="sourceLineNo">150</span><a id="line.150"></a>
-<span class="sourceLineNo">151</span><a id="line.151">                jar = Paths.get(prefix, "kernels", id, name).toString();</a>
-<span class="sourceLineNo">152</span><a id="line.152">            }</a>
-<span class="sourceLineNo">153</span><a id="line.153"></a>
-<span class="sourceLineNo">154</span><a id="line.154">            Stream.of(Stream.of(java,</a>
-<span class="sourceLineNo">155</span><a id="line.155">                                "--add-opens", "java.base/jdk.internal.misc=ALL-UNNAMED",</a>
-<span class="sourceLineNo">156</span><a id="line.156">                                "--illegal-access=permit",</a>
-<span class="sourceLineNo">157</span><a id="line.157">                                "-Djava.awt.headless=true",</a>
-<span class="sourceLineNo">158</span><a id="line.158">                                "-Djdk.disableLastUsageTracking=true"),</a>
-<span class="sourceLineNo">159</span><a id="line.159">                      sysProperties.entrySet().stream().map(t -&gt; "-D" + t),</a>
-<span class="sourceLineNo">160</span><a id="line.160">                      Stream.of("-jar", jar,</a>
-<span class="sourceLineNo">161</span><a id="line.161">                                "--runtime-dir=" + runtime_dir,</a>
-<span class="sourceLineNo">162</span><a id="line.162">                                "--connection-file={connection_file}"))</a>
-<span class="sourceLineNo">163</span><a id="line.163">                .flatMap(Function.identity())</a>
-<span class="sourceLineNo">164</span><a id="line.164">                .map(Object::toString)</a>
-<span class="sourceLineNo">165</span><a id="line.165">                .forEach(argv::add);</a>
-<span class="sourceLineNo">166</span><a id="line.166"></a>
-<span class="sourceLineNo">167</span><a id="line.167">            kernel.put("display_name", display_name);</a>
+<span class="sourceLineNo">151</span><a id="line.151">                var prefix = paths.at("/data").get(sysPrefix ? 1 : 0).asText();</a>
+<span class="sourceLineNo">152</span><a id="line.152"></a>
+<span class="sourceLineNo">153</span><a id="line.153">                jar = Paths.get(prefix, "kernels", id, name).toString();</a>
+<span class="sourceLineNo">154</span><a id="line.154">            }</a>
+<span class="sourceLineNo">155</span><a id="line.155"></a>
+<span class="sourceLineNo">156</span><a id="line.156">            Stream.of(Stream.of(java,</a>
+<span class="sourceLineNo">157</span><a id="line.157">                                "--add-opens", "java.base/jdk.internal.misc=ALL-UNNAMED",</a>
+<span class="sourceLineNo">158</span><a id="line.158">                                "--illegal-access=permit",</a>
+<span class="sourceLineNo">159</span><a id="line.159">                                "-Djava.awt.headless=true",</a>
+<span class="sourceLineNo">160</span><a id="line.160">                                "-Djdk.disableLastUsageTracking=true"),</a>
+<span class="sourceLineNo">161</span><a id="line.161">                      sysProperties.entrySet().stream().map(t -&gt; "-D" + t),</a>
+<span class="sourceLineNo">162</span><a id="line.162">                      Stream.of("-jar", jar,</a>
+<span class="sourceLineNo">163</span><a id="line.163">                                "--runtime-dir=" + runtime_dir,</a>
+<span class="sourceLineNo">164</span><a id="line.164">                                "--connection-file={connection_file}"))</a>
+<span class="sourceLineNo">165</span><a id="line.165">                .flatMap(Function.identity())</a>
+<span class="sourceLineNo">166</span><a id="line.166">                .map(Object::toString)</a>
+<span class="sourceLineNo">167</span><a id="line.167">                .forEach(argv::add);</a>
 <span class="sourceLineNo">168</span><a id="line.168"></a>
-<span class="sourceLineNo">169</span><a id="line.169">            var env = kernel.with("env");</a>
+<span class="sourceLineNo">169</span><a id="line.169">            kernel.put("display_name", display_name);</a>
 <span class="sourceLineNo">170</span><a id="line.170"></a>
-<span class="sourceLineNo">171</span><a id="line.171">            for (var envvar : envvars) {</a>
-<span class="sourceLineNo">172</span><a id="line.172">                var pair = envvar.split("=", 2);</a>
-<span class="sourceLineNo">173</span><a id="line.173"></a>
-<span class="sourceLineNo">174</span><a id="line.174">                env.put(pair[0], (pair.length &gt; 1) ? pair[1] : "");</a>
-<span class="sourceLineNo">175</span><a id="line.175">            }</a>
-<span class="sourceLineNo">176</span><a id="line.176"></a>
-<span class="sourceLineNo">177</span><a id="line.177">            kernel.put("interrupt_mode", "message");</a>
-<span class="sourceLineNo">178</span><a id="line.178">            kernel.put("language", "java");</a>
-<span class="sourceLineNo">179</span><a id="line.179"></a>
-<span class="sourceLineNo">180</span><a id="line.180">            JSON_OBJECT_MAPPER.writeValue(kernelspec.resolve("kernel.json").toFile(), kernel);</a>
-<span class="sourceLineNo">181</span><a id="line.181">            /*</a>
-<span class="sourceLineNo">182</span><a id="line.182">             * logo-16x16.png and logo-32x32.png</a>
-<span class="sourceLineNo">183</span><a id="line.183">             */</a>
-<span class="sourceLineNo">184</span><a id="line.184">            for (var png : List.of("16x16.png", "32x32.png")) {</a>
-<span class="sourceLineNo">185</span><a id="line.185">                var from = "/static/images/ball-java-jar-" + png;</a>
-<span class="sourceLineNo">186</span><a id="line.186">                var to = kernelspec.resolve("logo-" + png).toFile();</a>
-<span class="sourceLineNo">187</span><a id="line.187"></a>
-<span class="sourceLineNo">188</span><a id="line.188">                try (var in = getClass().getResourceAsStream(from)) {</a>
-<span class="sourceLineNo">189</span><a id="line.189">                    copy(copyToByteArray(in), to);</a>
-<span class="sourceLineNo">190</span><a id="line.190">                } catch (Exception exception) {</a>
-<span class="sourceLineNo">191</span><a id="line.191">                    log.warn("Could not copy resource {} to {}",</a>
-<span class="sourceLineNo">192</span><a id="line.192">                             from, to, exception);</a>
-<span class="sourceLineNo">193</span><a id="line.193">                }</a>
-<span class="sourceLineNo">194</span><a id="line.194">            }</a>
-<span class="sourceLineNo">195</span><a id="line.195">            /*</a>
-<span class="sourceLineNo">196</span><a id="line.196">             * jupyter kernelspec install &lt;kernelspec&gt;</a>
-<span class="sourceLineNo">197</span><a id="line.197">             */</a>
-<span class="sourceLineNo">198</span><a id="line.198">            new ProcessBuilder(jupyter, "kernelspec", "install", kernelspec.toString(),</a>
-<span class="sourceLineNo">199</span><a id="line.199">                               sysPrefix ? "--sys-prefix" : "--user",</a>
-<span class="sourceLineNo">200</span><a id="line.200">                               "--replace")</a>
-<span class="sourceLineNo">201</span><a id="line.201">                .inheritIO()</a>
-<span class="sourceLineNo">202</span><a id="line.202">                .start().waitFor();</a>
-<span class="sourceLineNo">203</span><a id="line.203">        } catch (Exception exception) {</a>
-<span class="sourceLineNo">204</span><a id="line.204">            log.fatal("{}", exception.getMessage(), exception);</a>
-<span class="sourceLineNo">205</span><a id="line.205">        } finally {</a>
-<span class="sourceLineNo">206</span><a id="line.206">            deleteRecursively(tmp);</a>
-<span class="sourceLineNo">207</span><a id="line.207">        }</a>
-<span class="sourceLineNo">208</span><a id="line.208">    }</a>
-<span class="sourceLineNo">209</span><a id="line.209"></a>
-<span class="sourceLineNo">210</span><a id="line.210">    private String which(String command) throws Exception {</a>
-<span class="sourceLineNo">211</span><a id="line.211">        return getOutputAsString("which", command);</a>
-<span class="sourceLineNo">212</span><a id="line.212">    }</a>
-<span class="sourceLineNo">213</span><a id="line.213"></a>
-<span class="sourceLineNo">214</span><a id="line.214">    private String getOutputAsString(String... argv) throws Exception {</a>
-<span class="sourceLineNo">215</span><a id="line.215">        var bytes = new byte[] { };</a>
-<span class="sourceLineNo">216</span><a id="line.216">        var process =</a>
-<span class="sourceLineNo">217</span><a id="line.217">            new ProcessBuilder(argv)</a>
-<span class="sourceLineNo">218</span><a id="line.218">            .inheritIO()</a>
-<span class="sourceLineNo">219</span><a id="line.219">            .redirectOutput(ProcessBuilder.Redirect.PIPE)</a>
-<span class="sourceLineNo">220</span><a id="line.220">            .redirectError(ProcessBuilder.Redirect.DISCARD)</a>
-<span class="sourceLineNo">221</span><a id="line.221">            .start();</a>
-<span class="sourceLineNo">222</span><a id="line.222"></a>
-<span class="sourceLineNo">223</span><a id="line.223">        try (var in = process.getInputStream()) {</a>
-<span class="sourceLineNo">224</span><a id="line.224">            bytes = in.readAllBytes();</a>
-<span class="sourceLineNo">225</span><a id="line.225"></a>
-<span class="sourceLineNo">226</span><a id="line.226">            var status = process.waitFor();</a>
+<span class="sourceLineNo">171</span><a id="line.171">            var env = kernel.with("env");</a>
+<span class="sourceLineNo">172</span><a id="line.172"></a>
+<span class="sourceLineNo">173</span><a id="line.173">            for (var envvar : envvars) {</a>
+<span class="sourceLineNo">174</span><a id="line.174">                var pair = envvar.split("=", 2);</a>
+<span class="sourceLineNo">175</span><a id="line.175"></a>
+<span class="sourceLineNo">176</span><a id="line.176">                env.put(pair[0], (pair.length &gt; 1) ? pair[1] : "");</a>
+<span class="sourceLineNo">177</span><a id="line.177">            }</a>
+<span class="sourceLineNo">178</span><a id="line.178"></a>
+<span class="sourceLineNo">179</span><a id="line.179">            kernel.put("interrupt_mode", "message");</a>
+<span class="sourceLineNo">180</span><a id="line.180">            kernel.put("language", "java");</a>
+<span class="sourceLineNo">181</span><a id="line.181"></a>
+<span class="sourceLineNo">182</span><a id="line.182">            JSON_OBJECT_MAPPER.writeValue(kernelspec.resolve("kernel.json").toFile(), kernel);</a>
+<span class="sourceLineNo">183</span><a id="line.183">            /*</a>
+<span class="sourceLineNo">184</span><a id="line.184">             * logo-16x16.png and logo-32x32.png</a>
+<span class="sourceLineNo">185</span><a id="line.185">             */</a>
+<span class="sourceLineNo">186</span><a id="line.186">            for (var png : List.of("16x16.png", "32x32.png")) {</a>
+<span class="sourceLineNo">187</span><a id="line.187">                var from = "/static/images/ball-java-jar-" + png;</a>
+<span class="sourceLineNo">188</span><a id="line.188">                var to = kernelspec.resolve("logo-" + png).toFile();</a>
+<span class="sourceLineNo">189</span><a id="line.189"></a>
+<span class="sourceLineNo">190</span><a id="line.190">                try (var in = getClass().getResourceAsStream(from)) {</a>
+<span class="sourceLineNo">191</span><a id="line.191">                    copy(copyToByteArray(in), to);</a>
+<span class="sourceLineNo">192</span><a id="line.192">                } catch (Exception exception) {</a>
+<span class="sourceLineNo">193</span><a id="line.193">                    log.warn("Could not copy resource {} to {}",</a>
+<span class="sourceLineNo">194</span><a id="line.194">                             from, to, exception);</a>
+<span class="sourceLineNo">195</span><a id="line.195">                }</a>
+<span class="sourceLineNo">196</span><a id="line.196">            }</a>
+<span class="sourceLineNo">197</span><a id="line.197">            /*</a>
+<span class="sourceLineNo">198</span><a id="line.198">             * jupyter kernelspec install &lt;kernelspec&gt;</a>
+<span class="sourceLineNo">199</span><a id="line.199">             */</a>
+<span class="sourceLineNo">200</span><a id="line.200">            new ProcessBuilder(jupyter, "kernelspec", "install", kernelspec.toString(),</a>
+<span class="sourceLineNo">201</span><a id="line.201">                               sysPrefix ? "--sys-prefix" : "--user",</a>
+<span class="sourceLineNo">202</span><a id="line.202">                               "--replace")</a>
+<span class="sourceLineNo">203</span><a id="line.203">                .inheritIO()</a>
+<span class="sourceLineNo">204</span><a id="line.204">                .start().waitFor();</a>
+<span class="sourceLineNo">205</span><a id="line.205">        } catch (Exception exception) {</a>
+<span class="sourceLineNo">206</span><a id="line.206">            log.fatal("{}", exception.getMessage(), exception);</a>
+<span class="sourceLineNo">207</span><a id="line.207">        } finally {</a>
+<span class="sourceLineNo">208</span><a id="line.208">            deleteRecursively(tmp);</a>
+<span class="sourceLineNo">209</span><a id="line.209">        }</a>
+<span class="sourceLineNo">210</span><a id="line.210">    }</a>
+<span class="sourceLineNo">211</span><a id="line.211"></a>
+<span class="sourceLineNo">212</span><a id="line.212">    private String which(String command) throws Exception {</a>
+<span class="sourceLineNo">213</span><a id="line.213">        return getOutputAsString("which", command);</a>
+<span class="sourceLineNo">214</span><a id="line.214">    }</a>
+<span class="sourceLineNo">215</span><a id="line.215"></a>
+<span class="sourceLineNo">216</span><a id="line.216">    private String getOutputAsString(String... argv) throws Exception {</a>
+<span class="sourceLineNo">217</span><a id="line.217">        var bytes = new byte[] { };</a>
+<span class="sourceLineNo">218</span><a id="line.218">        var process =</a>
+<span class="sourceLineNo">219</span><a id="line.219">            new ProcessBuilder(argv)</a>
+<span class="sourceLineNo">220</span><a id="line.220">            .inheritIO()</a>
+<span class="sourceLineNo">221</span><a id="line.221">            .redirectOutput(ProcessBuilder.Redirect.PIPE)</a>
+<span class="sourceLineNo">222</span><a id="line.222">            .redirectError(ProcessBuilder.Redirect.DISCARD)</a>
+<span class="sourceLineNo">223</span><a id="line.223">            .start();</a>
+<span class="sourceLineNo">224</span><a id="line.224"></a>
+<span class="sourceLineNo">225</span><a id="line.225">        try (var in = process.getInputStream()) {</a>
+<span class="sourceLineNo">226</span><a id="line.226">            bytes = in.readAllBytes();</a>
 <span class="sourceLineNo">227</span><a id="line.227"></a>
-<span class="sourceLineNo">228</span><a id="line.228">            if (status != 0) {</a>
-<span class="sourceLineNo">229</span><a id="line.229">                throw new IOException("Cannot read output of " + List.of(argv));</a>
-<span class="sourceLineNo">230</span><a id="line.230">            }</a>
-<span class="sourceLineNo">231</span><a id="line.231">        }</a>
-<span class="sourceLineNo">232</span><a id="line.232"></a>
-<span class="sourceLineNo">233</span><a id="line.233">        return new String(bytes, UTF_8).trim();</a>
-<span class="sourceLineNo">234</span><a id="line.234">    }</a>
-<span class="sourceLineNo">235</span><a id="line.235"></a>
-<span class="sourceLineNo">236</span><a id="line.236">    private JsonNode getOutputAsJson(String... argv) throws Exception {</a>
-<span class="sourceLineNo">237</span><a id="line.237">        var node = JSON_OBJECT_MAPPER.nullNode();</a>
-<span class="sourceLineNo">238</span><a id="line.238">        var process =</a>
-<span class="sourceLineNo">239</span><a id="line.239">            new ProcessBuilder(argv)</a>
-<span class="sourceLineNo">240</span><a id="line.240">            .inheritIO()</a>
-<span class="sourceLineNo">241</span><a id="line.241">            .redirectOutput(ProcessBuilder.Redirect.PIPE)</a>
-<span class="sourceLineNo">242</span><a id="line.242">            .redirectError(ProcessBuilder.Redirect.DISCARD)</a>
-<span class="sourceLineNo">243</span><a id="line.243">            .start();</a>
-<span class="sourceLineNo">244</span><a id="line.244"></a>
-<span class="sourceLineNo">245</span><a id="line.245">        try (var in = process.getInputStream()) {</a>
-<span class="sourceLineNo">246</span><a id="line.246">            node = JSON_OBJECT_MAPPER.readTree(in);</a>
-<span class="sourceLineNo">247</span><a id="line.247"></a>
-<span class="sourceLineNo">248</span><a id="line.248">            var status = process.waitFor();</a>
+<span class="sourceLineNo">228</span><a id="line.228">            var status = process.waitFor();</a>
+<span class="sourceLineNo">229</span><a id="line.229"></a>
+<span class="sourceLineNo">230</span><a id="line.230">            if (status != 0) {</a>
+<span class="sourceLineNo">231</span><a id="line.231">                throw new IOException("Cannot read output of " + List.of(argv));</a>
+<span class="sourceLineNo">232</span><a id="line.232">            }</a>
+<span class="sourceLineNo">233</span><a id="line.233">        }</a>
+<span class="sourceLineNo">234</span><a id="line.234"></a>
+<span class="sourceLineNo">235</span><a id="line.235">        return new String(bytes, UTF_8).trim();</a>
+<span class="sourceLineNo">236</span><a id="line.236">    }</a>
+<span class="sourceLineNo">237</span><a id="line.237"></a>
+<span class="sourceLineNo">238</span><a id="line.238">    private JsonNode getOutputAsJson(String... argv) throws Exception {</a>
+<span class="sourceLineNo">239</span><a id="line.239">        var node = JSON_OBJECT_MAPPER.nullNode();</a>
+<span class="sourceLineNo">240</span><a id="line.240">        var process =</a>
+<span class="sourceLineNo">241</span><a id="line.241">            new ProcessBuilder(argv)</a>
+<span class="sourceLineNo">242</span><a id="line.242">            .inheritIO()</a>
+<span class="sourceLineNo">243</span><a id="line.243">            .redirectOutput(ProcessBuilder.Redirect.PIPE)</a>
+<span class="sourceLineNo">244</span><a id="line.244">            .redirectError(ProcessBuilder.Redirect.DISCARD)</a>
+<span class="sourceLineNo">245</span><a id="line.245">            .start();</a>
+<span class="sourceLineNo">246</span><a id="line.246"></a>
+<span class="sourceLineNo">247</span><a id="line.247">        try (var in = process.getInputStream()) {</a>
+<span class="sourceLineNo">248</span><a id="line.248">            node = JSON_OBJECT_MAPPER.readTree(in);</a>
 <span class="sourceLineNo">249</span><a id="line.249"></a>
-<span class="sourceLineNo">250</span><a id="line.250">            if (status != 0) {</a>
-<span class="sourceLineNo">251</span><a id="line.251">                throw new IOException("Cannot read output of " + List.of(argv));</a>
-<span class="sourceLineNo">252</span><a id="line.252">            }</a>
-<span class="sourceLineNo">253</span><a id="line.253">        }</a>
-<span class="sourceLineNo">254</span><a id="line.254"></a>
-<span class="sourceLineNo">255</span><a id="line.255">        return node;</a>
-<span class="sourceLineNo">256</span><a id="line.256">    }</a>
-<span class="sourceLineNo">257</span><a id="line.257">}</a>
+<span class="sourceLineNo">250</span><a id="line.250">            var status = process.waitFor();</a>
+<span class="sourceLineNo">251</span><a id="line.251"></a>
+<span class="sourceLineNo">252</span><a id="line.252">            if (status != 0) {</a>
+<span class="sourceLineNo">253</span><a id="line.253">                throw new IOException("Cannot read output of " + List.of(argv));</a>
+<span class="sourceLineNo">254</span><a id="line.254">            }</a>
+<span class="sourceLineNo">255</span><a id="line.255">        }</a>
+<span class="sourceLineNo">256</span><a id="line.256"></a>
+<span class="sourceLineNo">257</span><a id="line.257">        return node;</a>
+<span class="sourceLineNo">258</span><a id="line.258">    }</a>
+<span class="sourceLineNo">259</span><a id="line.259">}</a>
 
 
 

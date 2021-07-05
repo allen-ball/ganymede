@@ -484,7 +484,7 @@
 <span class="sourceLineNo">475</span><a id="line.475">     * @return  The corresponding {@link ObjectNode}.</a>
 <span class="sourceLineNo">476</span><a id="line.476">     */</a>
 <span class="sourceLineNo">477</span><a id="line.477">    public static ObjectNode content(Throwable throwable, String evalue) {</a>
-<span class="sourceLineNo">478</span><a id="line.478">        var node = JSON_OBJECT_MAPPER.createObjectNode();</a>
+<span class="sourceLineNo">478</span><a id="line.478">        var node = new ObjectNode(JsonNodeFactory.instance);</a>
 <span class="sourceLineNo">479</span><a id="line.479"></a>
 <span class="sourceLineNo">480</span><a id="line.480">        if (throwable != null || evalue != null) {</a>
 <span class="sourceLineNo">481</span><a id="line.481">            node.put("status", "error");</a>
