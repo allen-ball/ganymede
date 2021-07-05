@@ -22,6 +22,7 @@ import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.server.Renderer;
 import ganymede.server.renderer.ForClass;
+/* import ganymede.util.ObjectMappers; */
 import java.io.ByteArrayOutputStream;
 import java.util.Optional;
 import lombok.NoArgsConstructor;
@@ -29,7 +30,6 @@ import lombok.ToString;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.io.string.DataFramePrinter;
 
-import static ganymede.server.Server.JSON_OBJECT_MAPPER;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static org.springframework.util.MimeTypeUtils.TEXT_HTML_VALUE;
 import static tech.tablesaw.api.Table.defaultWriterRegistry;
@@ -64,7 +64,7 @@ public class TablesawTableRenderer implements Renderer {
                 try {
                     if (hasWriterForExtension("json")) {
                         var string = table.write().toString("json");
-                        var node = JSON_OBJECT_MAPPER.readTree(string);
+                        var node = ObjectMappers.JSON.readTree(string);
 
                         bundle.with(DATA)
                             .set(APPLICATION_JSON_VALUE, node);

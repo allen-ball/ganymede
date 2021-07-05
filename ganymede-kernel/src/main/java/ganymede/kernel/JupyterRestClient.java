@@ -19,16 +19,13 @@ package ganymede.kernel;
  * ##########################################################################
  */
 import com.fasterxml.jackson.databind.JsonNode;
+import ganymede.util.ObjectMappers;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
-
-import static ganymede.server.Server.JSON_OBJECT_MAPPER;
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
  * Ganymede Jupyter Notebook/Lab REST client.  See
@@ -63,7 +60,7 @@ public class JupyterRestClient {
         var response =
             client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        return JSON_OBJECT_MAPPER.readTree(response.body());
+        return ObjectMappers.JSON.readTree(response.body());
     }
 
     /**
@@ -78,7 +75,7 @@ public class JupyterRestClient {
         var response =
             client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        return JSON_OBJECT_MAPPER.readTree(response.body());
+        return ObjectMappers.JSON.readTree(response.body());
     }
 
     /**
@@ -93,7 +90,7 @@ public class JupyterRestClient {
         var response =
             client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        return JSON_OBJECT_MAPPER.readTree(response.body());
+        return ObjectMappers.JSON.readTree(response.body());
     }
 
     /**
@@ -108,7 +105,7 @@ public class JupyterRestClient {
         var response =
             client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        return JSON_OBJECT_MAPPER.readTree(response.body());
+        return ObjectMappers.JSON.readTree(response.body());
     }
 
     /**
@@ -123,7 +120,7 @@ public class JupyterRestClient {
         var response =
             client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        return JSON_OBJECT_MAPPER.readTree(response.body());
+        return ObjectMappers.JSON.readTree(response.body());
     }
 
     /**
@@ -138,7 +135,7 @@ public class JupyterRestClient {
         var response =
             client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        return JSON_OBJECT_MAPPER.readTree(response.body());
+        return ObjectMappers.JSON.readTree(response.body());
     }
 
     /**
@@ -153,7 +150,7 @@ public class JupyterRestClient {
         var response =
             client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        return JSON_OBJECT_MAPPER.readTree(response.body());
+        return ObjectMappers.JSON.readTree(response.body());
     }
 
     private HttpRequest.Builder builder() {

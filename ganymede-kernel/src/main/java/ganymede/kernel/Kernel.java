@@ -22,16 +22,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.server.Message;
 import ganymede.server.Server;
 import ganymede.shell.Shell;
+import ganymede.util.ObjectMappers;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.LinkedList;
 import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import lombok.NoArgsConstructor;
@@ -105,7 +102,7 @@ public class Kernel extends Server implements ApplicationContextAware,
 
     {
         try (var in = getClass().getResourceAsStream("kernel_info_reply.yaml")) {
-            kernel_info_reply_content = (ObjectNode) YAML_OBJECT_MAPPER.readTree(in).with("content");
+            kernel_info_reply_content = (ObjectNode) ObjectMappers.YAML.readTree(in).with("content");
             kernel_info_reply_content.put("protocol_version", PROTOCOL_VERSION.toString());
         } catch (Exception exception) {
             throw new ExceptionInInitializerError(exception);
@@ -127,7 +124,7 @@ public class Kernel extends Server implements ApplicationContextAware,
             try (var stream = Files.newDirectoryStream(Paths.get(runtime_dir), glob)) {
                 var path = stream.iterator().next();
 
-                client = new JupyterRestClient(JSON_OBJECT_MAPPER.readTree(path.toFile()));
+                client = new JupyterRestClient(ObjectMappers.JSON.readTree(path.toFile()));
             } catch (NoSuchElementException exception) {
                 log.warn("{}: No match found for '{}'", runtime_dir, glob);
             } catch (Exception exception) {
@@ -158,7 +155,7 @@ public class Kernel extends Server implements ApplicationContextAware,
      */
     @RequestMapping(method = { GET }, value = { "kernel/classpath" })
     public ResponseEntity<String> classpath() throws Exception {
-        var json = JSON_OBJECT_MAPPER.writeValueAsString(shell.classpath());
+        var json = ObjectMappers.JSON.writeValueAsString(shell.classpath());
 
         return new ResponseEntity<>(json, HttpStatus.OK);
     }
@@ -224,7 +221,7 @@ public class Kernel extends Server implements ApplicationContextAware,
     protected void bind(String kernelId, File file) throws IOException {
         super.bind(kernelId, file);
 
-        var node = (ObjectNode) JSON_OBJECT_MAPPER.readTree(file);
+        var node = (ObjectNode) ObjectMappers.JSON.readTree(file);
 
         node.put("pid", ProcessHandle.current().pid());
 
@@ -232,7 +229,7 @@ public class Kernel extends Server implements ApplicationContextAware,
             node.put("port", port);
         }
 
-        JSON_OBJECT_MAPPER.writeValue(file, node);
+        ObjectMappers.JSON.writeValue(file, node);
     }
 
     @Override

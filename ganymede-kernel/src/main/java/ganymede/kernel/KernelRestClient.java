@@ -19,6 +19,7 @@ package ganymede.kernel;
  * ##########################################################################
  */
 import com.fasterxml.jackson.databind.JsonNode;
+import ganymede.util.ObjectMappers;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -30,7 +31,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
-import static ganymede.server.Server.JSON_OBJECT_MAPPER;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -61,7 +61,7 @@ public class KernelRestClient {
         var response =
             client.send(request, HttpResponse.BodyHandlers.ofString());
         var list =
-            asStream(JSON_OBJECT_MAPPER.readTree(response.body()))
+            asStream(ObjectMappers.JSON.readTree(response.body()))
             .map(JsonNode::asText)
             .collect(toList());
 

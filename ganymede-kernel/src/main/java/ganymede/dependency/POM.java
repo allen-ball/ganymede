@@ -25,16 +25,13 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import ganymede.util.ObjectMappers;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -68,13 +65,9 @@ import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toVersionlessId;
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
-@JsonPropertyOrder({ "localRepository", "interactiveMode", "offline",
-                     "repositories", "dependencies" })
+@JsonPropertyOrder({ "localRepository", "interactiveMode", "offline", "repositories", "dependencies" })
 @Data @NoArgsConstructor @ToString @Log4j2
 public class POM {
-    private static final YAMLFactory YAML_FACTORY =
-        new YAMLFactory()
-        .enable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER);
     private static final SimpleModule MODULE =
         new SimpleModule()
         .addDeserializer(Dependency.class, new DependencyDeserializer())
@@ -83,11 +76,9 @@ public class POM {
         .addSerializer(RemoteRepository.class, new RemoteRepositorySerializer())
         .addDeserializer(RepositoryPolicy.class, new RepositoryPolicyDeserializer());
     private static final ObjectMapper YAML_OBJECT_MAPPER =
-        new ObjectMapper(YAML_FACTORY)
+        ObjectMappers.YAML
         .registerModule(MODULE)
-        .setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
-        .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_VALUES)
-        .enable(SerializationFeature.INDENT_OUTPUT);
+        .setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
 
     /**
      * Static method to get default {@link POM}.

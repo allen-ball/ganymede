@@ -18,17 +18,12 @@ package ganymede.notebook;
  * limitations under the License.
  * ##########################################################################
  */
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import ganymede.kernel.KernelRestClient;
 import ganymede.server.Message;
 import ganymede.shell.MagicMap;
 import ganymede.shell.Shell;
+import ganymede.util.ObjectMappers;
 import java.io.File;
 import java.io.IOException;
 import java.io.StreamTokenizer;
@@ -75,20 +70,6 @@ import static jdk.jshell.Snippet.SubKind.TEMP_VAR_EXPRESSION_SUBKIND;
 public class NotebookContext {
     private static final Base64.Decoder DECODER = Base64.getDecoder();
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
-
-    private static final ObjectMapper JSON_OBJECT_MAPPER =
-        new ObjectMapper()
-        .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_VALUES)
-        .enable(SerializationFeature.INDENT_OUTPUT);
-
-    private static final YAMLFactory YAML_FACTORY =
-        new YAMLFactory()
-        .enable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER);
-    private static final ObjectMapper YAML_OBJECT_MAPPER =
-        new ObjectMapper(YAML_FACTORY)
-        .setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
-        .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_VALUES)
-        .enable(SerializationFeature.INDENT_OUTPUT);
 
     /**
      * The name ({@value #NAME}) the {@link NotebookContext} instance is
@@ -201,7 +182,7 @@ public class NotebookContext {
      */
     @NotebookFunction
     public JsonNode asJson(Object object) {
-        return JSON_OBJECT_MAPPER.valueToTree(object);
+        return ObjectMappers.JSON.valueToTree(object);
     }
 
     /**
@@ -217,7 +198,7 @@ public class NotebookContext {
         var yaml = "";
 
         try {
-            yaml = YAML_OBJECT_MAPPER.writeValueAsString(object);
+            yaml = ObjectMappers.YAML.writeValueAsString(object);
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
         }

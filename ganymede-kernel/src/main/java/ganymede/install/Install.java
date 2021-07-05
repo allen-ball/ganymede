@@ -21,6 +21,7 @@ package ganymede.install;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import ganymede.util.ObjectMappers;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -37,7 +38,6 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.system.ApplicationHome;
 
-import static ganymede.server.Server.JSON_OBJECT_MAPPER;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
 import static org.springframework.util.FileCopyUtils.copy;
@@ -179,7 +179,7 @@ public class Install implements ApplicationRunner {
             kernel.put("interrupt_mode", "message");
             kernel.put("language", "java");
 
-            JSON_OBJECT_MAPPER.writeValue(kernelspec.resolve("kernel.json").toFile(), kernel);
+            ObjectMappers.JSON.writeValue(kernelspec.resolve("kernel.json").toFile(), kernel);
             /*
              * logo-16x16.png and logo-32x32.png
              */
@@ -236,7 +236,7 @@ public class Install implements ApplicationRunner {
     }
 
     private JsonNode getOutputAsJson(String... argv) throws Exception {
-        var node = JSON_OBJECT_MAPPER.nullNode();
+        var node = ObjectMappers.JSON.nullNode();
         var process =
             new ProcessBuilder(argv)
             .inheritIO()
@@ -245,7 +245,7 @@ public class Install implements ApplicationRunner {
             .start();
 
         try (var in = process.getInputStream()) {
-            node = JSON_OBJECT_MAPPER.readTree(in);
+            node = ObjectMappers.JSON.readTree(in);
 
             var status = process.waitFor();
 

@@ -20,14 +20,13 @@ package ganymede.server;
  */
 import ball.annotation.CompileTimeCheck;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import ganymede.util.ObjectMappers;
 import java.io.File;
 import java.io.IOException;
 import java.util.regex.Pattern;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
-
-import static ganymede.server.Server.JSON_OBJECT_MAPPER;
 
 /**
  * Jupyter {@link Connection}.  See
@@ -60,7 +59,7 @@ public class Connection {
      *                          {@link Connection}.
      */
     public Connection(String id, File file) throws IOException {
-        this(id, (ObjectNode) JSON_OBJECT_MAPPER.readTree(file));
+        this(id, (ObjectNode) ObjectMappers.JSON.readTree(file));
     }
 
     /**

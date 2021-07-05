@@ -22,10 +22,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.io.PrintStreamBuffer;
+import ganymede.util.ObjectMappers;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -36,7 +36,6 @@ import lombok.extern.log4j.Log4j2;
 import org.zeromq.ZMQ;
 import org.zeromq.util.ZData;
 
-import static ganymede.server.Server.JSON_OBJECT_MAPPER;
 import static java.time.ZoneOffset.UTC;
 import static java.time.ZonedDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
@@ -392,7 +391,7 @@ public class Message {
         var string = "{}";
 
         try {
-            string = JSON_OBJECT_MAPPER.writeValueAsString(node);
+            string = ObjectMappers.JSON.writeValueAsString(node);
         } catch (Exception exception) {
             log.warn("{}", exception);
         }
@@ -456,7 +455,7 @@ public class Message {
         ObjectNode value = null;
 
         try {
-            value = (ObjectNode) JSON_OBJECT_MAPPER.readTree(new String(bytes, ZMQ.CHARSET));
+            value = (ObjectNode) ObjectMappers.JSON.readTree(new String(bytes, ZMQ.CHARSET));
         } catch (Exception exception) {
             log.warn("{}", exception);
         }
