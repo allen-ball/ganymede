@@ -158,12 +158,12 @@
 <span class="sourceLineNo">149</span><a id="line.149">     */</a>
 <span class="sourceLineNo">150</span><a id="line.150">    public void magic(String name, String line0, String code) {</a>
 <span class="sourceLineNo">151</span><a id="line.151">        try {</a>
-<span class="sourceLineNo">152</span><a id="line.152">            magics.reload();</a>
+<span class="sourceLineNo">152</span><a id="line.152">            var magic = magics.reload().get(name);</a>
 <span class="sourceLineNo">153</span><a id="line.153"></a>
-<span class="sourceLineNo">154</span><a id="line.154">            if (magics.containsKey(name)) {</a>
-<span class="sourceLineNo">155</span><a id="line.155">                magics.get(name).execute(decode(line0), decode(code));</a>
+<span class="sourceLineNo">154</span><a id="line.154">            if (magic != null) {</a>
+<span class="sourceLineNo">155</span><a id="line.155">                magic.execute(decode(line0), decode(code));</a>
 <span class="sourceLineNo">156</span><a id="line.156">            } else {</a>
-<span class="sourceLineNo">157</span><a id="line.157">                throw new IllegalStateException(String.format("Magic '%s' not found", name));</a>
+<span class="sourceLineNo">157</span><a id="line.157">                System.err.format("Magic '%s' not found\n", name);</a>
 <span class="sourceLineNo">158</span><a id="line.158">            }</a>
 <span class="sourceLineNo">159</span><a id="line.159">        } catch (Throwable throwable) {</a>
 <span class="sourceLineNo">160</span><a id="line.160">            throwable.printStackTrace(System.err);</a>

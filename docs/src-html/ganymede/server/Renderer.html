@@ -28,55 +28,99 @@
 <span class="sourceLineNo">019</span><a id="line.19"> * ##########################################################################</a>
 <span class="sourceLineNo">020</span><a id="line.20"> */</a>
 <span class="sourceLineNo">021</span><a id="line.21">import com.fasterxml.jackson.databind.node.ObjectNode;</a>
-<span class="sourceLineNo">022</span><a id="line.22">import java.util.Base64;</a>
-<span class="sourceLineNo">023</span><a id="line.23"></a>
-<span class="sourceLineNo">024</span><a id="line.24">import static ganymede.server.Server.JSON_OBJECT_MAPPER;</a>
-<span class="sourceLineNo">025</span><a id="line.25"></a>
-<span class="sourceLineNo">026</span><a id="line.26">/**</a>
-<span class="sourceLineNo">027</span><a id="line.27"> * {@link Message#mime_bundle(Object,Object...)} output {@link Renderer}.</a>
-<span class="sourceLineNo">028</span><a id="line.28"> *</a>
-<span class="sourceLineNo">029</span><a id="line.29"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
-<span class="sourceLineNo">030</span><a id="line.30"> */</a>
-<span class="sourceLineNo">031</span><a id="line.31">public interface Renderer {</a>
-<span class="sourceLineNo">032</span><a id="line.32">    public static final String DATA = "data";</a>
-<span class="sourceLineNo">033</span><a id="line.33">    public static final String METADATA = "metadata";</a>
-<span class="sourceLineNo">034</span><a id="line.34"></a>
-<span class="sourceLineNo">035</span><a id="line.35">    /**</a>
-<span class="sourceLineNo">036</span><a id="line.36">     * {@link Base64.Encoder} instance.</a>
-<span class="sourceLineNo">037</span><a id="line.37">     */</a>
-<span class="sourceLineNo">038</span><a id="line.38">    public static final Base64.Encoder BASE64_ENCODER = Base64.getEncoder();</a>
-<span class="sourceLineNo">039</span><a id="line.39"></a>
-<span class="sourceLineNo">040</span><a id="line.40">    /**</a>
-<span class="sourceLineNo">041</span><a id="line.41">     * Method to render an {@link Object} to a {@code mime-bundle}.</a>
-<span class="sourceLineNo">042</span><a id="line.42">     *</a>
-<span class="sourceLineNo">043</span><a id="line.43">     * @param   bundle          The {@link Message} {@code mime-bundle}.</a>
-<span class="sourceLineNo">044</span><a id="line.44">     * @param   object          The {@link Object} to render.</a>
-<span class="sourceLineNo">045</span><a id="line.45">     */</a>
-<span class="sourceLineNo">046</span><a id="line.46">    public void renderTo(ObjectNode bundle, Object object);</a>
-<span class="sourceLineNo">047</span><a id="line.47"></a>
-<span class="sourceLineNo">048</span><a id="line.48">    /**</a>
-<span class="sourceLineNo">049</span><a id="line.49">     * Static {@link RendererMap} instance used by</a>
-<span class="sourceLineNo">050</span><a id="line.50">     * {@link #render(Object,Object...)}.</a>
-<span class="sourceLineNo">051</span><a id="line.51">     */</a>
-<span class="sourceLineNo">052</span><a id="line.52">    public static RendererMap MAP = new RendererMap();</a>
-<span class="sourceLineNo">053</span><a id="line.53"></a>
-<span class="sourceLineNo">054</span><a id="line.54">    /**</a>
-<span class="sourceLineNo">055</span><a id="line.55">     * Method to render an {@link Object} to an</a>
-<span class="sourceLineNo">056</span><a id="line.56">     * {@link Message#execute_result(int,ObjectNode)}.</a>
-<span class="sourceLineNo">057</span><a id="line.57">     *</a>
-<span class="sourceLineNo">058</span><a id="line.58">     * @param   object          The {@link Object} to encode.</a>
-<span class="sourceLineNo">059</span><a id="line.59">     * @param   alternates      Optional alternate representations.</a>
-<span class="sourceLineNo">060</span><a id="line.60">     *</a>
-<span class="sourceLineNo">061</span><a id="line.61">     * @return  The {@link Message} {@code mime-bundle}.</a>
-<span class="sourceLineNo">062</span><a id="line.62">     */</a>
-<span class="sourceLineNo">063</span><a id="line.63">    public static ObjectNode render(Object object, Object... alternates) {</a>
-<span class="sourceLineNo">064</span><a id="line.64">        var bundle = JSON_OBJECT_MAPPER.createObjectNode();</a>
-<span class="sourceLineNo">065</span><a id="line.65"></a>
-<span class="sourceLineNo">066</span><a id="line.66">        MAP.renderTo(bundle, object, alternates);</a>
-<span class="sourceLineNo">067</span><a id="line.67"></a>
-<span class="sourceLineNo">068</span><a id="line.68">        return bundle;</a>
-<span class="sourceLineNo">069</span><a id="line.69">    }</a>
-<span class="sourceLineNo">070</span><a id="line.70">}</a>
+<span class="sourceLineNo">022</span><a id="line.22">import ganymede.server.renderer.ForClass;</a>
+<span class="sourceLineNo">023</span><a id="line.23">import ganymede.server.renderer.ForClassName;</a>
+<span class="sourceLineNo">024</span><a id="line.24">import java.util.Base64;</a>
+<span class="sourceLineNo">025</span><a id="line.25">import java.util.Optional;</a>
+<span class="sourceLineNo">026</span><a id="line.26"></a>
+<span class="sourceLineNo">027</span><a id="line.27">/**</a>
+<span class="sourceLineNo">028</span><a id="line.28"> * {@link Message#mime_bundle(Object,Object...)} output {@link Renderer}.</a>
+<span class="sourceLineNo">029</span><a id="line.29"> *</a>
+<span class="sourceLineNo">030</span><a id="line.30"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
+<span class="sourceLineNo">031</span><a id="line.31"> */</a>
+<span class="sourceLineNo">032</span><a id="line.32">public interface Renderer {</a>
+<span class="sourceLineNo">033</span><a id="line.33">    public static final String DATA = "data";</a>
+<span class="sourceLineNo">034</span><a id="line.34">    public static final String METADATA = "metadata";</a>
+<span class="sourceLineNo">035</span><a id="line.35"></a>
+<span class="sourceLineNo">036</span><a id="line.36">    /**</a>
+<span class="sourceLineNo">037</span><a id="line.37">     * Singleton {@link RendererMap} instance.</a>
+<span class="sourceLineNo">038</span><a id="line.38">     */</a>
+<span class="sourceLineNo">039</span><a id="line.39">    public static final RendererMap MAP = new RendererMap();</a>
+<span class="sourceLineNo">040</span><a id="line.40"></a>
+<span class="sourceLineNo">041</span><a id="line.41">    /**</a>
+<span class="sourceLineNo">042</span><a id="line.42">     * {@link Base64.Encoder} instance.</a>
+<span class="sourceLineNo">043</span><a id="line.43">     */</a>
+<span class="sourceLineNo">044</span><a id="line.44">    public static final Base64.Encoder BASE64_ENCODER = Base64.getEncoder();</a>
+<span class="sourceLineNo">045</span><a id="line.45"></a>
+<span class="sourceLineNo">046</span><a id="line.46">    /**</a>
+<span class="sourceLineNo">047</span><a id="line.47">     * Method to get a configured instance of this {@link Renderer}.</a>
+<span class="sourceLineNo">048</span><a id="line.48">     * Subclasses may override to return an instance that requires</a>
+<span class="sourceLineNo">049</span><a id="line.49">     * additional resources and/or configuration.  Default implementaion</a>
+<span class="sourceLineNo">050</span><a id="line.50">     * returns {@link.this}.</a>
+<span class="sourceLineNo">051</span><a id="line.51">     *</a>
+<span class="sourceLineNo">052</span><a id="line.52">     * @return  An {@link Optional} containing the configured instance.</a>
+<span class="sourceLineNo">053</span><a id="line.53">     */</a>
+<span class="sourceLineNo">054</span><a id="line.54">    public default Optional&lt;? extends Renderer&gt; instance() {</a>
+<span class="sourceLineNo">055</span><a id="line.55">        return Optional.of(this);</a>
+<span class="sourceLineNo">056</span><a id="line.56">    }</a>
+<span class="sourceLineNo">057</span><a id="line.57"></a>
+<span class="sourceLineNo">058</span><a id="line.58">    /**</a>
+<span class="sourceLineNo">059</span><a id="line.59">     * Default method to analyze {@link.this} instance for {@link ForClass}</a>
+<span class="sourceLineNo">060</span><a id="line.60">     * and {@link ForClassName} annotations.  May return {@code null} if a</a>
+<span class="sourceLineNo">061</span><a id="line.61">     * {@link Class} cannot be loaded.</a>
+<span class="sourceLineNo">062</span><a id="line.62">     *</a>
+<span class="sourceLineNo">063</span><a id="line.63">     * @return  The {@link Class type} the argument renders (may be</a>
+<span class="sourceLineNo">064</span><a id="line.64">     *          {@code null}).</a>
+<span class="sourceLineNo">065</span><a id="line.65">     */</a>
+<span class="sourceLineNo">066</span><a id="line.66">    public default Class&lt;?&gt; getRenderType() {</a>
+<span class="sourceLineNo">067</span><a id="line.67">        return getRenderType(getClass());</a>
+<span class="sourceLineNo">068</span><a id="line.68">    }</a>
+<span class="sourceLineNo">069</span><a id="line.69"></a>
+<span class="sourceLineNo">070</span><a id="line.70">    /**</a>
+<span class="sourceLineNo">071</span><a id="line.71">     * Method to render an {@link Object} to a {@code mime-bundle}.</a>
+<span class="sourceLineNo">072</span><a id="line.72">     *</a>
+<span class="sourceLineNo">073</span><a id="line.73">     * @param   bundle          The {@link Message} {@code mime-bundle}.</a>
+<span class="sourceLineNo">074</span><a id="line.74">     * @param   object          The {@link Object} to render.</a>
+<span class="sourceLineNo">075</span><a id="line.75">     */</a>
+<span class="sourceLineNo">076</span><a id="line.76">    public void renderTo(ObjectNode bundle, Object object);</a>
+<span class="sourceLineNo">077</span><a id="line.77"></a>
+<span class="sourceLineNo">078</span><a id="line.78">    /**</a>
+<span class="sourceLineNo">079</span><a id="line.79">     * Static method to analyze a class for {@link ForClass} and</a>
+<span class="sourceLineNo">080</span><a id="line.80">     * {@link ForClassName} annotations.  May return {@code null} if a</a>
+<span class="sourceLineNo">081</span><a id="line.81">     * {@link Class} cannot be loaded.</a>
+<span class="sourceLineNo">082</span><a id="line.82">     *</a>
+<span class="sourceLineNo">083</span><a id="line.83">     * @param   type            The {@link Class} to analyze.</a>
+<span class="sourceLineNo">084</span><a id="line.84">     *</a>
+<span class="sourceLineNo">085</span><a id="line.85">     * @return  The {@link Class type} the argument renders (may be</a>
+<span class="sourceLineNo">086</span><a id="line.86">     *          {@code null}).</a>
+<span class="sourceLineNo">087</span><a id="line.87">     */</a>
+<span class="sourceLineNo">088</span><a id="line.88">    public static Class&lt;?&gt; getRenderType(Class&lt;?&gt; type) {</a>
+<span class="sourceLineNo">089</span><a id="line.89">        Class&lt;?&gt; renderType = null;</a>
+<span class="sourceLineNo">090</span><a id="line.90"></a>
+<span class="sourceLineNo">091</span><a id="line.91">        if (type != null) {</a>
+<span class="sourceLineNo">092</span><a id="line.92">            try {</a>
+<span class="sourceLineNo">093</span><a id="line.93">                if (type.isAnnotationPresent(ForClassName.class)) {</a>
+<span class="sourceLineNo">094</span><a id="line.94">                    var name = type.getAnnotation(ForClassName.class).value();</a>
+<span class="sourceLineNo">095</span><a id="line.95"></a>
+<span class="sourceLineNo">096</span><a id="line.96">                    renderType = Class.forName(name, false, type.getClassLoader());</a>
+<span class="sourceLineNo">097</span><a id="line.97">                } else {</a>
+<span class="sourceLineNo">098</span><a id="line.98">                    renderType = type.getAnnotation(ForClass.class).value();</a>
+<span class="sourceLineNo">099</span><a id="line.99">                }</a>
+<span class="sourceLineNo">100</span><a id="line.100">            } catch (Throwable throwable) {</a>
+<span class="sourceLineNo">101</span><a id="line.101">            }</a>
+<span class="sourceLineNo">102</span><a id="line.102"></a>
+<span class="sourceLineNo">103</span><a id="line.103">            if (renderType == null) {</a>
+<span class="sourceLineNo">104</span><a id="line.104">                var superType = type.getSuperclass();</a>
+<span class="sourceLineNo">105</span><a id="line.105"></a>
+<span class="sourceLineNo">106</span><a id="line.106">                if (superType != null &amp;&amp; Renderer.class.isAssignableFrom(superType)) {</a>
+<span class="sourceLineNo">107</span><a id="line.107">                    renderType = getRenderType(superType);</a>
+<span class="sourceLineNo">108</span><a id="line.108">                }</a>
+<span class="sourceLineNo">109</span><a id="line.109">            }</a>
+<span class="sourceLineNo">110</span><a id="line.110">        }</a>
+<span class="sourceLineNo">111</span><a id="line.111"></a>
+<span class="sourceLineNo">112</span><a id="line.112">        return renderType;</a>
+<span class="sourceLineNo">113</span><a id="line.113">    }</a>
+<span class="sourceLineNo">114</span><a id="line.114">}</a>
 
 
 
