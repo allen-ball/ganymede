@@ -94,4 +94,26 @@ public abstract class AbstractMagic implements AnnotatedMagic {
 
         return result;
     }
+
+    /**
+     * Method to get usage message from an annotated command {@link Object}.
+     *
+     * @param   command         The annotated command {@link Object}.
+     *
+     * @return  The usage message.
+     *
+     * @see CommandLine
+     * @see CommandLine.Command
+     * @see CommandLine.Option
+     * @see CommandLine.Parameters
+     */
+    protected String getUsage(Object command) {
+        var line =
+            new CommandLine(command)
+            .setCommandName(getMagicNames()[0])
+            .setCaseInsensitiveEnumValuesAllowed(true)
+            .setUnmatchedArgumentsAllowed(false);
+
+        return line.getUsageMessage();
+    }
 }

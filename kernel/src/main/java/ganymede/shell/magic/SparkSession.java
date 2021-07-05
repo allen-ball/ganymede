@@ -99,6 +99,9 @@ public class SparkSession extends AbstractPropertiesMagic {
         }
     }
 
+    @Override
+    public String getUsage() { return getUsage(new Arguments()); }
+
     @Command @Data
     private class Arguments {
         @Parameters(description = { "Spark master" },

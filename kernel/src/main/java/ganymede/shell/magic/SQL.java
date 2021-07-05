@@ -102,6 +102,9 @@ public class SQL extends AbstractMagic {
         }
     }
 
+    @Override
+    public String getUsage() { return getUsage(new Arguments()); }
+
     @Command @Data
     private class Arguments {
         @Parameters(description = { "JDBC Connection URL" },
