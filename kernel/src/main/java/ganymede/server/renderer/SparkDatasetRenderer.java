@@ -47,7 +47,7 @@ public class SparkDatasetRenderer implements Renderer {
     }
 
     @NoArgsConstructor @ToString
-    public class Impl extends SparkDatasetRenderer {
+    private class Impl extends SparkDatasetRenderer {
         @Override
         public void renderTo(ObjectNode bundle, Object object) {
             var type = getClass().getEnclosingClass();

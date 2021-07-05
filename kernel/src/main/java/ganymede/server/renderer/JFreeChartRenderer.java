@@ -60,7 +60,7 @@ public class JFreeChartRenderer implements Renderer {
     }
 
     @NoArgsConstructor @ToString
-    public class Impl extends JFreeChartRenderer {
+    private class Impl extends JFreeChartRenderer {
         @Override
         public Optional<JFreeChartRenderer> instance() {
             return Optional.of(this);

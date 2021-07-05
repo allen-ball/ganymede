@@ -49,7 +49,7 @@ public class TablesawPlotlyFigureRenderer implements Renderer {
     }
 
     @NoArgsConstructor @ToString
-    public class Impl extends TablesawPlotlyFigureRenderer {
+    private class Impl extends TablesawPlotlyFigureRenderer {
         @Override
         public void renderTo(ObjectNode bundle, Object object) {
             var type = getClass().getEnclosingClass();

@@ -47,7 +47,7 @@ public class SparkSessionRenderer implements Renderer {
     }
 
     @NoArgsConstructor @ToString
-    public class Impl extends SparkSessionRenderer {
+    private class Impl extends SparkSessionRenderer {
         @Override
         public void renderTo(ObjectNode bundle, Object object) {
             var type = getClass().getEnclosingClass();

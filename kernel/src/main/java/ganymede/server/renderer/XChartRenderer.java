@@ -52,7 +52,7 @@ public class XChartRenderer implements Renderer {
     }
 
     @NoArgsConstructor @ToString
-    public class Impl extends XChartRenderer {
+    private class Impl extends XChartRenderer {
         @Override
         public void renderTo(ObjectNode bundle, Object object) {
             try {
