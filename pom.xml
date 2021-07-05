@@ -245,7 +245,7 @@
   </dependencyManagement>
   <modules>
     <module>ganymede</module>
-    <module>kernel</module>
+    <module>ganymede-kernel</module>
   </modules>
   <build>
     <pluginManagement>
