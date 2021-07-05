@@ -18,9 +18,17 @@ package ganymede.server.renderer;
  * limitations under the License.
  * ##########################################################################
  */
+import ball.annotation.ServiceProviderFor;
+import ball.annotation.processing.AnnotatedProcessor;
+import ball.annotation.processing.For;
+import ball.annotation.processing.TargetMustExtend;
+import ganymede.server.Renderer;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import javax.annotation.processing.Processor;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -34,6 +42,16 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Retention(RUNTIME)
 @Target({ TYPE })
+@TargetMustExtend(Renderer.class)
 public @interface ForClass {
     Class<?> value();
+
+    /**
+     * {@link Processor} implementation.
+     */
+    @ServiceProviderFor({ Processor.class })
+    @For({ ForClass.class })
+    @NoArgsConstructor @ToString
+    public static class ProcessorImpl extends AnnotatedProcessor {
+    }
 }

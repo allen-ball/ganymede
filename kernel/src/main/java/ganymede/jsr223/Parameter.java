@@ -18,10 +18,17 @@ package ganymede.jsr223;
  * limitations under the License.
  * ##########################################################################
  */
+import ball.annotation.ServiceProviderFor;
+import ball.annotation.processing.AnnotatedProcessor;
+import ball.annotation.processing.For;
+import ball.annotation.processing.TargetMustExtend;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import javax.annotation.processing.Processor;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -36,7 +43,17 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Repeatable(Parameters.class)
 @Target({ TYPE })
+@TargetMustExtend(AnnotatedScriptEngineFactory.class)
 public @interface Parameter {
     String name() default "";
     String value() default "";
+
+    /**
+     * {@link Processor} implementation.
+     */
+    @ServiceProviderFor({ Processor.class })
+    @For({ Parameter.class })
+    @NoArgsConstructor @ToString
+    public static class ProcessorImpl extends AnnotatedProcessor {
+    }
 }

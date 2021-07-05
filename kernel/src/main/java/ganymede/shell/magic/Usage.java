@@ -18,12 +18,25 @@ package ganymede.shell.magic;
  * limitations under the License.
  * ##########################################################################
  */
+import ball.annotation.ServiceProviderFor;
+import ball.annotation.processing.AnnotatedProcessor;
+import ball.annotation.processing.For;
+import ball.annotation.processing.TargetMustExtend;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import javax.annotation.processing.Processor;
+import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static javax.tools.Diagnostic.Kind.ERROR;
 
 /**
  * {@link AnnotatedMagic#getUsage()} source
@@ -34,6 +47,28 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Retention(RUNTIME)
 @Target({ TYPE })
+@TargetMustExtend(AnnotatedMagic.class)
 public @interface Usage {
     String[] value();
+
+    /**
+     * {@link Processor} implementation.
+     */
+    @ServiceProviderFor({ Processor.class })
+    @For({ Usage.class })
+    @NoArgsConstructor @ToString
+    public static class ProcessorImpl extends AnnotatedProcessor {
+        @Override
+        public void process(RoundEnvironment roundEnv,
+                            TypeElement annotation, Element element) {
+            super.process(roundEnv, annotation, element);
+
+            AnnotationMirror mirror = getAnnotationMirror(element, annotation);
+            AnnotationValue value = getAnnotationValue(mirror, "value");
+
+            if (isEmptyArray(value)) {
+                print(ERROR, element, mirror, value, "value() is empty");
+            }
+        }
+    }
 }
