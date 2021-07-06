@@ -33,11 +33,18 @@
     <version>2.0.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
+  <properties>
+    <start-class>ganymede.Launcher</start-class>
+  </properties>
   <dependencies verbose="true">
     <dependency>
       <groupId>ganymede</groupId>
       <artifactId>ganymede-kernel</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ball</groupId>
+      <artifactId>ball-java-jar</artifactId>
       <scope>runtime</scope>
     </dependency>
     <!-- Servlet Container -->
@@ -98,6 +105,52 @@
       <artifactId>unused</artifactId>
       <version>1.0.0</version>
       <scope>runtime</scope>
+    </dependency>
+    <!-- Compilation-only: Not distributed in shaded JAR -->
+    <dependency>
+      <groupId>ball</groupId>
+      <artifactId>ball-util</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-sql_${scala.binary.version}</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.graalvm</groupId>
+      <artifactId>graal-sdk</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jfree</groupId>
+      <artifactId>jfreechart</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.knowm.xchart</groupId>
+      <artifactId>xchart</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-compiler</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>tech.tablesaw</groupId>
+      <artifactId>tablesaw-core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>tech.tablesaw</groupId>
+      <artifactId>tablesaw-jsplot</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   <build>

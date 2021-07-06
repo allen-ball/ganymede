@@ -36,7 +36,7 @@
   <dependencies verbose="true">
     <dependency>
       <groupId>ball</groupId>
-      <artifactId>ball-java-jar</artifactId>
+      <artifactId>ball-util</artifactId>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
@@ -101,6 +101,10 @@
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-transport-http</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-sql_${scala.binary.version}</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.velocity</groupId>
@@ -170,6 +174,22 @@
       <version>${kotlin.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.jfree</groupId>
+      <artifactId>jfreechart</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.knowm.xchart</groupId>
+      <artifactId>xchart</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-compiler</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
       <exclusions>
@@ -211,51 +231,13 @@
       <groupId>org.zeromq</groupId>
       <artifactId>jeromq</artifactId>
     </dependency>
-    <!-- Compilation-only: Not distributed in shaded JAR -->
-    <dependency>
-      <groupId>ball</groupId>
-      <artifactId>ball-util</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.spark</groupId>
-      <artifactId>spark-sql_${scala.binary.version}</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.graalvm</groupId>
-      <artifactId>graal-sdk</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jfree</groupId>
-      <artifactId>jfreechart</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.knowm.xchart</groupId>
-      <artifactId>xchart</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.scala-lang</groupId>
-      <artifactId>scala-compiler</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.scala-lang</groupId>
-      <artifactId>scala-library</artifactId>
-      <scope>provided</scope>
-    </dependency>
     <dependency>
       <groupId>tech.tablesaw</groupId>
       <artifactId>tablesaw-core</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>tech.tablesaw</groupId>
       <artifactId>tablesaw-jsplot</artifactId>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>
