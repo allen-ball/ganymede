@@ -36,6 +36,11 @@
   <dependencies>
     <dependency>
       <groupId>ganymede</groupId>
+      <artifactId>ganymede</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ganymede</groupId>
       <artifactId>ganymede-kernel</artifactId>
       <version>${project.version}</version>
     </dependency>
