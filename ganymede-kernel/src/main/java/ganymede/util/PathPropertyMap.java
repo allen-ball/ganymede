@@ -1,4 +1,4 @@
- package ganymede.util;
+package ganymede.util;
 /*-
  * ##########################################################################
  * Ganymede
