@@ -30,23 +30,23 @@
 <span class="sourceLineNo">021</span><a id="line.21">import com.fasterxml.jackson.databind.JsonNode;</a>
 <span class="sourceLineNo">022</span><a id="line.22">import com.fasterxml.jackson.databind.node.JsonNodeFactory;</a>
 <span class="sourceLineNo">023</span><a id="line.23">import com.fasterxml.jackson.databind.node.ObjectNode;</a>
-<span class="sourceLineNo">024</span><a id="line.24">import java.io.IOException;</a>
-<span class="sourceLineNo">025</span><a id="line.25">import java.nio.file.Files;</a>
-<span class="sourceLineNo">026</span><a id="line.26">import java.nio.file.Paths;</a>
-<span class="sourceLineNo">027</span><a id="line.27">import java.util.LinkedHashMap;</a>
-<span class="sourceLineNo">028</span><a id="line.28">import java.util.List;</a>
-<span class="sourceLineNo">029</span><a id="line.29">import java.util.function.Function;</a>
-<span class="sourceLineNo">030</span><a id="line.30">import java.util.stream.Stream;</a>
-<span class="sourceLineNo">031</span><a id="line.31">import lombok.NoArgsConstructor;</a>
-<span class="sourceLineNo">032</span><a id="line.32">import lombok.ToString;</a>
-<span class="sourceLineNo">033</span><a id="line.33">import lombok.extern.log4j.Log4j2;</a>
-<span class="sourceLineNo">034</span><a id="line.34">import org.springframework.beans.factory.annotation.Value;</a>
-<span class="sourceLineNo">035</span><a id="line.35">import org.springframework.boot.ApplicationArguments;</a>
-<span class="sourceLineNo">036</span><a id="line.36">import org.springframework.boot.ApplicationRunner;</a>
-<span class="sourceLineNo">037</span><a id="line.37">import org.springframework.boot.autoconfigure.SpringBootApplication;</a>
-<span class="sourceLineNo">038</span><a id="line.38">import org.springframework.boot.system.ApplicationHome;</a>
-<span class="sourceLineNo">039</span><a id="line.39"></a>
-<span class="sourceLineNo">040</span><a id="line.40">import static ganymede.server.Server.JSON_OBJECT_MAPPER;</a>
+<span class="sourceLineNo">024</span><a id="line.24">import ganymede.util.ObjectMappers;</a>
+<span class="sourceLineNo">025</span><a id="line.25">import java.io.IOException;</a>
+<span class="sourceLineNo">026</span><a id="line.26">import java.nio.file.Files;</a>
+<span class="sourceLineNo">027</span><a id="line.27">import java.nio.file.Paths;</a>
+<span class="sourceLineNo">028</span><a id="line.28">import java.util.LinkedHashMap;</a>
+<span class="sourceLineNo">029</span><a id="line.29">import java.util.List;</a>
+<span class="sourceLineNo">030</span><a id="line.30">import java.util.function.Function;</a>
+<span class="sourceLineNo">031</span><a id="line.31">import java.util.stream.Stream;</a>
+<span class="sourceLineNo">032</span><a id="line.32">import lombok.NoArgsConstructor;</a>
+<span class="sourceLineNo">033</span><a id="line.33">import lombok.ToString;</a>
+<span class="sourceLineNo">034</span><a id="line.34">import lombok.extern.log4j.Log4j2;</a>
+<span class="sourceLineNo">035</span><a id="line.35">import org.springframework.beans.factory.annotation.Value;</a>
+<span class="sourceLineNo">036</span><a id="line.36">import org.springframework.boot.ApplicationArguments;</a>
+<span class="sourceLineNo">037</span><a id="line.37">import org.springframework.boot.ApplicationRunner;</a>
+<span class="sourceLineNo">038</span><a id="line.38">import org.springframework.boot.autoconfigure.SpringBootApplication;</a>
+<span class="sourceLineNo">039</span><a id="line.39">import org.springframework.boot.system.ApplicationHome;</a>
+<span class="sourceLineNo">040</span><a id="line.40"></a>
 <span class="sourceLineNo">041</span><a id="line.41">import static java.nio.charset.StandardCharsets.UTF_8;</a>
 <span class="sourceLineNo">042</span><a id="line.42">import static java.util.stream.Collectors.joining;</a>
 <span class="sourceLineNo">043</span><a id="line.43">import static org.springframework.util.FileCopyUtils.copy;</a>
@@ -188,7 +188,7 @@
 <span class="sourceLineNo">179</span><a id="line.179">            kernel.put("interrupt_mode", "message");</a>
 <span class="sourceLineNo">180</span><a id="line.180">            kernel.put("language", "java");</a>
 <span class="sourceLineNo">181</span><a id="line.181"></a>
-<span class="sourceLineNo">182</span><a id="line.182">            JSON_OBJECT_MAPPER.writeValue(kernelspec.resolve("kernel.json").toFile(), kernel);</a>
+<span class="sourceLineNo">182</span><a id="line.182">            ObjectMappers.JSON.writeValue(kernelspec.resolve("kernel.json").toFile(), kernel);</a>
 <span class="sourceLineNo">183</span><a id="line.183">            /*</a>
 <span class="sourceLineNo">184</span><a id="line.184">             * logo-16x16.png and logo-32x32.png</a>
 <span class="sourceLineNo">185</span><a id="line.185">             */</a>
@@ -245,7 +245,7 @@
 <span class="sourceLineNo">236</span><a id="line.236">    }</a>
 <span class="sourceLineNo">237</span><a id="line.237"></a>
 <span class="sourceLineNo">238</span><a id="line.238">    private JsonNode getOutputAsJson(String... argv) throws Exception {</a>
-<span class="sourceLineNo">239</span><a id="line.239">        var node = JSON_OBJECT_MAPPER.nullNode();</a>
+<span class="sourceLineNo">239</span><a id="line.239">        var node = ObjectMappers.JSON.nullNode();</a>
 <span class="sourceLineNo">240</span><a id="line.240">        var process =</a>
 <span class="sourceLineNo">241</span><a id="line.241">            new ProcessBuilder(argv)</a>
 <span class="sourceLineNo">242</span><a id="line.242">            .inheritIO()</a>
@@ -254,7 +254,7 @@
 <span class="sourceLineNo">245</span><a id="line.245">            .start();</a>
 <span class="sourceLineNo">246</span><a id="line.246"></a>
 <span class="sourceLineNo">247</span><a id="line.247">        try (var in = process.getInputStream()) {</a>
-<span class="sourceLineNo">248</span><a id="line.248">            node = JSON_OBJECT_MAPPER.readTree(in);</a>
+<span class="sourceLineNo">248</span><a id="line.248">            node = ObjectMappers.JSON.readTree(in);</a>
 <span class="sourceLineNo">249</span><a id="line.249"></a>
 <span class="sourceLineNo">250</span><a id="line.250">            var status = process.waitFor();</a>
 <span class="sourceLineNo">251</span><a id="line.251"></a>

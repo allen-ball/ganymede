@@ -28,66 +28,65 @@
 <span class="sourceLineNo">019</span><a id="line.19"> * ##########################################################################</a>
 <span class="sourceLineNo">020</span><a id="line.20"> */</a>
 <span class="sourceLineNo">021</span><a id="line.21">import ganymede.kernel.Kernel;</a>
-<span class="sourceLineNo">022</span><a id="line.22">import java.io.File;</a>
-<span class="sourceLineNo">023</span><a id="line.23">import java.util.Optional;</a>
-<span class="sourceLineNo">024</span><a id="line.24">import lombok.NoArgsConstructor;</a>
-<span class="sourceLineNo">025</span><a id="line.25">import lombok.ToString;</a>
-<span class="sourceLineNo">026</span><a id="line.26">import lombok.extern.log4j.Log4j2;</a>
-<span class="sourceLineNo">027</span><a id="line.27">import org.springframework.beans.factory.annotation.Value;</a>
-<span class="sourceLineNo">028</span><a id="line.28">import org.springframework.boot.ApplicationArguments;</a>
-<span class="sourceLineNo">029</span><a id="line.29">import org.springframework.boot.ApplicationRunner;</a>
-<span class="sourceLineNo">030</span><a id="line.30">import org.springframework.boot.autoconfigure.SpringBootApplication;</a>
-<span class="sourceLineNo">031</span><a id="line.31">import org.springframework.boot.builder.SpringApplicationBuilder;</a>
-<span class="sourceLineNo">032</span><a id="line.32"></a>
-<span class="sourceLineNo">033</span><a id="line.33">import static ganymede.server.Server.JSON_OBJECT_MAPPER;</a>
-<span class="sourceLineNo">034</span><a id="line.34"></a>
-<span class="sourceLineNo">035</span><a id="line.35">/**</a>
-<span class="sourceLineNo">036</span><a id="line.36"> * Ganymede Jupyter {@link ganymede.kernel.Kernel} {@link Connect} CLI.</a>
-<span class="sourceLineNo">037</span><a id="line.37"> * Parses {@code --connection-file} to look for a running</a>
-<span class="sourceLineNo">038</span><a id="line.38"> * {@link Kernel} and connects if one is found; otherwise starts a new</a>
-<span class="sourceLineNo">039</span><a id="line.39"> * {@link Kernel} instance.</a>
-<span class="sourceLineNo">040</span><a id="line.40"> *</a>
-<span class="sourceLineNo">041</span><a id="line.41"> * {@injected.fields}</a>
-<span class="sourceLineNo">042</span><a id="line.42"> *</a>
-<span class="sourceLineNo">043</span><a id="line.43"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
-<span class="sourceLineNo">044</span><a id="line.44"> */</a>
-<span class="sourceLineNo">045</span><a id="line.45">@SpringBootApplication</a>
-<span class="sourceLineNo">046</span><a id="line.46">@NoArgsConstructor @ToString @Log4j2</a>
-<span class="sourceLineNo">047</span><a id="line.47">public class Connect implements ApplicationRunner {</a>
-<span class="sourceLineNo">048</span><a id="line.48">    @Value("${JPY_PARENT_PID:#{-1}}")</a>
-<span class="sourceLineNo">049</span><a id="line.49">    private long jpy_parent_pid = -1;</a>
-<span class="sourceLineNo">050</span><a id="line.50"></a>
-<span class="sourceLineNo">051</span><a id="line.51">    @Value("${connection-file:#{null}}")</a>
-<span class="sourceLineNo">052</span><a id="line.52">    private String connection_file = null;</a>
-<span class="sourceLineNo">053</span><a id="line.53"></a>
-<span class="sourceLineNo">054</span><a id="line.54">    @Override</a>
-<span class="sourceLineNo">055</span><a id="line.55">    public void run(ApplicationArguments arguments) throws Exception {</a>
-<span class="sourceLineNo">056</span><a id="line.56">        try {</a>
-<span class="sourceLineNo">057</span><a id="line.57">            var file = new File(connection_file);</a>
-<span class="sourceLineNo">058</span><a id="line.58">            var node = JSON_OBJECT_MAPPER.readTree(file);</a>
-<span class="sourceLineNo">059</span><a id="line.59">            var isAlive =</a>
-<span class="sourceLineNo">060</span><a id="line.60">                Optional.of("pid")</a>
-<span class="sourceLineNo">061</span><a id="line.61">                .filter(t -&gt; node.hasNonNull(t))</a>
-<span class="sourceLineNo">062</span><a id="line.62">                .map(t -&gt; node.get(t).asLong())</a>
-<span class="sourceLineNo">063</span><a id="line.63">                .flatMap(ProcessHandle::of)</a>
-<span class="sourceLineNo">064</span><a id="line.64">                .map(ProcessHandle::isAlive)</a>
-<span class="sourceLineNo">065</span><a id="line.65">                .orElse(false);</a>
-<span class="sourceLineNo">066</span><a id="line.66"></a>
-<span class="sourceLineNo">067</span><a id="line.67">            if (! isAlive) {</a>
-<span class="sourceLineNo">068</span><a id="line.68">                var type = Kernel.class;</a>
-<span class="sourceLineNo">069</span><a id="line.69">                var profile = type.getSimpleName().toLowerCase();</a>
-<span class="sourceLineNo">070</span><a id="line.70"></a>
-<span class="sourceLineNo">071</span><a id="line.71">                new SpringApplicationBuilder(type)</a>
-<span class="sourceLineNo">072</span><a id="line.72">                    .profiles(profile)</a>
-<span class="sourceLineNo">073</span><a id="line.73">                    .run(arguments.getSourceArgs());</a>
-<span class="sourceLineNo">074</span><a id="line.74">            } else {</a>
-<span class="sourceLineNo">075</span><a id="line.75">                log.warn("Kernel already running");</a>
-<span class="sourceLineNo">076</span><a id="line.76">            }</a>
-<span class="sourceLineNo">077</span><a id="line.77">        } catch (Exception exception) {</a>
-<span class="sourceLineNo">078</span><a id="line.78">            log.warn("{}", connection_file, exception);</a>
-<span class="sourceLineNo">079</span><a id="line.79">        }</a>
-<span class="sourceLineNo">080</span><a id="line.80">    }</a>
-<span class="sourceLineNo">081</span><a id="line.81">}</a>
+<span class="sourceLineNo">022</span><a id="line.22">import ganymede.util.ObjectMappers;</a>
+<span class="sourceLineNo">023</span><a id="line.23">import java.io.File;</a>
+<span class="sourceLineNo">024</span><a id="line.24">import java.util.Optional;</a>
+<span class="sourceLineNo">025</span><a id="line.25">import lombok.NoArgsConstructor;</a>
+<span class="sourceLineNo">026</span><a id="line.26">import lombok.ToString;</a>
+<span class="sourceLineNo">027</span><a id="line.27">import lombok.extern.log4j.Log4j2;</a>
+<span class="sourceLineNo">028</span><a id="line.28">import org.springframework.beans.factory.annotation.Value;</a>
+<span class="sourceLineNo">029</span><a id="line.29">import org.springframework.boot.ApplicationArguments;</a>
+<span class="sourceLineNo">030</span><a id="line.30">import org.springframework.boot.ApplicationRunner;</a>
+<span class="sourceLineNo">031</span><a id="line.31">import org.springframework.boot.autoconfigure.SpringBootApplication;</a>
+<span class="sourceLineNo">032</span><a id="line.32">import org.springframework.boot.builder.SpringApplicationBuilder;</a>
+<span class="sourceLineNo">033</span><a id="line.33"></a>
+<span class="sourceLineNo">034</span><a id="line.34">/**</a>
+<span class="sourceLineNo">035</span><a id="line.35"> * Ganymede Jupyter {@link ganymede.kernel.Kernel} {@link Connect} CLI.</a>
+<span class="sourceLineNo">036</span><a id="line.36"> * Parses {@code --connection-file} to look for a running</a>
+<span class="sourceLineNo">037</span><a id="line.37"> * {@link Kernel} and connects if one is found; otherwise starts a new</a>
+<span class="sourceLineNo">038</span><a id="line.38"> * {@link Kernel} instance.</a>
+<span class="sourceLineNo">039</span><a id="line.39"> *</a>
+<span class="sourceLineNo">040</span><a id="line.40"> * {@injected.fields}</a>
+<span class="sourceLineNo">041</span><a id="line.41"> *</a>
+<span class="sourceLineNo">042</span><a id="line.42"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
+<span class="sourceLineNo">043</span><a id="line.43"> */</a>
+<span class="sourceLineNo">044</span><a id="line.44">@SpringBootApplication</a>
+<span class="sourceLineNo">045</span><a id="line.45">@NoArgsConstructor @ToString @Log4j2</a>
+<span class="sourceLineNo">046</span><a id="line.46">public class Connect implements ApplicationRunner {</a>
+<span class="sourceLineNo">047</span><a id="line.47">    @Value("${JPY_PARENT_PID:#{-1}}")</a>
+<span class="sourceLineNo">048</span><a id="line.48">    private long jpy_parent_pid = -1;</a>
+<span class="sourceLineNo">049</span><a id="line.49"></a>
+<span class="sourceLineNo">050</span><a id="line.50">    @Value("${connection-file:#{null}}")</a>
+<span class="sourceLineNo">051</span><a id="line.51">    private String connection_file = null;</a>
+<span class="sourceLineNo">052</span><a id="line.52"></a>
+<span class="sourceLineNo">053</span><a id="line.53">    @Override</a>
+<span class="sourceLineNo">054</span><a id="line.54">    public void run(ApplicationArguments arguments) throws Exception {</a>
+<span class="sourceLineNo">055</span><a id="line.55">        try {</a>
+<span class="sourceLineNo">056</span><a id="line.56">            var file = new File(connection_file);</a>
+<span class="sourceLineNo">057</span><a id="line.57">            var node = ObjectMappers.JSON.readTree(file);</a>
+<span class="sourceLineNo">058</span><a id="line.58">            var isAlive =</a>
+<span class="sourceLineNo">059</span><a id="line.59">                Optional.of("pid")</a>
+<span class="sourceLineNo">060</span><a id="line.60">                .filter(t -&gt; node.hasNonNull(t))</a>
+<span class="sourceLineNo">061</span><a id="line.61">                .map(t -&gt; node.get(t).asLong())</a>
+<span class="sourceLineNo">062</span><a id="line.62">                .flatMap(ProcessHandle::of)</a>
+<span class="sourceLineNo">063</span><a id="line.63">                .map(ProcessHandle::isAlive)</a>
+<span class="sourceLineNo">064</span><a id="line.64">                .orElse(false);</a>
+<span class="sourceLineNo">065</span><a id="line.65"></a>
+<span class="sourceLineNo">066</span><a id="line.66">            if (! isAlive) {</a>
+<span class="sourceLineNo">067</span><a id="line.67">                var type = Kernel.class;</a>
+<span class="sourceLineNo">068</span><a id="line.68">                var profile = type.getSimpleName().toLowerCase();</a>
+<span class="sourceLineNo">069</span><a id="line.69"></a>
+<span class="sourceLineNo">070</span><a id="line.70">                new SpringApplicationBuilder(type)</a>
+<span class="sourceLineNo">071</span><a id="line.71">                    .profiles(profile)</a>
+<span class="sourceLineNo">072</span><a id="line.72">                    .run(arguments.getSourceArgs());</a>
+<span class="sourceLineNo">073</span><a id="line.73">            } else {</a>
+<span class="sourceLineNo">074</span><a id="line.74">                log.warn("Kernel already running");</a>
+<span class="sourceLineNo">075</span><a id="line.75">            }</a>
+<span class="sourceLineNo">076</span><a id="line.76">        } catch (Exception exception) {</a>
+<span class="sourceLineNo">077</span><a id="line.77">            log.warn("{}", connection_file, exception);</a>
+<span class="sourceLineNo">078</span><a id="line.78">        }</a>
+<span class="sourceLineNo">079</span><a id="line.79">    }</a>
+<span class="sourceLineNo">080</span><a id="line.80">}</a>
 
 
 
