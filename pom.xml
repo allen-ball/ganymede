@@ -249,6 +249,22 @@
     <pluginManagement>
       <plugins>
         <plugin>
+          <groupId>ball</groupId>
+          <artifactId>ball-license-maven-plugin</artifactId>
+          <configuration>
+            <selections>
+              <selection>
+                <artifact>mysql:mysql-connector-java</artifact>
+                <license>GPL-2.0 WITH Universal-FOSS-exception-1.0</license>
+              </selection>
+              <selection>
+                <artifact>org.glassfish.jersey.*</artifact>
+                <license>GPL-2.0-with-classpath-exception</license>
+              </selection>
+            </selections>
+          </configuration>
+        </plugin>
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <configuration>
