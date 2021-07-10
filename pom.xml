@@ -83,6 +83,22 @@
       <url>https://repo.hcf.dev/maven/release/</url>
     </pluginRepository>
   </pluginRepositories>
+  <profiles>
+    <profile>
+      <id>jeromq-SNAPSHOT</id>
+      <repositories>
+        <repository>
+          <id>sonatype-nexus-snapshots</id>
+          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+          <releases><enabled>false</enabled></releases>
+          <snapshots><enabled>true</enabled></snapshots>
+        </repository>
+      </repositories>
+      <properties>
+        <jeromq.version>0.5.3-SNAPSHOT</jeromq.version>
+      </properties>
+    </profile>
+  </profiles>
   <properties>
     <license.skipUpdateProjectLicense>true</license.skipUpdateProjectLicense>
     <jse.target>11</jse.target>
@@ -91,6 +107,7 @@
     <commonmark.version>0.18.0</commonmark.version>
     <graal-sdk.version>0.33</graal-sdk.version>
     <jackson-bom.version>2.10.5.20201202</jackson-bom.version>
+    <jeromq.version>0.5.2</jeromq.version>
     <jetty.version>9.4.43.v20210629</jetty.version>
     <postgresql.version>42.2.23</postgresql.version>
     <scala.binary.version>2.12</scala.binary.version>
@@ -214,7 +231,7 @@
       <dependency>
         <groupId>org.zeromq</groupId>
         <artifactId>jeromq</artifactId>
-        <version>0.5.2</version>
+        <version>${jeromq.version}</version>
       </dependency>
       <dependency>
         <groupId>tech.tablesaw</groupId>
