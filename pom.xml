@@ -469,7 +469,7 @@
               </offlineLink>
               <!-- jOOQ -->
               <offlineLink>
-                <url>https://www.jooq.org/javadoc/latest/org.jooq/</url>
+                <url>https://www.jooq.org/javadoc/latest/</url>
                 <location>${javadoc-offline-locations}/jooq-javadoc-jar/</location>
               </offlineLink>
               <!-- Scala -->
