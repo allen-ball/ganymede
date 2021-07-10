@@ -1,4 +1,4 @@
-package ganymede.kernel;
+package ganymede.jupyter;
 /*-
  * ##########################################################################
  * Ganymede
@@ -20,6 +20,8 @@ package ganymede.kernel;
  */
 import com.fasterxml.jackson.databind.JsonNode;
 import ganymede.util.ObjectMappers;
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -41,7 +43,20 @@ public class JupyterRestClient {
     private final HttpClient client = HttpClient.newHttpClient();
 
     /**
-     * Sole constructor.
+     * {@link File} constructor.
+     *
+     * @param   file            The {@link File} containing the server
+     *                          parameters.
+     *
+     * @throws  IOException     If the {@link File} cannot be opened or
+     *                          parsed.
+     */
+    public JupyterRestClient(File file) throws IOException {
+        this(ObjectMappers.JSON.readTree(file));
+    }
+
+    /**
+     * {@link JsonNode} constructor.
      *
      * @param   json            The {@link JsonNode} describing the server
      *                          parameters.
