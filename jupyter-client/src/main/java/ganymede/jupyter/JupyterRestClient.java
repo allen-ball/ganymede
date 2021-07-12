@@ -19,7 +19,8 @@ package ganymede.jupyter;
  * ##########################################################################
  */
 import com.fasterxml.jackson.databind.JsonNode;
-import ganymede.util.ObjectMappers;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import ganymede.jupyter.notebook.JSON;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -37,6 +38,8 @@ import lombok.extern.log4j.Log4j2;
  */
 @Log4j2
 public class JupyterRestClient {
+    private static final ObjectMapper OBJECT_MAPPER = JSON.getDefault().getMapper();
+
     private final JsonNode json;
     private final URI uri;
     private final String token;
@@ -52,7 +55,7 @@ public class JupyterRestClient {
      *                          parsed.
      */
     public JupyterRestClient(File file) throws IOException {
-        this(ObjectMappers.JSON.readTree(file));
+        this(OBJECT_MAPPER.readTree(file));
     }
 
     /**
@@ -75,7 +78,7 @@ public class JupyterRestClient {
         var response =
             client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        return ObjectMappers.JSON.readTree(response.body());
+        return OBJECT_MAPPER.readTree(response.body());
     }
 
     /**
@@ -90,7 +93,7 @@ public class JupyterRestClient {
         var response =
             client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        return ObjectMappers.JSON.readTree(response.body());
+        return OBJECT_MAPPER.readTree(response.body());
     }
 
     /**
@@ -105,7 +108,7 @@ public class JupyterRestClient {
         var response =
             client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        return ObjectMappers.JSON.readTree(response.body());
+        return OBJECT_MAPPER.readTree(response.body());
     }
 
     /**
@@ -120,7 +123,7 @@ public class JupyterRestClient {
         var response =
             client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        return ObjectMappers.JSON.readTree(response.body());
+        return OBJECT_MAPPER.readTree(response.body());
     }
 
     /**
@@ -135,7 +138,7 @@ public class JupyterRestClient {
         var response =
             client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        return ObjectMappers.JSON.readTree(response.body());
+        return OBJECT_MAPPER.readTree(response.body());
     }
 
     /**
@@ -150,7 +153,7 @@ public class JupyterRestClient {
         var response =
             client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        return ObjectMappers.JSON.readTree(response.body());
+        return OBJECT_MAPPER.readTree(response.body());
     }
 
     /**
@@ -165,7 +168,7 @@ public class JupyterRestClient {
         var response =
             client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        return ObjectMappers.JSON.readTree(response.body());
+        return OBJECT_MAPPER.readTree(response.body());
     }
 
     private HttpRequest.Builder builder() {

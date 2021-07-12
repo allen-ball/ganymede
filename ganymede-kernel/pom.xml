@@ -35,6 +35,11 @@
   </parent>
   <dependencies verbose="true">
     <dependency>
+      <groupId>ganymede</groupId>
+      <artifactId>jupyter-client</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>ball</groupId>
       <artifactId>ball-util</artifactId>
     </dependency>
