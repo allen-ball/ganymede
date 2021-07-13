@@ -109,6 +109,8 @@
     <jackson-bom.version>2.10.5.20201202</jackson-bom.version>
     <jeromq.version>0.5.2</jeromq.version>
     <jetty.version>9.4.43.v20210629</jetty.version>
+    <kotlin.version>1.5.21</kotlin.version>
+    <kotlin-coroutines.version>1.5.1</kotlin-coroutines.version>
     <postgresql.version>42.2.23</postgresql.version>
     <scala.binary.version>2.12</scala.binary.version>
     <scala.version>${scala.binary.version}.10</scala.version>
