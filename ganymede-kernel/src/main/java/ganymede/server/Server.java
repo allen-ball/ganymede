@@ -25,7 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -55,8 +55,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
     protected static final ComparableVersion PROTOCOL_VERSION = new ComparableVersion("5.3");
 
     private final ZMQ.Context context = ZMQ.context(1);
-    private final ConcurrentSkipListMap<String,Connection> connectionMap =
-        new ConcurrentSkipListMap<>();
+    private final ConcurrentSkipListMap<UUID,Connection> connectionMap = new ConcurrentSkipListMap<>();
     private final Channel.Heartbeat heartbeat = new Channel.Heartbeat(this);
     private final Channel.Control control = new Control();
     private final Channel.IOPub iopub = new Channel.IOPub(this);
@@ -84,29 +83,19 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
      *                          parsed.
      */
     public void bind(String path) throws IOException {
-        var file = new File(path);
-        var kernelId =
-            Optional.of(file.getName())
-            .map(Connection.FILE_NAME_PATTERN::matcher)
-            .filter(t -> t.matches())
-            .map(t -> t.group("kernelId"))
-            .orElse(null);
-
-        bind(kernelId, file);
+        bind(new File(path));
     }
 
     /**
      * Add a connection specified by a {@link Connection} {@link File}.
      *
-     * @param   kernelId        The kernel ID.
      * @param   file            The {@link Connection} {@link File}.
      *
      * @throws  IOException     If the {@link File} cannot be opened or
      *                          parsed.
      */
-    protected void bind(String kernelId, File file) throws IOException {
-        var node = ObjectMappers.JSON.readTree(file);
-        var connection = new Connection(kernelId, (ObjectNode) node);
+    protected void bind(File file) throws IOException {
+        var connection = Connection.parse(file);
 
         connectionMap.put(connection.getKernelId(), connection);
 

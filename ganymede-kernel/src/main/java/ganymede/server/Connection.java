@@ -23,10 +23,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.util.ObjectMappers;
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 import java.util.regex.Pattern;
 import lombok.Data;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+
+import static lombok.AccessLevel.PRIVATE;
 
 /**
  * Jupyter {@link Connection}.  See
@@ -36,7 +40,7 @@ import lombok.extern.log4j.Log4j2;
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
-@Data @Log4j2
+@RequiredArgsConstructor(access = PRIVATE) @Data @Log4j2
 public class Connection {
 
     /**
@@ -47,33 +51,29 @@ public class Connection {
     public static final Pattern FILE_NAME_PATTERN =
         Pattern.compile("(?i)^(kernel-|)(?<kernelId>[^.]+)[.]json$");
 
-    @NonNull private final String kernelId;
-    @NonNull private final ObjectNode node;
-    @NonNull private final HMACDigester digester;
-
     /**
-     * {@link File} constructor.
+     * Static factory method.
      *
-     * @param   kernelId        The kernel ID.
      * @param   file            The {@link File} describing the
      *                          {@link Connection}.
+     *
+     * @return  The parsed {@link Connection}.
      */
-    public Connection(String kernelId, File file) throws IOException {
-        this(kernelId, (ObjectNode) ObjectMappers.JSON.readTree(file));
+    public static Connection parse(File file) throws IOException {
+        var matcher = FILE_NAME_PATTERN.matcher(file.getName());
+        var kernelId =
+            matcher.matches() ? UUID.fromString(matcher.group("kernelId")) : null;
+        var node = (ObjectNode) ObjectMappers.JSON.readTree(file);
+        var digester =
+            new HMACDigester(node.at("/signature_scheme").asText(),
+                             node.at("/key").asText());
+
+        return new Connection(kernelId, node, digester);
     }
 
-    /**
-     * {@link ObjectNode} constructor.
-     *
-     * @param   kernelId        The kernel ID.
-     * @param   node            The {@link ObjectNode} describing the
-     *                          {@link Connection}.
-     */
-    public Connection(String kernelId, ObjectNode node) {
-        this.kernelId = kernelId;
-        this.node = node;
-        this.digester = new HMACDigesterImpl();
-    }
+    @NonNull private final UUID kernelId;
+    @NonNull private final ObjectNode node;
+    @NonNull private final HMACDigester digester;
 
     /**
      * Method to connect a kernel's {@link Channel}s.
@@ -116,12 +116,5 @@ public class Connection {
                           node.at("/" + portName).asInt());
 
         return address;
-    }
-
-    private class HMACDigesterImpl extends HMACDigester {
-        public HMACDigesterImpl() {
-            super(node.at("/signature_scheme").asText(),
-                  node.at("/key").asText());
-        }
     }
 }

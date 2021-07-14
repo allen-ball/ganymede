@@ -219,8 +219,8 @@ public class Kernel extends Server implements ApplicationContextAware,
     }
 
     @Override
-    protected void bind(String kernelId, File file) throws IOException {
-        super.bind(kernelId, file);
+    protected void bind(File file) throws IOException {
+        super.bind(file);
 
         var node = (ObjectNode) ObjectMappers.JSON.readTree(file);
 
