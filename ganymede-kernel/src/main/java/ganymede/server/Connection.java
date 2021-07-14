@@ -54,12 +54,12 @@ public class Connection {
     /**
      * {@link File} constructor.
      *
-     * @param   id              The kernel ID.
+     * @param   kernelId        The kernel ID.
      * @param   file            The {@link File} describing the
      *                          {@link Connection}.
      */
-    public Connection(String id, File file) throws IOException {
-        this(id, (ObjectNode) ObjectMappers.JSON.readTree(file));
+    public Connection(String kernelId, File file) throws IOException {
+        this(kernelId, (ObjectNode) ObjectMappers.JSON.readTree(file));
     }
 
     /**
