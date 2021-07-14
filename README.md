@@ -92,26 +92,28 @@ kernelspec:
 
 ```json
 {
-    "argv" :
-    [
-        "/Library/Java/JavaVirtualMachines/adoptopenjdk-11.jdk/Contents/Home/bin/java",
-        "--add-opens",
-        "java.base/jdk.internal.misc=ALL-UNNAMED",
-        "--illegal-access=permit",
-        "-Djava.awt.headless=true",
-        "-Djdk.disableLastUsageTracking=true",
-        "-Dmaven.repo.local=/Users/jdoe/Notebooks/.venv/share/jupyter/repository",
-        "-jar",
-        "/Users/jdoe/.m2/repository/ganymede/ganymede/2.0.0-SNAPSHOT/ganymede-2.0.0-SNAPSHOT.jar",
-        "--runtime-dir=/Users/jdoe/Library/Jupyter/runtime",
-        "--connection-file={connection_file}"
-    ],
-    "display_name" : "Ganymede 2.0.0 (Java 11) with Spark 3.1.2",
-    "env" : {
-        "SPARK_HOME" : "/path/to/spark-3.1.2-bin-hadoop3.2"
-    },
-    "interrupt_mode" : "message",
-    "language" : "java"
+  "argv" : [
+    "/Library/Java/JavaVirtualMachines/adoptopenjdk-11.jdk/Contents/Home/bin/java",
+    "--add-opens",
+    "java.base/jdk.internal.misc=ALL-UNNAMED",
+    "--illegal-access=permit",
+    "-Djava.awt.headless=true",
+    "-Djdk.disableLastUsageTracking=true",
+    "-Dmaven.repo.local=/Users/jdoe/Notebooks/.venv/share/jupyter/repository",
+    "-jar",
+    "/Users/jdoe/.m2/repository/ganymede/ganymede/2.0.0-SNAPSHOT/ganymede-2.0.0-SNAPSHOT.jar",
+    "--connection-file={connection_file}"
+  ],
+  "display_name" : "Ganymede 2.0.0 (Java 11) with Spark 3.1.2",
+  "env" : {
+    "JUPYTER_CONFIG_DIR" : "/Users/jdoe/.jupyter",
+    "JUPYTER_CONFIG_PATH" : "/Users/jdoe/.jupyter:/Users/jdoe/Notebooks/.venv/etc/jupyter:/usr/local/etc/jupyter:/etc/jupyter",
+    "JUPYTER_DATA_DIR" : "/Users/jdoe/Library/Jupyter",
+    "JUPYTER_RUNTIME_DIR" : "/Users/jdoe/Library/Jupyter/runtime",
+    "SPARK_HOME" : "/Users/jdoe/Notebooks/.venv/spark-3.1.2-bin-hadoop3.2"
+  },
+  "interrupt_mode" : "message",
+  "language" : "java"
 }
 ```
 

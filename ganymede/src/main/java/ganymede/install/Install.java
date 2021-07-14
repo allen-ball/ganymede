@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.util.ObjectMappers;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -29,6 +30,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
@@ -111,6 +113,18 @@ public class Install implements ApplicationRunner {
              * jupyter --paths --json
              */
             var paths = getOutputAsJson(jupyter, "--paths", "--json");
+            var config_path =
+                StreamSupport.stream(paths.get("config").spliterator(), false)
+                .map(JsonNode::asText)
+                .collect(joining(File.pathSeparator));
+            /*
+             * jupyter --config-dir
+             */
+            var config_dir = getOutputAsString(jupyter, "--config-dir");
+            /*
+             * jupyter --data-dir
+             */
+            var data_dir = getOutputAsString(jupyter, "--data-dir");
             /*
              * jupyter --runtime-dir
              */
@@ -160,7 +174,6 @@ public class Install implements ApplicationRunner {
                                 "-Djdk.disableLastUsageTracking=true"),
                       sysProperties.entrySet().stream().map(t -> "-D" + t),
                       Stream.of("-jar", jar,
-                                "--runtime-dir=" + runtime_dir,
                                 "--connection-file={connection_file}"))
                 .flatMap(Function.identity())
                 .map(Object::toString)
@@ -169,6 +182,11 @@ public class Install implements ApplicationRunner {
             kernel.put("display_name", display_name);
 
             var env = kernel.with("env");
+
+            env.put("JUPYTER_CONFIG_DIR", config_dir);
+            env.put("JUPYTER_CONFIG_PATH", config_path);
+            env.put("JUPYTER_DATA_DIR", data_dir);
+            env.put("JUPYTER_RUNTIME_DIR", runtime_dir);
 
             for (var envvar : envvars) {
                 var pair = envvar.split("=", 2);
