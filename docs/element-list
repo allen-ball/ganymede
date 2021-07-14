@@ -5,6 +5,9 @@ ganymede.install
 ganymede.io
 ganymede.jsr223
 ganymede.jupyter
+ganymede.jupyter.notebook
+ganymede.jupyter.notebook.api
+ganymede.jupyter.notebook.model
 ganymede.kernel
 ganymede.notebook
 ganymede.server
