@@ -19,16 +19,13 @@ package ganymede.kernel;
  * ##########################################################################
  */
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import ganymede.jupyter.NotebookServicesClient;
 import ganymede.server.Message;
 import ganymede.server.Server;
 import ganymede.shell.Shell;
 import ganymede.util.ObjectMappers;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -77,12 +74,6 @@ public class Kernel extends Server implements ApplicationContextAware,
      */
     public static final String PORT_PROPERTY = "kernel.port";
 
-    @Value("${JPY_PARENT_PID:#{-1}}")
-    private long jpy_parent_pid = -1;
-
-    @Value("${runtime-dir:#{null}}")
-    private String runtime_dir = null;
-
     @Value("${connection-file:#{null}}")
     private String connection_file = null;
 
@@ -98,7 +89,6 @@ public class Kernel extends Server implements ApplicationContextAware,
     private final Shell shell = new Shell(this);
     private ApplicationContext context = null;
     private int port = -1;
-    private NotebookServicesClient client = null;
     private final ObjectNode kernel_info_reply_content;
 
     {
@@ -119,20 +109,6 @@ public class Kernel extends Server implements ApplicationContextAware,
 
     @PostConstruct
     public void init() throws Exception {
-        if (runtime_dir != null) {
-            var glob = String.format("{nb,jp}server-%d.json", jpy_parent_pid);
-
-            try (var stream = Files.newDirectoryStream(Paths.get(runtime_dir), glob)) {
-                var path = stream.iterator().next();
-
-                client = new NotebookServicesClient(path.toFile());
-            } catch (NoSuchElementException exception) {
-                log.warn("{}: No match found for '{}'", runtime_dir, glob);
-            } catch (Exception exception) {
-                log.warn("{}: {}", runtime_dir, exception);
-            }
-        }
-
         if (spark_home != null) {
             var parent = Paths.get(spark_home, "jars").toFile();
 
