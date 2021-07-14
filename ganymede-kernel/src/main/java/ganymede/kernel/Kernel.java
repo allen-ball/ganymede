@@ -19,7 +19,7 @@ package ganymede.kernel;
  * ##########################################################################
  */
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import ganymede.jupyter.JupyterRestClient;
+import ganymede.jupyter.NotebookServicesClient;
 import ganymede.server.Message;
 import ganymede.server.Server;
 import ganymede.shell.Shell;
@@ -98,7 +98,7 @@ public class Kernel extends Server implements ApplicationContextAware,
     private final Shell shell = new Shell(this);
     private ApplicationContext context = null;
     private int port = -1;
-    private JupyterRestClient client = null;
+    private NotebookServicesClient client = null;
     private final ObjectNode kernel_info_reply_content;
 
     {
@@ -125,7 +125,7 @@ public class Kernel extends Server implements ApplicationContextAware,
             try (var stream = Files.newDirectoryStream(Paths.get(runtime_dir), glob)) {
                 var path = stream.iterator().next();
 
-                client = new JupyterRestClient(path.toFile());
+                client = new NotebookServicesClient(path.toFile());
             } catch (NoSuchElementException exception) {
                 log.warn("{}: No match found for '{}'", runtime_dir, glob);
             } catch (Exception exception) {
