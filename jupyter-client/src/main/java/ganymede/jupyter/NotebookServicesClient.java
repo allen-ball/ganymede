@@ -20,9 +20,17 @@ package ganymede.jupyter;
  */
 import com.fasterxml.jackson.databind.JsonNode;
 import ganymede.jupyter.notebook.ApiClient;
+import ganymede.jupyter.notebook.ApiException;
 import ganymede.jupyter.notebook.JSON;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
@@ -36,7 +44,35 @@ import lombok.extern.log4j.Log4j2;
  */
 @ToString @Log4j2
 public class NotebookServicesClient extends ApiClient {
-    private final String token;
+    private static final String JUPYTER_RUNTIME_DIR = "JUPYTER_RUNTIME_DIR";
+    private static final String JPY_PARENT_PID = "JPY_PARENT_PID";
+    private static final String GLOB_FORMAT = "{nb,jp}server-%d.json";
+
+    private static File getFileFromEnv() throws IOException {
+        var directory = Paths.get(System.getenv().get("JUPYTER_RUNTIME_DIR"));
+        var pid = Long.parseLong(System.getenv().get("JPY_PARENT_PID"));
+        var glob = String.format(GLOB_FORMAT, pid);
+
+        try (var stream = Files.newDirectoryStream(directory, glob)) {
+            var path = stream.iterator().next();
+
+            return path.toFile();
+        } catch (NoSuchElementException exception) {
+            throw new FileNotFoundException(glob);
+        }
+    }
+
+    /**
+     * No-argument constructor.  {@link File} is specified by the
+     * {@code JUPYTER_RUNTIME_DIR} and {@code JPY_PARENT_PID} environment
+     * variables.
+     *
+     * @throws  IOException     If the {@link File} cannot be opened or
+     *                          parsed.
+     */
+    public NotebookServicesClient() throws IOException {
+        this(getFileFromEnv());
+    }
 
     /**
      * {@link File} constructor.
@@ -60,9 +96,14 @@ public class NotebookServicesClient extends ApiClient {
     public NotebookServicesClient(JsonNode node) {
         super();
 
-        token = node.get("token").asText();
+        var url = URI.create(node.get("url").asText());
 
-        updateBaseUri(node.get("url").asText());
+        setScheme(url.getScheme());
+        setHost(url.getHost());
+        setPort(url.getPort());
+
+        var token = node.get("token").asText();
+
         setRequestInterceptor(t -> t.header("Authorization", "Token " + token));
     }
 }
