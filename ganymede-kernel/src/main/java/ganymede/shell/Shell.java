@@ -49,6 +49,7 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.io.IoBuilder;
 
+import static ganymede.kernel.client.KernelRestClient.PORT_PROPERTY;
 import static ganymede.notebook.NotebookContext.unescape;
 import static java.util.stream.Collectors.joining;
 import static jdk.jshell.Snippet.Status.REJECTED;
@@ -249,7 +250,7 @@ public class Shell implements AutoCloseable {
 
             Collections.addAll(options, definitions);
             Collections.addAll(options, VMOPTIONS);
-            options.add("-D" + Map.entry(Kernel.PORT_PROPERTY, kernel.getPort()));
+            options.add("-D" + Map.entry(PORT_PROPERTY, kernel.getPort()));
 
             if (! kernel.isTerminating()) {
                 try {

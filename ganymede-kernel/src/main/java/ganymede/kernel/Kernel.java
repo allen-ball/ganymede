@@ -18,6 +18,7 @@ package ganymede.kernel;
  * limitations under the License.
  * ##########################################################################
  */
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.server.Message;
 import ganymede.server.Server;
@@ -26,6 +27,7 @@ import ganymede.util.ObjectMappers;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -44,10 +46,9 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static java.util.stream.Collectors.toList;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
@@ -57,23 +58,19 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
  *
  * {@injected.fields}
  *
+ * {@bean.info}
+ *
+ * <p>{@link KernelApi} implements:</p>
+ * {@include /ganymede-rest-protocol.yml}
+ *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 @SpringBootApplication
 @RestController
-@RequestMapping(value = { "/" },
-                consumes = APPLICATION_JSON_VALUE,
-                produces = APPLICATION_JSON_VALUE)
 @NoArgsConstructor @ToString @Log4j2
-public class Kernel extends Server implements ApplicationContextAware,
+public class Kernel extends Server implements KernelApi,
+                                              ApplicationContextAware,
                                               ApplicationRunner {
-
-    /**
-     * The name of the {@link System} property containing the
-     * {@link Kernel}'s REST server port.
-     */
-    public static final String PORT_PROPERTY = "kernel.port";
-
     @Value("${connection-file:#{null}}")
     private String connection_file = null;
 
@@ -127,58 +124,6 @@ public class Kernel extends Server implements ApplicationContextAware,
     @PreDestroy
     public void destroy() { super.shutdown(); }
 
-    /**
-     * REST method to retrieve the current {@link Shell#classpath()}.
-     */
-    @RequestMapping(method = { GET }, value = { "kernel/classpath" })
-    public ResponseEntity<String> classpath() throws Exception {
-        var json = ObjectMappers.JSON.writeValueAsString(shell.classpath());
-
-        return new ResponseEntity<>(json, HttpStatus.OK);
-    }
-
-    /**
-     * REST method to display MIME bundles from a sub-process.  See
-     * {@link KernelRestClient#display(JsonNode)}.
-     *
-     * @param   bundle          The MIME bundle {@link ObjectNode}.
-     */
-    @RequestMapping(method = { PUT }, value = { "kernel/display" })
-    public ResponseEntity<String> display(@RequestBody ObjectNode bundle) {
-        var request = this.request;
-
-        if (request != null) {
-            var silent = request.content().at("/silent").asBoolean();
-
-            if (! silent) {
-                pub(request.display_data(bundle));
-            }
-        }
-
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    /**
-     * REST method to print MIME bundles from a sub-process.  See
-     * {@link KernelRestClient#print(JsonNode)}.
-     *
-     * @param   bundle          The MIME bundle {@link ObjectNode}.
-     */
-    @RequestMapping(method = { PUT }, value = { "kernel/print" })
-    public ResponseEntity<String> print(@RequestBody ObjectNode bundle) {
-        var request = this.request;
-
-        if (request != null) {
-            var silent = request.content().at("/silent").asBoolean();
-
-            if (! silent) {
-                pub(request.execute_result(execution_count.intValue(), bundle));
-            }
-        }
-
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
     @Override
     public void setApplicationContext(ApplicationContext context) {
         this.context = context;
@@ -215,7 +160,7 @@ public class Kernel extends Server implements ApplicationContextAware,
 
         shell.restart(getIn(), getOut(), getErr());
 
-        setSessionId(UUID.randomUUID().toString());
+        setKernelSessionId(UUID.randomUUID());
     }
 
     @Override
@@ -247,6 +192,48 @@ public class Kernel extends Server implements ApplicationContextAware,
 
     @Override
     public void shutdown() { SpringApplication.exit(context, () -> 0); }
+
+    @Override
+    public ResponseEntity<List<String>> classpath() {
+        var list = shell.classpath().stream().map(File::getAbsolutePath).collect(toList());
+
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<UUID> kernelId() {
+        return new ResponseEntity<>(getKernelId(), HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Void> display(ObjectNode body) {
+        var request = this.request;
+
+        if (request != null) {
+            var silent = request.content().at("/silent").asBoolean();
+
+            if (! silent) {
+                pub(request.display_data(body));
+            }
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Void> print(ObjectNode body) {
+        var request = this.request;
+
+        if (request != null) {
+            var silent = request.content().at("/silent").asBoolean();
+
+            if (! silent) {
+                pub(request.execute_result(execution_count.intValue(), body));
+            }
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
     @Override
     public void run(ApplicationArguments arguments) throws Exception {

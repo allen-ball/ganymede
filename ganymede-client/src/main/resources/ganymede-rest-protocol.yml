@@ -1,0 +1,64 @@
+openapi: "3.0.0"
+info:
+  title: Ganymede Kernel Rest Protocol
+  description: Ganymede Kernel Rest Protocol
+  version: @project.majorVersion@.@project.minorVersion@.@project.incrementalVersion@
+servers:
+  - url: http://localhost/
+paths:
+  /kernel/id:
+    get:
+      summary: Get Kernel UUID
+      operationId: kernelId
+      parameters: [ ]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: UUID
+  /kernel/classpath:
+    get:
+      summary: Get Shell classpath
+      operationId: classpath
+      parameters: [ ]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /kernel/display:
+    put:
+      summary: Jupyter display implemenation
+      operationId: display
+      parameters: [ ]
+      requestBody:
+        description: Jupyter MIME bundle
+        required: true
+        content:
+          application/json:
+            schema:
+              type: JsonNode
+      responses:
+        '200':
+          description: OK
+  /kernel/print:
+    put:
+      operationId: print
+      summary: Jupyter print implemenation
+      parameters: [ ]
+      requestBody:
+        description: Jupyter MIME bundle
+        required: true
+        content:
+          application/json:
+            schema:
+              type: JsonNode
+      responses:
+        '200':
+          description: OK

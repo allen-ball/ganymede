@@ -19,7 +19,7 @@ package ganymede.shell.magic;
  * ##########################################################################
  */
 import ball.annotation.ServiceProviderFor;
-import ganymede.kernel.KernelRestClient;
+import ganymede.kernel.client.KernelRestClient;
 import ganymede.server.Message;
 import ganymede.server.renderer.ThymeleafRenderer;
 import ganymede.shell.Magic;

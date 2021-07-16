@@ -19,7 +19,9 @@ package ganymede.notebook;
  * ##########################################################################
  */
 import com.fasterxml.jackson.databind.JsonNode;
-import ganymede.kernel.KernelRestClient;
+import ganymede.jupyter.NotebookServicesClient;
+import ganymede.jupyter.notebook.model.Kernel;
+import ganymede.kernel.client.KernelRestClient;
 import ganymede.server.Message;
 import ganymede.shell.MagicMap;
 import ganymede.shell.Shell;
@@ -38,6 +40,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Stream;
 import javax.script.ScriptContext;
@@ -77,6 +80,25 @@ public class NotebookContext {
      */
     public static final String NAME = "$$";
 
+    public final KernelRestClient krc = new KernelRestClient();
+    public final NotebookServicesClient nsc;
+    private final UUID kernelId;
+
+    /**
+     * {@link Kernel} model.
+     */
+    public Kernel kernel = null;
+
+    {
+        try {
+            nsc = new NotebookServicesClient();
+            kernelId = krc.kernelId();
+            kernel = nsc.getKernel(kernelId);
+        } catch (Exception exception) {
+            throw new ExceptionInInitializerError(exception);
+        }
+    }
+
     /**
      * Common {@link ScriptContext} supplied to
      * {@link ganymede.shell.Magic#execute(String,String)}.
@@ -105,12 +127,31 @@ public class NotebookContext {
     public final Map<String,String> types = new ConcurrentSkipListMap<>();
 
     /**
+     * {@link NotebookServicesClient}-specific context.
+     * See {@link NotebookContext.Notebook Notebook}.
+     */
+    public final Notebook notebook = new Notebook();
+
+    /**
      * {@link ganymede.shell.magic.SQL}-specific context.
      * See {@link NotebookContext.SQL SQL}.
      */
     public final SQL sql = new SQL();
 
     private final MagicMap magics = new MagicMap(t -> t.configure(this));
+
+    /**
+     * Method to update notebook context.
+     *
+     * @see #kernel
+     */
+    public void refresh() {
+        try {
+            kernel = nsc.getKernel(kernelId);
+        } catch (Throwable throwable) {
+            throwable.printStackTrace(System.err);
+        }
+    }
 
     /**
      * Provide access to the {@link NotebookContext} {@link MagicMap}.
@@ -150,7 +191,7 @@ public class NotebookContext {
     @NotebookFunction
     public void display(Object object) {
         try {
-            new KernelRestClient().display(Message.mime_bundle(object));
+            krc.display(Message.mime_bundle(object));
         } catch (Exception exception) {
             System.out.println(object);
             exception.printStackTrace(System.err);
@@ -165,7 +206,7 @@ public class NotebookContext {
     @NotebookFunction
     public void print(Object object) {
         try {
-            new KernelRestClient().print(Message.mime_bundle(object));
+            krc.print(Message.mime_bundle(object));
         } catch (Exception exception) {
             System.out.println(object);
             exception.printStackTrace(System.err);
@@ -274,6 +315,9 @@ public class NotebookContext {
      */
     public static void preExecute(Shell shell) {
         var jshell = shell.jshell();
+
+        evaluate(jshell, "%1$s.refresh()", NAME);
+
         var classpath =
             shell.classpath().stream()
             .map(File::getAbsolutePath)

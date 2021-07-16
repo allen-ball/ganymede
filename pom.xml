@@ -154,6 +154,11 @@
         <version>4.6.1</version>
       </dependency>
       <dependency>
+        <groupId>io.springfox</groupId>
+        <artifactId>springfox-swagger2</artifactId>
+        <version>2.9.2</version>
+      </dependency>
+      <dependency>
         <groupId>io.swagger</groupId>
         <artifactId>swagger-annotations</artifactId>
         <version>1.6.2</version>
@@ -277,6 +282,7 @@
   </dependencyManagement>
   <modules>
     <module>ganymede</module>
+    <module>ganymede-client</module>
     <module>ganymede-kernel</module>
     <module>jupyter-client</module>
   </modules>

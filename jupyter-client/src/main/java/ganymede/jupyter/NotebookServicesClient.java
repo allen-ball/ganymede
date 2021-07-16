@@ -165,7 +165,7 @@ public class NotebookServicesClient extends ApiClient {
     }
 
     /**
-     * See {@link TerminalsApi#apiTerminalsTerminalIdGet(UUID)}.
+     * See {@link TerminalsApi#apiTerminalsTerminalIdGet(String)}.
      *
      * @param   id              The terminal ID.
      *

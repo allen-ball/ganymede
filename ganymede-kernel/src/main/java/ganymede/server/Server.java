@@ -35,6 +35,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.zeromq.ZMQ;
 
+import static lombok.AccessLevel.NONE;
 import static lombok.AccessLevel.PROTECTED;
 
 /**
@@ -65,7 +66,8 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
     private UUID kernelId = null;
     private UUID kernelSessionId = null;
     protected final AtomicInteger execution_count = new AtomicInteger(0);
-    private transient Message request = null;
+    @Getter(NONE) @Setter(NONE)
+    protected transient Message request = null;
 
     /**
      * Sole constructor.

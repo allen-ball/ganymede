@@ -20,7 +20,7 @@ package ganymede.shell.magic;
  */
 import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import ganymede.kernel.KernelRestClient;
+import ganymede.kernel.client.KernelRestClient;
 import ganymede.server.Message;
 import ganymede.server.Renderer;
 import ganymede.server.renderer.ForClass;
