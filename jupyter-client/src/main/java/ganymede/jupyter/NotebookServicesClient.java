@@ -22,6 +22,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import ganymede.jupyter.notebook.ApiClient;
 import ganymede.jupyter.notebook.ApiException;
 import ganymede.jupyter.notebook.JSON;
+import ganymede.jupyter.notebook.api.KernelsApi;
+import ganymede.jupyter.notebook.api.SessionsApi;
+import ganymede.jupyter.notebook.api.TerminalsApi;
+import ganymede.jupyter.notebook.model.Kernel;
+import ganymede.jupyter.notebook.model.Session;
+import ganymede.jupyter.notebook.model.Terminal;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -37,6 +43,8 @@ import lombok.extern.log4j.Log4j2;
 /**
  * Ganymede Jupyter Notebook/Lab REST client.  See
  * {@link.uri https://github.com/jupyter/jupyter/wiki/Jupyter-Notebook-Server-API target=newtab Jupyter Notebook Server API}.
+ *
+ * {@bean.info}
  *
  * @see ApiClient
  *
@@ -105,5 +113,32 @@ public class NotebookServicesClient extends ApiClient {
         var token = node.get("token").asText();
 
         setRequestInterceptor(t -> t.header("Authorization", "Token " + token));
+    }
+
+    /**
+     * See {@link KernelsApi#apiKernelsGet()}.
+     *
+     * @return  The {@link List} of {@link Kernel}s.
+     */
+    public List<Kernel> getKernelList() throws ApiException {
+        return new KernelsApi(this).apiKernelsGet();
+    }
+
+    /**
+     * See {@link SessionsApi#apiSessionsGet()}.
+     *
+     * @return  The {@link List} of {@link Session}s.
+     */
+    public List<Session> getSessionList() throws ApiException {
+        return new SessionsApi(this).apiSessionsGet();
+    }
+
+    /**
+     * See {@link TerminalsApi#apiTerminalsGet()}.
+     *
+     * @return  The {@link List} of {@link Terminal}s.
+     */
+    public List<Terminal> getTerminalList() throws ApiException {
+        return new TerminalsApi(this).apiTerminalsGet();
     }
 }
