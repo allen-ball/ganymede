@@ -44,9 +44,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 @SpringBootApplication
 @NoArgsConstructor @ToString @Log4j2
 public class Connect implements ApplicationRunner {
-    @Value("${JPY_PARENT_PID:#{-1}}")
-    private long jpy_parent_pid = -1;
-
     @Value("${connection-file:#{null}}")
     private String connection_file = null;
 
