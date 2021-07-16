@@ -125,6 +125,17 @@ public class NotebookServicesClient extends ApiClient {
     }
 
     /**
+     * See {@link KernelsApi#apiKernelsKernelIdGet(UUID)}.
+     *
+     * @param   id              The kernel {@link UUID}.
+     *
+     * @return  The {@link Kernel} matching the argument ID.
+     */
+    public Kernel getKernel(UUID id) throws ApiException {
+        return new KernelsApi(this).apiKernelsKernelIdGet(id);
+    }
+
+    /**
      * See {@link SessionsApi#apiSessionsGet()}.
      *
      * @return  The {@link List} of {@link Session}s.
@@ -134,11 +145,33 @@ public class NotebookServicesClient extends ApiClient {
     }
 
     /**
+     * See {@link SessionsApi#apiSessionsSessionGet(UUID)}.
+     *
+     * @param   id              The session {@link UUID}.
+     *
+     * @return  The {@link Session} matching the argument ID.
+     */
+    public Session getSession(UUID id) throws ApiException {
+        return new SessionsApi(this).apiSessionsSessionGet(id);
+    }
+
+    /**
      * See {@link TerminalsApi#apiTerminalsGet()}.
      *
      * @return  The {@link List} of {@link Terminal}s.
      */
     public List<Terminal> getTerminalList() throws ApiException {
         return new TerminalsApi(this).apiTerminalsGet();
+    }
+
+    /**
+     * See {@link TerminalsApi#apiTerminalsTerminalIdGet(UUID)}.
+     *
+     * @param   id              The terminal ID.
+     *
+     * @return  The {@link Terminal} matching the argument ID.
+     */
+    public Terminal getTerminal(String id) throws ApiException {
+        return new TerminalsApi(this).apiTerminalsTerminalIdGet(id);
     }
 }
