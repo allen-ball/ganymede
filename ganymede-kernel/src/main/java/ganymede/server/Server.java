@@ -26,7 +26,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.Getter;
@@ -55,7 +54,6 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
     protected static final ComparableVersion PROTOCOL_VERSION = new ComparableVersion("5.3");
 
     private final ZMQ.Context context = ZMQ.context(1);
-    private final ConcurrentSkipListMap<UUID,Connection> connectionMap = new ConcurrentSkipListMap<>();
     private final Channel.Heartbeat heartbeat = new Channel.Heartbeat(this);
     private final Channel.Control control = new Control();
     private final Channel.IOPub iopub = new Channel.IOPub(this);
@@ -64,9 +62,10 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
     private InputStream in = null;
     private PrintStreamBuffer out = null;
     private PrintStreamBuffer err = null;
-    private String sessionId = null;
+    private UUID kernelId = null;
+    private UUID kernelSessionId = null;
     protected final AtomicInteger execution_count = new AtomicInteger(0);
-    protected transient Message request = null;
+    private transient Message request = null;
 
     /**
      * Sole constructor.
@@ -97,12 +96,13 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
     protected void bind(File file) throws IOException {
         var connection = Connection.parse(file);
 
-        connectionMap.put(connection.getKernelId(), connection);
+        setKernelId(connection.getKernelId());
+
+        log.info("Kernel {}", getKernelId());
 
         connection.connect(shell, control, iopub, stdin, heartbeat);
 
-        log.info("Connected to {} {}",
-                 connection.getKernelId(), connection.getNode().toPrettyString());
+        log.info("Connected to {}", connection.getNode().toPrettyString());
     }
 
     /**
@@ -178,7 +178,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
         }
 
         if (message.session() == null) {
-            message.session(getSessionId());
+            message.session(getKernelSessionId().toString());
         }
 
         return message.timestamp();
