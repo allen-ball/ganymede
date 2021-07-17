@@ -3,7 +3,7 @@
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
-@Manifest.Section
+@Manifest.Section @Generated("OpenAPI")
 package ganymede.kernel;
 /*-
  * ##########################################################################
@@ -25,3 +25,4 @@ package ganymede.kernel;
  * ##########################################################################
  */
 import ball.annotation.Manifest;
+import javax.annotation.processing.Generated;

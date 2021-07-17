@@ -32,6 +32,7 @@ import java.io.PrintStream;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -52,7 +53,10 @@ import org.apache.logging.log4j.io.IoBuilder;
 import static ganymede.kernel.client.KernelRestClient.PORT_PROPERTY;
 import static ganymede.notebook.NotebookContext.unescape;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toMap;
 import static jdk.jshell.Snippet.Status.REJECTED;
+import static jdk.jshell.Snippet.SubKind.TEMP_VAR_EXPRESSION_SUBKIND;
 import static org.apache.logging.log4j.Level.WARN;
 
 /**
@@ -229,6 +233,47 @@ public class Shell implements AutoCloseable {
      * @return  The {@link Set} of {@link File}s.
      */
     public Set<File> classpath() { return resolver.classpath(); }
+
+    /**
+     * Method to get the current imports.
+     *
+     * @return  The {@link Set} of imports as {@link String}s.
+     */
+    public Set<String> imports() {
+        var imports = Set.<String>of();
+        var jshell = this.jshell;
+
+        if (jshell != null) {
+            imports =
+                jshell.imports()
+                .map(t -> t.source())
+                .map(String::strip)
+                .collect(toCollection(LinkedHashSet::new));
+        }
+
+        return imports;
+    }
+
+    /**
+     * Method to get the current {@link Map} of defined variables to their
+     * type definitions.
+     *
+     * @return  The {@link Map} of defined variables and their types as
+     *          {@link String}s.
+     */
+    public Map<String,String> variables() {
+        var variables = Map.<String,String>of();
+        var jshell = this.jshell;
+
+        if (jshell != null) {
+            variables =
+                jshell.variables()
+                .filter(t -> (! t.subKind().equals(TEMP_VAR_EXPRESSION_SUBKIND)))
+                .collect(toMap(k -> k.name(), v -> v.typeName()));
+        }
+
+        return variables;
+    }
 
     /**
      * Accessor to the {@link JShell} instance (created and initialized on

@@ -1,3 +1,5 @@
+# ganymede-rest-protocol.yml
+---
 openapi: "3.0.0"
 info:
   title: Ganymede Kernel Rest Protocol
@@ -18,20 +20,6 @@ paths:
             application/json:
               schema:
                 type: UUID
-  /kernel/classpath:
-    get:
-      summary: Get Shell classpath
-      operationId: classpath
-      parameters: [ ]
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
   /kernel/display:
     put:
       summary: Jupyter display implemenation
@@ -62,3 +50,45 @@ paths:
       responses:
         '200':
           description: OK
+  /kernel/shell/classpath:
+    get:
+      summary: Get Shell classpath
+      operationId: classpath
+      parameters: [ ]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /kernel/shell/java/imports:
+    get:
+      summary: Get Java imports
+      operationId: imports
+      parameters: [ ]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /kernel/shell/java/variables:
+    get:
+      summary: Get Java variables
+      operationId: variables
+      parameters: [ ]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string

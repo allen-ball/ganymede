@@ -26,7 +26,6 @@ import ganymede.server.Message;
 import ganymede.shell.MagicMap;
 import ganymede.shell.Shell;
 import ganymede.util.ObjectMappers;
-import java.io.File;
 import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
@@ -36,10 +35,10 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Stream;
@@ -57,10 +56,6 @@ import org.jooq.impl.DSL;
 
 import static java.lang.reflect.Modifier.isPublic;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-import static jdk.jshell.Snippet.SubKind.TEMP_VAR_EXPRESSION_SUBKIND;
 
 /**
  * {@link NotebookContext} for {@link Notebook} {@link Shell}
@@ -80,8 +75,8 @@ public class NotebookContext {
      */
     public static final String NAME = "$$";
 
-    public final KernelRestClient krc = new KernelRestClient();
-    public final NotebookServicesClient nsc;
+    private final KernelRestClient krc = new KernelRestClient();
+    private final NotebookServicesClient nsc;
     private final UUID kernelId;
 
     /**
@@ -124,13 +119,7 @@ public class NotebookContext {
     /**
      * {@link Map} of known bindings' {@link Class types}.
      */
-    public final Map<String,String> types = new ConcurrentSkipListMap<>();
-
-    /**
-     * {@link NotebookServicesClient}-specific context.
-     * See {@link NotebookContext.Notebook Notebook}.
-     */
-    public final Notebook notebook = new Notebook();
+    public final Map<String,String> types = new TreeMap<>();
 
     /**
      * {@link ganymede.shell.magic.SQL}-specific context.
@@ -148,6 +137,15 @@ public class NotebookContext {
     public void refresh() {
         try {
             kernel = nsc.getKernel(kernelId);
+
+            classpath.clear();
+            classpath.addAll(krc.classpath());
+
+            imports.clear();
+            imports.addAll(krc.imports());
+
+            types.clear();
+            types.putAll(krc.variables());
         } catch (Throwable throwable) {
             throwable.printStackTrace(System.err);
         }
@@ -318,47 +316,12 @@ public class NotebookContext {
 
         evaluate(jshell, "%1$s.refresh()", NAME);
 
-        var classpath =
-            shell.classpath().stream()
-            .map(File::getAbsolutePath)
-            .collect(toList());
+        var variables = shell.variables();
 
-        evaluate(jshell, "%1$s.classpath.clear()", NAME);
-
-        if (! classpath.isEmpty()) {
-            evaluate(jshell,
-                     "java.util.Collections.addAll(%1$s.classpath, \"%2$s\".split(\",\"))",
-                     NAME, String.join(",", classpath));
-        }
-
-        var imports =
-            jshell.imports()
-            .map(t -> t.source())
-            .map(String::strip)
-            .collect(toCollection(LinkedHashSet::new));
-
-        evaluate(jshell, "%1$s.imports.clear()", NAME);
-
-        if (! imports.isEmpty()) {
-            evaluate(jshell,
-                     "java.util.Collections.addAll(%1$s.imports, \"%2$s\".split(\",\"))",
-                     NAME, String.join(",", imports));
-        }
-
-        var types =
-            jshell.variables()
-            .filter(t -> (! t.subKind().equals(TEMP_VAR_EXPRESSION_SUBKIND)))
-            .collect(toMap(k -> k.name(), v -> v.typeName()));
-
-        evaluate(jshell, "%1$s.types.clear()", NAME);
-
-        for (var entry : types.entrySet()) {
+        for (var entry : variables.entrySet()) {
             evaluate(jshell,
                      "%1$s.context.getBindings(%2$d).put(\"%3$s\", %3$s)",
                      NAME, ScriptContext.ENGINE_SCOPE, entry.getKey());
-            evaluate(jshell,
-                     "%1$s.types.put(\"%2$s\", \"%3$s\")",
-                     NAME, entry.getKey(), entry.getValue());
         }
     }
 

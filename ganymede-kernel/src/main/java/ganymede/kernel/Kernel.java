@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -194,13 +195,6 @@ public class Kernel extends Server implements KernelApi,
     public void shutdown() { SpringApplication.exit(context, () -> 0); }
 
     @Override
-    public ResponseEntity<List<String>> classpath() {
-        var list = shell.classpath().stream().map(File::getAbsolutePath).collect(toList());
-
-        return new ResponseEntity<>(list, HttpStatus.OK);
-    }
-
-    @Override
     public ResponseEntity<UUID> kernelId() {
         return new ResponseEntity<>(getKernelId(), HttpStatus.OK);
     }
@@ -233,6 +227,25 @@ public class Kernel extends Server implements KernelApi,
         }
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<List<String>> classpath() {
+        var list = shell.classpath().stream().map(File::getAbsolutePath).collect(toList());
+
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<List<String>> imports() {
+        var list = shell.imports().stream().collect(toList());
+
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Map<String,String>> variables() {
+        return new ResponseEntity<>(shell.variables(), HttpStatus.OK);
     }
 
     @Override

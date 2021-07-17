@@ -21,12 +21,10 @@ package ganymede.kernel.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import ganymede.kernel.client.api.DefaultApi;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
-
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
  * Ganymede {@link ganymede.kernel.Kernel} REST client.
@@ -47,7 +45,7 @@ public class KernelRestClient extends ApiClient {
 
     {
         setPort(Integer.decode(System.getProperty(PORT_PROPERTY)));
-        setRequestInterceptor(t -> t.header(CONTENT_TYPE, APPLICATION_JSON_VALUE));
+        setRequestInterceptor(t -> t.header("Accept", "application/json"));
     }
 
     /**
@@ -55,13 +53,6 @@ public class KernelRestClient extends ApiClient {
      */
     public UUID kernelId() throws Exception {
         return new DefaultApi(this).kernelId();
-    }
-
-    /**
-     * See {@link DefaultApi#classpath()}.
-     */
-    public List<String> classpath() throws Exception {
-        return new DefaultApi(this).classpath();
     }
 
     /**
@@ -80,5 +71,26 @@ public class KernelRestClient extends ApiClient {
      */
     public void print(JsonNode bundle) throws Exception {
         new DefaultApi(this).print(bundle);
+    }
+
+    /**
+     * See {@link DefaultApi#classpath()}.
+     */
+    public List<String> classpath() throws Exception {
+        return new DefaultApi(this).classpath();
+    }
+
+    /**
+     * See {@link DefaultApi#imports()}.
+     */
+    public List<String> imports() throws Exception {
+        return new DefaultApi(this).imports();
+    }
+
+    /**
+     * See {@link DefaultApi#variables()}.
+     */
+    public Map<String,String> variables() throws Exception {
+        return new DefaultApi(this).variables();
     }
 }
