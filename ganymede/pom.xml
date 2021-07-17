@@ -41,6 +41,13 @@
       <groupId>ganymede</groupId>
       <artifactId>ganymede-kernel</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <!-- Integrated in org.apache.velocity:velocity-engine-core -->
+        <exclusion>
+          <groupId>commons-io</groupId>
+          <artifactId>commons-io</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>ball</groupId>
@@ -53,6 +60,10 @@
       <artifactId>spring-boot-starter-jetty</artifactId>
       <scope>runtime</scope>
       <exclusions>
+        <exclusion>
+          <groupId>org.eclipse.jetty.toolchain</groupId>
+          <artifactId>jetty-servlet-api</artifactId>
+        </exclusion>
         <exclusion>
           <groupId>org.eclipse.jetty.websocket</groupId>
           <artifactId>javax-websocket-server-impl</artifactId>
@@ -233,6 +244,7 @@
                 <exclude>META-INF/README.txt</exclude>
                 <exclude>META-INF/spring-configuration-metadata.json</exclude>
                 <exclude>META-INF/additional-spring-configuration-metadata.json</exclude>
+                <exclude>**/.gitkeep</exclude>
                 <exclude>**/module-info.class</exclude>
               </excludes>
             </filter>

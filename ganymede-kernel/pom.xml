@@ -41,6 +41,13 @@
       <groupId>ganymede</groupId>
       <artifactId>ganymede-client</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <!-- Integrated in org.apache.velocity:velocity-engine-core -->
+        <exclusion>
+          <groupId>commons-io</groupId>
+          <artifactId>commons-io</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>ganymede</groupId>
