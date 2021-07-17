@@ -9,6 +9,9 @@ ganymede.jupyter.notebook
 ganymede.jupyter.notebook.api
 ganymede.jupyter.notebook.model
 ganymede.kernel
+ganymede.kernel.client
+ganymede.kernel.client.api
+ganymede.kernel.client.model
 ganymede.notebook
 ganymede.server
 ganymede.server.renderer

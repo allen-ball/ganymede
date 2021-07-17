@@ -134,23 +134,56 @@
 <span class="sourceLineNo">125</span><a id="line.125">    }</a>
 <span class="sourceLineNo">126</span><a id="line.126"></a>
 <span class="sourceLineNo">127</span><a id="line.127">    /**</a>
-<span class="sourceLineNo">128</span><a id="line.128">     * See {@link SessionsApi#apiSessionsGet()}.</a>
+<span class="sourceLineNo">128</span><a id="line.128">     * See {@link KernelsApi#apiKernelsKernelIdGet(UUID)}.</a>
 <span class="sourceLineNo">129</span><a id="line.129">     *</a>
-<span class="sourceLineNo">130</span><a id="line.130">     * @return  The {@link List} of {@link Session}s.</a>
-<span class="sourceLineNo">131</span><a id="line.131">     */</a>
-<span class="sourceLineNo">132</span><a id="line.132">    public List&lt;Session&gt; getSessionList() throws ApiException {</a>
-<span class="sourceLineNo">133</span><a id="line.133">        return new SessionsApi(this).apiSessionsGet();</a>
-<span class="sourceLineNo">134</span><a id="line.134">    }</a>
-<span class="sourceLineNo">135</span><a id="line.135"></a>
-<span class="sourceLineNo">136</span><a id="line.136">    /**</a>
-<span class="sourceLineNo">137</span><a id="line.137">     * See {@link TerminalsApi#apiTerminalsGet()}.</a>
-<span class="sourceLineNo">138</span><a id="line.138">     *</a>
-<span class="sourceLineNo">139</span><a id="line.139">     * @return  The {@link List} of {@link Terminal}s.</a>
-<span class="sourceLineNo">140</span><a id="line.140">     */</a>
-<span class="sourceLineNo">141</span><a id="line.141">    public List&lt;Terminal&gt; getTerminalList() throws ApiException {</a>
-<span class="sourceLineNo">142</span><a id="line.142">        return new TerminalsApi(this).apiTerminalsGet();</a>
-<span class="sourceLineNo">143</span><a id="line.143">    }</a>
-<span class="sourceLineNo">144</span><a id="line.144">}</a>
+<span class="sourceLineNo">130</span><a id="line.130">     * @param   id              The kernel {@link UUID}.</a>
+<span class="sourceLineNo">131</span><a id="line.131">     *</a>
+<span class="sourceLineNo">132</span><a id="line.132">     * @return  The {@link Kernel} matching the argument ID.</a>
+<span class="sourceLineNo">133</span><a id="line.133">     */</a>
+<span class="sourceLineNo">134</span><a id="line.134">    public Kernel getKernel(UUID id) throws ApiException {</a>
+<span class="sourceLineNo">135</span><a id="line.135">        return new KernelsApi(this).apiKernelsKernelIdGet(id);</a>
+<span class="sourceLineNo">136</span><a id="line.136">    }</a>
+<span class="sourceLineNo">137</span><a id="line.137"></a>
+<span class="sourceLineNo">138</span><a id="line.138">    /**</a>
+<span class="sourceLineNo">139</span><a id="line.139">     * See {@link SessionsApi#apiSessionsGet()}.</a>
+<span class="sourceLineNo">140</span><a id="line.140">     *</a>
+<span class="sourceLineNo">141</span><a id="line.141">     * @return  The {@link List} of {@link Session}s.</a>
+<span class="sourceLineNo">142</span><a id="line.142">     */</a>
+<span class="sourceLineNo">143</span><a id="line.143">    public List&lt;Session&gt; getSessionList() throws ApiException {</a>
+<span class="sourceLineNo">144</span><a id="line.144">        return new SessionsApi(this).apiSessionsGet();</a>
+<span class="sourceLineNo">145</span><a id="line.145">    }</a>
+<span class="sourceLineNo">146</span><a id="line.146"></a>
+<span class="sourceLineNo">147</span><a id="line.147">    /**</a>
+<span class="sourceLineNo">148</span><a id="line.148">     * See {@link SessionsApi#apiSessionsSessionGet(UUID)}.</a>
+<span class="sourceLineNo">149</span><a id="line.149">     *</a>
+<span class="sourceLineNo">150</span><a id="line.150">     * @param   id              The session {@link UUID}.</a>
+<span class="sourceLineNo">151</span><a id="line.151">     *</a>
+<span class="sourceLineNo">152</span><a id="line.152">     * @return  The {@link Session} matching the argument ID.</a>
+<span class="sourceLineNo">153</span><a id="line.153">     */</a>
+<span class="sourceLineNo">154</span><a id="line.154">    public Session getSession(UUID id) throws ApiException {</a>
+<span class="sourceLineNo">155</span><a id="line.155">        return new SessionsApi(this).apiSessionsSessionGet(id);</a>
+<span class="sourceLineNo">156</span><a id="line.156">    }</a>
+<span class="sourceLineNo">157</span><a id="line.157"></a>
+<span class="sourceLineNo">158</span><a id="line.158">    /**</a>
+<span class="sourceLineNo">159</span><a id="line.159">     * See {@link TerminalsApi#apiTerminalsGet()}.</a>
+<span class="sourceLineNo">160</span><a id="line.160">     *</a>
+<span class="sourceLineNo">161</span><a id="line.161">     * @return  The {@link List} of {@link Terminal}s.</a>
+<span class="sourceLineNo">162</span><a id="line.162">     */</a>
+<span class="sourceLineNo">163</span><a id="line.163">    public List&lt;Terminal&gt; getTerminalList() throws ApiException {</a>
+<span class="sourceLineNo">164</span><a id="line.164">        return new TerminalsApi(this).apiTerminalsGet();</a>
+<span class="sourceLineNo">165</span><a id="line.165">    }</a>
+<span class="sourceLineNo">166</span><a id="line.166"></a>
+<span class="sourceLineNo">167</span><a id="line.167">    /**</a>
+<span class="sourceLineNo">168</span><a id="line.168">     * See {@link TerminalsApi#apiTerminalsTerminalIdGet(String)}.</a>
+<span class="sourceLineNo">169</span><a id="line.169">     *</a>
+<span class="sourceLineNo">170</span><a id="line.170">     * @param   id              The terminal ID.</a>
+<span class="sourceLineNo">171</span><a id="line.171">     *</a>
+<span class="sourceLineNo">172</span><a id="line.172">     * @return  The {@link Terminal} matching the argument ID.</a>
+<span class="sourceLineNo">173</span><a id="line.173">     */</a>
+<span class="sourceLineNo">174</span><a id="line.174">    public Terminal getTerminal(String id) throws ApiException {</a>
+<span class="sourceLineNo">175</span><a id="line.175">        return new TerminalsApi(this).apiTerminalsTerminalIdGet(id);</a>
+<span class="sourceLineNo">176</span><a id="line.176">    }</a>
+<span class="sourceLineNo">177</span><a id="line.177">}</a>
 
 
 
