@@ -296,17 +296,6 @@ public abstract class Channel {
         }
 
         @Override
-        public void connect(Connection connection, String address) {
-            boolean isStarting = getDispatcherQueue().isEmpty();
-
-            super.connect(connection, address);
-
-            if (isStarting) {
-                iopub.pub(Message.status(Message.status.starting, null));
-            }
-        }
-
-        @Override
         protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, Message message) {
             try {
                 iopub.pub(message.status(Message.status.busy));

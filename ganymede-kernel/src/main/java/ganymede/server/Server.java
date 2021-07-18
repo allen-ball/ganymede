@@ -108,6 +108,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
      */
     protected void bind(File file) throws IOException {
         var connection = Connection.parse(file);
+        var starting = (getKernelId() == null);
 
         setKernelId(connection.getKernelId());
 
@@ -116,6 +117,10 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
         connection.connect(shell, control, iopub, stdin, heartbeat);
 
         log.info("Connected to {}", connection.getNode().toPrettyString());
+
+        if (starting) {
+            iopub.pub(Message.status(Message.status.starting, null));
+        }
     }
 
     /**
