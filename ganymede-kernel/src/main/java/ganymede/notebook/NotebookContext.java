@@ -21,6 +21,7 @@ package ganymede.notebook;
 import com.fasterxml.jackson.databind.JsonNode;
 import ganymede.jupyter.NotebookServicesClient;
 import ganymede.jupyter.notebook.model.Kernel;
+import ganymede.jupyter.notebook.model.Session;
 import ganymede.kernel.client.KernelRestClient;
 import ganymede.server.Message;
 import ganymede.shell.MagicMap;
@@ -95,6 +96,11 @@ public class NotebookContext {
     }
 
     /**
+     * {@link Session} model.
+     */
+    public Session session = null;
+
+    /**
      * Common {@link ScriptContext} supplied to
      * {@link ganymede.shell.Magic#execute(String,String)}.
      */
@@ -137,6 +143,11 @@ public class NotebookContext {
     public void refresh() {
         try {
             kernel = nsc.getKernel(kernelId);
+
+            session =
+                nsc.getSessionList().stream()
+                .filter(t -> kernelId.equals(t.getKernel().getId()))
+                .findFirst().orElse(null);
 
             classpath.clear();
             classpath.addAll(krc.classpath());
