@@ -20,6 +20,7 @@ package ganymede.server;
  */
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.io.PrintStreamBuffer;
+import ganymede.jupyter.NotebookServicesClient;
 import ganymede.util.ObjectMappers;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -60,11 +61,13 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
     private final Channel.IOPub iopub = new Channel.IOPub(this);
     private final Channel.Stdin stdin = new Stdin();
     private final Channel.Shell shell = new Shell();
+    private final NotebookServicesClient notebookServicesClient;
     private InputStream in = null;
     private PrintStreamBuffer out = null;
     private PrintStreamBuffer err = null;
     private UUID kernelId = null;
     private UUID kernelSessionId = null;
+    @Getter(NONE) @Setter(NONE)
     protected final AtomicInteger execution_count = new AtomicInteger(0);
     @Getter(NONE) @Setter(NONE)
     protected transient Message request = null;
@@ -72,7 +75,15 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
     /**
      * Sole constructor.
      */
-    protected Server() { super(16); }
+    protected Server() {
+        super(16);
+
+        try {
+            notebookServicesClient = new NotebookServicesClient();
+        } catch (Exception exception) {
+            throw new ExceptionInInitializerError(exception);
+        }
+    }
 
     /**
      * Add a connection specified by a {@link Connection} {@link File}.
@@ -260,15 +271,6 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
         }
 
         private void execute(Dispatcher dispatcher, Message request, Message reply) throws Exception {
-            /*
-             * jupyter lab populates execute_request metadata.  E.g.,
-             *
-             * metadata: {
-             *   "deletedCells" : [ ],
-             *   "recordTiming" : false,
-             *   "cellId" : "4cf407d2"
-             * }
-             */
             var code = request.content().at("/code").asText();
             var silent = request.content().at("/silent").asBoolean();
             var store_history = request.content().at("/store_history").asBoolean();
@@ -285,7 +287,15 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
                             iopub.pub(request.execute_input(code, execution_count.intValue()));
                         }
                     }
-
+                    /*
+                     * jupyter lab populates execute_request metadata.  E.g.,
+                     *
+                     * metadata: {
+                     *   "deletedCells" : [ ],
+                     *   "recordTiming" : false,
+                     *   "cellId" : "4cf407d2"
+                     * }
+                     */
                     Server.this.execute(code);
                 }
             } catch (Throwable throwable) {
