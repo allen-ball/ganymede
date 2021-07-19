@@ -1,4 +1,10 @@
-package ganymede.shell.magic;
+/**
+ * {@link ganymede.shell.Builtin} service provider classes.
+ *
+ * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
+ */
+@Manifest.Section
+package ganymede.shell.builtin;
 /*-
  * ##########################################################################
  * Ganymede
@@ -18,20 +24,4 @@ package ganymede.shell.magic;
  * limitations under the License.
  * ##########################################################################
  */
-import lombok.NoArgsConstructor;
-
-import static lombok.AccessLevel.PROTECTED;
-
-/**
- * Abstract base class for {@link jdk.jshell.JShell}
- * {@link ganymede.shell.Magic}s.
- *
- * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- */
-@NoArgsConstructor(access = PROTECTED)
-public abstract class JShell extends AbstractMagic {
-    @Override
-    public void execute(String line0, String code) throws Exception {
-        throw new IllegalArgumentException(line0);
-    }
-}
+import ball.annotation.Manifest;

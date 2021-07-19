@@ -1,4 +1,4 @@
-package ganymede.shell.magic;
+package ganymede.shell.builtin;
 /*-
  * ##########################################################################
  * Ganymede
@@ -19,8 +19,10 @@ package ganymede.shell.magic;
  * ##########################################################################
  */
 import ball.annotation.ServiceProviderFor;
+import ganymede.shell.Builtin;
 import ganymede.shell.Magic;
 import ganymede.shell.Shell;
+import ganymede.shell.magic.Description;
 import ganymede.util.PathPropertyMap;
 import java.io.File;
 import java.io.InputStream;
@@ -31,21 +33,23 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * {@link Classpath} {@link Magic}.  See
+ * {@link Classpath} {@link Builtin}.  See
  * {@link jdk.jshell.JShell#addToClasspath(String)}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
-@ServiceProviderFor({ Magic.class })
+@ServiceProviderFor({ Builtin.class, Magic.class })
 @Description("Add to or print JShell classpath")
 @NoArgsConstructor @ToString @Log4j2
-public class Classpath extends JShell {
+public class Classpath extends Builtin {
     private static final String SEPARATOR = System.getProperty("path.separator");
 
     @Override
     public void execute(Shell shell,
                         InputStream in, PrintStream out, PrintStream err,
-                        String line0, String code) throws Exception {
+                        Application application) throws Exception {
+        var code = application.getCode();
+
         if (! code.isBlank()) {
             var files =
                 HELPER.replacePlaceholders(code, System.getProperties())

@@ -23,7 +23,6 @@ import ganymede.dependency.Resolver;
 import ganymede.kernel.Kernel;
 import ganymede.notebook.NotebookContext;
 import ganymede.server.Message;
-import ganymede.shell.magic.AnnotatedMagic;
 import ganymede.shell.magic.Description;
 import ganymede.shell.magic.MagicNames;
 import java.io.File;
@@ -52,7 +51,6 @@ import org.apache.logging.log4j.io.IoBuilder;
 
 import static ganymede.kernel.client.KernelRestClient.PORT_PROPERTY;
 import static ganymede.notebook.NotebookContext.unescape;
-import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toMap;
 import static jdk.jshell.Snippet.Status.REJECTED;
@@ -78,13 +76,13 @@ public class Shell implements AutoCloseable {
     private final Kernel kernel;
     private Locale locale = null;       /* TBD: Query Notebook server */
     private final AtomicInteger restarts = new AtomicInteger(0);
-    private final MagicMap magics = new MagicMap(null);
     private final Java java = new Java();
+    private final BuiltinMap builtins = new BuiltinMap();
+    private final Resolver resolver = new Resolver();
     private JShell jshell = null;
     private InputStream in = null;
     private PrintStream out = null;
     private PrintStream err = null;
-    private final Resolver resolver = new Resolver();
 
     /**
      * Sole constructor.
@@ -107,11 +105,6 @@ public class Shell implements AutoCloseable {
         this.in = in;
         this.out = out;
         this.err = err;
-
-        magics.clear();
-        magics.reload();
-
-        Stream.of(java.getMagicNames()).forEach(t -> magics.put(t, java));
     }
 
     /**
@@ -137,8 +130,6 @@ public class Shell implements AutoCloseable {
     @Override
     @Synchronized
     public void close() {
-        Stream.of(java.getMagicNames()).forEach(t -> magics.remove(t));
-
         try (var jshell = this.jshell) {
             this.jshell = null;
 
@@ -154,13 +145,6 @@ public class Shell implements AutoCloseable {
      * @return  The {@link Kernel}.
      */
     public Kernel kernel() { return kernel; }
-
-    /**
-     * Method to get the {@link Map} of configured {@link Magic}s.
-     *
-     * @return  The {@link Map} of configured {@link Magic}s.
-     */
-    public Map<String,Magic> magics() { return magics; }
 
     /**
      * Method to get the {@link Resolver}.
@@ -338,12 +322,12 @@ public class Shell implements AutoCloseable {
 
             var application = new Magic.Application(code);
             var name = application.getMagicName();
-            var magic = (name != null) ? magics.reload().get(name) : java;
+            var builtin = (name != null) ? builtins.get(name) : java;
 
-            if (magic != null) {
-                application.apply(this, magic, in, out, err);
+            if (builtin != null) {
+                builtin.execute(this, in, out, err, application);
             } else {
-                application.apply(this);
+                NotebookContext.magic(this, name, application);
             }
         } catch (Exception exception) {
             exception.printStackTrace(err);
@@ -390,10 +374,10 @@ public class Shell implements AutoCloseable {
         var application = new Magic.Application(code);
         var name = application.getMagicName();
 
-        if (name == null || magics.containsKey(name)) {
-            var magic = (name != null) ? magics.get(name) : java;
+        if (name == null || builtins.containsKey(name)) {
+            var builtin = (name != null) ? builtins.get(name) : java;
 
-            completeness = magic.isComplete(application.getLine0(), application.getCode());
+            completeness = builtin.isComplete(application.getLine0(), application.getCode());
         } else {
             completeness = Message.completeness.invalid;
         }
@@ -424,16 +408,20 @@ public class Shell implements AutoCloseable {
     @MagicNames({ "java" })
     @Description("Execute code in Java REPL")
     @NoArgsConstructor @ToString
-    private class Java implements AnnotatedMagic {
+    private class Java extends Builtin {
         @Override
         public void execute(Shell shell,
                             InputStream in, PrintStream out, PrintStream err,
-                            String line0, String code) throws Exception {
+                            Application application) throws Exception {
+            var code = application.getCode();
+
             if (! code.isBlank()) {
                 execute(shell.jshell(), in, out, err, code);
             } else {
+                var line0 = application.getLine0();
+
                 if (line0 != null) {
-                    AnnotatedMagic.super.execute(shell, in, out, err, line0, code);
+                    NotebookContext.magic(shell, getMagicNames()[0], application);
                 }
             }
         }
@@ -588,8 +576,30 @@ public class Shell implements AutoCloseable {
         }
     }
 
+    private class BuiltinMap extends MagicMap {
+        private static final long serialVersionUID = 1258050942509042030L;
+
+        public BuiltinMap() {
+            super(Builtin.class, null);
+
+            reload();
+        }
+
+        @Override
+        public BuiltinMap reload() {
+            super.reload();
+
+            Stream.of(java.getMagicNames()).forEach(t -> put(t, java));
+
+            return this;
+        }
+
+        @Override
+        public Builtin get(Object key) { return (Builtin) super.get(key); }
+    }
+
     private class IncompleteParseException extends ParseException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = -2830925996685540774L;
 
         public IncompleteParseException(int offset) {
             super("Incomplete input", offset);
@@ -597,7 +607,7 @@ public class Shell implements AutoCloseable {
     }
 
     private class UnknownParseException extends ParseException {
-        private static final long serialVersionUID = 2L;
+        private static final long serialVersionUID = -336967204687913199L;
 
         public UnknownParseException(int offset) {
             super("Unknown input", offset);

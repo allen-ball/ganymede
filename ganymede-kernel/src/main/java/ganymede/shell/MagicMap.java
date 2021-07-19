@@ -31,7 +31,7 @@ import java.util.stream.Stream;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 public class MagicMap extends TreeMap<String,Magic> {
-    private static final long serialVersionUID = 6930042409603983399L;
+    private static final long serialVersionUID = -7065055117520194894L;
 
     /** @serial */ private final Consumer<Magic> initializer;
     /** @serial */ private final ServiceProviderMap<Magic> map;
@@ -39,12 +39,13 @@ public class MagicMap extends TreeMap<String,Magic> {
     /**
      * Sole constructor.
      *
+     * @param   subtype         The {@link Magic} subtype.
      * @param   initializer     The {@link Consumer} to apply to newly
      *                          allocated {@link Magic} providers.
      */
-    public MagicMap(Consumer<Magic> initializer) {
+    public MagicMap(Class<? extends Magic> subtype, Consumer<Magic> initializer) {
         this.initializer = initializer;
-        this.map = new ServiceProviderMap<>(Magic.class, this::compute);
+        this.map = new ServiceProviderMap<>(subtype.asSubclass(Magic.class), this::compute);
     }
 
     private Magic compute(ServiceLoader.Provider<Magic> provider) {

@@ -20,8 +20,6 @@ package ganymede.shell;
  */
 import ganymede.notebook.NotebookContext;
 import ganymede.server.Message;
-import java.io.InputStream;
-import java.io.PrintStream;
 import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.Data;
@@ -76,24 +74,6 @@ public interface Magic {
      * @return  The usage.
      */
     public String getUsage();
-
-    /**
-     * {@link ganymede.shell.Shell} execution method.  Default
-     * implementation sends to the {@link #execute(String,String)} method in
-     * the {@link jdk.jshell.JShell} instance.
-     *
-     * @param   shell           The {@link Shell}.
-     * @param   in              The {@code in} {@link InputStream}.
-     * @param   out             The {@code out} {@link PrintStream}.
-     * @param   err             The {@code err} {@link PrintStream}.
-     * @param   line0           The initial magic line.
-     * @param   code            The remainder of the cell.
-     */
-    default void execute(Shell shell,
-                         InputStream in, PrintStream out, PrintStream err,
-                         String line0, String code) throws Exception {
-        NotebookContext.magic(shell, getMagicNames()[0], line0, code);
-    }
 
     /**
      * Method to determine code's {@link Message.completeness completeness}.
@@ -223,28 +203,6 @@ public interface Magic {
          */
         public String getMagicName() {
             return (argv.length > 0) ? argv[0] : null;
-        }
-
-        /**
-         * Method to invoke the {@link Magic} locally.
-         *
-         * @param       shell   The {@link Shell}.
-         * @param       magic   The {@link Magic} to apply.
-         * @param       in      The {@code in} {@link InputStream}.
-         * @param       out     The {@code out} {@link PrintStream}.
-         * @param       err     The {@code err} {@link PrintStream}.
-         */
-        public void apply(Shell shell, Magic magic, InputStream in, PrintStream out, PrintStream err) throws Exception {
-            magic.execute(shell, in, out, err, getLine0(), getCode());
-        }
-
-        /**
-         * Method to invoke the {@link Magic} remotely.
-         *
-         * @param       shell   The {@link Shell}.
-         */
-        public void apply(Shell shell) {
-            NotebookContext.magic(shell, getMagicName(), getLine0(), getCode());
         }
     }
 }

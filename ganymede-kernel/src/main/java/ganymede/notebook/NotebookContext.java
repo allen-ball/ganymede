@@ -24,6 +24,7 @@ import ganymede.jupyter.notebook.model.Kernel;
 import ganymede.jupyter.notebook.model.Session;
 import ganymede.kernel.client.KernelRestClient;
 import ganymede.server.Message;
+import ganymede.shell.Magic;
 import ganymede.shell.MagicMap;
 import ganymede.shell.Shell;
 import ganymede.util.ObjectMappers;
@@ -133,7 +134,7 @@ public class NotebookContext {
      */
     public final SQL sql = new SQL();
 
-    private final MagicMap magics = new MagicMap(t -> t.configure(this));
+    private final MagicMap magics = new MagicMap(Magic.class, t -> t.configure(this));
 
     /**
      * Method to update notebook context.
@@ -172,7 +173,7 @@ public class NotebookContext {
     /**
      * Method to receive a {@link ganymede.shell.Magic} request in the
      * {@link JShell} instance.  See
-     * {@link magic(Shell,String,String,String)}.
+     * {@link magic(Shell,String,Application)}.
      *
      * @param   name            The magic name.
      * @param   line0           The initial magic line.
@@ -359,15 +360,14 @@ public class NotebookContext {
      *
      * @param   shell           The {@link Shell}.
      * @param   name            The magic name.
-     * @param   line0           The initial magic line.
-     * @param   code            The remainder of the cell.
+     * @param   application     The {@link Magic.Application} instance.
      */
-    public static void magic(Shell shell, String name, String line0, String code) {
+    public static void magic(Shell shell, String name, Magic.Application application) {
         var jshell = shell.jshell();
 
         evaluate(jshell,
                  "%1$s.magic(\"%2$s\", \"%3$s\", \"%4$s\")",
-                 NAME, name, encode(line0), encode(code));
+                 NAME, name, encode(application.getLine0()), encode(application.getCode()));
     }
 
     /**
