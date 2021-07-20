@@ -19,10 +19,10 @@ package ganymede.shell.builtin;
  * ##########################################################################
  */
 import ball.annotation.ServiceProviderFor;
+import ganymede.notebook.Description;
+import ganymede.notebook.Magic;
 import ganymede.shell.Builtin;
-import ganymede.shell.Magic;
 import ganymede.shell.Shell;
-import ganymede.shell.magic.Description;
 import ganymede.util.PathPropertyMap;
 import java.io.File;
 import java.io.InputStream;

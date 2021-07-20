@@ -1,4 +1,4 @@
-package ganymede.shell.builtin;
+package ganymede.kernel.magic;
 /*-
  * ##########################################################################
  * Ganymede
@@ -19,42 +19,50 @@ package ganymede.shell.builtin;
  * ##########################################################################
  */
 import ball.annotation.ServiceProviderFor;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import ganymede.notebook.AbstractScriptEngineMagic;
 import ganymede.notebook.Description;
 import ganymede.notebook.Magic;
-import ganymede.shell.Builtin;
-import ganymede.shell.Shell;
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.StringWriter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
+import org.apache.velocity.script.VelocityScriptEngine;
 
 /**
- * {@link POM} {@link Builtin}.
+ * {@link Velocity} {@link Magic}.
+ *
+ * @see VelocityScriptEngine
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
-@ServiceProviderFor({ Builtin.class, Magic.class })
-@Description("Define the Notebook's Project Object Model")
+@ServiceProviderFor({ Magic.class })
+@Description("Velocity template evaluator")
 @NoArgsConstructor @ToString @Log4j2
-public class POM extends Builtin {
-    @Override
-    public void execute(Shell shell,
-                        InputStream in, PrintStream out, PrintStream err,
-                        Application application) throws Exception {
-        try {
-            var code = application.getCode();
+public class Velocity extends AbstractScriptEngineMagic {
+    private final StringWriter out = new StringWriter();
 
-            if (! code.isBlank()) {
-                shell.resolve(ganymede.dependency.POM.parse(code));
-            } else {
-                shell.resolver().pom().writeTo(out);
-            }
-        } catch (JsonProcessingException exception) {
-            err.println(exception.getMessage());
-        } catch (Exception exception) {
-            exception.printStackTrace(err);
+    @Override
+    protected VelocityScriptEngine engine() {
+        return (VelocityScriptEngine) super.engine();
+    }
+
+    @Override
+    protected void execute(String code) {
+        var stdout = context.context.getWriter();
+
+        try {
+            out.getBuffer().setLength(0);
+
+            context.context.setWriter(out);
+
+            super.execute(code);
+        } finally {
+            context.context.setWriter(stdout);
         }
+    }
+
+    @Override
+    protected void render(Object object) {
+        context.print(out.toString());
     }
 }

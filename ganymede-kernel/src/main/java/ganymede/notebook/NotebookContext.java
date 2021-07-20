@@ -24,8 +24,6 @@ import ganymede.jupyter.notebook.model.Kernel;
 import ganymede.jupyter.notebook.model.Session;
 import ganymede.kernel.client.KernelRestClient;
 import ganymede.server.Message;
-import ganymede.shell.Magic;
-import ganymede.shell.MagicMap;
 import ganymede.util.ObjectMappers;
 import java.io.IOException;
 import java.io.StreamTokenizer;
@@ -106,7 +104,7 @@ public class NotebookContext {
 
     /**
      * Common {@link ScriptContext} supplied to
-     * {@link ganymede.shell.Magic#execute(String,String)}.
+     * {@link Magic#execute(String,String)}.
      */
     public final ScriptContext context =
         new SimpleScriptContext() {
@@ -132,7 +130,7 @@ public class NotebookContext {
     public final Map<String,String> types = new TreeMap<>();
 
     /**
-     * {@link ganymede.shell.magic.SQL}-specific context.
+     * {@link ganymede.kernel.magic.SQL}-specific context.
      * See {@link NotebookContext.SQL SQL}.
      */
     public final SQL sql = new SQL();
@@ -174,9 +172,8 @@ public class NotebookContext {
     public MagicMap magics() { return magics; }
 
     /**
-     * Method to receive a {@link ganymede.shell.Magic} request in the
-     * {@link JShell} instance.  See
-     * {@link #magic(JShell,String,Application)}.
+     * Method to receive a {@link Magic} request in the {@link JShell}
+     * instance.  See {@link #magic(JShell,String,Application)}.
      *
      * @param   name            The magic name.
      * @param   line0           The initial magic line.
@@ -398,8 +395,8 @@ public class NotebookContext {
     }
 
     /**
-     * Static method invoke a {@link ganymede.shell.Magic} in a
-     * {@link JShell} instance.  See {@link #magic(String,String,String)}.
+     * Static method invoke a {@link Magic} in a {@link JShell} instance.
+     * See {@link #magic(String,String,String)}.
      *
      * @param   jshell          The {@link JShell}.
      * @param   name            The magic name.
@@ -448,7 +445,7 @@ public class NotebookContext {
     }
 
     /**
-     * {@link ganymede.shell.magic.SQL}-specific context.  Implements
+     * {@link ganymede.kernel.magic.SQL}-specific context.  Implements
      * {@link Map} of JDBC URLs to {@link DSLContext}s.
      */
     @NoArgsConstructor
@@ -456,7 +453,7 @@ public class NotebookContext {
         private static final long serialVersionUID = -4901551333824542142L;
 
         /**
-         * {@link List} of most recent {@link ganymede.shell.magic.SQL}
+         * {@link List} of most recent {@link ganymede.kernel.magic.SQL}
          * {@link Query Queries}.
          *
          * @serial
@@ -464,7 +461,7 @@ public class NotebookContext {
         public final List<Query> queries = new ArrayList<>();
 
         /**
-         * {@link List} of most recent {@link ganymede.shell.magic.SQL}
+         * {@link List} of most recent {@link ganymede.kernel.magic.SQL}
          * {@link Result}s.
          *
          * @serial
@@ -472,8 +469,7 @@ public class NotebookContext {
         public final List<Result<Record>> results = new ArrayList<>();
 
         /**
-         * Target of the {@link ganymede.shell.magic.SQL}
-         * {@link ganymede.shell.Magic}.
+         * Target of the {@link ganymede.kernel.magic.SQL} {@link Magic}.
          *
          * @param       url             The JDBC URL.
          * @param       username        The JDBC Username.

@@ -1,9 +1,3 @@
-/**
- * Ganymede {@link NotebookContext} classes.
- *
- * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- */
-@Manifest.Section
 package ganymede.notebook;
 /*-
  * ##########################################################################
@@ -24,4 +18,27 @@ package ganymede.notebook;
  * limitations under the License.
  * ##########################################################################
  */
-import ball.annotation.Manifest;
+import ball.annotation.ServiceProviderFor;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import ganymede.notebook.Renderer;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+import static org.springframework.util.MimeTypeUtils.TEXT_PLAIN_VALUE;
+
+/**
+ * Default {@link Object} {@link Renderer} service provider.
+ *
+ * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
+ */
+@ServiceProviderFor({ Renderer.class })
+@ForClass(Object.class)
+@NoArgsConstructor @ToString
+public class DefaultRenderer implements Renderer {
+    @Override
+    public void renderTo(ObjectNode bundle, Object object) {
+        if (! bundle.with(DATA).has(TEXT_PLAIN_VALUE)) {
+            bundle.with(DATA).put(TEXT_PLAIN_VALUE, String.valueOf(object));
+        }
+    }
+}

@@ -18,7 +18,7 @@ package ganymede.shell;
  * limitations under the License.
  * ##########################################################################
  */
-import ganymede.shell.magic.AbstractMagic;
+import ganymede.notebook.AbstractMagic;
 import java.io.InputStream;
 import java.io.PrintStream;
 import lombok.NoArgsConstructor;
@@ -26,8 +26,8 @@ import lombok.NoArgsConstructor;
 import static lombok.AccessLevel.PROTECTED;
 
 /**
- * Abstract base class for built-in {@link ganymede.shell.Magic}s (executed
- * locally in the {@link ganymede.shell.Shell}).
+ * Abstract base class for built-in {@link ganymede.notebook.Magic}s
+ * (executed locally in the {@link ganymede.shell.Shell}).
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */

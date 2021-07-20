@@ -1,4 +1,4 @@
-package ganymede.shell.builtin;
+package ganymede.kernel.magic;
 /*-
  * ##########################################################################
  * Ganymede
@@ -19,42 +19,49 @@ package ganymede.shell.builtin;
  * ##########################################################################
  */
 import ball.annotation.ServiceProviderFor;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import ganymede.notebook.AbstractMagic;
 import ganymede.notebook.Description;
 import ganymede.notebook.Magic;
-import ganymede.shell.Builtin;
-import ganymede.shell.Shell;
-import java.io.InputStream;
-import java.io.PrintStream;
+import ganymede.notebook.MagicNames;
+import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
+import static java.lang.ProcessBuilder.Redirect.PIPE;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
- * {@link POM} {@link Builtin}.
+ * {@link Script} {@link Magic}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
-@ServiceProviderFor({ Builtin.class, Magic.class })
-@Description("Define the Notebook's Project Object Model")
+@ServiceProviderFor({ Magic.class })
+@MagicNames({ Magic.BANG, "script" })
+@Description("Execute script with the argument command")
 @NoArgsConstructor @ToString @Log4j2
-public class POM extends Builtin {
+public class Script extends AbstractMagic {
     @Override
-    public void execute(Shell shell,
-                        InputStream in, PrintStream out, PrintStream err,
-                        Application application) throws Exception {
-        try {
-            var code = application.getCode();
+    public void execute(String line0, String code) throws Exception {
+        var argv =
+            Stream.of(Magic.getCellMagicCommand(line0))
+            .skip(1)
+            .toArray(String[]::new);
+        var process =
+            new ProcessBuilder(argv)
+            .redirectInput(PIPE)
+            .redirectErrorStream(true)
+            .redirectOutput(PIPE)
+            .start();
 
-            if (! code.isBlank()) {
-                shell.resolve(ganymede.dependency.POM.parse(code));
-            } else {
-                shell.resolver().pom().writeTo(out);
+        try (var in = process.getInputStream()) {
+            try (var out = process.getOutputStream()) {
+                out.write(code.getBytes(UTF_8));
             }
-        } catch (JsonProcessingException exception) {
-            err.println(exception.getMessage());
-        } catch (Exception exception) {
-            exception.printStackTrace(err);
+
+            in.transferTo(System.out);
+
+            int status = process.waitFor();
         }
     }
 }

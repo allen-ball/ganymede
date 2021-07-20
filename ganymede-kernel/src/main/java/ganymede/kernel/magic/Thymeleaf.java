@@ -1,4 +1,4 @@
-package ganymede.shell.builtin;
+package ganymede.kernel.magic;
 /*-
  * ##########################################################################
  * Ganymede
@@ -19,42 +19,32 @@ package ganymede.shell.builtin;
  * ##########################################################################
  */
 import ball.annotation.ServiceProviderFor;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import ganymede.jsr223.ThymeleafScriptEngine;
+import ganymede.kernel.renderer.ThymeleafRenderer;
+import ganymede.notebook.AbstractScriptEngineMagic;
 import ganymede.notebook.Description;
 import ganymede.notebook.Magic;
-import ganymede.shell.Builtin;
-import ganymede.shell.Shell;
-import java.io.InputStream;
-import java.io.PrintStream;
+import ganymede.notebook.ScriptEngineName;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * {@link POM} {@link Builtin}.
+ * {@link Thymeleaf} template {@link Magic}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
-@ServiceProviderFor({ Builtin.class, Magic.class })
-@Description("Define the Notebook's Project Object Model")
+@ServiceProviderFor({ Magic.class })
+@Description("Thymeleaf template evaluator")
+@ScriptEngineName("thymeleaf")
 @NoArgsConstructor @ToString @Log4j2
-public class POM extends Builtin {
+public class Thymeleaf extends AbstractScriptEngineMagic {
     @Override
-    public void execute(Shell shell,
-                        InputStream in, PrintStream out, PrintStream err,
-                        Application application) throws Exception {
-        try {
-            var code = application.getCode();
+    protected void render(Object object) {
+        var engine = (ThymeleafScriptEngine) engine();
+        var mode = engine.getResolver().getTemplateMode();
 
-            if (! code.isBlank()) {
-                shell.resolve(ganymede.dependency.POM.parse(code));
-            } else {
-                shell.resolver().pom().writeTo(out);
-            }
-        } catch (JsonProcessingException exception) {
-            err.println(exception.getMessage());
-        } catch (Exception exception) {
-            exception.printStackTrace(err);
-        }
+        context.print(new ThymeleafRenderer.Output(mode, String.valueOf(object)));
     }
 }

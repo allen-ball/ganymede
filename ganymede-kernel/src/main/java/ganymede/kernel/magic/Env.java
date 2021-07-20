@@ -1,4 +1,4 @@
-package ganymede.shell.builtin;
+package ganymede.kernel.magic;
 /*-
  * ##########################################################################
  * Ganymede
@@ -19,42 +19,37 @@ package ganymede.shell.builtin;
  * ##########################################################################
  */
 import ball.annotation.ServiceProviderFor;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import ganymede.notebook.AbstractPropertiesMagic;
 import ganymede.notebook.Description;
 import ganymede.notebook.Magic;
-import ganymede.shell.Builtin;
-import ganymede.shell.Shell;
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.util.Properties;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * {@link POM} {@link Builtin}.
+ * {@link Env} {@link Magic}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
-@ServiceProviderFor({ Builtin.class, Magic.class })
-@Description("Define the Notebook's Project Object Model")
+@ServiceProviderFor({ Magic.class })
+@Description("Add/Update or print the environment")
 @NoArgsConstructor @ToString @Log4j2
-public class POM extends Builtin {
+public class Env extends AbstractPropertiesMagic {
     @Override
-    public void execute(Shell shell,
-                        InputStream in, PrintStream out, PrintStream err,
-                        Application application) throws Exception {
-        try {
-            var code = application.getCode();
+    public void execute(String line0, String code) throws Exception {
+        if (! code.isBlank()) {
+            var properties = compile(code);
 
-            if (! code.isBlank()) {
-                shell.resolve(ganymede.dependency.POM.parse(code));
-            } else {
-                shell.resolver().pom().writeTo(out);
+            for (var entry : properties.entrySet()) {
+                throw new UnsupportedOperationException(System.getProperty("os.name")
+                                                        + ": Cannot set " + entry);
             }
-        } catch (JsonProcessingException exception) {
-            err.println(exception.getMessage());
-        } catch (Exception exception) {
-            exception.printStackTrace(err);
+        } else {
+            var properties = new Properties();
+
+            properties.putAll(System.getenv());
+            properties.store(System.out, null);
         }
     }
 }

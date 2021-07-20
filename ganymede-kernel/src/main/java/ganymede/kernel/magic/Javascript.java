@@ -1,4 +1,4 @@
-package ganymede.shell.builtin;
+package ganymede.kernel.magic;
 /*-
  * ##########################################################################
  * Ganymede
@@ -19,42 +19,24 @@ package ganymede.shell.builtin;
  * ##########################################################################
  */
 import ball.annotation.ServiceProviderFor;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import ganymede.notebook.AbstractScriptEngineMagic;
 import ganymede.notebook.Description;
+import ganymede.notebook.Extensions;
 import ganymede.notebook.Magic;
-import ganymede.shell.Builtin;
-import ganymede.shell.Shell;
-import java.io.InputStream;
-import java.io.PrintStream;
+import ganymede.notebook.MagicNames;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * {@link POM} {@link Builtin}.
+ * {@link Javascript} {@link Magic}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
-@ServiceProviderFor({ Builtin.class, Magic.class })
-@Description("Define the Notebook's Project Object Model")
+@ServiceProviderFor({ Magic.class })
+@MagicNames({ "javascript", "js" })
+@Description("Execute code in javascript REPL")
+@Extensions({ "js" })
 @NoArgsConstructor @ToString @Log4j2
-public class POM extends Builtin {
-    @Override
-    public void execute(Shell shell,
-                        InputStream in, PrintStream out, PrintStream err,
-                        Application application) throws Exception {
-        try {
-            var code = application.getCode();
-
-            if (! code.isBlank()) {
-                shell.resolve(ganymede.dependency.POM.parse(code));
-            } else {
-                shell.resolver().pom().writeTo(out);
-            }
-        } catch (JsonProcessingException exception) {
-            err.println(exception.getMessage());
-        } catch (Exception exception) {
-            exception.printStackTrace(err);
-        }
-    }
+public class Javascript extends AbstractScriptEngineMagic {
 }

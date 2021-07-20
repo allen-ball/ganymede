@@ -1,10 +1,10 @@
 /**
- * Ganymede {@link NotebookContext} classes.
+ * {@link ganymede.notebook.Magic} service provider classes.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 @Manifest.Section
-package ganymede.notebook;
+package ganymede.kernel.magic;
 /*-
  * ##########################################################################
  * Ganymede
