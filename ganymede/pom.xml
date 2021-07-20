@@ -233,6 +233,18 @@
               </excludes>
             </filter>
             <filter>
+              <artifact>org.jetbrains.kotlin:kotlin-reflect</artifact>
+              <excludes>
+                <exclude>**/*.kotlin_module</exclude>
+              </excludes>
+            </filter>
+            <filter>
+              <artifact>org.jetbrains.kotlin:kotlin-stdlib</artifact>
+              <excludes>
+                <exclude>**/*.kotlin_builtins</exclude>
+              </excludes>
+            </filter>
+            <filter>
               <artifact>*:*</artifact>
               <excludes>
                 <exclude>META-INF/*.DSA</exclude>
