@@ -22,6 +22,7 @@ import ganymede.notebook.NotebookContext;
 import ganymede.server.Message;
 import java.util.Optional;
 import java.util.stream.Stream;
+import jdk.jshell.JShell;
 import lombok.Data;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 
@@ -86,14 +87,14 @@ public interface Magic {
     public Message.completeness isComplete(String line0, String code);
 
     /**
-     * {@link jdk.jshell.JShell} configuation method.
+     * {@link JShell} configuation method.
      *
      * @param   context         The {@link NotebookContext}.
      */
     public void configure(NotebookContext context);
 
     /**
-     * {@link jdk.jshell.JShell} execution method.
+     * {@link JShell} execution method.
      *
      * @param   line0           The initial magic line.
      * @param   code            The remainder of the cell.

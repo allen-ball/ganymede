@@ -51,10 +51,7 @@ import org.apache.logging.log4j.io.IoBuilder;
 
 import static ganymede.kernel.client.KernelRestClient.PORT_PROPERTY;
 import static ganymede.notebook.NotebookContext.unescape;
-import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.toMap;
 import static jdk.jshell.Snippet.Status.REJECTED;
-import static jdk.jshell.Snippet.SubKind.TEMP_VAR_EXPRESSION_SUBKIND;
 import static org.apache.logging.log4j.Level.WARN;
 
 /**
@@ -228,11 +225,7 @@ public class Shell implements AutoCloseable {
         var jshell = this.jshell;
 
         if (jshell != null) {
-            imports =
-                jshell.imports()
-                .map(t -> t.source())
-                .map(String::strip)
-                .collect(toCollection(LinkedHashSet::new));
+            imports = NotebookContext.imports(jshell);
         }
 
         return imports;
@@ -250,10 +243,7 @@ public class Shell implements AutoCloseable {
         var jshell = this.jshell;
 
         if (jshell != null) {
-            variables =
-                jshell.variables()
-                .filter(t -> (! t.subKind().equals(TEMP_VAR_EXPRESSION_SUBKIND)))
-                .collect(toMap(k -> k.name(), v -> v.typeName()));
+            variables = NotebookContext.variables(jshell);
         }
 
         return variables;
@@ -317,8 +307,10 @@ public class Shell implements AutoCloseable {
      * @param   code            The code to execute.
      */
     public void execute(String code) {
+        var jshell = jshell();
+
         try {
-            NotebookContext.preExecute(this);
+            NotebookContext.preExecute(jshell);
 
             var application = new Magic.Application(code);
             var name = application.getMagicName();
@@ -327,12 +319,12 @@ public class Shell implements AutoCloseable {
             if (builtin != null) {
                 builtin.execute(this, in, out, err, application);
             } else {
-                NotebookContext.magic(this, name, application);
+                NotebookContext.magic(jshell, name, application);
             }
         } catch (Exception exception) {
             exception.printStackTrace(err);
         } finally {
-            NotebookContext.postExecute(this);
+            NotebookContext.postExecute(jshell);
         }
     }
 
@@ -421,7 +413,7 @@ public class Shell implements AutoCloseable {
                 var line0 = application.getLine0();
 
                 if (line0 != null) {
-                    NotebookContext.magic(shell, getMagicNames()[0], application);
+                    NotebookContext.magic(jshell(), getMagicNames()[0], application);
                 }
             }
         }

@@ -26,7 +26,6 @@ import ganymede.kernel.client.KernelRestClient;
 import ganymede.server.Message;
 import ganymede.shell.Magic;
 import ganymede.shell.MagicMap;
-import ganymede.shell.Shell;
 import ganymede.util.ObjectMappers;
 import java.io.IOException;
 import java.io.StreamTokenizer;
@@ -37,9 +36,11 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -58,11 +59,13 @@ import org.jooq.impl.DSL;
 
 import static java.lang.reflect.Modifier.isPublic;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toMap;
+import static jdk.jshell.Snippet.SubKind.TEMP_VAR_EXPRESSION_SUBKIND;
 
 /**
- * {@link NotebookContext} for {@link Notebook} {@link Shell}
- * {@link JShell} instance.  Bound to {@value #NAME} in the {@link JShell}
- * instance.
+ * {@link NotebookContext} for {@link Notebook} {@link JShell} instance
+ * (bound to {@value #NAME}).
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
@@ -173,7 +176,7 @@ public class NotebookContext {
     /**
      * Method to receive a {@link ganymede.shell.Magic} request in the
      * {@link JShell} instance.  See
-     * {@link magic(Shell,String,Application)}.
+     * {@link #magic(JShell,String,Application)}.
      *
      * @param   name            The magic name.
      * @param   line0           The initial magic line.
@@ -318,17 +321,58 @@ public class NotebookContext {
     }
 
     /**
-     * Static method used by the {@link Shell} REPL to update the
-     * {@link NotebookContext} instance before execution.
+     * Static method to get the current imports.
      *
-     * @param   shell           The {@link Shell}.
+     * @param   jshell          The {@link JShell}.
+     *
+     * @return  The {@link Set} of imports as {@link String}s.
      */
-    public static void preExecute(Shell shell) {
-        var jshell = shell.jshell();
+    public static Set<String> imports(JShell jshell) {
+        var imports = Set.<String>of();
 
+        if (jshell != null) {
+            imports =
+                jshell.imports()
+                .map(t -> t.source())
+                .map(String::strip)
+                .collect(toCollection(LinkedHashSet::new));
+        }
+
+        return imports;
+    }
+
+    /**
+     * Static method to get the current {@link Map} of defined variables to
+     * their type definitions.
+     *
+     * @param   jshell          The {@link JShell}.
+     *
+     * @return  The {@link Map} of defined variables and their types as
+     *          {@link String}s.
+     */
+    public static Map<String,String> variables(JShell jshell) {
+        var variables = Map.<String,String>of();
+
+        if (jshell != null) {
+            variables =
+                jshell.variables()
+                .filter(t -> (! t.subKind().equals(TEMP_VAR_EXPRESSION_SUBKIND)))
+                .collect(toMap(k -> k.name(), v -> v.typeName()));
+        }
+
+        return variables;
+    }
+
+    /**
+     * Static method used by the {@link ganymede.shell.Shell} REPL to update
+     * the {@link NotebookContext} instance before execution.
+     *
+     * @param   jshell          The {@link JShell}.
+     */
+    public static void preExecute(JShell jshell) {
         evaluate(jshell, "%1$s.refresh()", NAME);
 
-        var variables = shell.variables();
+        var variables = variables(jshell);
 
         for (var entry : variables.entrySet()) {
             evaluate(jshell,
@@ -338,13 +382,12 @@ public class NotebookContext {
     }
 
     /**
-     * Static method used by the {@link Shell} REPL to update the
-     * {@link Shell} and {@link JShell} after execution.
+     * Static method used by the {@link ganymede.shell.Shell} REPL to update
+     * the {@link NotebookContext} after execution.
      *
-     * @param   shell           The {@link Shell}.
+     * @param   jshell          The {@link JShell}.
      */
-    public static void postExecute(Shell shell) {
-        /* var jshell = shell.jshell(); */
+    public static void postExecute(JShell jshell) {
     }
 
     private static String evaluate(JShell jshell, String expression, Object... argv) {
@@ -358,13 +401,11 @@ public class NotebookContext {
      * Static method invoke a {@link ganymede.shell.Magic} in a
      * {@link JShell} instance.  See {@link #magic(String,String,String)}.
      *
-     * @param   shell           The {@link Shell}.
+     * @param   jshell          The {@link JShell}.
      * @param   name            The magic name.
      * @param   application     The {@link Magic.Application} instance.
      */
-    public static void magic(Shell shell, String name, Magic.Application application) {
-        var jshell = shell.jshell();
-
+    public static void magic(JShell jshell, String name, Magic.Application application) {
         evaluate(jshell,
                  "%1$s.magic(\"%2$s\", \"%3$s\", \"%4$s\")",
                  NAME, name, encode(application.getLine0()), encode(application.getCode()));
