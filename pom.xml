@@ -284,6 +284,7 @@
     <module>ganymede</module>
     <module>ganymede-client</module>
     <module>ganymede-kernel</module>
+    <module>ganymede-notebook</module>
     <module>jupyter-client</module>
   </modules>
   <build>

@@ -23,7 +23,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <name>Ganymede Kernel</name>
+  <name>Ganymede Jupyter Kernel</name>
   <groupId>ganymede</groupId>
   <artifactId>ganymede-kernel</artifactId>
   <packaging>jar</packaging>
@@ -39,7 +39,7 @@
   <dependencies verbose="true">
     <dependency>
       <groupId>ganymede</groupId>
-      <artifactId>ganymede-client</artifactId>
+      <artifactId>ganymede-notebook</artifactId>
       <version>${project.version}</version>
       <exclusions>
         <!-- Integrated in org.apache.velocity:velocity-engine-core -->
@@ -208,20 +208,6 @@
     <dependency>
       <groupId>org.freemarker</groupId>
       <artifactId>freemarker</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jooq</groupId>
-      <artifactId>jooq</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.xml.bind</groupId>
-          <artifactId>jaxb-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.jooq</groupId>
-      <artifactId>jooq-meta</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
