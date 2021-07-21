@@ -305,28 +305,17 @@
 <span class="sourceLineNo">296</span><a id="line.296">        }</a>
 <span class="sourceLineNo">297</span><a id="line.297"></a>
 <span class="sourceLineNo">298</span><a id="line.298">        @Override</a>
-<span class="sourceLineNo">299</span><a id="line.299">        public void connect(Connection connection, String address) {</a>
-<span class="sourceLineNo">300</span><a id="line.300">            boolean isStarting = getDispatcherQueue().isEmpty();</a>
-<span class="sourceLineNo">301</span><a id="line.301"></a>
-<span class="sourceLineNo">302</span><a id="line.302">            super.connect(connection, address);</a>
-<span class="sourceLineNo">303</span><a id="line.303"></a>
-<span class="sourceLineNo">304</span><a id="line.304">            if (isStarting) {</a>
-<span class="sourceLineNo">305</span><a id="line.305">                iopub.pub(Message.status(Message.status.starting, null));</a>
+<span class="sourceLineNo">299</span><a id="line.299">        protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, Message message) {</a>
+<span class="sourceLineNo">300</span><a id="line.300">            try {</a>
+<span class="sourceLineNo">301</span><a id="line.301">                iopub.pub(message.status(Message.status.busy));</a>
+<span class="sourceLineNo">302</span><a id="line.302"></a>
+<span class="sourceLineNo">303</span><a id="line.303">                super.dispatch(dispatcher, socket, message);</a>
+<span class="sourceLineNo">304</span><a id="line.304">            } finally {</a>
+<span class="sourceLineNo">305</span><a id="line.305">                iopub.pub(message.status(Message.status.idle));</a>
 <span class="sourceLineNo">306</span><a id="line.306">            }</a>
 <span class="sourceLineNo">307</span><a id="line.307">        }</a>
-<span class="sourceLineNo">308</span><a id="line.308"></a>
-<span class="sourceLineNo">309</span><a id="line.309">        @Override</a>
-<span class="sourceLineNo">310</span><a id="line.310">        protected void dispatch(Dispatcher dispatcher, ZMQ.Socket socket, Message message) {</a>
-<span class="sourceLineNo">311</span><a id="line.311">            try {</a>
-<span class="sourceLineNo">312</span><a id="line.312">                iopub.pub(message.status(Message.status.busy));</a>
-<span class="sourceLineNo">313</span><a id="line.313"></a>
-<span class="sourceLineNo">314</span><a id="line.314">                super.dispatch(dispatcher, socket, message);</a>
-<span class="sourceLineNo">315</span><a id="line.315">            } finally {</a>
-<span class="sourceLineNo">316</span><a id="line.316">                iopub.pub(message.status(Message.status.idle));</a>
-<span class="sourceLineNo">317</span><a id="line.317">            }</a>
-<span class="sourceLineNo">318</span><a id="line.318">        }</a>
-<span class="sourceLineNo">319</span><a id="line.319">    }</a>
-<span class="sourceLineNo">320</span><a id="line.320">}</a>
+<span class="sourceLineNo">308</span><a id="line.308">    }</a>
+<span class="sourceLineNo">309</span><a id="line.309">}</a>
 
 
 

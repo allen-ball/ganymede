@@ -12,9 +12,10 @@ ganymede.kernel
 ganymede.kernel.client
 ganymede.kernel.client.api
 ganymede.kernel.client.model
+ganymede.kernel.magic
+ganymede.kernel.renderer
 ganymede.notebook
 ganymede.server
-ganymede.server.renderer
 ganymede.shell
-ganymede.shell.magic
+ganymede.shell.builtin
 ganymede.util
