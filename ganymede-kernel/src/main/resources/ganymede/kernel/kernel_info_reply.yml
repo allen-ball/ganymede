@@ -16,3 +16,5 @@ content:
       url: "https://github.com/allen-ball/ganymede"
     - text: "Ganymede API Javadoc"
       url: "https://allen-ball.github.io/ganymede/index.html?overview-summary.html"
+    - text: "Java SE 11 & JDK 11"
+      url: "https://docs.oracle.com/en/java/javase/11/docs/api/"

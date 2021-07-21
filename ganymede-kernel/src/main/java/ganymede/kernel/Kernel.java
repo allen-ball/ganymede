@@ -91,7 +91,7 @@ public class Kernel extends Server implements KernelApi,
     private final ObjectNode kernel_info_reply_content;
 
     {
-        try (var in = getClass().getResourceAsStream("kernel_info_reply.yaml")) {
+        try (var in = getClass().getResourceAsStream("kernel_info_reply.yml")) {
             kernel_info_reply_content = (ObjectNode) ObjectMappers.YAML.readTree(in).with("content");
             kernel_info_reply_content.put("protocol_version", PROTOCOL_VERSION.toString());
         } catch (Exception exception) {
