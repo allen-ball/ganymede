@@ -19,7 +19,6 @@ package ganymede.notebook;
  * ##########################################################################
  */
 import ganymede.notebook.NotebookContext;
-import ganymede.server.Message;
 import java.util.Optional;
 import java.util.stream.Stream;
 import jdk.jshell.JShell;
@@ -77,14 +76,19 @@ public interface Magic {
     public String getUsage();
 
     /**
-     * Method to determine code's {@link Message.completeness completeness}.
+     * Return result of {@link #isComplete(String,String)}.
+     */
+    public enum completeness { complete, incomplete, invalid, unknown };
+
+    /**
+     * Method to determine code's {@link completeness}.
      *
      * @param   line0           The initial magic line.
      * @param   code            The code to execute.
      *
-     * @return  The code's {@link Message.completeness completeness}.
+     * @return  The code's {@link completeness}.
      */
-    public Message.completeness isComplete(String line0, String code);
+    public completeness isComplete(String line0, String code);
 
     /**
      * {@link JShell} configuation method.

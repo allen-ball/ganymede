@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.io.PrintStreamBuffer;
+import ganymede.notebook.Magic;
 import ganymede.notebook.Renderer;
 import ganymede.util.ObjectMappers;
 import java.util.Collections;
@@ -210,19 +211,13 @@ public class Message {
     }
 
     /**
-     * Parameter to {@link Message#status(Message.completeness)}.
-     */
-    public enum completeness { complete, incomplete, invalid, unknown };
-
-    /**
-     * Method to set status for a code {@link completeness completeness}
-     * test.
+     * Method to set status for a code {@link Magic.completeness} test.
      *
-     * @param   completeness    The {@link completeness}.
+     * @param   completeness    The {@link Magic.completeness}.
      *
      * @return  {@link.this} {@link Message} for chaining.
      */
-    public Message status(completeness completeness) {
+    public Message status(Magic.completeness completeness) {
         content().put("status", completeness.name());
 
         return this;

@@ -19,7 +19,6 @@ package ganymede.notebook;
  * ##########################################################################
  */
 import ganymede.notebook.NotebookContext;
-import ganymede.server.Message;
 import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
 import org.springframework.util.PropertyPlaceholderHelper;
@@ -45,8 +44,8 @@ public abstract class AbstractMagic implements AnnotatedMagic {
         new PropertyPlaceholderHelper("${", "}", ":", true);
 
     @Override
-    public Message.completeness isComplete(String line0, String code) {
-        return Message.completeness.complete;
+    public completeness isComplete(String line0, String code) {
+        return completeness.complete;
     }
 
     @Override

@@ -21,6 +21,7 @@ package ganymede.server;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.io.PrintStreamBuffer;
 import ganymede.jupyter.NotebookServicesClient;
+import ganymede.notebook.Magic;
 import ganymede.util.ObjectMappers;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -159,14 +160,13 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
     protected abstract String evaluate(String expression) throws Exception;
 
     /**
-     * Method to determine code's
-     * {@link Message.completeness completeness}.
+     * Method to determine code's {@link Magic.completeness completeness}.
      *
      * @param   code            The cell code to execute.
      *
-     * @return  The {@link Message.completeness completeness}.
+     * @return  The {@link Magic.completeness completeness}.
      */
-    protected abstract Message.completeness isComplete(String code) throws Exception;
+    protected abstract Magic.completeness isComplete(String code) throws Exception;
 
     /**
      * Method to interrupt a kernel.

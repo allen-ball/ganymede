@@ -357,14 +357,14 @@ public class Shell implements AutoCloseable {
     }
 
     /**
-     * Method to determine code's {@link Message.completeness completeness}.
+     * Method to determine code's {@link Magic.completeness completeness}.
      *
      * @param   code            The code to execute.
      *
-     * @return  The code's {@link Message.completeness completeness}.
+     * @return  The code's {@link Magic.completeness completeness}.
      */
-    public Message.completeness isComplete(String code) {
-        var completeness = Message.completeness.unknown;
+    public Magic.completeness isComplete(String code) {
+        var completeness = Magic.completeness.unknown;
         var application = new Magic.Application(code);
         var name = application.getMagicName();
 
@@ -373,7 +373,7 @@ public class Shell implements AutoCloseable {
 
             completeness = builtin.isComplete(application.getLine0(), application.getCode());
         } else {
-            completeness = Message.completeness.invalid;
+            completeness = Magic.completeness.invalid;
         }
 
         return completeness;
@@ -421,8 +421,8 @@ public class Shell implements AutoCloseable {
         }
 
         @Override
-        public Message.completeness isComplete(String line0, String code) {
-            var completeness = Message.completeness.unknown;
+        public completeness isComplete(String line0, String code) {
+            var completeness = Magic.completeness.unknown;
 
             if (! code.isBlank()) {
                 var jshell = Shell.this.jshell;
@@ -430,16 +430,16 @@ public class Shell implements AutoCloseable {
                 if (jshell != null) {
                     try {
                         if (! parse(jshell, code).isEmpty()) {
-                            completeness = Message.completeness.complete;
+                            completeness = Magic.completeness.complete;
                         } else {
-                            completeness = Message.completeness.incomplete;
+                            completeness = Magic.completeness.incomplete;
                         }
                     } catch (ParseException exception) {
-                        completeness = Message.completeness.incomplete;
+                        completeness = Magic.completeness.incomplete;
                     }
                 }
             } else {
-                completeness = Message.completeness.incomplete;
+                completeness = Magic.completeness.incomplete;
             }
 
             return completeness;

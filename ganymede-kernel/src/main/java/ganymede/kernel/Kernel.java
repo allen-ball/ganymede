@@ -20,6 +20,7 @@ package ganymede.kernel;
  */
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import ganymede.notebook.Magic;
 import ganymede.server.Message;
 import ganymede.server.Server;
 import ganymede.shell.Shell;
@@ -178,7 +179,7 @@ public class Kernel extends Server implements KernelApi,
     }
 
     @Override
-    protected Message.completeness isComplete(String code) throws Exception {
+    protected Magic.completeness isComplete(String code) throws Exception {
         return shell.isComplete(code);
     }
 
