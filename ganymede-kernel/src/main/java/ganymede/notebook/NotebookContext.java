@@ -23,7 +23,6 @@ import ganymede.jupyter.NotebookServicesClient;
 import ganymede.jupyter.notebook.model.Kernel;
 import ganymede.jupyter.notebook.model.Session;
 import ganymede.kernel.client.KernelRestClient;
-import ganymede.server.Message;
 import ganymede.util.ObjectMappers;
 import java.io.IOException;
 import java.io.StreamTokenizer;
@@ -201,7 +200,7 @@ public class NotebookContext {
     @NotebookFunction
     public void display(Object object) {
         try {
-            krc.display(Message.mime_bundle(object));
+            krc.display(Renderer.MAP.render(object));
         } catch (Exception exception) {
             System.out.println(object);
             exception.printStackTrace(System.err);
@@ -216,7 +215,7 @@ public class NotebookContext {
     @NotebookFunction
     public void print(Object object) {
         try {
-            krc.print(Message.mime_bundle(object));
+            krc.print(Renderer.MAP.render(object));
         } catch (Exception exception) {
             System.out.println(object);
             exception.printStackTrace(System.err);
