@@ -31,7 +31,7 @@
   <parent>
     <groupId>ball</groupId>
     <artifactId>parent</artifactId>
-    <version>20210625.0</version>
+    <version>20210722.0</version>
     <relativePath/>
   </parent>
   <organization>
@@ -107,14 +107,13 @@
     <notebook.services.version>v6.4.0</notebook.services.version>
     <notebook.services.spec>https://github.com/jupyter/notebook/raw/${notebook.services.version}/notebook/services/api/api.yaml</notebook.services.spec>
 
+    <openapi-generator-maven-plugin.version>5.2.0</openapi-generator-maven-plugin.version>
+
     <commonmark.version>0.18.0</commonmark.version>
     <graal-sdk.version>0.33</graal-sdk.version>
     <jackson-bom.version>2.10.5.20201202</jackson-bom.version>
     <jeromq.version>0.5.2</jeromq.version>
     <jetty.version>10.0.6</jetty.version>
-    <kotlin.version>1.5.21</kotlin.version>
-    <kotlin-coroutines.version>1.5.1</kotlin-coroutines.version>
-    <postgresql.version>42.2.23</postgresql.version>
     <scala.binary.version>2.12</scala.binary.version>
     <scala.version>${scala.binary.version}.10</scala.version>
     <spark.version>3.1.2</spark.version>
@@ -533,7 +532,7 @@
         <plugin>
           <groupId>org.openapitools</groupId>
 	  <artifactId>openapi-generator-maven-plugin</artifactId>
-	  <version>5.2.0</version>
+	  <version>${openapi-generator-maven-plugin.version}</version>
         </plugin>
       </plugins>
     </pluginManagement>
