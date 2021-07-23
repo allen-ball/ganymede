@@ -27,108 +27,109 @@
 <span class="sourceLineNo">018</span><a id="line.18"> * limitations under the License.</a>
 <span class="sourceLineNo">019</span><a id="line.19"> * ##########################################################################</a>
 <span class="sourceLineNo">020</span><a id="line.20"> */</a>
-<span class="sourceLineNo">021</span><a id="line.21">import ball.annotation.ServiceProviderFor;</a>
-<span class="sourceLineNo">022</span><a id="line.22">import ganymede.notebook.AbstractPropertiesMagic;</a>
-<span class="sourceLineNo">023</span><a id="line.23">import ganymede.notebook.Description;</a>
-<span class="sourceLineNo">024</span><a id="line.24">import ganymede.notebook.Magic;</a>
-<span class="sourceLineNo">025</span><a id="line.25">import ganymede.notebook.MagicNames;</a>
-<span class="sourceLineNo">026</span><a id="line.26">import lombok.Data;</a>
-<span class="sourceLineNo">027</span><a id="line.27">import lombok.NoArgsConstructor;</a>
-<span class="sourceLineNo">028</span><a id="line.28">import lombok.ToString;</a>
-<span class="sourceLineNo">029</span><a id="line.29">import lombok.extern.log4j.Log4j2;</a>
-<span class="sourceLineNo">030</span><a id="line.30">import org.apache.spark.SparkConf;</a>
-<span class="sourceLineNo">031</span><a id="line.31">import picocli.CommandLine.Command;</a>
-<span class="sourceLineNo">032</span><a id="line.32">import picocli.CommandLine.Option;</a>
-<span class="sourceLineNo">033</span><a id="line.33">import picocli.CommandLine.ParameterException;</a>
-<span class="sourceLineNo">034</span><a id="line.34">import picocli.CommandLine.Parameters;</a>
-<span class="sourceLineNo">035</span><a id="line.35"></a>
-<span class="sourceLineNo">036</span><a id="line.36">import static org.apache.spark.sql.SparkSession.builder;</a>
-<span class="sourceLineNo">037</span><a id="line.37">import static org.apache.spark.sql.SparkSession.getDefaultSession;</a>
-<span class="sourceLineNo">038</span><a id="line.38">import static org.apache.spark.sql.SparkSession.setActiveSession;</a>
-<span class="sourceLineNo">039</span><a id="line.39">import static org.apache.spark.sql.SparkSession.setDefaultSession;</a>
-<span class="sourceLineNo">040</span><a id="line.40"></a>
-<span class="sourceLineNo">041</span><a id="line.41">/**</a>
-<span class="sourceLineNo">042</span><a id="line.42"> * {@link SparkSession} {@link Magic}.</a>
-<span class="sourceLineNo">043</span><a id="line.43"> *</a>
-<span class="sourceLineNo">044</span><a id="line.44"> * @see org.apache.spark.sql.SparkSession</a>
-<span class="sourceLineNo">045</span><a id="line.45"> *</a>
-<span class="sourceLineNo">046</span><a id="line.46"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
-<span class="sourceLineNo">047</span><a id="line.47"> */</a>
-<span class="sourceLineNo">048</span><a id="line.48">@ServiceProviderFor({ Magic.class })</a>
-<span class="sourceLineNo">049</span><a id="line.49">@MagicNames({ "spark-session" })</a>
-<span class="sourceLineNo">050</span><a id="line.50">@Description("Configure and start a Spark session")</a>
-<span class="sourceLineNo">051</span><a id="line.51">@NoArgsConstructor @ToString @Log4j2</a>
-<span class="sourceLineNo">052</span><a id="line.52">public class SparkSession extends AbstractPropertiesMagic {</a>
-<span class="sourceLineNo">053</span><a id="line.53">    @Override</a>
-<span class="sourceLineNo">054</span><a id="line.54">    public void execute(String line0, String code) throws Exception {</a>
-<span class="sourceLineNo">055</span><a id="line.55">        try {</a>
-<span class="sourceLineNo">056</span><a id="line.56">            var argv = Magic.getCellMagicCommand(line0);</a>
-<span class="sourceLineNo">057</span><a id="line.57">            var arguments = new Arguments();</a>
-<span class="sourceLineNo">058</span><a id="line.58"></a>
-<span class="sourceLineNo">059</span><a id="line.59">            parse(argv, arguments);</a>
-<span class="sourceLineNo">060</span><a id="line.60"></a>
-<span class="sourceLineNo">061</span><a id="line.61">            var config = new SparkConf();</a>
-<span class="sourceLineNo">062</span><a id="line.62"></a>
-<span class="sourceLineNo">063</span><a id="line.63">            compile(code).entrySet().stream()</a>
-<span class="sourceLineNo">064</span><a id="line.64">                .forEach(t -&gt; config.set(t.getKey().toString(),</a>
-<span class="sourceLineNo">065</span><a id="line.65">                                         String.valueOf(t.getValue())));</a>
-<span class="sourceLineNo">066</span><a id="line.66"></a>
-<span class="sourceLineNo">067</span><a id="line.67">            if (arguments.getMaster() != null) {</a>
-<span class="sourceLineNo">068</span><a id="line.68">                config.setMaster(arguments.getMaster());</a>
-<span class="sourceLineNo">069</span><a id="line.69">            }</a>
-<span class="sourceLineNo">070</span><a id="line.70"></a>
-<span class="sourceLineNo">071</span><a id="line.71">            if (arguments.getAppName() != null) {</a>
-<span class="sourceLineNo">072</span><a id="line.72">                config.setAppName(arguments.getAppName());</a>
-<span class="sourceLineNo">073</span><a id="line.73">            }</a>
-<span class="sourceLineNo">074</span><a id="line.74"></a>
-<span class="sourceLineNo">075</span><a id="line.75">            var builder = builder().config(config);</a>
-<span class="sourceLineNo">076</span><a id="line.76"></a>
-<span class="sourceLineNo">077</span><a id="line.77">            if (arguments.isEnableHiveIfAvailable()) {</a>
-<span class="sourceLineNo">078</span><a id="line.78">                try {</a>
-<span class="sourceLineNo">079</span><a id="line.79">                    builder.enableHiveSupport();</a>
-<span class="sourceLineNo">080</span><a id="line.80">                } catch (Exception exception) {</a>
-<span class="sourceLineNo">081</span><a id="line.81">                    System.err.println(exception.getMessage());</a>
-<span class="sourceLineNo">082</span><a id="line.82">                }</a>
-<span class="sourceLineNo">083</span><a id="line.83">            }</a>
-<span class="sourceLineNo">084</span><a id="line.84"></a>
-<span class="sourceLineNo">085</span><a id="line.85">            var session = builder.getOrCreate();</a>
-<span class="sourceLineNo">086</span><a id="line.86"></a>
-<span class="sourceLineNo">087</span><a id="line.87">            if (getDefaultSession().isEmpty()) {</a>
-<span class="sourceLineNo">088</span><a id="line.88">                setDefaultSession(session);</a>
-<span class="sourceLineNo">089</span><a id="line.89">            }</a>
-<span class="sourceLineNo">090</span><a id="line.90"></a>
-<span class="sourceLineNo">091</span><a id="line.91">            setActiveSession(session);</a>
-<span class="sourceLineNo">092</span><a id="line.92"></a>
-<span class="sourceLineNo">093</span><a id="line.93">            context.display(session);</a>
-<span class="sourceLineNo">094</span><a id="line.94">        } catch (ParameterException exception) {</a>
-<span class="sourceLineNo">095</span><a id="line.95">            System.err.println(exception.getMessage());</a>
-<span class="sourceLineNo">096</span><a id="line.96">            System.err.println();</a>
-<span class="sourceLineNo">097</span><a id="line.97">            exception.getCommandLine().usage(System.err);</a>
-<span class="sourceLineNo">098</span><a id="line.98">        } catch (NoClassDefFoundError error) {</a>
-<span class="sourceLineNo">099</span><a id="line.99">            System.err.format("Apache Spark not found on classpath: %s:\n", error);</a>
-<span class="sourceLineNo">100</span><a id="line.100">        } catch (Throwable throwable) {</a>
-<span class="sourceLineNo">101</span><a id="line.101">            throwable.printStackTrace(System.err);</a>
-<span class="sourceLineNo">102</span><a id="line.102">        }</a>
-<span class="sourceLineNo">103</span><a id="line.103">    }</a>
-<span class="sourceLineNo">104</span><a id="line.104"></a>
-<span class="sourceLineNo">105</span><a id="line.105">    @Override</a>
-<span class="sourceLineNo">106</span><a id="line.106">    public String getUsage() { return getUsage(new Arguments()); }</a>
-<span class="sourceLineNo">107</span><a id="line.107"></a>
-<span class="sourceLineNo">108</span><a id="line.108">    @Command @Data</a>
-<span class="sourceLineNo">109</span><a id="line.109">    private class Arguments {</a>
-<span class="sourceLineNo">110</span><a id="line.110">        @Parameters(description = { "Spark master" },</a>
-<span class="sourceLineNo">111</span><a id="line.111">                    index = "0", arity = "0..1")</a>
-<span class="sourceLineNo">112</span><a id="line.112">        private String master = null;</a>
-<span class="sourceLineNo">113</span><a id="line.113"></a>
-<span class="sourceLineNo">114</span><a id="line.114">        @Parameters(description = { "Spark appName" },</a>
-<span class="sourceLineNo">115</span><a id="line.115">                    index = "1", arity = "0..1", defaultValue = "root")</a>
-<span class="sourceLineNo">116</span><a id="line.116">        private String appName = null;</a>
-<span class="sourceLineNo">117</span><a id="line.117"></a>
-<span class="sourceLineNo">118</span><a id="line.118">        @Option(description = { "Enable Hive if available.  true by default" },</a>
-<span class="sourceLineNo">119</span><a id="line.119">                names = "--no-enable-hive-if-available", negatable = true)</a>
-<span class="sourceLineNo">120</span><a id="line.120">        private boolean enableHiveIfAvailable = true;</a>
-<span class="sourceLineNo">121</span><a id="line.121">    }</a>
-<span class="sourceLineNo">122</span><a id="line.122">}</a>
+<span class="sourceLineNo">021</span><a id="line.21">import com.fasterxml.jackson.databind.JsonNode;</a>
+<span class="sourceLineNo">022</span><a id="line.22">import ball.annotation.ServiceProviderFor;</a>
+<span class="sourceLineNo">023</span><a id="line.23">import ganymede.notebook.AbstractPropertiesMagic;</a>
+<span class="sourceLineNo">024</span><a id="line.24">import ganymede.notebook.Description;</a>
+<span class="sourceLineNo">025</span><a id="line.25">import ganymede.notebook.Magic;</a>
+<span class="sourceLineNo">026</span><a id="line.26">import ganymede.notebook.MagicNames;</a>
+<span class="sourceLineNo">027</span><a id="line.27">import lombok.Data;</a>
+<span class="sourceLineNo">028</span><a id="line.28">import lombok.NoArgsConstructor;</a>
+<span class="sourceLineNo">029</span><a id="line.29">import lombok.ToString;</a>
+<span class="sourceLineNo">030</span><a id="line.30">import lombok.extern.log4j.Log4j2;</a>
+<span class="sourceLineNo">031</span><a id="line.31">import org.apache.spark.SparkConf;</a>
+<span class="sourceLineNo">032</span><a id="line.32">import picocli.CommandLine.Command;</a>
+<span class="sourceLineNo">033</span><a id="line.33">import picocli.CommandLine.Option;</a>
+<span class="sourceLineNo">034</span><a id="line.34">import picocli.CommandLine.ParameterException;</a>
+<span class="sourceLineNo">035</span><a id="line.35">import picocli.CommandLine.Parameters;</a>
+<span class="sourceLineNo">036</span><a id="line.36"></a>
+<span class="sourceLineNo">037</span><a id="line.37">import static org.apache.spark.sql.SparkSession.builder;</a>
+<span class="sourceLineNo">038</span><a id="line.38">import static org.apache.spark.sql.SparkSession.getDefaultSession;</a>
+<span class="sourceLineNo">039</span><a id="line.39">import static org.apache.spark.sql.SparkSession.setActiveSession;</a>
+<span class="sourceLineNo">040</span><a id="line.40">import static org.apache.spark.sql.SparkSession.setDefaultSession;</a>
+<span class="sourceLineNo">041</span><a id="line.41"></a>
+<span class="sourceLineNo">042</span><a id="line.42">/**</a>
+<span class="sourceLineNo">043</span><a id="line.43"> * {@link SparkSession} {@link Magic}.</a>
+<span class="sourceLineNo">044</span><a id="line.44"> *</a>
+<span class="sourceLineNo">045</span><a id="line.45"> * @see org.apache.spark.sql.SparkSession</a>
+<span class="sourceLineNo">046</span><a id="line.46"> *</a>
+<span class="sourceLineNo">047</span><a id="line.47"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
+<span class="sourceLineNo">048</span><a id="line.48"> */</a>
+<span class="sourceLineNo">049</span><a id="line.49">@ServiceProviderFor({ Magic.class })</a>
+<span class="sourceLineNo">050</span><a id="line.50">@MagicNames({ "spark-session" })</a>
+<span class="sourceLineNo">051</span><a id="line.51">@Description("Configure and start a Spark session")</a>
+<span class="sourceLineNo">052</span><a id="line.52">@NoArgsConstructor @ToString @Log4j2</a>
+<span class="sourceLineNo">053</span><a id="line.53">public class SparkSession extends AbstractPropertiesMagic {</a>
+<span class="sourceLineNo">054</span><a id="line.54">    @Override</a>
+<span class="sourceLineNo">055</span><a id="line.55">    public void execute(String line0, String code, JsonNode metadata) throws Exception {</a>
+<span class="sourceLineNo">056</span><a id="line.56">        try {</a>
+<span class="sourceLineNo">057</span><a id="line.57">            var argv = Magic.getCellMagicCommand(line0);</a>
+<span class="sourceLineNo">058</span><a id="line.58">            var arguments = new Arguments();</a>
+<span class="sourceLineNo">059</span><a id="line.59"></a>
+<span class="sourceLineNo">060</span><a id="line.60">            parse(argv, arguments);</a>
+<span class="sourceLineNo">061</span><a id="line.61"></a>
+<span class="sourceLineNo">062</span><a id="line.62">            var config = new SparkConf();</a>
+<span class="sourceLineNo">063</span><a id="line.63"></a>
+<span class="sourceLineNo">064</span><a id="line.64">            compile(code).entrySet().stream()</a>
+<span class="sourceLineNo">065</span><a id="line.65">                .forEach(t -&gt; config.set(t.getKey().toString(),</a>
+<span class="sourceLineNo">066</span><a id="line.66">                                         String.valueOf(t.getValue())));</a>
+<span class="sourceLineNo">067</span><a id="line.67"></a>
+<span class="sourceLineNo">068</span><a id="line.68">            if (arguments.getMaster() != null) {</a>
+<span class="sourceLineNo">069</span><a id="line.69">                config.setMaster(arguments.getMaster());</a>
+<span class="sourceLineNo">070</span><a id="line.70">            }</a>
+<span class="sourceLineNo">071</span><a id="line.71"></a>
+<span class="sourceLineNo">072</span><a id="line.72">            if (arguments.getAppName() != null) {</a>
+<span class="sourceLineNo">073</span><a id="line.73">                config.setAppName(arguments.getAppName());</a>
+<span class="sourceLineNo">074</span><a id="line.74">            }</a>
+<span class="sourceLineNo">075</span><a id="line.75"></a>
+<span class="sourceLineNo">076</span><a id="line.76">            var builder = builder().config(config);</a>
+<span class="sourceLineNo">077</span><a id="line.77"></a>
+<span class="sourceLineNo">078</span><a id="line.78">            if (arguments.isEnableHiveIfAvailable()) {</a>
+<span class="sourceLineNo">079</span><a id="line.79">                try {</a>
+<span class="sourceLineNo">080</span><a id="line.80">                    builder.enableHiveSupport();</a>
+<span class="sourceLineNo">081</span><a id="line.81">                } catch (Exception exception) {</a>
+<span class="sourceLineNo">082</span><a id="line.82">                    System.err.println(exception.getMessage());</a>
+<span class="sourceLineNo">083</span><a id="line.83">                }</a>
+<span class="sourceLineNo">084</span><a id="line.84">            }</a>
+<span class="sourceLineNo">085</span><a id="line.85"></a>
+<span class="sourceLineNo">086</span><a id="line.86">            var session = builder.getOrCreate();</a>
+<span class="sourceLineNo">087</span><a id="line.87"></a>
+<span class="sourceLineNo">088</span><a id="line.88">            if (getDefaultSession().isEmpty()) {</a>
+<span class="sourceLineNo">089</span><a id="line.89">                setDefaultSession(session);</a>
+<span class="sourceLineNo">090</span><a id="line.90">            }</a>
+<span class="sourceLineNo">091</span><a id="line.91"></a>
+<span class="sourceLineNo">092</span><a id="line.92">            setActiveSession(session);</a>
+<span class="sourceLineNo">093</span><a id="line.93"></a>
+<span class="sourceLineNo">094</span><a id="line.94">            context.display(session);</a>
+<span class="sourceLineNo">095</span><a id="line.95">        } catch (ParameterException exception) {</a>
+<span class="sourceLineNo">096</span><a id="line.96">            System.err.println(exception.getMessage());</a>
+<span class="sourceLineNo">097</span><a id="line.97">            System.err.println();</a>
+<span class="sourceLineNo">098</span><a id="line.98">            exception.getCommandLine().usage(System.err);</a>
+<span class="sourceLineNo">099</span><a id="line.99">        } catch (NoClassDefFoundError error) {</a>
+<span class="sourceLineNo">100</span><a id="line.100">            System.err.format("Apache Spark not found on classpath: %s:\n", error);</a>
+<span class="sourceLineNo">101</span><a id="line.101">        } catch (Throwable throwable) {</a>
+<span class="sourceLineNo">102</span><a id="line.102">            throwable.printStackTrace(System.err);</a>
+<span class="sourceLineNo">103</span><a id="line.103">        }</a>
+<span class="sourceLineNo">104</span><a id="line.104">    }</a>
+<span class="sourceLineNo">105</span><a id="line.105"></a>
+<span class="sourceLineNo">106</span><a id="line.106">    @Override</a>
+<span class="sourceLineNo">107</span><a id="line.107">    public String getUsage() { return getUsage(new Arguments()); }</a>
+<span class="sourceLineNo">108</span><a id="line.108"></a>
+<span class="sourceLineNo">109</span><a id="line.109">    @Command @Data</a>
+<span class="sourceLineNo">110</span><a id="line.110">    private class Arguments {</a>
+<span class="sourceLineNo">111</span><a id="line.111">        @Parameters(description = { "Spark master" },</a>
+<span class="sourceLineNo">112</span><a id="line.112">                    index = "0", arity = "0..1")</a>
+<span class="sourceLineNo">113</span><a id="line.113">        private String master = null;</a>
+<span class="sourceLineNo">114</span><a id="line.114"></a>
+<span class="sourceLineNo">115</span><a id="line.115">        @Parameters(description = { "Spark appName" },</a>
+<span class="sourceLineNo">116</span><a id="line.116">                    index = "1", arity = "0..1", defaultValue = "root")</a>
+<span class="sourceLineNo">117</span><a id="line.117">        private String appName = null;</a>
+<span class="sourceLineNo">118</span><a id="line.118"></a>
+<span class="sourceLineNo">119</span><a id="line.119">        @Option(description = { "Enable Hive if available.  true by default" },</a>
+<span class="sourceLineNo">120</span><a id="line.120">                names = "--no-enable-hive-if-available", negatable = true)</a>
+<span class="sourceLineNo">121</span><a id="line.121">        private boolean enableHiveIfAvailable = true;</a>
+<span class="sourceLineNo">122</span><a id="line.122">    }</a>
+<span class="sourceLineNo">123</span><a id="line.123">}</a>
 
 
 

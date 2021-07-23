@@ -27,199 +27,202 @@
 <span class="sourceLineNo">018</span><a id="line.18"> * limitations under the License.</a>
 <span class="sourceLineNo">019</span><a id="line.19"> * ##########################################################################</a>
 <span class="sourceLineNo">020</span><a id="line.20"> */</a>
-<span class="sourceLineNo">021</span><a id="line.21">import ganymede.notebook.NotebookContext;</a>
-<span class="sourceLineNo">022</span><a id="line.22">import java.util.Optional;</a>
-<span class="sourceLineNo">023</span><a id="line.23">import java.util.stream.Stream;</a>
-<span class="sourceLineNo">024</span><a id="line.24">import jdk.jshell.JShell;</a>
-<span class="sourceLineNo">025</span><a id="line.25">import lombok.Data;</a>
-<span class="sourceLineNo">026</span><a id="line.26">import org.codehaus.plexus.util.cli.CommandLineUtils;</a>
-<span class="sourceLineNo">027</span><a id="line.27"></a>
-<span class="sourceLineNo">028</span><a id="line.28">/**</a>
-<span class="sourceLineNo">029</span><a id="line.29"> * {@link Magic} service interface.</a>
-<span class="sourceLineNo">030</span><a id="line.30"> *</a>
-<span class="sourceLineNo">031</span><a id="line.31"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
-<span class="sourceLineNo">032</span><a id="line.32"> */</a>
-<span class="sourceLineNo">033</span><a id="line.33">public interface Magic {</a>
-<span class="sourceLineNo">034</span><a id="line.34"></a>
-<span class="sourceLineNo">035</span><a id="line.35">    /**</a>
-<span class="sourceLineNo">036</span><a id="line.36">     * Cell {@link Magic} indicator.</a>
-<span class="sourceLineNo">037</span><a id="line.37">     */</a>
-<span class="sourceLineNo">038</span><a id="line.38">    public static final String CELL = "%%";</a>
-<span class="sourceLineNo">039</span><a id="line.39"></a>
-<span class="sourceLineNo">040</span><a id="line.40">    /**</a>
-<span class="sourceLineNo">041</span><a id="line.41">     * Special-case {@link Magic} name.</a>
-<span class="sourceLineNo">042</span><a id="line.42">     */</a>
-<span class="sourceLineNo">043</span><a id="line.43">    public static final String BANG = "!";</a>
-<span class="sourceLineNo">044</span><a id="line.44"></a>
-<span class="sourceLineNo">045</span><a id="line.45">    /**</a>
-<span class="sourceLineNo">046</span><a id="line.46">     * Method to get a configured instance of this {@link Magic}.</a>
-<span class="sourceLineNo">047</span><a id="line.47">     * Subclasses may override to return an instance that requires</a>
-<span class="sourceLineNo">048</span><a id="line.48">     * additional resources and/or configuration.  Default implementaion</a>
-<span class="sourceLineNo">049</span><a id="line.49">     * returns {@link.this}.</a>
-<span class="sourceLineNo">050</span><a id="line.50">     *</a>
-<span class="sourceLineNo">051</span><a id="line.51">     * @return  An {@link Optional} containing the configured instance.</a>
-<span class="sourceLineNo">052</span><a id="line.52">     */</a>
-<span class="sourceLineNo">053</span><a id="line.53">    public default Optional&lt;? extends Magic&gt; instance() {</a>
-<span class="sourceLineNo">054</span><a id="line.54">        return Optional.of(this);</a>
-<span class="sourceLineNo">055</span><a id="line.55">    }</a>
-<span class="sourceLineNo">056</span><a id="line.56"></a>
-<span class="sourceLineNo">057</span><a id="line.57">    /**</a>
-<span class="sourceLineNo">058</span><a id="line.58">     * Method to get the names associated with {@link.this} {@link Magic}.</a>
-<span class="sourceLineNo">059</span><a id="line.59">     *</a>
-<span class="sourceLineNo">060</span><a id="line.60">     * @return  The names.</a>
-<span class="sourceLineNo">061</span><a id="line.61">     */</a>
-<span class="sourceLineNo">062</span><a id="line.62">    public String[] getMagicNames();</a>
-<span class="sourceLineNo">063</span><a id="line.63"></a>
-<span class="sourceLineNo">064</span><a id="line.64">    /**</a>
-<span class="sourceLineNo">065</span><a id="line.65">     * Method to get the description of {@link.this} {@link Magic}.</a>
-<span class="sourceLineNo">066</span><a id="line.66">     *</a>
-<span class="sourceLineNo">067</span><a id="line.67">     * @return  The description.</a>
-<span class="sourceLineNo">068</span><a id="line.68">     */</a>
-<span class="sourceLineNo">069</span><a id="line.69">    public String getDescription();</a>
-<span class="sourceLineNo">070</span><a id="line.70"></a>
-<span class="sourceLineNo">071</span><a id="line.71">    /**</a>
-<span class="sourceLineNo">072</span><a id="line.72">     * Method to get the usage of {@link.this} {@link Magic}.</a>
-<span class="sourceLineNo">073</span><a id="line.73">     *</a>
-<span class="sourceLineNo">074</span><a id="line.74">     * @return  The usage.</a>
-<span class="sourceLineNo">075</span><a id="line.75">     */</a>
-<span class="sourceLineNo">076</span><a id="line.76">    public String getUsage();</a>
-<span class="sourceLineNo">077</span><a id="line.77"></a>
-<span class="sourceLineNo">078</span><a id="line.78">    /**</a>
-<span class="sourceLineNo">079</span><a id="line.79">     * Return result of {@link #isComplete(String,String)}.</a>
-<span class="sourceLineNo">080</span><a id="line.80">     */</a>
-<span class="sourceLineNo">081</span><a id="line.81">    public enum completeness { complete, incomplete, invalid, unknown };</a>
-<span class="sourceLineNo">082</span><a id="line.82"></a>
-<span class="sourceLineNo">083</span><a id="line.83">    /**</a>
-<span class="sourceLineNo">084</span><a id="line.84">     * Method to determine code's {@link completeness}.</a>
-<span class="sourceLineNo">085</span><a id="line.85">     *</a>
-<span class="sourceLineNo">086</span><a id="line.86">     * @param   line0           The initial magic line.</a>
-<span class="sourceLineNo">087</span><a id="line.87">     * @param   code            The code to execute.</a>
-<span class="sourceLineNo">088</span><a id="line.88">     *</a>
-<span class="sourceLineNo">089</span><a id="line.89">     * @return  The code's {@link completeness}.</a>
-<span class="sourceLineNo">090</span><a id="line.90">     */</a>
-<span class="sourceLineNo">091</span><a id="line.91">    public completeness isComplete(String line0, String code);</a>
-<span class="sourceLineNo">092</span><a id="line.92"></a>
-<span class="sourceLineNo">093</span><a id="line.93">    /**</a>
-<span class="sourceLineNo">094</span><a id="line.94">     * {@link JShell} configuation method.</a>
-<span class="sourceLineNo">095</span><a id="line.95">     *</a>
-<span class="sourceLineNo">096</span><a id="line.96">     * @param   context         The {@link NotebookContext}.</a>
-<span class="sourceLineNo">097</span><a id="line.97">     */</a>
-<span class="sourceLineNo">098</span><a id="line.98">    public void configure(NotebookContext context);</a>
-<span class="sourceLineNo">099</span><a id="line.99"></a>
-<span class="sourceLineNo">100</span><a id="line.100">    /**</a>
-<span class="sourceLineNo">101</span><a id="line.101">     * {@link JShell} execution method.</a>
-<span class="sourceLineNo">102</span><a id="line.102">     *</a>
-<span class="sourceLineNo">103</span><a id="line.103">     * @param   line0           The initial magic line.</a>
-<span class="sourceLineNo">104</span><a id="line.104">     * @param   code            The remainder of the cell.</a>
-<span class="sourceLineNo">105</span><a id="line.105">     */</a>
-<span class="sourceLineNo">106</span><a id="line.106">    public void execute(String line0, String code) throws Exception;</a>
-<span class="sourceLineNo">107</span><a id="line.107"></a>
-<span class="sourceLineNo">108</span><a id="line.108">    /**</a>
-<span class="sourceLineNo">109</span><a id="line.109">     * Method to determine if the code is cell magic (starts with</a>
-<span class="sourceLineNo">110</span><a id="line.110">     * '{@code %%}').</a>
-<span class="sourceLineNo">111</span><a id="line.111">     *</a>
-<span class="sourceLineNo">112</span><a id="line.112">     * @param   code            The code to test.</a>
-<span class="sourceLineNo">113</span><a id="line.113">     *</a>
-<span class="sourceLineNo">114</span><a id="line.114">     * @return  {@code true} if cell magic; {@code false} otherwise.</a>
-<span class="sourceLineNo">115</span><a id="line.115">     */</a>
-<span class="sourceLineNo">116</span><a id="line.116">    public static boolean isCellMagic(String code) {</a>
-<span class="sourceLineNo">117</span><a id="line.117">        return code.startsWith(CELL);</a>
-<span class="sourceLineNo">118</span><a id="line.118">    }</a>
-<span class="sourceLineNo">119</span><a id="line.119"></a>
-<span class="sourceLineNo">120</span><a id="line.120">    /**</a>
-<span class="sourceLineNo">121</span><a id="line.121">     * Method to parse a cell magic command.  The code must start with</a>
-<span class="sourceLineNo">122</span><a id="line.122">     * "{@code %%}".  "{@code #}" to the EOL is a comment.  The command is</a>
-<span class="sourceLineNo">123</span><a id="line.123">     * either a word or a single punctuation character.  Words may be quoted</a>
-<span class="sourceLineNo">124</span><a id="line.124">     * with double quotes.</a>
-<span class="sourceLineNo">125</span><a id="line.125">     *</a>
-<span class="sourceLineNo">126</span><a id="line.126">     * @param   code            The code to parse.</a>
-<span class="sourceLineNo">127</span><a id="line.127">     *</a>
-<span class="sourceLineNo">128</span><a id="line.128">     * @return  The array of command arguments.</a>
-<span class="sourceLineNo">129</span><a id="line.129">     *</a>
-<span class="sourceLineNo">130</span><a id="line.130">     * @throws  IllegalArgumentException</a>
-<span class="sourceLineNo">131</span><a id="line.131">     *                          If the magic line can't be parsed.</a>
-<span class="sourceLineNo">132</span><a id="line.132">     */</a>
-<span class="sourceLineNo">133</span><a id="line.133">    public static String[] getCellMagicCommand(String code) {</a>
-<span class="sourceLineNo">134</span><a id="line.134">        var line0 = code.split("\\R", 2)[0];</a>
-<span class="sourceLineNo">135</span><a id="line.135">        var argv = new String[] { line0 };</a>
-<span class="sourceLineNo">136</span><a id="line.136"></a>
-<span class="sourceLineNo">137</span><a id="line.137">        try {</a>
-<span class="sourceLineNo">138</span><a id="line.138">            argv = CommandLineUtils.translateCommandline(argv[0]);</a>
+<span class="sourceLineNo">021</span><a id="line.21">import com.fasterxml.jackson.databind.JsonNode;</a>
+<span class="sourceLineNo">022</span><a id="line.22">import ganymede.notebook.NotebookContext;</a>
+<span class="sourceLineNo">023</span><a id="line.23">import java.util.Optional;</a>
+<span class="sourceLineNo">024</span><a id="line.24">import java.util.stream.Stream;</a>
+<span class="sourceLineNo">025</span><a id="line.25">import jdk.jshell.JShell;</a>
+<span class="sourceLineNo">026</span><a id="line.26">import lombok.Data;</a>
+<span class="sourceLineNo">027</span><a id="line.27">import org.codehaus.plexus.util.cli.CommandLineUtils;</a>
+<span class="sourceLineNo">028</span><a id="line.28"></a>
+<span class="sourceLineNo">029</span><a id="line.29">/**</a>
+<span class="sourceLineNo">030</span><a id="line.30"> * {@link Magic} service interface.</a>
+<span class="sourceLineNo">031</span><a id="line.31"> *</a>
+<span class="sourceLineNo">032</span><a id="line.32"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
+<span class="sourceLineNo">033</span><a id="line.33"> */</a>
+<span class="sourceLineNo">034</span><a id="line.34">public interface Magic {</a>
+<span class="sourceLineNo">035</span><a id="line.35"></a>
+<span class="sourceLineNo">036</span><a id="line.36">    /**</a>
+<span class="sourceLineNo">037</span><a id="line.37">     * Cell {@link Magic} indicator.</a>
+<span class="sourceLineNo">038</span><a id="line.38">     */</a>
+<span class="sourceLineNo">039</span><a id="line.39">    public static final String CELL = "%%";</a>
+<span class="sourceLineNo">040</span><a id="line.40"></a>
+<span class="sourceLineNo">041</span><a id="line.41">    /**</a>
+<span class="sourceLineNo">042</span><a id="line.42">     * Special-case {@link Magic} name.</a>
+<span class="sourceLineNo">043</span><a id="line.43">     */</a>
+<span class="sourceLineNo">044</span><a id="line.44">    public static final String BANG = "!";</a>
+<span class="sourceLineNo">045</span><a id="line.45"></a>
+<span class="sourceLineNo">046</span><a id="line.46">    /**</a>
+<span class="sourceLineNo">047</span><a id="line.47">     * Method to get a configured instance of this {@link Magic}.</a>
+<span class="sourceLineNo">048</span><a id="line.48">     * Subclasses may override to return an instance that requires</a>
+<span class="sourceLineNo">049</span><a id="line.49">     * additional resources and/or configuration.  Default implementaion</a>
+<span class="sourceLineNo">050</span><a id="line.50">     * returns {@link.this}.</a>
+<span class="sourceLineNo">051</span><a id="line.51">     *</a>
+<span class="sourceLineNo">052</span><a id="line.52">     * @return  An {@link Optional} containing the configured instance.</a>
+<span class="sourceLineNo">053</span><a id="line.53">     */</a>
+<span class="sourceLineNo">054</span><a id="line.54">    public default Optional&lt;? extends Magic&gt; instance() {</a>
+<span class="sourceLineNo">055</span><a id="line.55">        return Optional.of(this);</a>
+<span class="sourceLineNo">056</span><a id="line.56">    }</a>
+<span class="sourceLineNo">057</span><a id="line.57"></a>
+<span class="sourceLineNo">058</span><a id="line.58">    /**</a>
+<span class="sourceLineNo">059</span><a id="line.59">     * Method to get the names associated with {@link.this} {@link Magic}.</a>
+<span class="sourceLineNo">060</span><a id="line.60">     *</a>
+<span class="sourceLineNo">061</span><a id="line.61">     * @return  The names.</a>
+<span class="sourceLineNo">062</span><a id="line.62">     */</a>
+<span class="sourceLineNo">063</span><a id="line.63">    public String[] getMagicNames();</a>
+<span class="sourceLineNo">064</span><a id="line.64"></a>
+<span class="sourceLineNo">065</span><a id="line.65">    /**</a>
+<span class="sourceLineNo">066</span><a id="line.66">     * Method to get the description of {@link.this} {@link Magic}.</a>
+<span class="sourceLineNo">067</span><a id="line.67">     *</a>
+<span class="sourceLineNo">068</span><a id="line.68">     * @return  The description.</a>
+<span class="sourceLineNo">069</span><a id="line.69">     */</a>
+<span class="sourceLineNo">070</span><a id="line.70">    public String getDescription();</a>
+<span class="sourceLineNo">071</span><a id="line.71"></a>
+<span class="sourceLineNo">072</span><a id="line.72">    /**</a>
+<span class="sourceLineNo">073</span><a id="line.73">     * Method to get the usage of {@link.this} {@link Magic}.</a>
+<span class="sourceLineNo">074</span><a id="line.74">     *</a>
+<span class="sourceLineNo">075</span><a id="line.75">     * @return  The usage.</a>
+<span class="sourceLineNo">076</span><a id="line.76">     */</a>
+<span class="sourceLineNo">077</span><a id="line.77">    public String getUsage();</a>
+<span class="sourceLineNo">078</span><a id="line.78"></a>
+<span class="sourceLineNo">079</span><a id="line.79">    /**</a>
+<span class="sourceLineNo">080</span><a id="line.80">     * Return result of {@link #isComplete(String,String)}.</a>
+<span class="sourceLineNo">081</span><a id="line.81">     */</a>
+<span class="sourceLineNo">082</span><a id="line.82">    public enum completeness { complete, incomplete, invalid, unknown };</a>
+<span class="sourceLineNo">083</span><a id="line.83"></a>
+<span class="sourceLineNo">084</span><a id="line.84">    /**</a>
+<span class="sourceLineNo">085</span><a id="line.85">     * Method to determine code's {@link completeness}.</a>
+<span class="sourceLineNo">086</span><a id="line.86">     *</a>
+<span class="sourceLineNo">087</span><a id="line.87">     * @param   line0           The initial magic line.</a>
+<span class="sourceLineNo">088</span><a id="line.88">     * @param   code            The code to execute.</a>
+<span class="sourceLineNo">089</span><a id="line.89">     *</a>
+<span class="sourceLineNo">090</span><a id="line.90">     * @return  The code's {@link completeness}.</a>
+<span class="sourceLineNo">091</span><a id="line.91">     */</a>
+<span class="sourceLineNo">092</span><a id="line.92">    public completeness isComplete(String line0, String code);</a>
+<span class="sourceLineNo">093</span><a id="line.93"></a>
+<span class="sourceLineNo">094</span><a id="line.94">    /**</a>
+<span class="sourceLineNo">095</span><a id="line.95">     * {@link JShell} configuation method.</a>
+<span class="sourceLineNo">096</span><a id="line.96">     *</a>
+<span class="sourceLineNo">097</span><a id="line.97">     * @param   context         The {@link NotebookContext}.</a>
+<span class="sourceLineNo">098</span><a id="line.98">     */</a>
+<span class="sourceLineNo">099</span><a id="line.99">    public void configure(NotebookContext context);</a>
+<span class="sourceLineNo">100</span><a id="line.100"></a>
+<span class="sourceLineNo">101</span><a id="line.101">    /**</a>
+<span class="sourceLineNo">102</span><a id="line.102">     * {@link JShell} execution method.</a>
+<span class="sourceLineNo">103</span><a id="line.103">     *</a>
+<span class="sourceLineNo">104</span><a id="line.104">     * @param   line0           The initial magic line.</a>
+<span class="sourceLineNo">105</span><a id="line.105">     * @param   code            The remainder of the cell.</a>
+<span class="sourceLineNo">106</span><a id="line.106">     * @param   metadata        The metadata from the Jupyter</a>
+<span class="sourceLineNo">107</span><a id="line.107">     *                          {@code execute_request}.</a>
+<span class="sourceLineNo">108</span><a id="line.108">     */</a>
+<span class="sourceLineNo">109</span><a id="line.109">    public void execute(String line0, String code, JsonNode metadata) throws Exception;</a>
+<span class="sourceLineNo">110</span><a id="line.110"></a>
+<span class="sourceLineNo">111</span><a id="line.111">    /**</a>
+<span class="sourceLineNo">112</span><a id="line.112">     * Method to determine if the code is cell magic (starts with</a>
+<span class="sourceLineNo">113</span><a id="line.113">     * '{@code %%}').</a>
+<span class="sourceLineNo">114</span><a id="line.114">     *</a>
+<span class="sourceLineNo">115</span><a id="line.115">     * @param   code            The code to test.</a>
+<span class="sourceLineNo">116</span><a id="line.116">     *</a>
+<span class="sourceLineNo">117</span><a id="line.117">     * @return  {@code true} if cell magic; {@code false} otherwise.</a>
+<span class="sourceLineNo">118</span><a id="line.118">     */</a>
+<span class="sourceLineNo">119</span><a id="line.119">    public static boolean isCellMagic(String code) {</a>
+<span class="sourceLineNo">120</span><a id="line.120">        return code.startsWith(CELL);</a>
+<span class="sourceLineNo">121</span><a id="line.121">    }</a>
+<span class="sourceLineNo">122</span><a id="line.122"></a>
+<span class="sourceLineNo">123</span><a id="line.123">    /**</a>
+<span class="sourceLineNo">124</span><a id="line.124">     * Method to parse a cell magic command.  The code must start with</a>
+<span class="sourceLineNo">125</span><a id="line.125">     * "{@code %%}".  "{@code #}" to the EOL is a comment.  The command is</a>
+<span class="sourceLineNo">126</span><a id="line.126">     * either a word or a single punctuation character.  Words may be quoted</a>
+<span class="sourceLineNo">127</span><a id="line.127">     * with double quotes.</a>
+<span class="sourceLineNo">128</span><a id="line.128">     *</a>
+<span class="sourceLineNo">129</span><a id="line.129">     * @param   code            The code to parse.</a>
+<span class="sourceLineNo">130</span><a id="line.130">     *</a>
+<span class="sourceLineNo">131</span><a id="line.131">     * @return  The array of command arguments.</a>
+<span class="sourceLineNo">132</span><a id="line.132">     *</a>
+<span class="sourceLineNo">133</span><a id="line.133">     * @throws  IllegalArgumentException</a>
+<span class="sourceLineNo">134</span><a id="line.134">     *                          If the magic line can't be parsed.</a>
+<span class="sourceLineNo">135</span><a id="line.135">     */</a>
+<span class="sourceLineNo">136</span><a id="line.136">    public static String[] getCellMagicCommand(String code) {</a>
+<span class="sourceLineNo">137</span><a id="line.137">        var line0 = code.split("\\R", 2)[0];</a>
+<span class="sourceLineNo">138</span><a id="line.138">        var argv = new String[] { line0 };</a>
 <span class="sourceLineNo">139</span><a id="line.139"></a>
-<span class="sourceLineNo">140</span><a id="line.140">            if (argv[0].startsWith(CELL)) {</a>
-<span class="sourceLineNo">141</span><a id="line.141">                argv[0] = argv[0].substring(CELL.length()).trim();</a>
+<span class="sourceLineNo">140</span><a id="line.140">        try {</a>
+<span class="sourceLineNo">141</span><a id="line.141">            argv = CommandLineUtils.translateCommandline(argv[0]);</a>
 <span class="sourceLineNo">142</span><a id="line.142"></a>
-<span class="sourceLineNo">143</span><a id="line.143">                if (argv[0].isBlank()) {</a>
-<span class="sourceLineNo">144</span><a id="line.144">                    argv = Stream.of(argv).skip(1).toArray(String[]::new);</a>
-<span class="sourceLineNo">145</span><a id="line.145">                }</a>
-<span class="sourceLineNo">146</span><a id="line.146"></a>
-<span class="sourceLineNo">147</span><a id="line.147">                if (argv[0].startsWith(BANG) &amp;&amp; argv[0].length() &gt; BANG.length()) {</a>
-<span class="sourceLineNo">148</span><a id="line.148">                    argv =</a>
-<span class="sourceLineNo">149</span><a id="line.149">                        Stream.concat(Stream.of(BANG, argv[0].substring(BANG.length())),</a>
-<span class="sourceLineNo">150</span><a id="line.150">                                      Stream.of(argv).skip(1))</a>
-<span class="sourceLineNo">151</span><a id="line.151">                        .toArray(String[]::new);</a>
-<span class="sourceLineNo">152</span><a id="line.152">                }</a>
-<span class="sourceLineNo">153</span><a id="line.153">            } else {</a>
-<span class="sourceLineNo">154</span><a id="line.154">                throw new IllegalArgumentException();</a>
-<span class="sourceLineNo">155</span><a id="line.155">            }</a>
-<span class="sourceLineNo">156</span><a id="line.156">        } catch (IllegalStateException exception) {</a>
-<span class="sourceLineNo">157</span><a id="line.157">            throw exception;</a>
-<span class="sourceLineNo">158</span><a id="line.158">        } catch (Exception exception) {</a>
-<span class="sourceLineNo">159</span><a id="line.159">            throw new IllegalArgumentException(line0);</a>
-<span class="sourceLineNo">160</span><a id="line.160">        }</a>
-<span class="sourceLineNo">161</span><a id="line.161"></a>
-<span class="sourceLineNo">162</span><a id="line.162">        return argv;</a>
-<span class="sourceLineNo">163</span><a id="line.163">    }</a>
+<span class="sourceLineNo">143</span><a id="line.143">            if (argv[0].startsWith(CELL)) {</a>
+<span class="sourceLineNo">144</span><a id="line.144">                argv[0] = argv[0].substring(CELL.length()).trim();</a>
+<span class="sourceLineNo">145</span><a id="line.145"></a>
+<span class="sourceLineNo">146</span><a id="line.146">                if (argv[0].isBlank()) {</a>
+<span class="sourceLineNo">147</span><a id="line.147">                    argv = Stream.of(argv).skip(1).toArray(String[]::new);</a>
+<span class="sourceLineNo">148</span><a id="line.148">                }</a>
+<span class="sourceLineNo">149</span><a id="line.149"></a>
+<span class="sourceLineNo">150</span><a id="line.150">                if (argv[0].startsWith(BANG) &amp;&amp; argv[0].length() &gt; BANG.length()) {</a>
+<span class="sourceLineNo">151</span><a id="line.151">                    argv =</a>
+<span class="sourceLineNo">152</span><a id="line.152">                        Stream.concat(Stream.of(BANG, argv[0].substring(BANG.length())),</a>
+<span class="sourceLineNo">153</span><a id="line.153">                                      Stream.of(argv).skip(1))</a>
+<span class="sourceLineNo">154</span><a id="line.154">                        .toArray(String[]::new);</a>
+<span class="sourceLineNo">155</span><a id="line.155">                }</a>
+<span class="sourceLineNo">156</span><a id="line.156">            } else {</a>
+<span class="sourceLineNo">157</span><a id="line.157">                throw new IllegalArgumentException();</a>
+<span class="sourceLineNo">158</span><a id="line.158">            }</a>
+<span class="sourceLineNo">159</span><a id="line.159">        } catch (IllegalStateException exception) {</a>
+<span class="sourceLineNo">160</span><a id="line.160">            throw exception;</a>
+<span class="sourceLineNo">161</span><a id="line.161">        } catch (Exception exception) {</a>
+<span class="sourceLineNo">162</span><a id="line.162">            throw new IllegalArgumentException(line0);</a>
+<span class="sourceLineNo">163</span><a id="line.163">        }</a>
 <span class="sourceLineNo">164</span><a id="line.164"></a>
-<span class="sourceLineNo">165</span><a id="line.165">    /**</a>
-<span class="sourceLineNo">166</span><a id="line.166">     * {@link Magic} {@link Application Application} instance to parse code,</a>
-<span class="sourceLineNo">167</span><a id="line.167">     * find {@link Magic}, and execute.</a>
-<span class="sourceLineNo">168</span><a id="line.168">     *</a>
-<span class="sourceLineNo">169</span><a id="line.169">     * {@bean.info}</a>
-<span class="sourceLineNo">170</span><a id="line.170">     */</a>
-<span class="sourceLineNo">171</span><a id="line.171">    @Data</a>
-<span class="sourceLineNo">172</span><a id="line.172">    public static class Application {</a>
-<span class="sourceLineNo">173</span><a id="line.173">        private final String line0;</a>
-<span class="sourceLineNo">174</span><a id="line.174">        private final String code;</a>
-<span class="sourceLineNo">175</span><a id="line.175">        private final String[] argv;</a>
-<span class="sourceLineNo">176</span><a id="line.176"></a>
-<span class="sourceLineNo">177</span><a id="line.177">        /**</a>
-<span class="sourceLineNo">178</span><a id="line.178">         * Sole public constructor.</a>
-<span class="sourceLineNo">179</span><a id="line.179">         *</a>
-<span class="sourceLineNo">180</span><a id="line.180">         * @param       code    The complete cell code.</a>
-<span class="sourceLineNo">181</span><a id="line.181">         */</a>
-<span class="sourceLineNo">182</span><a id="line.182">        public Application(String code) {</a>
-<span class="sourceLineNo">183</span><a id="line.183">            this(isCellMagic(code) ? code.split("\\R", 2) : new String[] { null, code });</a>
-<span class="sourceLineNo">184</span><a id="line.184">        }</a>
-<span class="sourceLineNo">185</span><a id="line.185"></a>
-<span class="sourceLineNo">186</span><a id="line.186">        private Application(String[] lines) {</a>
-<span class="sourceLineNo">187</span><a id="line.187">            this(lines[0], (lines.length &gt; 1) ? lines[1] : "");</a>
-<span class="sourceLineNo">188</span><a id="line.188">        }</a>
-<span class="sourceLineNo">189</span><a id="line.189"></a>
-<span class="sourceLineNo">190</span><a id="line.190">        private Application(String line0, String code) {</a>
-<span class="sourceLineNo">191</span><a id="line.191">            this.line0 = line0;</a>
-<span class="sourceLineNo">192</span><a id="line.192">            this.code = code;</a>
-<span class="sourceLineNo">193</span><a id="line.193">            this.argv = (line0 != null) ? getCellMagicCommand(line0) : new String[] { };</a>
-<span class="sourceLineNo">194</span><a id="line.194">        }</a>
-<span class="sourceLineNo">195</span><a id="line.195"></a>
-<span class="sourceLineNo">196</span><a id="line.196">        /**</a>
-<span class="sourceLineNo">197</span><a id="line.197">         * Method to determine if the code has a "magic" line.</a>
-<span class="sourceLineNo">198</span><a id="line.198">         *</a>
-<span class="sourceLineNo">199</span><a id="line.199">         * @return      {@code true} or {@code false}.</a>
-<span class="sourceLineNo">200</span><a id="line.200">         */</a>
-<span class="sourceLineNo">201</span><a id="line.201">        public boolean hasMagicLine() { return (line0 != null); }</a>
-<span class="sourceLineNo">202</span><a id="line.202"></a>
-<span class="sourceLineNo">203</span><a id="line.203">        /**</a>
-<span class="sourceLineNo">204</span><a id="line.204">         * Method to get the specified {@link Magic} name.</a>
-<span class="sourceLineNo">205</span><a id="line.205">         *</a>
-<span class="sourceLineNo">206</span><a id="line.206">         * @return      The specified {@link Magic} name; {@code null} if</a>
-<span class="sourceLineNo">207</span><a id="line.207">         *              none is specified.</a>
-<span class="sourceLineNo">208</span><a id="line.208">         */</a>
-<span class="sourceLineNo">209</span><a id="line.209">        public String getMagicName() {</a>
-<span class="sourceLineNo">210</span><a id="line.210">            return (argv.length &gt; 0) ? argv[0] : null;</a>
-<span class="sourceLineNo">211</span><a id="line.211">        }</a>
-<span class="sourceLineNo">212</span><a id="line.212">    }</a>
-<span class="sourceLineNo">213</span><a id="line.213">}</a>
+<span class="sourceLineNo">165</span><a id="line.165">        return argv;</a>
+<span class="sourceLineNo">166</span><a id="line.166">    }</a>
+<span class="sourceLineNo">167</span><a id="line.167"></a>
+<span class="sourceLineNo">168</span><a id="line.168">    /**</a>
+<span class="sourceLineNo">169</span><a id="line.169">     * {@link Magic} {@link Application Application} instance to parse code,</a>
+<span class="sourceLineNo">170</span><a id="line.170">     * find {@link Magic}, and execute.</a>
+<span class="sourceLineNo">171</span><a id="line.171">     *</a>
+<span class="sourceLineNo">172</span><a id="line.172">     * {@bean.info}</a>
+<span class="sourceLineNo">173</span><a id="line.173">     */</a>
+<span class="sourceLineNo">174</span><a id="line.174">    @Data</a>
+<span class="sourceLineNo">175</span><a id="line.175">    public static class Application {</a>
+<span class="sourceLineNo">176</span><a id="line.176">        private final String line0;</a>
+<span class="sourceLineNo">177</span><a id="line.177">        private final String code;</a>
+<span class="sourceLineNo">178</span><a id="line.178">        private final String[] argv;</a>
+<span class="sourceLineNo">179</span><a id="line.179"></a>
+<span class="sourceLineNo">180</span><a id="line.180">        /**</a>
+<span class="sourceLineNo">181</span><a id="line.181">         * Sole public constructor.</a>
+<span class="sourceLineNo">182</span><a id="line.182">         *</a>
+<span class="sourceLineNo">183</span><a id="line.183">         * @param       code    The complete cell code.</a>
+<span class="sourceLineNo">184</span><a id="line.184">         */</a>
+<span class="sourceLineNo">185</span><a id="line.185">        public Application(String code) {</a>
+<span class="sourceLineNo">186</span><a id="line.186">            this(isCellMagic(code) ? code.split("\\R", 2) : new String[] { null, code });</a>
+<span class="sourceLineNo">187</span><a id="line.187">        }</a>
+<span class="sourceLineNo">188</span><a id="line.188"></a>
+<span class="sourceLineNo">189</span><a id="line.189">        private Application(String[] lines) {</a>
+<span class="sourceLineNo">190</span><a id="line.190">            this(lines[0], (lines.length &gt; 1) ? lines[1] : "");</a>
+<span class="sourceLineNo">191</span><a id="line.191">        }</a>
+<span class="sourceLineNo">192</span><a id="line.192"></a>
+<span class="sourceLineNo">193</span><a id="line.193">        private Application(String line0, String code) {</a>
+<span class="sourceLineNo">194</span><a id="line.194">            this.line0 = line0;</a>
+<span class="sourceLineNo">195</span><a id="line.195">            this.code = code;</a>
+<span class="sourceLineNo">196</span><a id="line.196">            this.argv = (line0 != null) ? getCellMagicCommand(line0) : new String[] { };</a>
+<span class="sourceLineNo">197</span><a id="line.197">        }</a>
+<span class="sourceLineNo">198</span><a id="line.198"></a>
+<span class="sourceLineNo">199</span><a id="line.199">        /**</a>
+<span class="sourceLineNo">200</span><a id="line.200">         * Method to determine if the code has a "magic" line.</a>
+<span class="sourceLineNo">201</span><a id="line.201">         *</a>
+<span class="sourceLineNo">202</span><a id="line.202">         * @return      {@code true} or {@code false}.</a>
+<span class="sourceLineNo">203</span><a id="line.203">         */</a>
+<span class="sourceLineNo">204</span><a id="line.204">        public boolean hasMagicLine() { return (line0 != null); }</a>
+<span class="sourceLineNo">205</span><a id="line.205"></a>
+<span class="sourceLineNo">206</span><a id="line.206">        /**</a>
+<span class="sourceLineNo">207</span><a id="line.207">         * Method to get the specified {@link Magic} name.</a>
+<span class="sourceLineNo">208</span><a id="line.208">         *</a>
+<span class="sourceLineNo">209</span><a id="line.209">         * @return      The specified {@link Magic} name; {@code null} if</a>
+<span class="sourceLineNo">210</span><a id="line.210">         *              none is specified.</a>
+<span class="sourceLineNo">211</span><a id="line.211">         */</a>
+<span class="sourceLineNo">212</span><a id="line.212">        public String getMagicName() {</a>
+<span class="sourceLineNo">213</span><a id="line.213">            return (argv.length &gt; 0) ? argv[0] : null;</a>
+<span class="sourceLineNo">214</span><a id="line.214">        }</a>
+<span class="sourceLineNo">215</span><a id="line.215">    }</a>
+<span class="sourceLineNo">216</span><a id="line.216">}</a>
 
 
 

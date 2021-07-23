@@ -542,84 +542,102 @@
 <span class="sourceLineNo">533</span><a id="line.533">        }</a>
 <span class="sourceLineNo">534</span><a id="line.534">    }</a>
 <span class="sourceLineNo">535</span><a id="line.535"></a>
-<span class="sourceLineNo">536</span><a id="line.536">    @Override</a>
-<span class="sourceLineNo">537</span><a id="line.537">    public String toString() {</a>
-<span class="sourceLineNo">538</span><a id="line.538">        var string =</a>
-<span class="sourceLineNo">539</span><a id="line.539">            Stream.of(envelope().stream().map(ZData::new),</a>
-<span class="sourceLineNo">540</span><a id="line.540">                      Stream.of(DELIMITER_STRING, "DIGEST"),</a>
-<span class="sourceLineNo">541</span><a id="line.541">                      Stream.of(header(), parentHeader(), metadata(), content())</a>
-<span class="sourceLineNo">542</span><a id="line.542">                      .map(t -&gt; t.toPrettyString()),</a>
-<span class="sourceLineNo">543</span><a id="line.543">                      buffers().stream().map(ZData::new))</a>
-<span class="sourceLineNo">544</span><a id="line.544">            .flatMap(t -&gt; t)</a>
-<span class="sourceLineNo">545</span><a id="line.545">            .map(Object::toString)</a>
-<span class="sourceLineNo">546</span><a id="line.546">            .collect(joining("\n"));</a>
-<span class="sourceLineNo">547</span><a id="line.547"></a>
-<span class="sourceLineNo">548</span><a id="line.548">        return string;</a>
-<span class="sourceLineNo">549</span><a id="line.549">    }</a>
+<span class="sourceLineNo">536</span><a id="line.536">    /**</a>
+<span class="sourceLineNo">537</span><a id="line.537">     * Convenience method to return {@link #header}, {@link #parentHeader},</a>
+<span class="sourceLineNo">538</span><a id="line.538">     * {@link metadata}, and {@link #content} wrapped in an</a>
+<span class="sourceLineNo">539</span><a id="line.539">     * {@link ObjectNode}.</a>
+<span class="sourceLineNo">540</span><a id="line.540">     *</a>
+<span class="sourceLineNo">541</span><a id="line.541">     * @return The {@link ObjectNode}.</a>
+<span class="sourceLineNo">542</span><a id="line.542">     */</a>
+<span class="sourceLineNo">543</span><a id="line.543">    public ObjectNode asObjectNode() {</a>
+<span class="sourceLineNo">544</span><a id="line.544">        var node = new ObjectNode(JsonNodeFactory.instance);</a>
+<span class="sourceLineNo">545</span><a id="line.545"></a>
+<span class="sourceLineNo">546</span><a id="line.546">        node.set("header", header);</a>
+<span class="sourceLineNo">547</span><a id="line.547">        node.set("parentHeader", parentHeader);</a>
+<span class="sourceLineNo">548</span><a id="line.548">        node.set("metadata", metadata);</a>
+<span class="sourceLineNo">549</span><a id="line.549">        node.set("content", content);</a>
 <span class="sourceLineNo">550</span><a id="line.550"></a>
-<span class="sourceLineNo">551</span><a id="line.551">    private static class Copy extends Message {</a>
-<span class="sourceLineNo">552</span><a id="line.552">        public Copy(Message message) {</a>
-<span class="sourceLineNo">553</span><a id="line.553">            super(null);</a>
-<span class="sourceLineNo">554</span><a id="line.554"></a>
-<span class="sourceLineNo">555</span><a id="line.555">            envelope().addAll(message.envelope());</a>
-<span class="sourceLineNo">556</span><a id="line.556">            header().setAll(message.header());</a>
-<span class="sourceLineNo">557</span><a id="line.557">            parentHeader().setAll(message.parentHeader());</a>
-<span class="sourceLineNo">558</span><a id="line.558">            metadata().setAll(message.metadata());</a>
-<span class="sourceLineNo">559</span><a id="line.559">            content().setAll(message.content());</a>
-<span class="sourceLineNo">560</span><a id="line.560">            buffers().addAll(message.buffers());</a>
-<span class="sourceLineNo">561</span><a id="line.561">        }</a>
-<span class="sourceLineNo">562</span><a id="line.562">    }</a>
-<span class="sourceLineNo">563</span><a id="line.563"></a>
-<span class="sourceLineNo">564</span><a id="line.564">    private static abstract class Child extends Message {</a>
-<span class="sourceLineNo">565</span><a id="line.565">        protected Child(String msg_type, Message request) {</a>
-<span class="sourceLineNo">566</span><a id="line.566">            super(null);</a>
-<span class="sourceLineNo">567</span><a id="line.567"></a>
-<span class="sourceLineNo">568</span><a id="line.568">            if (msg_type != null) {</a>
-<span class="sourceLineNo">569</span><a id="line.569">                msg_type(msg_type);</a>
-<span class="sourceLineNo">570</span><a id="line.570">            }</a>
-<span class="sourceLineNo">571</span><a id="line.571"></a>
-<span class="sourceLineNo">572</span><a id="line.572">            if (request != null) {</a>
-<span class="sourceLineNo">573</span><a id="line.573">                parentHeader().setAll(request.header());</a>
-<span class="sourceLineNo">574</span><a id="line.574">            }</a>
-<span class="sourceLineNo">575</span><a id="line.575">        }</a>
-<span class="sourceLineNo">576</span><a id="line.576">    }</a>
-<span class="sourceLineNo">577</span><a id="line.577"></a>
-<span class="sourceLineNo">578</span><a id="line.578">    private static class Reply extends Child {</a>
-<span class="sourceLineNo">579</span><a id="line.579">        public Reply(Message request) {</a>
-<span class="sourceLineNo">580</span><a id="line.580">            super(request.getMessageTypeAction() + "_reply", request);</a>
+<span class="sourceLineNo">551</span><a id="line.551">        return node;</a>
+<span class="sourceLineNo">552</span><a id="line.552">    }</a>
+<span class="sourceLineNo">553</span><a id="line.553"></a>
+<span class="sourceLineNo">554</span><a id="line.554">    @Override</a>
+<span class="sourceLineNo">555</span><a id="line.555">    public String toString() {</a>
+<span class="sourceLineNo">556</span><a id="line.556">        var string =</a>
+<span class="sourceLineNo">557</span><a id="line.557">            Stream.of(envelope().stream().map(ZData::new),</a>
+<span class="sourceLineNo">558</span><a id="line.558">                      Stream.of(DELIMITER_STRING, "DIGEST"),</a>
+<span class="sourceLineNo">559</span><a id="line.559">                      Stream.of(header(), parentHeader(), metadata(), content())</a>
+<span class="sourceLineNo">560</span><a id="line.560">                      .map(t -&gt; t.toPrettyString()),</a>
+<span class="sourceLineNo">561</span><a id="line.561">                      buffers().stream().map(ZData::new))</a>
+<span class="sourceLineNo">562</span><a id="line.562">            .flatMap(t -&gt; t)</a>
+<span class="sourceLineNo">563</span><a id="line.563">            .map(Object::toString)</a>
+<span class="sourceLineNo">564</span><a id="line.564">            .collect(joining("\n"));</a>
+<span class="sourceLineNo">565</span><a id="line.565"></a>
+<span class="sourceLineNo">566</span><a id="line.566">        return string;</a>
+<span class="sourceLineNo">567</span><a id="line.567">    }</a>
+<span class="sourceLineNo">568</span><a id="line.568"></a>
+<span class="sourceLineNo">569</span><a id="line.569">    private static class Copy extends Message {</a>
+<span class="sourceLineNo">570</span><a id="line.570">        public Copy(Message message) {</a>
+<span class="sourceLineNo">571</span><a id="line.571">            super(null);</a>
+<span class="sourceLineNo">572</span><a id="line.572"></a>
+<span class="sourceLineNo">573</span><a id="line.573">            envelope().addAll(message.envelope());</a>
+<span class="sourceLineNo">574</span><a id="line.574">            header().setAll(message.header());</a>
+<span class="sourceLineNo">575</span><a id="line.575">            parentHeader().setAll(message.parentHeader());</a>
+<span class="sourceLineNo">576</span><a id="line.576">            metadata().setAll(message.metadata());</a>
+<span class="sourceLineNo">577</span><a id="line.577">            content().setAll(message.content());</a>
+<span class="sourceLineNo">578</span><a id="line.578">            buffers().addAll(message.buffers());</a>
+<span class="sourceLineNo">579</span><a id="line.579">        }</a>
+<span class="sourceLineNo">580</span><a id="line.580">    }</a>
 <span class="sourceLineNo">581</span><a id="line.581"></a>
-<span class="sourceLineNo">582</span><a id="line.582">            if (request.isRequest()) {</a>
-<span class="sourceLineNo">583</span><a id="line.583">                envelope().addAll(request.envelope());</a>
-<span class="sourceLineNo">584</span><a id="line.584">                content().setAll(content(null, null));</a>
-<span class="sourceLineNo">585</span><a id="line.585">                buffers().addAll(request.buffers());</a>
-<span class="sourceLineNo">586</span><a id="line.586">            } else {</a>
-<span class="sourceLineNo">587</span><a id="line.587">                throw new IllegalStateException("Source message is not a request");</a>
+<span class="sourceLineNo">582</span><a id="line.582">    private static abstract class Child extends Message {</a>
+<span class="sourceLineNo">583</span><a id="line.583">        protected Child(String msg_type, Message request) {</a>
+<span class="sourceLineNo">584</span><a id="line.584">            super(null);</a>
+<span class="sourceLineNo">585</span><a id="line.585"></a>
+<span class="sourceLineNo">586</span><a id="line.586">            if (msg_type != null) {</a>
+<span class="sourceLineNo">587</span><a id="line.587">                msg_type(msg_type);</a>
 <span class="sourceLineNo">588</span><a id="line.588">            }</a>
-<span class="sourceLineNo">589</span><a id="line.589">        }</a>
-<span class="sourceLineNo">590</span><a id="line.590">    }</a>
-<span class="sourceLineNo">591</span><a id="line.591"></a>
-<span class="sourceLineNo">592</span><a id="line.592">    private static class Pub extends Child {</a>
-<span class="sourceLineNo">593</span><a id="line.593">        public Pub(String msg_type, Message request) {</a>
-<span class="sourceLineNo">594</span><a id="line.594">            super(msg_type, request);</a>
+<span class="sourceLineNo">589</span><a id="line.589"></a>
+<span class="sourceLineNo">590</span><a id="line.590">            if (request != null) {</a>
+<span class="sourceLineNo">591</span><a id="line.591">                parentHeader().setAll(request.header());</a>
+<span class="sourceLineNo">592</span><a id="line.592">            }</a>
+<span class="sourceLineNo">593</span><a id="line.593">        }</a>
+<span class="sourceLineNo">594</span><a id="line.594">    }</a>
 <span class="sourceLineNo">595</span><a id="line.595"></a>
-<span class="sourceLineNo">596</span><a id="line.596">            envelope().clear();</a>
-<span class="sourceLineNo">597</span><a id="line.597"></a>
-<span class="sourceLineNo">598</span><a id="line.598">            var topic = msg_type;</a>
+<span class="sourceLineNo">596</span><a id="line.596">    private static class Reply extends Child {</a>
+<span class="sourceLineNo">597</span><a id="line.597">        public Reply(Message request) {</a>
+<span class="sourceLineNo">598</span><a id="line.598">            super(request.getMessageTypeAction() + "_reply", request);</a>
 <span class="sourceLineNo">599</span><a id="line.599"></a>
-<span class="sourceLineNo">600</span><a id="line.600">            if (request != null &amp;&amp; request.connection != null) {</a>
-<span class="sourceLineNo">601</span><a id="line.601">                var kernelId = request.connection.getKernelId();</a>
-<span class="sourceLineNo">602</span><a id="line.602"></a>
-<span class="sourceLineNo">603</span><a id="line.603">                if (kernelId != null) {</a>
-<span class="sourceLineNo">604</span><a id="line.604">                    topic = String.format("kernel.%s.%s", kernelId, msg_type);</a>
-<span class="sourceLineNo">605</span><a id="line.605">                }</a>
+<span class="sourceLineNo">600</span><a id="line.600">            if (request.isRequest()) {</a>
+<span class="sourceLineNo">601</span><a id="line.601">                envelope().addAll(request.envelope());</a>
+<span class="sourceLineNo">602</span><a id="line.602">                content().setAll(content(null, null));</a>
+<span class="sourceLineNo">603</span><a id="line.603">                buffers().addAll(request.buffers());</a>
+<span class="sourceLineNo">604</span><a id="line.604">            } else {</a>
+<span class="sourceLineNo">605</span><a id="line.605">                throw new IllegalStateException("Source message is not a request");</a>
 <span class="sourceLineNo">606</span><a id="line.606">            }</a>
-<span class="sourceLineNo">607</span><a id="line.607"></a>
-<span class="sourceLineNo">608</span><a id="line.608">            if (topic != null) {</a>
-<span class="sourceLineNo">609</span><a id="line.609">                envelope().add(topic.getBytes(ZMQ.CHARSET));</a>
-<span class="sourceLineNo">610</span><a id="line.610">            }</a>
-<span class="sourceLineNo">611</span><a id="line.611">        }</a>
-<span class="sourceLineNo">612</span><a id="line.612">    }</a>
-<span class="sourceLineNo">613</span><a id="line.613">}</a>
+<span class="sourceLineNo">607</span><a id="line.607">        }</a>
+<span class="sourceLineNo">608</span><a id="line.608">    }</a>
+<span class="sourceLineNo">609</span><a id="line.609"></a>
+<span class="sourceLineNo">610</span><a id="line.610">    private static class Pub extends Child {</a>
+<span class="sourceLineNo">611</span><a id="line.611">        public Pub(String msg_type, Message request) {</a>
+<span class="sourceLineNo">612</span><a id="line.612">            super(msg_type, request);</a>
+<span class="sourceLineNo">613</span><a id="line.613"></a>
+<span class="sourceLineNo">614</span><a id="line.614">            envelope().clear();</a>
+<span class="sourceLineNo">615</span><a id="line.615"></a>
+<span class="sourceLineNo">616</span><a id="line.616">            var topic = msg_type;</a>
+<span class="sourceLineNo">617</span><a id="line.617"></a>
+<span class="sourceLineNo">618</span><a id="line.618">            if (request != null &amp;&amp; request.connection != null) {</a>
+<span class="sourceLineNo">619</span><a id="line.619">                var kernelId = request.connection.getKernelId();</a>
+<span class="sourceLineNo">620</span><a id="line.620"></a>
+<span class="sourceLineNo">621</span><a id="line.621">                if (kernelId != null) {</a>
+<span class="sourceLineNo">622</span><a id="line.622">                    topic = String.format("kernel.%s.%s", kernelId, msg_type);</a>
+<span class="sourceLineNo">623</span><a id="line.623">                }</a>
+<span class="sourceLineNo">624</span><a id="line.624">            }</a>
+<span class="sourceLineNo">625</span><a id="line.625"></a>
+<span class="sourceLineNo">626</span><a id="line.626">            if (topic != null) {</a>
+<span class="sourceLineNo">627</span><a id="line.627">                envelope().add(topic.getBytes(ZMQ.CHARSET));</a>
+<span class="sourceLineNo">628</span><a id="line.628">            }</a>
+<span class="sourceLineNo">629</span><a id="line.629">        }</a>
+<span class="sourceLineNo">630</span><a id="line.630">    }</a>
+<span class="sourceLineNo">631</span><a id="line.631">}</a>
 
 
 

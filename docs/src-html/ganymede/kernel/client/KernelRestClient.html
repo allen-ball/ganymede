@@ -65,44 +65,51 @@
 <span class="sourceLineNo">056</span><a id="line.56">    }</a>
 <span class="sourceLineNo">057</span><a id="line.57"></a>
 <span class="sourceLineNo">058</span><a id="line.58">    /**</a>
-<span class="sourceLineNo">059</span><a id="line.59">     * See {@link DefaultApi#display(JsonNode)}.</a>
-<span class="sourceLineNo">060</span><a id="line.60">     *</a>
-<span class="sourceLineNo">061</span><a id="line.61">     * @param   bundle          The MIME bundle {@link JsonNode}.</a>
-<span class="sourceLineNo">062</span><a id="line.62">     */</a>
-<span class="sourceLineNo">063</span><a id="line.63">    public void display(JsonNode bundle) throws Exception {</a>
-<span class="sourceLineNo">064</span><a id="line.64">        new DefaultApi(this).display(bundle);</a>
-<span class="sourceLineNo">065</span><a id="line.65">    }</a>
-<span class="sourceLineNo">066</span><a id="line.66"></a>
-<span class="sourceLineNo">067</span><a id="line.67">    /**</a>
-<span class="sourceLineNo">068</span><a id="line.68">     * See {@link DefaultApi#print(JsonNode)}.</a>
-<span class="sourceLineNo">069</span><a id="line.69">     *</a>
-<span class="sourceLineNo">070</span><a id="line.70">     * @param   bundle          The MIME bundle {@link JsonNode}.</a>
-<span class="sourceLineNo">071</span><a id="line.71">     */</a>
-<span class="sourceLineNo">072</span><a id="line.72">    public void print(JsonNode bundle) throws Exception {</a>
-<span class="sourceLineNo">073</span><a id="line.73">        new DefaultApi(this).print(bundle);</a>
-<span class="sourceLineNo">074</span><a id="line.74">    }</a>
-<span class="sourceLineNo">075</span><a id="line.75"></a>
-<span class="sourceLineNo">076</span><a id="line.76">    /**</a>
-<span class="sourceLineNo">077</span><a id="line.77">     * See {@link DefaultApi#classpath()}.</a>
+<span class="sourceLineNo">059</span><a id="line.59">     * See {@link DefaultApi#getExecuteRequest()}.</a>
+<span class="sourceLineNo">060</span><a id="line.60">     */</a>
+<span class="sourceLineNo">061</span><a id="line.61">    public JsonNode getExecuteRequest() throws Exception {</a>
+<span class="sourceLineNo">062</span><a id="line.62">        return new DefaultApi(this).getExecuteRequest();</a>
+<span class="sourceLineNo">063</span><a id="line.63">    }</a>
+<span class="sourceLineNo">064</span><a id="line.64"></a>
+<span class="sourceLineNo">065</span><a id="line.65">    /**</a>
+<span class="sourceLineNo">066</span><a id="line.66">     * See {@link DefaultApi#display(JsonNode)}.</a>
+<span class="sourceLineNo">067</span><a id="line.67">     *</a>
+<span class="sourceLineNo">068</span><a id="line.68">     * @param   bundle          The MIME bundle {@link JsonNode}.</a>
+<span class="sourceLineNo">069</span><a id="line.69">     */</a>
+<span class="sourceLineNo">070</span><a id="line.70">    public void display(JsonNode bundle) throws Exception {</a>
+<span class="sourceLineNo">071</span><a id="line.71">        new DefaultApi(this).display(bundle);</a>
+<span class="sourceLineNo">072</span><a id="line.72">    }</a>
+<span class="sourceLineNo">073</span><a id="line.73"></a>
+<span class="sourceLineNo">074</span><a id="line.74">    /**</a>
+<span class="sourceLineNo">075</span><a id="line.75">     * See {@link DefaultApi#print(JsonNode)}.</a>
+<span class="sourceLineNo">076</span><a id="line.76">     *</a>
+<span class="sourceLineNo">077</span><a id="line.77">     * @param   bundle          The MIME bundle {@link JsonNode}.</a>
 <span class="sourceLineNo">078</span><a id="line.78">     */</a>
-<span class="sourceLineNo">079</span><a id="line.79">    public List&lt;String&gt; classpath() throws Exception {</a>
-<span class="sourceLineNo">080</span><a id="line.80">        return new DefaultApi(this).classpath();</a>
+<span class="sourceLineNo">079</span><a id="line.79">    public void print(JsonNode bundle) throws Exception {</a>
+<span class="sourceLineNo">080</span><a id="line.80">        new DefaultApi(this).print(bundle);</a>
 <span class="sourceLineNo">081</span><a id="line.81">    }</a>
 <span class="sourceLineNo">082</span><a id="line.82"></a>
 <span class="sourceLineNo">083</span><a id="line.83">    /**</a>
-<span class="sourceLineNo">084</span><a id="line.84">     * See {@link DefaultApi#imports()}.</a>
+<span class="sourceLineNo">084</span><a id="line.84">     * See {@link DefaultApi#classpath()}.</a>
 <span class="sourceLineNo">085</span><a id="line.85">     */</a>
-<span class="sourceLineNo">086</span><a id="line.86">    public List&lt;String&gt; imports() throws Exception {</a>
-<span class="sourceLineNo">087</span><a id="line.87">        return new DefaultApi(this).imports();</a>
+<span class="sourceLineNo">086</span><a id="line.86">    public List&lt;String&gt; classpath() throws Exception {</a>
+<span class="sourceLineNo">087</span><a id="line.87">        return new DefaultApi(this).classpath();</a>
 <span class="sourceLineNo">088</span><a id="line.88">    }</a>
 <span class="sourceLineNo">089</span><a id="line.89"></a>
 <span class="sourceLineNo">090</span><a id="line.90">    /**</a>
-<span class="sourceLineNo">091</span><a id="line.91">     * See {@link DefaultApi#variables()}.</a>
+<span class="sourceLineNo">091</span><a id="line.91">     * See {@link DefaultApi#imports()}.</a>
 <span class="sourceLineNo">092</span><a id="line.92">     */</a>
-<span class="sourceLineNo">093</span><a id="line.93">    public Map&lt;String,String&gt; variables() throws Exception {</a>
-<span class="sourceLineNo">094</span><a id="line.94">        return new DefaultApi(this).variables();</a>
+<span class="sourceLineNo">093</span><a id="line.93">    public List&lt;String&gt; imports() throws Exception {</a>
+<span class="sourceLineNo">094</span><a id="line.94">        return new DefaultApi(this).imports();</a>
 <span class="sourceLineNo">095</span><a id="line.95">    }</a>
-<span class="sourceLineNo">096</span><a id="line.96">}</a>
+<span class="sourceLineNo">096</span><a id="line.96"></a>
+<span class="sourceLineNo">097</span><a id="line.97">    /**</a>
+<span class="sourceLineNo">098</span><a id="line.98">     * See {@link DefaultApi#variables()}.</a>
+<span class="sourceLineNo">099</span><a id="line.99">     */</a>
+<span class="sourceLineNo">100</span><a id="line.100">    public Map&lt;String,String&gt; variables() throws Exception {</a>
+<span class="sourceLineNo">101</span><a id="line.101">        return new DefaultApi(this).variables();</a>
+<span class="sourceLineNo">102</span><a id="line.102">    }</a>
+<span class="sourceLineNo">103</span><a id="line.103">}</a>
 
 
 
