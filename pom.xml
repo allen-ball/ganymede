@@ -85,6 +85,15 @@
   </pluginRepositories>
   <profiles>
     <profile>
+      <id>JAVA_POST_PROCESS_FILE</id>
+      <activation>
+        <property><name>env.JAVA_POST_PROCESS_FILE</name></property>
+      </activation>
+      <properties>
+        <openapi.generator.maven.plugin.enablePostProcessFile>true</openapi.generator.maven.plugin.enablePostProcessFile>
+      </properties>
+    </profile>
+    <profile>
       <id>jeromq-SNAPSHOT</id>
       <repositories>
         <repository>
