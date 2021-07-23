@@ -201,6 +201,11 @@ public class Kernel extends Server implements KernelApi,
     }
 
     @Override
+    public ResponseEntity<ObjectNode> getExecuteRequest() {
+        return new ResponseEntity<>(request.asObjectNode(), HttpStatus.OK);
+    }
+
+    @Override
     public ResponseEntity<Void> display(ObjectNode body) {
         var request = this.request;
 

@@ -533,6 +533,24 @@ public class Message {
         }
     }
 
+    /**
+     * Convenience method to return {@link #header}, {@link #parentHeader},
+     * {@link metadata}, and {@link #content} wrapped in an
+     * {@link ObjectNode}.
+     *
+     * @return The {@link ObjectNode}.
+     */
+    public ObjectNode asObjectNode() {
+        var node = new ObjectNode(JsonNodeFactory.instance);
+
+        node.set("header", header);
+        node.set("parentHeader", parentHeader);
+        node.set("metadata", metadata);
+        node.set("content", content);
+
+        return node;
+    }
+
     @Override
     public String toString() {
         var string =

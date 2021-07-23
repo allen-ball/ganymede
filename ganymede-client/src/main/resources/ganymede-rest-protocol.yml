@@ -20,7 +20,19 @@ paths:
             application/json:
               schema:
                 type: UUID
-  /kernel/display:
+  /kernel/execute-request:
+    get:
+      summary: Get current execute_request
+      operationId: getExecuteRequest
+      parameters: [ ]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: JsonNode
+  /kernel/function/display:
     put:
       summary: Jupyter display implemenation
       operationId: display
@@ -35,7 +47,7 @@ paths:
       responses:
         '200':
           description: OK
-  /kernel/print:
+  /kernel/function/print:
     put:
       operationId: print
       summary: Jupyter print implemenation

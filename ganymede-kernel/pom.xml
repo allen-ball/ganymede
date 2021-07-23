@@ -334,6 +334,7 @@
                 <supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
                 <configOptions>
                   <delegatePattern>true</delegatePattern>
+                  <skipDefaultInterface>true</skipDefaultInterface>
                 </configOptions>
               </configOptions>
             </configuration>

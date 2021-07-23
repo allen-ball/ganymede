@@ -56,6 +56,13 @@ public class KernelRestClient extends ApiClient {
     }
 
     /**
+     * See {@link DefaultApi#getExecuteRequest()}.
+     */
+    public JsonNode getExecuteRequest() throws Exception {
+        return new DefaultApi(this).getExecuteRequest();
+    }
+
+    /**
      * See {@link DefaultApi#display(JsonNode)}.
      *
      * @param   bundle          The MIME bundle {@link JsonNode}.
