@@ -62,9 +62,6 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
  *
  * {@bean.info}
  *
- * <p>{@link KernelApi} implements:</p>
- * {@include /ganymede-rest-protocol.yml}
- *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 @SpringBootApplication

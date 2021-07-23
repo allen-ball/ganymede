@@ -1,6 +1,9 @@
 /**
  * {@code ganymede-rest-protocol.yml} client classes.
  *
+ * <p>{@link ApiClient} implements:</p>
+ * {@include /ganymede-rest-protocol.yml}
+ *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 @Manifest.Section @Generated("OpenAPI")

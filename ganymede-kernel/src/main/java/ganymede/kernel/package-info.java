@@ -1,6 +1,9 @@
 /**
  * Ganymede Jupyter {@link Kernel}.
  *
+ * <p>{@link KernelApi} implements:</p>
+ * {@include /ganymede-rest-protocol.yml}
+ *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 @Manifest.Section @Generated("OpenAPI")

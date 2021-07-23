@@ -4,7 +4,7 @@ openapi: "3.0.0"
 info:
   title: Ganymede Kernel Rest Protocol
   description: Ganymede Kernel Rest Protocol
-  version: @project.majorVersion@.@project.minorVersion@.@project.incrementalVersion@
+  version: "@project.majorVersion@.@project.minorVersion@.@project.incrementalVersion@"
 servers:
   - url: http://localhost/
 paths:

@@ -29,9 +29,6 @@ import lombok.extern.log4j.Log4j2;
 /**
  * Ganymede {@link ganymede.kernel.Kernel} REST client.
  *
- * <p>{@link ApiClient} implements:</p>
- * {@include /ganymede-rest-protocol.yml}
- *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 @ToString @Log4j2
