@@ -100,7 +100,7 @@ public class NotebookContext {
 
     /**
      * Common {@link ScriptContext} supplied to
-     * {@link Magic#execute(String,String)}.
+     * {@link Magic#execute(String,String,JsonNode)}.
      */
     public final ScriptContext context =
         new SimpleScriptContext() {
@@ -180,9 +180,10 @@ public class NotebookContext {
             if (magic != null) {
                 var request = krc.getExecuteRequest();
                 var code = request.at("/content/code").asText();
+                var metadata = request.at("/metadata");
                 var application = new Magic.Application(code);
 
-                magic.execute(application.getLine0(), application.getCode());
+                magic.execute(application.getLine0(), application.getCode(), metadata);
             } else {
                 System.err.format("Magic '%s' not found\n", name);
             }

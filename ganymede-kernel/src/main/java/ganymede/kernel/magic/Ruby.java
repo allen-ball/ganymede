@@ -18,6 +18,7 @@ package ganymede.kernel.magic;
  * limitations under the License.
  * ##########################################################################
  */
+import com.fasterxml.jackson.databind.JsonNode;
 import ball.annotation.ServiceProviderFor;
 import ganymede.notebook.Description;
 import ganymede.notebook.Magic;
@@ -35,12 +36,9 @@ import lombok.extern.log4j.Log4j2;
 @NoArgsConstructor @ToString @Log4j2
 public class Ruby extends Script {
     @Override
-    public void execute(String line0, String code) throws Exception {
+    public void execute(String line0, String code, JsonNode metadata) throws Exception {
         try {
-            super.execute(String.format("%s%s %s",
-                                        CELL, "script",
-                                        line0.substring(CELL.length())),
-                          code);
+            super.execute(rewrite(line0), code, metadata);
         } catch (IllegalArgumentException exception) {
             throw new IllegalArgumentException(line0);
         }

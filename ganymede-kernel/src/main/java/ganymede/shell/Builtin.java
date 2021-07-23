@@ -18,6 +18,7 @@ package ganymede.shell;
  * limitations under the License.
  * ##########################################################################
  */
+import com.fasterxml.jackson.databind.JsonNode;
 import ganymede.notebook.AbstractMagic;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -48,7 +49,7 @@ public abstract class Builtin extends AbstractMagic {
                                  Application application) throws Exception;
 
     @Override
-    public void execute(String line0, String code) throws Exception {
+    public void execute(String line0, String code, JsonNode metadata) throws Exception {
         throw new IllegalStateException(line0);
     }
 }

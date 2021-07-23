@@ -18,6 +18,7 @@ package ganymede.kernel.magic;
  * limitations under the License.
  * ##########################################################################
  */
+import com.fasterxml.jackson.databind.JsonNode;
 import ball.annotation.ServiceProviderFor;
 import ganymede.kernel.client.KernelRestClient;
 import ganymede.kernel.renderer.ThymeleafRenderer;
@@ -44,7 +45,7 @@ import static javax.script.ScriptContext.ENGINE_SCOPE;
 @NoArgsConstructor @ToString @Log4j2
 public class Java extends AbstractMagic {
     @Override
-    public void execute(String line0, String code) throws Exception {
+    public void execute(String line0, String code, JsonNode metadata) throws Exception {
         if (code.isBlank()) {
             var resource = getClass().getSimpleName();
             var map =

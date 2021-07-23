@@ -18,6 +18,7 @@ package ganymede.kernel.magic;
  * limitations under the License.
  * ##########################################################################
  */
+import com.fasterxml.jackson.databind.JsonNode;
 import ball.annotation.ServiceProviderFor;
 import ganymede.kernel.client.KernelRestClient;
 import ganymede.kernel.renderer.ThymeleafRenderer;
@@ -43,7 +44,7 @@ import static java.util.stream.Collectors.toList;
 @NoArgsConstructor @ToString @Log4j2
 public class Magics extends AbstractMagic {
     @Override
-    public void execute(String line0, String code) throws Exception {
+    public void execute(String line0, String code, JsonNode metadata) throws Exception {
         var resource = getClass().getSimpleName();
         var rows =
             context.magics().values().stream()

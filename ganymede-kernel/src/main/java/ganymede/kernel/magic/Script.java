@@ -18,6 +18,7 @@ package ganymede.kernel.magic;
  * limitations under the License.
  * ##########################################################################
  */
+import com.fasterxml.jackson.databind.JsonNode;
 import ball.annotation.ServiceProviderFor;
 import ganymede.notebook.AbstractMagic;
 import ganymede.notebook.Description;
@@ -42,7 +43,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @NoArgsConstructor @ToString @Log4j2
 public class Script extends AbstractMagic {
     @Override
-    public void execute(String line0, String code) throws Exception {
+    public void execute(String line0, String code, JsonNode metadata) throws Exception {
         var argv =
             Stream.of(Magic.getCellMagicCommand(line0))
             .skip(1)
@@ -63,5 +64,10 @@ public class Script extends AbstractMagic {
 
             int status = process.waitFor();
         }
+    }
+
+    protected String rewrite(String line0) {
+        return String.format("%s%s %s",
+                             CELL, "script", line0.substring(CELL.length()));
     }
 }

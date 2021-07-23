@@ -18,6 +18,7 @@ package ganymede.notebook;
  * limitations under the License.
  * ##########################################################################
  */
+import com.fasterxml.jackson.databind.JsonNode;
 import ganymede.notebook.Magic;
 import java.io.InputStreamReader;
 import java.util.List;
@@ -108,7 +109,7 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic
     }
 
     @Override
-    public void execute(String line0, String code) throws Exception {
+    public void execute(String line0, String code, JsonNode metadata) throws Exception {
         execute(Magic.getCellMagicCommand(line0), code);
     }
 
@@ -132,8 +133,8 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic
     }
 
     /**
-     * Target of {@link #execute(String,String)}.  The
-     * {@code argv} is available in the {@link javax.script.ScriptContext}
+     * Target of {@link #execute(String[],String)}.  The {@code argv} is
+     * available in the {@link javax.script.ScriptContext}
      * {@code ENGINE_SCOPE} {@link javax.script.Bindings} as
      * {@link ScriptEngine#ARGV ScriptEngine.ARGV}.
      *

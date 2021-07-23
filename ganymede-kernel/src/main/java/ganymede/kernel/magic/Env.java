@@ -18,6 +18,7 @@ package ganymede.kernel.magic;
  * limitations under the License.
  * ##########################################################################
  */
+import com.fasterxml.jackson.databind.JsonNode;
 import ball.annotation.ServiceProviderFor;
 import ganymede.notebook.AbstractPropertiesMagic;
 import ganymede.notebook.Description;
@@ -37,7 +38,7 @@ import lombok.extern.log4j.Log4j2;
 @NoArgsConstructor @ToString @Log4j2
 public class Env extends AbstractPropertiesMagic {
     @Override
-    public void execute(String line0, String code) throws Exception {
+    public void execute(String line0, String code, JsonNode metadata) throws Exception {
         if (! code.isBlank()) {
             var properties = compile(code);
 

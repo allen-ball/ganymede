@@ -18,6 +18,7 @@ package ganymede.shell;
  * limitations under the License.
  * ##########################################################################
  */
+import com.fasterxml.jackson.databind.JsonNode;
 import ganymede.dependency.POM;
 import ganymede.dependency.Resolver;
 import ganymede.kernel.Kernel;
@@ -483,7 +484,7 @@ public class Shell implements AutoCloseable {
         }
 
         @Override
-        public void execute(String line0, String code) throws Exception {
+        public void execute(String line0, String code, JsonNode metadata) throws Exception {
             throw new IllegalStateException();
         }
 

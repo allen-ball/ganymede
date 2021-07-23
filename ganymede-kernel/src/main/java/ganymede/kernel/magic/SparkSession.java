@@ -18,6 +18,7 @@ package ganymede.kernel.magic;
  * limitations under the License.
  * ##########################################################################
  */
+import com.fasterxml.jackson.databind.JsonNode;
 import ball.annotation.ServiceProviderFor;
 import ganymede.notebook.AbstractPropertiesMagic;
 import ganymede.notebook.Description;
@@ -51,7 +52,7 @@ import static org.apache.spark.sql.SparkSession.setDefaultSession;
 @NoArgsConstructor @ToString @Log4j2
 public class SparkSession extends AbstractPropertiesMagic {
     @Override
-    public void execute(String line0, String code) throws Exception {
+    public void execute(String line0, String code, JsonNode metadata) throws Exception {
         try {
             var argv = Magic.getCellMagicCommand(line0);
             var arguments = new Arguments();

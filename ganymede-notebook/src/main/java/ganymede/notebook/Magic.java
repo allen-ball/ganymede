@@ -18,6 +18,7 @@ package ganymede.notebook;
  * limitations under the License.
  * ##########################################################################
  */
+import com.fasterxml.jackson.databind.JsonNode;
 import ganymede.notebook.NotebookContext;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -102,8 +103,10 @@ public interface Magic {
      *
      * @param   line0           The initial magic line.
      * @param   code            The remainder of the cell.
+     * @param   metadata        The metadata from the Jupyter
+     *                          {@code execute_request}.
      */
-    public void execute(String line0, String code) throws Exception;
+    public void execute(String line0, String code, JsonNode metadata) throws Exception;
 
     /**
      * Method to determine if the code is cell magic (starts with

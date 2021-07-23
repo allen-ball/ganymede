@@ -18,6 +18,7 @@ package ganymede.kernel.magic;
  * limitations under the License.
  * ##########################################################################
  */
+import com.fasterxml.jackson.databind.JsonNode;
 import ball.annotation.ServiceProviderFor;
 import ganymede.notebook.AbstractMagic;
 import ganymede.notebook.Description;
@@ -50,7 +51,7 @@ public class SQL extends AbstractMagic {
     private DSLContext dsl = null;
 
     @Override
-    public void execute(String line0, String code) throws Exception {
+    public void execute(String line0, String code, JsonNode metadata) throws Exception {
         try {
             if (dsl != null && (! context.sql.values().contains(dsl))) {
                 dsl = null;
