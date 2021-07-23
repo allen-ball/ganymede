@@ -321,7 +321,7 @@ public class Shell implements AutoCloseable {
             if (builtin != null) {
                 builtin.execute(this, in, out, err, application);
             } else {
-                NotebookContext.magic(jshell, name, application);
+                NotebookContext.invoke(jshell, name);
             }
         } catch (Exception exception) {
             exception.printStackTrace(err);
@@ -412,10 +412,8 @@ public class Shell implements AutoCloseable {
             if (! code.isBlank()) {
                 execute(shell.jshell(), in, out, err, code);
             } else {
-                var line0 = application.getLine0();
-
-                if (line0 != null) {
-                    NotebookContext.magic(jshell(), getMagicNames()[0], application);
+                if (application.getLine0() != null) {
+                    NotebookContext.invoke(jshell(), getMagicNames()[0]);
                 }
             }
         }

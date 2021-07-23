@@ -31,7 +31,6 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -68,8 +67,6 @@ import static jdk.jshell.Snippet.SubKind.TEMP_VAR_EXPRESSION_SUBKIND;
  */
 @NoArgsConstructor @ToString(callSuper = true, onlyExplicitlyIncluded = true)
 public class NotebookContext {
-    private static final Base64.Decoder DECODER = Base64.getDecoder();
-    private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     /**
      * The name ({@value #NAME}) the {@link NotebookContext} instance is
@@ -172,18 +169,20 @@ public class NotebookContext {
 
     /**
      * Method to receive a {@link Magic} request in the {@link JShell}
-     * instance.  See {@link #magic(JShell,String,Application)}.
+     * instance.  See {@link #invoke(JShell,String)}.
      *
      * @param   name            The magic name.
-     * @param   line0           The initial magic line.
-     * @param   code            The remainder of the cell.
      */
-    public void magic(String name, String line0, String code) {
+    public void invoke(String name) {
         try {
             var magic = magics.reload().get(name);
 
             if (magic != null) {
-                magic.execute(decode(line0), decode(code));
+                var request = krc.getExecuteRequest();
+                var code = request.at("/content/code").asText();
+                var application = new Magic.Application(code);
+
+                magic.execute(application.getLine0(), application.getCode());
             } else {
                 System.err.format("Magic '%s' not found\n", name);
             }
@@ -394,17 +393,14 @@ public class NotebookContext {
     }
 
     /**
-     * Static method invoke a {@link Magic} in a {@link JShell} instance.
-     * See {@link #magic(String,String,String)}.
+     * Static method to invoke a {@link Magic} in a {@link JShell} instance.
+     * See {@link #invoke(String)}.
      *
      * @param   jshell          The {@link JShell}.
      * @param   name            The magic name.
-     * @param   application     The {@link Magic.Application} instance.
      */
-    public static void magic(JShell jshell, String name, Magic.Application application) {
-        evaluate(jshell,
-                 "%1$s.magic(\"%2$s\", \"%3$s\", \"%4$s\")",
-                 NAME, name, encode(application.getLine0()), encode(application.getCode()));
+    public static void invoke(JShell jshell, String name) {
+        evaluate(jshell, "%1$s.invoke(\"%2$s\")", NAME, name);
     }
 
     /**
@@ -433,14 +429,6 @@ public class NotebookContext {
         }
 
         return string;
-    }
-
-    private static String decode(String string) {
-        return new String(DECODER.decode(string), UTF_8);
-    }
-
-    private static String encode(String string) {
-        return ENCODER.encodeToString(((string != null) ? string : "").getBytes(UTF_8));
     }
 
     /**
