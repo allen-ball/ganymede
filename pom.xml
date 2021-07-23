@@ -117,7 +117,7 @@
     <scala.binary.version>2.12</scala.binary.version>
     <scala.version>${scala.binary.version}.10</scala.version>
     <spark.version>3.1.2</spark.version>
-    <tablesaw.version>0.38.2</tablesaw.version>
+    <tablesaw.version>0.38.3</tablesaw.version>
 
     <ball-api.version>${ball-parent.version}</ball-api.version>
     <javadoc-offline-locations>${settings.localRepository}/javadoc-offline-locations</javadoc-offline-locations>
