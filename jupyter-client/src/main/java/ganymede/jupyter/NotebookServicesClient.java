@@ -23,9 +23,11 @@ import ganymede.jupyter.notebook.ApiClient;
 import ganymede.jupyter.notebook.ApiException;
 import ganymede.jupyter.notebook.JSON;
 import ganymede.jupyter.notebook.api.KernelsApi;
+import ganymede.jupyter.notebook.api.KernelspecsApi;
 import ganymede.jupyter.notebook.api.SessionsApi;
 import ganymede.jupyter.notebook.api.TerminalsApi;
 import ganymede.jupyter.notebook.model.Kernel;
+import ganymede.jupyter.notebook.model.KernelSpec;
 import ganymede.jupyter.notebook.model.Session;
 import ganymede.jupyter.notebook.model.Terminal;
 import java.io.File;
@@ -35,6 +37,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.ToString;
@@ -133,6 +136,15 @@ public class NotebookServicesClient extends ApiClient {
      */
     public Kernel getKernel(UUID id) throws ApiException {
         return new KernelsApi(this).apiKernelsKernelIdGet(id);
+    }
+
+    /**
+     * See {@link KernelspecsApi#apiKernelspecsGet()}.
+     *
+     * @return  The {@link Map} of {@link Kernelspec}s.
+     */
+    public Map<String,KernelSpec> getKernelSpecMap() throws ApiException {
+        return new KernelspecsApi(this).apiKernelspecsGet().getKernelspecs();
     }
 
     /**
