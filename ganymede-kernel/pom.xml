@@ -331,7 +331,6 @@
                 <invokerPackage>${ganymede.server.package}</invokerPackage>
                 <apiPackage>${ganymede.server.package}</apiPackage>
                 <modelPackage>${ganymede.server.package}</modelPackage>
-                <supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
                 <configOptions>
                   <delegatePattern>true</delegatePattern>
                   <skipDefaultInterface>true</skipDefaultInterface>
