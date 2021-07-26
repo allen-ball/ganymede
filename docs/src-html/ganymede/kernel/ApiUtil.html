@@ -9,23 +9,24 @@
 <div class="sourceContainer">
 <pre><span class="sourceLineNo">001</span><a id="line.1">package ganymede.kernel;</a>
 <span class="sourceLineNo">002</span><a id="line.2"></a>
-<span class="sourceLineNo">003</span><a id="line.3">import org.springframework.web.context.request.NativeWebRequest;</a>
-<span class="sourceLineNo">004</span><a id="line.4"></a>
-<span class="sourceLineNo">005</span><a id="line.5">import javax.servlet.http.HttpServletResponse;</a>
-<span class="sourceLineNo">006</span><a id="line.6">import java.io.IOException;</a>
-<span class="sourceLineNo">007</span><a id="line.7"></a>
-<span class="sourceLineNo">008</span><a id="line.8">public class ApiUtil {</a>
-<span class="sourceLineNo">009</span><a id="line.9">    public static void setExampleResponse(NativeWebRequest req, String contentType, String example) {</a>
-<span class="sourceLineNo">010</span><a id="line.10">        try {</a>
-<span class="sourceLineNo">011</span><a id="line.11">            HttpServletResponse res = req.getNativeResponse(HttpServletResponse.class);</a>
-<span class="sourceLineNo">012</span><a id="line.12">            res.setCharacterEncoding("UTF-8");</a>
-<span class="sourceLineNo">013</span><a id="line.13">            res.addHeader("Content-Type", contentType);</a>
-<span class="sourceLineNo">014</span><a id="line.14">            res.getWriter().print(example);</a>
-<span class="sourceLineNo">015</span><a id="line.15">        } catch (IOException e) {</a>
-<span class="sourceLineNo">016</span><a id="line.16">            throw new RuntimeException(e);</a>
-<span class="sourceLineNo">017</span><a id="line.17">        }</a>
+<span class="sourceLineNo">003</span><a id="line.3">import java.io.IOException;</a>
+<span class="sourceLineNo">004</span><a id="line.4">import javax.servlet.http.HttpServletResponse;</a>
+<span class="sourceLineNo">005</span><a id="line.5">import org.springframework.web.context.request.NativeWebRequest;</a>
+<span class="sourceLineNo">006</span><a id="line.6"></a>
+<span class="sourceLineNo">007</span><a id="line.7">public class ApiUtil {</a>
+<span class="sourceLineNo">008</span><a id="line.8">  public static void setExampleResponse(NativeWebRequest req,</a>
+<span class="sourceLineNo">009</span><a id="line.9">                                        String contentType, String example) {</a>
+<span class="sourceLineNo">010</span><a id="line.10">    try {</a>
+<span class="sourceLineNo">011</span><a id="line.11">      HttpServletResponse res =</a>
+<span class="sourceLineNo">012</span><a id="line.12">          req.getNativeResponse(HttpServletResponse.class);</a>
+<span class="sourceLineNo">013</span><a id="line.13">      res.setCharacterEncoding("UTF-8");</a>
+<span class="sourceLineNo">014</span><a id="line.14">      res.addHeader("Content-Type", contentType);</a>
+<span class="sourceLineNo">015</span><a id="line.15">      res.getWriter().print(example);</a>
+<span class="sourceLineNo">016</span><a id="line.16">    } catch (IOException e) {</a>
+<span class="sourceLineNo">017</span><a id="line.17">      throw new RuntimeException(e);</a>
 <span class="sourceLineNo">018</span><a id="line.18">    }</a>
-<span class="sourceLineNo">019</span><a id="line.19">}</a>
+<span class="sourceLineNo">019</span><a id="line.19">  }</a>
+<span class="sourceLineNo">020</span><a id="line.20">}</a>
 
 
 
