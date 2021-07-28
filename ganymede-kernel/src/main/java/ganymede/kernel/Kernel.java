@@ -19,6 +19,7 @@ package ganymede.kernel;
  * ##########################################################################
  */
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.notebook.Magic;
 import ganymede.server.Message;
@@ -46,6 +47,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -70,6 +72,11 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 public class Kernel extends Server implements KernelApi,
                                               ApplicationContextAware,
                                               ApplicationRunner {
+    private static final String JSE_HELP_LINK_TEXT_FORMAT =
+        "Java SE %1$s & JDK %1$s";
+    private static final String JSE_HELP_LINK_URL_FORMAT =
+        "https://docs.oracle.com/en/java/javase/%1$s/docs/api/";
+
     @Value("${connection-file:#{null}}")
     private String connection_file = null;
 
@@ -82,19 +89,13 @@ public class Kernel extends Server implements KernelApi,
     @Value("${kernel.version}")
     private String kernel_version = null;
 
+    @Value("classpath:kernel_info_reply.yml")
+    private Resource kernel_info_reply = null;
+
     private final Shell shell = new Shell(this);
     private ApplicationContext context = null;
     private int port = -1;
-    private final ObjectNode kernel_info_reply_content;
-
-    {
-        try (var in = getClass().getResourceAsStream("kernel_info_reply.yml")) {
-            kernel_info_reply_content = (ObjectNode) ObjectMappers.YAML.readTree(in).with("content");
-            kernel_info_reply_content.put("protocol_version", PROTOCOL_VERSION.toString());
-        } catch (Exception exception) {
-            throw new ExceptionInInitializerError(exception);
-        }
-    }
+    private ObjectNode kernel_info_reply_content = null;
 
     /**
      * Method to get the {@link Kernel} REST server port.
@@ -105,6 +106,21 @@ public class Kernel extends Server implements KernelApi,
 
     @PostConstruct
     public void init() throws Exception {
+        try (var in = kernel_info_reply.getInputStream()) {
+            kernel_info_reply_content = (ObjectNode) ObjectMappers.YAML.readTree(in).with("content");
+        } catch (Exception exception) {
+            log.warn("{}", exception);
+        }
+
+        var jse_help_link = new ObjectNode(JsonNodeFactory.instance);
+        var version = System.getProperty("java.specification.version");
+
+        jse_help_link.put("text", String.format(JSE_HELP_LINK_TEXT_FORMAT, version));
+        jse_help_link.put("url", String.format(JSE_HELP_LINK_URL_FORMAT, version));
+
+        kernel_info_reply_content.put("protocol_version", PROTOCOL_VERSION.toString());
+        kernel_info_reply_content.withArray("help_links").add(jse_help_link);
+
         if (spark_home != null) {
             var parent = Paths.get(spark_home, "jars").toFile();
 
