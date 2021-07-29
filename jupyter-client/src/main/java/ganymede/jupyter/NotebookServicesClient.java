@@ -141,7 +141,7 @@ public class NotebookServicesClient extends ApiClient {
     /**
      * See {@link KernelspecsApi#apiKernelspecsGet()}.
      *
-     * @return  The {@link Map} of {@link Kernelspec}s.
+     * @return  The {@link Map} of {@link KernelSpec}s.
      */
     public Map<String,KernelSpec> getKernelSpecMap() throws ApiException {
         return new KernelspecsApi(this).apiKernelspecsGet().getKernelspecs();
