@@ -147,11 +147,12 @@ methods that wrap the `public` methods defined in [NotebookContext] class
 annotated with [@NotebookFunction][NotebookFunction].  These functions
 include:
 
-| Method          | Description                            |
-|-----------------|----------------------------------------|
-| print(Object)   | Render the Object to a Notebook format |
-| display(Object) | Render the Object to a Notebook format |
-| toJson(Object)  | Convert argument to JsonNode           |
+| Method                                                                                                                    | Description                            |
+|---------------------------------------------------------------------------------------------------------------------------|----------------------------------------|
+| [print(Object)](https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookContext.html#print(java.lang.Object))     | Render the Object to a Notebook format |
+| [display(Object)](https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookContext.html#display(java.lang.Object)) | Render the Object to a Notebook format |
+| [asJson(Object)](https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookContext.html#asJson(java.lang.Object))   | Convert argument to JsonNode           |
+| [asYaml(Object)](https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookContext.html#asYaml(java.lang.Object))   | Convert argument to YAML (String)      |
 
 The builtin functions are mostly concerned with "printing" or displaying
 (rendering) Objects to multimedia formats.  For example, `print(byte[])`
