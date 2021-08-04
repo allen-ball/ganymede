@@ -10,7 +10,7 @@ Shaded [Ganymede Kernel] shaded uber-JAR with three entry points:
 3. [Installer][Install]
 
 
-[Ganymede Kernel]: ..
+[Ganymede Kernel]: https://github.com/allen-ball/ganymede
 
 [Install]: https://allen-ball.github.io/ganymede/ganymede/install/Install.html
 [Kernel]: https://allen-ball.github.io/ganymede/ganymede/kernel/Kernel.html

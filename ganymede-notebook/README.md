@@ -4,7 +4,7 @@ ganymede-notebook
 [NotebookContext] instance for [Ganymede Kernel]'s [JShell].
 
 
-[Ganymede Kernel]: ..
+[Ganymede Kernel]: https://github.com/allen-ball/ganymede
 
 [NotebookContext]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookContext.html
 
