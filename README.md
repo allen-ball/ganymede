@@ -1,7 +1,8 @@
 [![Ganymede](README/ganymede.png)](https://images.nasa.gov/details-GSFC_20171208_Archive_e002091)
 
 
-# Ganymede: Jupyter Notebook Java Kernel
+Ganymede: Jupyter Notebook Java Kernel
+======================================
 
 The [Ganymede Kernel] is a [Jupyter Notebook] Java [kernel][Jupyter Kernel].
 Java code is compiled and interpreted with the Java Shell tool, [JShell].
@@ -654,6 +655,20 @@ specified at runtime and is optimized to be used with [Apache Spark].
 Ibid.
 [↩](#ref4)
 
+
+[Ganymede Kernel]: .
+[Ganymede Kernel download]: https://github.com/allen-ball/ganymede/releases/download/v1.1.0.20210614/ganymede-kernel-1.1.0.20210614.jar
+[Ganymede API Javadoc]: https://allen-ball.github.io/ganymede/index.html?overview-summary.html
+[Magic]: https://allen-ball.github.io/ganymede/ganymede/shell/Magic.html
+[NotebookContext]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookContext.html
+[NotebookContext.SQL]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookContext.SQL.html
+[NotebookContext.SQL.queries]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookContext.SQL.html#queries
+[NotebookContext.SQL.results]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookContext.SQL.html#results
+[NotebookFunction]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookFunction.html
+[SQL]: https://allen-ball.github.io/ganymede/ganymede/shell/magic/SQL.html
+
+[trig.ipynb]: https://github.com/allen-ball/ganymede-notebooks/blob/trunk/trig.ipynb
+
 [Apache License, Version 2.0]: https://www.apache.org/licenses/LICENSE-2.0
 
 [Apache FreeMarker]: https://freemarker.apache.org/
@@ -682,6 +697,7 @@ Ibid.
 [Java API]: https://docs.oracle.com/en/java/javase/11/docs/api
 [JShell]: https://docs.oracle.com/en/java/javase/11/docs/api/jdk.jshell/jdk/jshell/JShell.html?is-external=true
 [List]: https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html?is-external=true
+[Process]: https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Process.html
 
 [Javascript]: https://www.oracle.com/technical-resources/articles/java/jf14-nashorn.html
 
@@ -724,21 +740,3 @@ Ibid.
 [XChart]: https://github.com/knowm/XChart
 
 [YAML]: https://yaml.org/
-
-
-[Process]: https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Process.html
-
-
-[Ganymede Kernel]: https://github.com/allen-ball/ganymede
-[Ganymede Kernel download]: https://github.com/allen-ball/ganymede/releases/download/v1.1.0.20210614/ganymede-kernel-1.1.0.20210614.jar
-[Ganymede API Javadoc]: https://allen-ball.github.io/ganymede/index.html?overview-summary.html
-[Magic]: https://allen-ball.github.io/ganymede/ganymede/shell/Magic.html
-[NotebookContext]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookContext.html
-[NotebookContext.SQL]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookContext.SQL.html
-[NotebookContext.SQL.queries]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookContext.SQL.html#queries
-[NotebookContext.SQL.results]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookContext.SQL.html#results
-[NotebookFunction]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookFunction.html
-[SQL]: https://allen-ball.github.io/ganymede/ganymede/shell/magic/SQL.html
-
-
-[trig.ipynb]: https://github.com/allen-ball/ganymede-notebooks/blob/trunk/trig.ipynb
