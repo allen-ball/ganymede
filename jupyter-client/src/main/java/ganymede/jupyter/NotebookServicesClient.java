@@ -107,15 +107,17 @@ public class NotebookServicesClient extends ApiClient {
     public NotebookServicesClient(JsonNode node) {
         super();
 
-        var url = URI.create(node.get("url").asText());
+        if (node.has("url")) {
+            var url = URI.create(node.get("url").asText());
 
-        setScheme(url.getScheme());
-        setHost(url.getHost());
-        setPort(url.getPort());
+            setScheme(url.getScheme());
+            setHost(url.getHost());
+            setPort(url.getPort());
+        }
 
-        var token = node.get("token").asText();
-
-        setRequestInterceptor(t -> t.header("Authorization", "Token " + token));
+        if (node.has("token")) {
+            setRequestInterceptor(t -> t.header("Authorization", "Token " + node.get("token").asText()));
+        }
     }
 
     /**
