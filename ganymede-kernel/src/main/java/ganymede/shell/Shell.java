@@ -155,19 +155,19 @@ public class Shell implements AutoCloseable {
 
     /**
      * Method to call
-     * {@link Resolver#resolve(Shell,PrintStream,PrintStream,POM)}.
+     * {@link Resolver#resolve(Shell,PrintStream,PrintStream,POM)} and add
+     * any newly resolved artifacts to the {@link JShell} classpath.
      *
      * @param   pom             The {@link POM} to merge.
      */
     public void resolve(POM pom) {
-        for (var file : resolver().resolve(this, out, err, pom)) {
-            var jshell = this.jshell;
+        var files = resolver().resolve(this, out, err, pom);
+        var jshell = this.jshell;
 
-            if (jshell != null) {
-                jshell.addToClasspath(file.toString());
-            } else {
-                break;
-            }
+        if (jshell != null) {
+            files.stream()
+                .map(Object::toString)
+                .forEach(jshell::addToClasspath);
         }
     }
 
