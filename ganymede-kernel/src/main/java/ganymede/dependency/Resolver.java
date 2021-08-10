@@ -35,13 +35,14 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
-import lombok.Synchronized;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.AbstractRepositoryListener;
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.DefaultRepositoryCache;
+/* import org.eclipse.aether.RepositoryEvent; */
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
@@ -58,6 +59,8 @@ import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.transfer.AbstractTransferListener;
+import org.eclipse.aether.transfer.TransferCancelledException;
+import org.eclipse.aether.transfer.TransferEvent;
 import org.eclipse.aether.transport.classpath.ClasspathTransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.eclipse.aether.transport.http.HttpTransporterFactory;
@@ -89,14 +92,23 @@ public class Resolver extends Analyzer {
 
     private static final String DEPENDENCIES_FORMAT = "/META-INF/%s.dependencies";
 
+    private final RepositorySystem system;
     private final POM pom;
     private final Set<File> classpath = new LinkedHashSet<>();
     private final RepositoryImpl repository = new RepositoryImpl();
     private final PathPropertyMap pathMap = new PathPropertyMap();
-    private RepositorySystem system = null;
 
     {
         try {
+            var locator = MavenRepositorySystemUtils.newServiceLocator();
+
+            locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
+            locator.addService(TransporterFactory.class, FileTransporterFactory.class);
+            locator.addService(TransporterFactory.class, HttpTransporterFactory.class);
+            locator.addService(TransporterFactory.class, ClasspathTransporterFactory.class);
+
+            system = locator.getService(RepositorySystem.class);
+
             pom = POM.getDefault();
 
             classpath.add(new ApplicationHome(getClass()).getSource());
@@ -299,8 +311,7 @@ public class Resolver extends Analyzer {
 
         pom().merge(pom);
 
-        var system = system();
-        var session = session();
+        var session = session(out, err);
         var repositories = pom().getRepositories().stream().collect(toList());
         var scope = JavaScopes.RUNTIME;
         var filter = DependencyFilterUtils.classpathFilter(scope);
@@ -353,24 +364,7 @@ public class Resolver extends Analyzer {
         return files;
     }
 
-    @Synchronized
-    private RepositorySystem system() {
-        if (system == null) {
-            var locator = MavenRepositorySystemUtils.newServiceLocator();
-
-            locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
-            locator.addService(TransporterFactory.class, FileTransporterFactory.class);
-            locator.addService(TransporterFactory.class, HttpTransporterFactory.class);
-            locator.addService(TransporterFactory.class, ClasspathTransporterFactory.class);
-
-            system = locator.getService(RepositorySystem.class);
-        }
-
-        return system;
-    }
-
-    @Synchronized
-    private RepositorySystemSession session() {
+    private RepositorySystemSession session(PrintStream out, PrintStream err) {
         var session = MavenRepositorySystemUtils.newSession();
         var properties = new LinkedHashMap<Object,Object>();
 
@@ -397,15 +391,7 @@ public class Resolver extends Analyzer {
          * session.setAuthenticationSelector(getAuthSelector());
          */
         session.setCache(new DefaultRepositoryCache());
-        session.setLocalRepositoryManager(getLocalRepositoryManager(session));
-        session.setRepositoryListener(new RepositoryListener());
-        session.setTransferListener(new TransferListener());
-        session.setWorkspaceReader(repository);
 
-        return session;
-    }
-
-    private LocalRepositoryManager getLocalRepositoryManager(RepositorySystemSession session) {
         var path =
             Stream.of(pom().getLocalRepository(),
                       System.getProperty("maven.repo.local"))
@@ -413,9 +399,15 @@ public class Resolver extends Analyzer {
             .map(Paths::get)
             .findFirst()
             .orElse(Paths.get(System.getProperty("user.home"), ".m2", "repository"));
-        var repository = new LocalRepository(path.toFile());
+        var local = new LocalRepository(path.toFile());
+        var manager = system.newLocalRepositoryManager(session, local);
 
-        return system().newLocalRepositoryManager(session, repository);
+        session.setLocalRepositoryManager(manager);
+        session.setWorkspaceReader(repository);
+        session.setRepositoryListener(new RepositoryListener(out, err));
+        session.setTransferListener(new TransferListener(out, err));
+
+        return session;
     }
 
     @NoArgsConstructor
@@ -472,11 +464,23 @@ public class Resolver extends Analyzer {
         }
     }
 
-    @NoArgsConstructor @ToString
+    @RequiredArgsConstructor @ToString
     private class RepositoryListener extends AbstractRepositoryListener {
+        private final PrintStream out;
+        private final PrintStream err;
     }
 
-    @NoArgsConstructor @ToString
+    @RequiredArgsConstructor @ToString
     private class TransferListener extends AbstractTransferListener {
+        private final PrintStream out;
+        private final PrintStream err;
+
+        @Override
+        public void transferCorrupted(TransferEvent event) throws TransferCancelledException {
+            err.format("%s%s: %s\n",
+                       event.getResource().getRepositoryUrl(),
+                       event.getResource().getResourceName(),
+                       event.getException().getMessage());
+        }
     }
 }
