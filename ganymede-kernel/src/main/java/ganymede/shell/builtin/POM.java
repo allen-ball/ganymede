@@ -29,6 +29,7 @@ import java.io.PrintStream;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
+import org.eclipse.aether.RepositoryException;
 
 /**
  * {@link POM} {@link Builtin}.
@@ -47,10 +48,14 @@ public class POM extends Builtin {
             var code = application.getCode();
 
             if (! code.isBlank()) {
+                code = HELPER.replacePlaceholders(code, System.getProperties());
+
                 shell.resolve(ganymede.dependency.POM.parse(code));
             } else {
                 shell.resolver().pom().writeTo(out);
             }
+        } catch (RepositoryException exception) {
+            err.println(exception.getMessage());
         } catch (JsonProcessingException exception) {
             err.println(exception.getMessage());
         } catch (Exception exception) {
