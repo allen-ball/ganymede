@@ -34,7 +34,7 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <properties>
-    <ganymede.client.package>ganymede.kernel.client</ganymede.client.package>
+    <target-package>ganymede.kernel.client</target-package>
   </properties>
   <dependencies verbose="true">
     <dependency>
@@ -87,9 +87,9 @@
                 <serializationLibrary>jackson</serializationLibrary>
                 <hideGenerationTimestamp>true</hideGenerationTimestamp>
                 <openApiNullable>false</openApiNullable>
-                <invokerPackage>${ganymede.client.package}</invokerPackage>
-                <apiPackage>${ganymede.client.package}.api</apiPackage>
-                <modelPackage>${ganymede.client.package}.model</modelPackage>
+                <invokerPackage>${target-package}</invokerPackage>
+                <apiPackage>${target-package}.api</apiPackage>
+                <modelPackage>${target-package}.model</modelPackage>
               </configOptions>
             </configuration>
           </execution>

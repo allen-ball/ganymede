@@ -31,7 +31,7 @@
   <parent>
     <groupId>ball</groupId>
     <artifactId>parent</artifactId>
-    <version>20210722.1</version>
+    <version>20210803-SNAPSHOT</version>
     <relativePath/>
   </parent>
   <organization>
@@ -50,16 +50,16 @@
     <url>https://github.com/allen-ball/ganymede</url>
   </scm>
   <distributionManagement>
-    <downloadUrl>https://maven.pkg.github.com/allen-ball/ganymede/</downloadUrl>
+    <downloadUrl>https://maven.pkg.github.com/allen-ball/${project.groupId}/</downloadUrl>
     <repository>
       <id>github</id>
-      <name>GitHub allen-ball/ganymede Packages</name>
-      <url>https://maven.pkg.github.com/allen-ball/ganymede/</url>
+      <name>GitHub allen-ball Packages</name>
+      <url>https://maven.pkg.github.com/allen-ball/${project.groupId}/</url>
     </repository>
     <snapshotRepository>
       <id>github</id>
-      <name>GitHub allen-ball/ganymede Packages</name>
-      <url>https://maven.pkg.github.com/allen-ball/ganymede/</url>
+      <name>GitHub allen-ball Packages</name>
+      <url>https://maven.pkg.github.com/allen-ball/${project.groupId}/</url>
     </snapshotRepository>
   </distributionManagement>
   <repositories>
@@ -85,15 +85,6 @@
   </pluginRepositories>
   <profiles>
     <profile>
-      <id>JAVA_POST_PROCESS_FILE</id>
-      <activation>
-        <property><name>env.JAVA_POST_PROCESS_FILE</name></property>
-      </activation>
-      <properties>
-        <openapi.generator.maven.plugin.enablePostProcessFile>true</openapi.generator.maven.plugin.enablePostProcessFile>
-      </properties>
-    </profile>
-    <profile>
       <id>jeromq-SNAPSHOT</id>
       <repositories>
         <repository>
@@ -115,8 +106,6 @@
 
     <notebook.services.version>v6.4.0</notebook.services.version>
     <notebook.services.spec>https://github.com/jupyter/notebook/raw/${notebook.services.version}/notebook/services/api/api.yaml</notebook.services.spec>
-
-    <openapi-generator-maven-plugin.version>5.2.0</openapi-generator-maven-plugin.version>
 
     <commonmark.version>0.18.0</commonmark.version>
     <graal-sdk.version>0.33</graal-sdk.version>
@@ -161,11 +150,6 @@
         <groupId>io.springfox</groupId>
         <artifactId>springfox-swagger2</artifactId>
         <version>3.0.0</version>
-      </dependency>
-      <dependency>
-        <groupId>io.swagger</groupId>
-        <artifactId>swagger-annotations</artifactId>
-        <version>1.6.2</version>
       </dependency>
       <dependency>
         <groupId>org.apache.spark</groupId>
@@ -327,106 +311,6 @@
               </goals>
             </execution>
           </executions>
-          <configuration>
-            <links>
-              <link>
-                <artifact>com.fasterxml.jackson.core</artifact>
-                <url>https://fasterxml.github.io/{a}/javadoc/${jackson.major.version}/</url>
-              </link>
-              <link>
-                <artifact>info.picocli:picocli</artifact>
-                <url>https://picocli.info/apidocs/</url>
-              </link>
-              <link>
-                <artifact>javax.*</artifact>
-                <url>https://javaee.github.io/javaee-spec/javadocs/</url>
-              </link>
-              <link>
-                <artifact>org.apache.maven:*</artifact>
-                <url>https://maven.apache.org/ref/${maven.version}/apidocs/</url>
-              </link>
-              <link>
-                <artifact>commons-*</artifact>
-                <url>https://commons.apache.org/proper/{a}/apidocs/</url>
-              </link>
-              <link>
-                <artifact>org.apache.spark:*</artifact>
-                <url>https://spark.apache.org/docs/latest/api/java/</url>
-              </link>
-              <link>
-                <artifact>org.freemarker:*</artifact>
-                <url>https://freemarker.apache.org/docs/api/</url>
-              </link>
-              <link>
-                <artifact>org.jfree:*</artifact>
-                <url>https://www.jfree.org/jfreechart/api/javadoc/</url>
-              </link>
-              <link>
-                <artifact>org.knowm.xchart:*</artifact>
-                <url>https://knowm.org/javadocs/xchart/</url>
-              </link>
-              <link>
-                <artifact>org.springframework</artifact>
-                <url>https://docs.spring.io/spring-framework/docs/${spring-framework.version}/javadoc-api/</url>
-              </link>
-              <link>
-                <artifact>org.springframework.boot</artifact>
-                <url>https://docs.spring.io/spring-boot/docs/${spring-boot.version}/api/</url>
-              </link>
-              <link>
-                <artifact>org.springframework.data</artifact>
-                <url>https://docs.spring.io/spring-data/commons/docs/current/api/</url>
-              </link>
-              <link>
-                <artifact>org.springframework.data:spring-data-jpa</artifact>
-                <url>https://docs.spring.io/spring-data/jpa/docs/current/api/</url>
-              </link>
-              <link>
-                <artifact>org.springframework.security</artifact>
-                <url>https://docs.spring.io/spring-security/site/docs/${spring-security.version}/api/</url>
-              </link>
-            </links>
-            <offlinelinks>
-              <offlinelink>
-                <artifact>
-                  com.github.jknack:*
-                  org.apache.httpcomponents:*
-                  org.apache.maven.resolver:*
-                  org.apache.velocity:*
-                  org.commonmark:*
-                  org.thymeleaf.extras:thymeleaf-extras-java8time
-                  org.zeromq:jeromq
-                  tech.tablesaw:*
-                </artifact>
-                <url>https://javadoc.io/doc/{g}/{a}/latest/</url>
-              </offlinelink>
-              <offlinelink>
-                <artifact>
-                  com.fasterxml.jackson.dataformat:*
-                  com.fasterxml.jackson.datatype:*
-                  com.fasterxml.jackson.jaxrs:*
-                  com.fasterxml.jackson.module:*
-                </artifact>
-                <url>https://javadoc.io/doc/{g}/{a}/{v}/</url>
-              </offlinelink>
-              <offlinelink>
-                <artifact>org.apache.maven:*</artifact>
-                <url>https://maven.apache.org/ref/${maven.version}/{a}/apidocs/</url>
-              </offlinelink>
-              <offlinelink>
-                <artifact>org.codehaus.groovy:*</artifact>
-                <url>https://javadoc.io/doc/{g}/groovy-all/latest/</url>
-              </offlinelink>
-              <offlinelink>
-                <artifact>org.jooq:*</artifact>
-                <url>https://www.jooq.org/javadoc/latest/</url>
-              </offlinelink>
-              <offlineLink>
-                <artifact>org.thymeleaf:*</artifact>
-                <url>https://www.thymeleaf.org/apidocs/{a}/${thymeleaf.version}/</url>
-              </offlineLink>
-            </offlinelinks>
-          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -446,17 +330,6 @@
             <quiet>true</quiet>
             <serialwarn>true</serialwarn>
             <show>protected</show>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.openapitools</groupId>
-	  <artifactId>openapi-generator-maven-plugin</artifactId>
-	  <version>${openapi-generator-maven-plugin.version}</version>
-          <configuration>
-            <generateApiDocumentation>false</generateApiDocumentation>
-            <generateApiTests>false</generateApiTests>
-            <generateModelDocumentation>false</generateModelDocumentation>
-            <generateModelTests>false</generateModelTests>
           </configuration>
         </plugin>
       </plugins>

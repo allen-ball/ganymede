@@ -34,7 +34,7 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <properties>
-    <ganymede.server.package>ganymede.kernel</ganymede.server.package>
+    <target-package>ganymede.kernel</target-package>
   </properties>
   <dependencies verbose="true">
     <dependency>
@@ -328,9 +328,9 @@
                 <hideGenerationTimestamp>true</hideGenerationTimestamp>
                 <interfaceOnly>true</interfaceOnly>
                 <openApiNullable>false</openApiNullable>
-                <invokerPackage>${ganymede.server.package}</invokerPackage>
-                <apiPackage>${ganymede.server.package}</apiPackage>
-                <modelPackage>${ganymede.server.package}</modelPackage>
+                <invokerPackage>${target-package}</invokerPackage>
+                <apiPackage>${target-package}</apiPackage>
+                <modelPackage>${target-package}</modelPackage>
                 <configOptions>
                   <delegatePattern>true</delegatePattern>
                   <skipDefaultInterface>true</skipDefaultInterface>

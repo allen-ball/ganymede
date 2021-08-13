@@ -34,7 +34,7 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <properties>
-    <notebook.client.package>ganymede.jupyter.notebook</notebook.client.package>
+    <target-package>ganymede.jupyter.notebook</target-package>
   </properties>
   <dependencies verbose="true">
     <dependency>
@@ -83,9 +83,9 @@
                 <serializationLibrary>jackson</serializationLibrary>
                 <hideGenerationTimestamp>true</hideGenerationTimestamp>
                 <openApiNullable>false</openApiNullable>
-                <invokerPackage>${notebook.client.package}</invokerPackage>
-                <apiPackage>${notebook.client.package}.api</apiPackage>
-                <modelPackage>${notebook.client.package}.model</modelPackage>
+                <invokerPackage>${target-package}</invokerPackage>
+                <apiPackage>${target-package}.api</apiPackage>
+                <modelPackage>${target-package}.model</modelPackage>
               </configOptions>
             </configuration>
           </execution>
