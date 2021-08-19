@@ -589,38 +589,38 @@ Would generate:
 
 <table>
   <tr>
-    <th>RoyalFlush</th><td>A-♧</td><td>K-♧</td><td>Q-♧</td><td>J-♧</td><td>10-♧</td>
+    <th>RoyalFlush</th><td>A-♤</td><td>K-♤</td><td>Q-♤</td><td>J-♤</td><td>10-♤</td>
   </tr>
   <tr>
-    <th>StraightFlush</th><td>K-♢</td><td>Q-♢</td><td>J-♢</td><td>10-♢</td><td>9-♢</td>
+    <th>StraightFlush</th><td>K-♡</td><td>Q-♡</td><td>J-♡</td><td>10-♡</td><td>9-♡</td>
   </tr>
   <tr>
-    <th>FourOfAKind</th><td>8-♧</td><td>8-♢</td><td>8-♡</td><td>8-♤</td><td>J-♤</td>
+    <th>FourOfAKind</th><td>8-♤</td><td>8-♡</td><td>8-♢</td><td>8-♧</td><td>2-♧</td>
   </tr>
   <tr>
-    <th>FullHouse</th><td>A-♢</td><td>A-♡</td><td>A-♤</td><td>K-♡</td><td>K-♤</td>
+    <th>FullHouse</th><td>A-♡</td><td>A-♢</td><td>A-♧</td><td>K-♢</td><td>K-♧</td>
   </tr>
   <tr>
-    <th>Flush</th><td>Q-♡</td><td>J-♡</td><td>10-♡</td><td>9-♡</td><td>7-♡</td>
+    <th>Flush</th><td>Q-♢</td><td>J-♢</td><td>10-♢</td><td>9-♢</td><td>7-♢</td>
   </tr>
   <tr>
-    <th>Straight</th><td>7-♧</td><td>6-♧</td><td>5-♧</td><td>4-♧</td><td>3-♧</td>
+    <th>Straight</th><td>7-♤</td><td>6-♤</td><td>5-♤</td><td>4-♤</td><td>3-♤</td>
   </tr>
   <tr>
-    <th>ThreeOfAKind</th><td>6-♢</td><td>6-♡</td><td>6-♤</td><td>10-♤</td><td>5-♤</td>
+    <th>ThreeOfAKind</th><td>6-♡</td><td>6-♢</td><td>6-♧</td><td>3-♧</td><td>4-♧</td>
   </tr>
   <tr>
-    <th>TwoPair</th><td>9-♧</td><td>9-♤</td><td>7-♢</td><td>7-♤</td><td>4-♢</td>
+    <th>TwoPair</th><td>9-♤</td><td>9-♧</td><td>7-♡</td><td>7-♧</td><td>5-♧</td>
   </tr>
   <tr>
-    <th>Pair</th><td>5-♢</td><td>5-♡</td><td>4-♡</td><td>4-♤</td><td>3-♢</td>
+    <th>Pair</th><td>5-♡</td><td>5-♢</td><td>10-♧</td><td>J-♧</td><td>2-♢</td>
   </tr>
   <tr>
-    <th>HighCard</th><td>Q-♤</td><td>3-♡</td><td>3-♤</td><td>2-♧</td><td>2-♢</td>
+    <th>HighCard</th><td>Q-♧</td><td>3-♢</td><td>4-♢</td><td>2-♡</td><td>3-♡</td>
   </tr>
   <tr>
   </tr>
-  <tr><th>Remaining</th><td>2-♡</td><td>2-♤</td></tr>
+  <tr><th>Remaining</th><td>4-♡</td><td>2-♤</td></tr>
 </table>
 
 
