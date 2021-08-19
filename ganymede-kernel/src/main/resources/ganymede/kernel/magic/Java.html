@@ -33,11 +33,20 @@
   </style>
   <table border="1" class="bindings">
     <thead>
-      <tr><th th:text="Name"/><th th:text="Type"/><th th:text="Value"/></tr>
+      <tr>
+        <th th:text="Name"/>
+        <th th:text="Type"/>
+        <th th:text="Value"/>
+      </tr>
     </thead>
     <tbody>
       <tr th:each="entry : ${bindings.entrySet()}">
-        <td th:text="${entry.key}"/><td th:text="${types.get(entry.key)}"/><td th:text="${entry.value}"/>
+        <td th:text="${entry.key}"/>
+        <td th:with="type = ${types.get(entry.key)}, href = ${javadoc.href(type, entry.value.class)}">
+          <a th:if="${href != null}" th:href="@{${href}}" th:target="_newtab" th:text="${type}"/>
+          <a th:unless="${href != null}" th:text="${type}"/>
+        </td>
+        <td th:text="${entry.value}"/>
       </tr>
     </tbody>
   </table>

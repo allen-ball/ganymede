@@ -92,4 +92,31 @@
       </exclusions>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>ball</groupId>
+        <artifactId>ball-javadoc-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>generate-javadoc-map</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+          <links>
+            <link>
+              <url>https://allen-ball.github.io/ganymede/</url>
+            </link>
+            <link>
+              <url>https://docs.oracle.com/en/java/javase/${java.specification.version}/docs/api/</url>
+            </link>
+          </links>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

@@ -18,8 +18,8 @@ package ganymede.kernel.magic;
  * limitations under the License.
  * ##########################################################################
  */
-import com.fasterxml.jackson.databind.JsonNode;
 import ball.annotation.ServiceProviderFor;
+import com.fasterxml.jackson.databind.JsonNode;
 import ganymede.kernel.client.KernelRestClient;
 import ganymede.kernel.renderer.ThymeleafRenderer;
 import ganymede.notebook.AbstractMagic;
@@ -27,6 +27,7 @@ import ganymede.notebook.Description;
 import ganymede.notebook.Magic;
 import ganymede.notebook.MagicNames;
 import ganymede.server.Message;
+import ganymede.util.Javadoc;
 import java.util.Map;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -50,7 +51,8 @@ public class Java extends AbstractMagic {
             var resource = getClass().getSimpleName();
             var map =
                 Map.<String,Object>of("bindings", context.context.getBindings(ENGINE_SCOPE),
-                                      "types", context.types);
+                                      "types", context.types,
+                                      "javadoc", new Javadoc());
             var html = ThymeleafRenderer.process(getClass(), resource + ".html", "html", map);
             var text = ThymeleafRenderer.process(getClass(), resource + ".text", "text", map);
 
