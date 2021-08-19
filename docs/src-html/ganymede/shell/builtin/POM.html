@@ -38,35 +38,40 @@
 <span class="sourceLineNo">029</span><a id="line.29">import lombok.NoArgsConstructor;</a>
 <span class="sourceLineNo">030</span><a id="line.30">import lombok.ToString;</a>
 <span class="sourceLineNo">031</span><a id="line.31">import lombok.extern.log4j.Log4j2;</a>
-<span class="sourceLineNo">032</span><a id="line.32"></a>
-<span class="sourceLineNo">033</span><a id="line.33">/**</a>
-<span class="sourceLineNo">034</span><a id="line.34"> * {@link POM} {@link Builtin}.</a>
-<span class="sourceLineNo">035</span><a id="line.35"> *</a>
-<span class="sourceLineNo">036</span><a id="line.36"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
-<span class="sourceLineNo">037</span><a id="line.37"> */</a>
-<span class="sourceLineNo">038</span><a id="line.38">@ServiceProviderFor({ Builtin.class, Magic.class })</a>
-<span class="sourceLineNo">039</span><a id="line.39">@Description("Define the Notebook's Project Object Model")</a>
-<span class="sourceLineNo">040</span><a id="line.40">@NoArgsConstructor @ToString @Log4j2</a>
-<span class="sourceLineNo">041</span><a id="line.41">public class POM extends Builtin {</a>
-<span class="sourceLineNo">042</span><a id="line.42">    @Override</a>
-<span class="sourceLineNo">043</span><a id="line.43">    public void execute(Shell shell,</a>
-<span class="sourceLineNo">044</span><a id="line.44">                        InputStream in, PrintStream out, PrintStream err,</a>
-<span class="sourceLineNo">045</span><a id="line.45">                        Application application) throws Exception {</a>
-<span class="sourceLineNo">046</span><a id="line.46">        try {</a>
-<span class="sourceLineNo">047</span><a id="line.47">            var code = application.getCode();</a>
-<span class="sourceLineNo">048</span><a id="line.48"></a>
-<span class="sourceLineNo">049</span><a id="line.49">            if (! code.isBlank()) {</a>
-<span class="sourceLineNo">050</span><a id="line.50">                shell.resolve(ganymede.dependency.POM.parse(code));</a>
-<span class="sourceLineNo">051</span><a id="line.51">            } else {</a>
-<span class="sourceLineNo">052</span><a id="line.52">                shell.resolver().pom().writeTo(out);</a>
-<span class="sourceLineNo">053</span><a id="line.53">            }</a>
-<span class="sourceLineNo">054</span><a id="line.54">        } catch (JsonProcessingException exception) {</a>
-<span class="sourceLineNo">055</span><a id="line.55">            err.println(exception.getMessage());</a>
-<span class="sourceLineNo">056</span><a id="line.56">        } catch (Exception exception) {</a>
-<span class="sourceLineNo">057</span><a id="line.57">            exception.printStackTrace(err);</a>
-<span class="sourceLineNo">058</span><a id="line.58">        }</a>
-<span class="sourceLineNo">059</span><a id="line.59">    }</a>
-<span class="sourceLineNo">060</span><a id="line.60">}</a>
+<span class="sourceLineNo">032</span><a id="line.32">import org.eclipse.aether.RepositoryException;</a>
+<span class="sourceLineNo">033</span><a id="line.33"></a>
+<span class="sourceLineNo">034</span><a id="line.34">/**</a>
+<span class="sourceLineNo">035</span><a id="line.35"> * {@link POM} {@link Builtin}.</a>
+<span class="sourceLineNo">036</span><a id="line.36"> *</a>
+<span class="sourceLineNo">037</span><a id="line.37"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
+<span class="sourceLineNo">038</span><a id="line.38"> */</a>
+<span class="sourceLineNo">039</span><a id="line.39">@ServiceProviderFor({ Builtin.class, Magic.class })</a>
+<span class="sourceLineNo">040</span><a id="line.40">@Description("Define the Notebook's Project Object Model")</a>
+<span class="sourceLineNo">041</span><a id="line.41">@NoArgsConstructor @ToString @Log4j2</a>
+<span class="sourceLineNo">042</span><a id="line.42">public class POM extends Builtin {</a>
+<span class="sourceLineNo">043</span><a id="line.43">    @Override</a>
+<span class="sourceLineNo">044</span><a id="line.44">    public void execute(Shell shell,</a>
+<span class="sourceLineNo">045</span><a id="line.45">                        InputStream in, PrintStream out, PrintStream err,</a>
+<span class="sourceLineNo">046</span><a id="line.46">                        Application application) throws Exception {</a>
+<span class="sourceLineNo">047</span><a id="line.47">        try {</a>
+<span class="sourceLineNo">048</span><a id="line.48">            var code = application.getCode();</a>
+<span class="sourceLineNo">049</span><a id="line.49"></a>
+<span class="sourceLineNo">050</span><a id="line.50">            if (! code.isBlank()) {</a>
+<span class="sourceLineNo">051</span><a id="line.51">                code = HELPER.replacePlaceholders(code, System.getProperties());</a>
+<span class="sourceLineNo">052</span><a id="line.52"></a>
+<span class="sourceLineNo">053</span><a id="line.53">                shell.resolve(ganymede.dependency.POM.parse(code));</a>
+<span class="sourceLineNo">054</span><a id="line.54">            } else {</a>
+<span class="sourceLineNo">055</span><a id="line.55">                shell.resolver().pom().writeTo(out);</a>
+<span class="sourceLineNo">056</span><a id="line.56">            }</a>
+<span class="sourceLineNo">057</span><a id="line.57">        } catch (RepositoryException exception) {</a>
+<span class="sourceLineNo">058</span><a id="line.58">            err.println(exception.getMessage());</a>
+<span class="sourceLineNo">059</span><a id="line.59">        } catch (JsonProcessingException exception) {</a>
+<span class="sourceLineNo">060</span><a id="line.60">            err.println(exception.getMessage());</a>
+<span class="sourceLineNo">061</span><a id="line.61">        } catch (Exception exception) {</a>
+<span class="sourceLineNo">062</span><a id="line.62">            exception.printStackTrace(err);</a>
+<span class="sourceLineNo">063</span><a id="line.63">        }</a>
+<span class="sourceLineNo">064</span><a id="line.64">    }</a>
+<span class="sourceLineNo">065</span><a id="line.65">}</a>
 
 
 

@@ -57,86 +57,88 @@
 <span class="sourceLineNo">048</span><a id="line.48">   * menu item link text</a>
 <span class="sourceLineNo">049</span><a id="line.49">   * @return text</a>
 <span class="sourceLineNo">050</span><a id="line.50">   **/</a>
-<span class="sourceLineNo">051</span><a id="line.51">  @ApiModelProperty(required = true, value = "menu item link text")</a>
-<span class="sourceLineNo">052</span><a id="line.52">  @JsonProperty(JSON_PROPERTY_TEXT)</a>
-<span class="sourceLineNo">053</span><a id="line.53">  @JsonInclude(value = JsonInclude.Include.ALWAYS)</a>
-<span class="sourceLineNo">054</span><a id="line.54"></a>
-<span class="sourceLineNo">055</span><a id="line.55">  public String getText() {</a>
-<span class="sourceLineNo">056</span><a id="line.56">    return text;</a>
-<span class="sourceLineNo">057</span><a id="line.57">  }</a>
-<span class="sourceLineNo">058</span><a id="line.58"></a>
-<span class="sourceLineNo">059</span><a id="line.59">  @JsonProperty(JSON_PROPERTY_TEXT)</a>
-<span class="sourceLineNo">060</span><a id="line.60">  @JsonInclude(value = JsonInclude.Include.ALWAYS)</a>
-<span class="sourceLineNo">061</span><a id="line.61">  public void setText(String text) {</a>
-<span class="sourceLineNo">062</span><a id="line.62">    this.text = text;</a>
-<span class="sourceLineNo">063</span><a id="line.63">  }</a>
-<span class="sourceLineNo">064</span><a id="line.64"></a>
-<span class="sourceLineNo">065</span><a id="line.65">  public KernelSpecFileHelpLinks url(String url) {</a>
-<span class="sourceLineNo">066</span><a id="line.66">    this.url = url;</a>
-<span class="sourceLineNo">067</span><a id="line.67">    return this;</a>
-<span class="sourceLineNo">068</span><a id="line.68">  }</a>
-<span class="sourceLineNo">069</span><a id="line.69"></a>
-<span class="sourceLineNo">070</span><a id="line.70">  /**</a>
-<span class="sourceLineNo">071</span><a id="line.71">   * menu item link url</a>
-<span class="sourceLineNo">072</span><a id="line.72">   * @return url</a>
-<span class="sourceLineNo">073</span><a id="line.73">   **/</a>
-<span class="sourceLineNo">074</span><a id="line.74">  @ApiModelProperty(required = true, value = "menu item link url")</a>
-<span class="sourceLineNo">075</span><a id="line.75">  @JsonProperty(JSON_PROPERTY_URL)</a>
-<span class="sourceLineNo">076</span><a id="line.76">  @JsonInclude(value = JsonInclude.Include.ALWAYS)</a>
-<span class="sourceLineNo">077</span><a id="line.77"></a>
-<span class="sourceLineNo">078</span><a id="line.78">  public String getUrl() {</a>
-<span class="sourceLineNo">079</span><a id="line.79">    return url;</a>
-<span class="sourceLineNo">080</span><a id="line.80">  }</a>
-<span class="sourceLineNo">081</span><a id="line.81"></a>
-<span class="sourceLineNo">082</span><a id="line.82">  @JsonProperty(JSON_PROPERTY_URL)</a>
-<span class="sourceLineNo">083</span><a id="line.83">  @JsonInclude(value = JsonInclude.Include.ALWAYS)</a>
-<span class="sourceLineNo">084</span><a id="line.84">  public void setUrl(String url) {</a>
-<span class="sourceLineNo">085</span><a id="line.85">    this.url = url;</a>
-<span class="sourceLineNo">086</span><a id="line.86">  }</a>
-<span class="sourceLineNo">087</span><a id="line.87"></a>
-<span class="sourceLineNo">088</span><a id="line.88">  /**</a>
-<span class="sourceLineNo">089</span><a id="line.89">   * Return true if this KernelSpecFile_help_links object is equal to o.</a>
-<span class="sourceLineNo">090</span><a id="line.90">   */</a>
-<span class="sourceLineNo">091</span><a id="line.91">  @Override</a>
-<span class="sourceLineNo">092</span><a id="line.92">  public boolean equals(Object o) {</a>
-<span class="sourceLineNo">093</span><a id="line.93">    if (this == o) {</a>
-<span class="sourceLineNo">094</span><a id="line.94">      return true;</a>
-<span class="sourceLineNo">095</span><a id="line.95">    }</a>
-<span class="sourceLineNo">096</span><a id="line.96">    if (o == null || getClass() != o.getClass()) {</a>
-<span class="sourceLineNo">097</span><a id="line.97">      return false;</a>
-<span class="sourceLineNo">098</span><a id="line.98">    }</a>
-<span class="sourceLineNo">099</span><a id="line.99">    KernelSpecFileHelpLinks kernelSpecFileHelpLinks =</a>
-<span class="sourceLineNo">100</span><a id="line.100">        (KernelSpecFileHelpLinks)o;</a>
-<span class="sourceLineNo">101</span><a id="line.101">    return Objects.equals(this.text, kernelSpecFileHelpLinks.text) &amp;&amp;</a>
-<span class="sourceLineNo">102</span><a id="line.102">        Objects.equals(this.url, kernelSpecFileHelpLinks.url);</a>
-<span class="sourceLineNo">103</span><a id="line.103">  }</a>
-<span class="sourceLineNo">104</span><a id="line.104"></a>
-<span class="sourceLineNo">105</span><a id="line.105">  @Override</a>
-<span class="sourceLineNo">106</span><a id="line.106">  public int hashCode() {</a>
-<span class="sourceLineNo">107</span><a id="line.107">    return Objects.hash(text, url);</a>
-<span class="sourceLineNo">108</span><a id="line.108">  }</a>
-<span class="sourceLineNo">109</span><a id="line.109"></a>
-<span class="sourceLineNo">110</span><a id="line.110">  @Override</a>
-<span class="sourceLineNo">111</span><a id="line.111">  public String toString() {</a>
-<span class="sourceLineNo">112</span><a id="line.112">    StringBuilder sb = new StringBuilder();</a>
-<span class="sourceLineNo">113</span><a id="line.113">    sb.append("class KernelSpecFileHelpLinks {\n");</a>
-<span class="sourceLineNo">114</span><a id="line.114">    sb.append("    text: ").append(toIndentedString(text)).append("\n");</a>
-<span class="sourceLineNo">115</span><a id="line.115">    sb.append("    url: ").append(toIndentedString(url)).append("\n");</a>
-<span class="sourceLineNo">116</span><a id="line.116">    sb.append("}");</a>
-<span class="sourceLineNo">117</span><a id="line.117">    return sb.toString();</a>
-<span class="sourceLineNo">118</span><a id="line.118">  }</a>
-<span class="sourceLineNo">119</span><a id="line.119"></a>
-<span class="sourceLineNo">120</span><a id="line.120">  /**</a>
-<span class="sourceLineNo">121</span><a id="line.121">   * Convert the given object to string with each line indented by 4 spaces</a>
-<span class="sourceLineNo">122</span><a id="line.122">   * (except the first line).</a>
-<span class="sourceLineNo">123</span><a id="line.123">   */</a>
-<span class="sourceLineNo">124</span><a id="line.124">  private String toIndentedString(Object o) {</a>
-<span class="sourceLineNo">125</span><a id="line.125">    if (o == null) {</a>
-<span class="sourceLineNo">126</span><a id="line.126">      return "null";</a>
-<span class="sourceLineNo">127</span><a id="line.127">    }</a>
-<span class="sourceLineNo">128</span><a id="line.128">    return o.toString().replace("\n", "\n    ");</a>
-<span class="sourceLineNo">129</span><a id="line.129">  }</a>
-<span class="sourceLineNo">130</span><a id="line.130">}</a>
+<span class="sourceLineNo">051</span><a id="line.51">  @javax.annotation.Nonnull</a>
+<span class="sourceLineNo">052</span><a id="line.52">  @ApiModelProperty(required = true, value = "menu item link text")</a>
+<span class="sourceLineNo">053</span><a id="line.53">  @JsonProperty(JSON_PROPERTY_TEXT)</a>
+<span class="sourceLineNo">054</span><a id="line.54">  @JsonInclude(value = JsonInclude.Include.ALWAYS)</a>
+<span class="sourceLineNo">055</span><a id="line.55"></a>
+<span class="sourceLineNo">056</span><a id="line.56">  public String getText() {</a>
+<span class="sourceLineNo">057</span><a id="line.57">    return text;</a>
+<span class="sourceLineNo">058</span><a id="line.58">  }</a>
+<span class="sourceLineNo">059</span><a id="line.59"></a>
+<span class="sourceLineNo">060</span><a id="line.60">  @JsonProperty(JSON_PROPERTY_TEXT)</a>
+<span class="sourceLineNo">061</span><a id="line.61">  @JsonInclude(value = JsonInclude.Include.ALWAYS)</a>
+<span class="sourceLineNo">062</span><a id="line.62">  public void setText(String text) {</a>
+<span class="sourceLineNo">063</span><a id="line.63">    this.text = text;</a>
+<span class="sourceLineNo">064</span><a id="line.64">  }</a>
+<span class="sourceLineNo">065</span><a id="line.65"></a>
+<span class="sourceLineNo">066</span><a id="line.66">  public KernelSpecFileHelpLinks url(String url) {</a>
+<span class="sourceLineNo">067</span><a id="line.67">    this.url = url;</a>
+<span class="sourceLineNo">068</span><a id="line.68">    return this;</a>
+<span class="sourceLineNo">069</span><a id="line.69">  }</a>
+<span class="sourceLineNo">070</span><a id="line.70"></a>
+<span class="sourceLineNo">071</span><a id="line.71">  /**</a>
+<span class="sourceLineNo">072</span><a id="line.72">   * menu item link url</a>
+<span class="sourceLineNo">073</span><a id="line.73">   * @return url</a>
+<span class="sourceLineNo">074</span><a id="line.74">   **/</a>
+<span class="sourceLineNo">075</span><a id="line.75">  @javax.annotation.Nonnull</a>
+<span class="sourceLineNo">076</span><a id="line.76">  @ApiModelProperty(required = true, value = "menu item link url")</a>
+<span class="sourceLineNo">077</span><a id="line.77">  @JsonProperty(JSON_PROPERTY_URL)</a>
+<span class="sourceLineNo">078</span><a id="line.78">  @JsonInclude(value = JsonInclude.Include.ALWAYS)</a>
+<span class="sourceLineNo">079</span><a id="line.79"></a>
+<span class="sourceLineNo">080</span><a id="line.80">  public String getUrl() {</a>
+<span class="sourceLineNo">081</span><a id="line.81">    return url;</a>
+<span class="sourceLineNo">082</span><a id="line.82">  }</a>
+<span class="sourceLineNo">083</span><a id="line.83"></a>
+<span class="sourceLineNo">084</span><a id="line.84">  @JsonProperty(JSON_PROPERTY_URL)</a>
+<span class="sourceLineNo">085</span><a id="line.85">  @JsonInclude(value = JsonInclude.Include.ALWAYS)</a>
+<span class="sourceLineNo">086</span><a id="line.86">  public void setUrl(String url) {</a>
+<span class="sourceLineNo">087</span><a id="line.87">    this.url = url;</a>
+<span class="sourceLineNo">088</span><a id="line.88">  }</a>
+<span class="sourceLineNo">089</span><a id="line.89"></a>
+<span class="sourceLineNo">090</span><a id="line.90">  /**</a>
+<span class="sourceLineNo">091</span><a id="line.91">   * Return true if this KernelSpecFile_help_links object is equal to o.</a>
+<span class="sourceLineNo">092</span><a id="line.92">   */</a>
+<span class="sourceLineNo">093</span><a id="line.93">  @Override</a>
+<span class="sourceLineNo">094</span><a id="line.94">  public boolean equals(Object o) {</a>
+<span class="sourceLineNo">095</span><a id="line.95">    if (this == o) {</a>
+<span class="sourceLineNo">096</span><a id="line.96">      return true;</a>
+<span class="sourceLineNo">097</span><a id="line.97">    }</a>
+<span class="sourceLineNo">098</span><a id="line.98">    if (o == null || getClass() != o.getClass()) {</a>
+<span class="sourceLineNo">099</span><a id="line.99">      return false;</a>
+<span class="sourceLineNo">100</span><a id="line.100">    }</a>
+<span class="sourceLineNo">101</span><a id="line.101">    KernelSpecFileHelpLinks kernelSpecFileHelpLinks =</a>
+<span class="sourceLineNo">102</span><a id="line.102">        (KernelSpecFileHelpLinks)o;</a>
+<span class="sourceLineNo">103</span><a id="line.103">    return Objects.equals(this.text, kernelSpecFileHelpLinks.text) &amp;&amp;</a>
+<span class="sourceLineNo">104</span><a id="line.104">        Objects.equals(this.url, kernelSpecFileHelpLinks.url);</a>
+<span class="sourceLineNo">105</span><a id="line.105">  }</a>
+<span class="sourceLineNo">106</span><a id="line.106"></a>
+<span class="sourceLineNo">107</span><a id="line.107">  @Override</a>
+<span class="sourceLineNo">108</span><a id="line.108">  public int hashCode() {</a>
+<span class="sourceLineNo">109</span><a id="line.109">    return Objects.hash(text, url);</a>
+<span class="sourceLineNo">110</span><a id="line.110">  }</a>
+<span class="sourceLineNo">111</span><a id="line.111"></a>
+<span class="sourceLineNo">112</span><a id="line.112">  @Override</a>
+<span class="sourceLineNo">113</span><a id="line.113">  public String toString() {</a>
+<span class="sourceLineNo">114</span><a id="line.114">    StringBuilder sb = new StringBuilder();</a>
+<span class="sourceLineNo">115</span><a id="line.115">    sb.append("class KernelSpecFileHelpLinks {\n");</a>
+<span class="sourceLineNo">116</span><a id="line.116">    sb.append("    text: ").append(toIndentedString(text)).append("\n");</a>
+<span class="sourceLineNo">117</span><a id="line.117">    sb.append("    url: ").append(toIndentedString(url)).append("\n");</a>
+<span class="sourceLineNo">118</span><a id="line.118">    sb.append("}");</a>
+<span class="sourceLineNo">119</span><a id="line.119">    return sb.toString();</a>
+<span class="sourceLineNo">120</span><a id="line.120">  }</a>
+<span class="sourceLineNo">121</span><a id="line.121"></a>
+<span class="sourceLineNo">122</span><a id="line.122">  /**</a>
+<span class="sourceLineNo">123</span><a id="line.123">   * Convert the given object to string with each line indented by 4 spaces</a>
+<span class="sourceLineNo">124</span><a id="line.124">   * (except the first line).</a>
+<span class="sourceLineNo">125</span><a id="line.125">   */</a>
+<span class="sourceLineNo">126</span><a id="line.126">  private String toIndentedString(Object o) {</a>
+<span class="sourceLineNo">127</span><a id="line.127">    if (o == null) {</a>
+<span class="sourceLineNo">128</span><a id="line.128">      return "null";</a>
+<span class="sourceLineNo">129</span><a id="line.129">    }</a>
+<span class="sourceLineNo">130</span><a id="line.130">    return o.toString().replace("\n", "\n    ");</a>
+<span class="sourceLineNo">131</span><a id="line.131">  }</a>
+<span class="sourceLineNo">132</span><a id="line.132">}</a>
 
 
 

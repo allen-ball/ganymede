@@ -164,19 +164,19 @@
 <span class="sourceLineNo">155</span><a id="line.155"></a>
 <span class="sourceLineNo">156</span><a id="line.156">    /**</a>
 <span class="sourceLineNo">157</span><a id="line.157">     * Method to call</a>
-<span class="sourceLineNo">158</span><a id="line.158">     * {@link Resolver#resolve(Shell,PrintStream,PrintStream,POM)}.</a>
-<span class="sourceLineNo">159</span><a id="line.159">     *</a>
-<span class="sourceLineNo">160</span><a id="line.160">     * @param   pom             The {@link POM} to merge.</a>
-<span class="sourceLineNo">161</span><a id="line.161">     */</a>
-<span class="sourceLineNo">162</span><a id="line.162">    public void resolve(POM pom) {</a>
-<span class="sourceLineNo">163</span><a id="line.163">        for (var file : resolver().resolve(this, out, err, pom)) {</a>
-<span class="sourceLineNo">164</span><a id="line.164">            var jshell = this.jshell;</a>
-<span class="sourceLineNo">165</span><a id="line.165"></a>
-<span class="sourceLineNo">166</span><a id="line.166">            if (jshell != null) {</a>
-<span class="sourceLineNo">167</span><a id="line.167">                jshell.addToClasspath(file.toString());</a>
-<span class="sourceLineNo">168</span><a id="line.168">            } else {</a>
-<span class="sourceLineNo">169</span><a id="line.169">                break;</a>
-<span class="sourceLineNo">170</span><a id="line.170">            }</a>
+<span class="sourceLineNo">158</span><a id="line.158">     * {@link Resolver#resolve(Shell,PrintStream,PrintStream,POM)} and add</a>
+<span class="sourceLineNo">159</span><a id="line.159">     * any newly resolved artifacts to the {@link JShell} classpath.</a>
+<span class="sourceLineNo">160</span><a id="line.160">     *</a>
+<span class="sourceLineNo">161</span><a id="line.161">     * @param   pom             The {@link POM} to merge.</a>
+<span class="sourceLineNo">162</span><a id="line.162">     */</a>
+<span class="sourceLineNo">163</span><a id="line.163">    public void resolve(POM pom) {</a>
+<span class="sourceLineNo">164</span><a id="line.164">        var files = resolver().resolve(this, out, err, pom);</a>
+<span class="sourceLineNo">165</span><a id="line.165">        var jshell = this.jshell;</a>
+<span class="sourceLineNo">166</span><a id="line.166"></a>
+<span class="sourceLineNo">167</span><a id="line.167">        if (jshell != null) {</a>
+<span class="sourceLineNo">168</span><a id="line.168">            files.stream()</a>
+<span class="sourceLineNo">169</span><a id="line.169">                .map(Object::toString)</a>
+<span class="sourceLineNo">170</span><a id="line.170">                .forEach(jshell::addToClasspath);</a>
 <span class="sourceLineNo">171</span><a id="line.171">        }</a>
 <span class="sourceLineNo">172</span><a id="line.172">    }</a>
 <span class="sourceLineNo">173</span><a id="line.173"></a>

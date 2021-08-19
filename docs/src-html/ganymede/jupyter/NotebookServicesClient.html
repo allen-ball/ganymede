@@ -116,86 +116,88 @@
 <span class="sourceLineNo">107</span><a id="line.107">    public NotebookServicesClient(JsonNode node) {</a>
 <span class="sourceLineNo">108</span><a id="line.108">        super();</a>
 <span class="sourceLineNo">109</span><a id="line.109"></a>
-<span class="sourceLineNo">110</span><a id="line.110">        var url = URI.create(node.get("url").asText());</a>
-<span class="sourceLineNo">111</span><a id="line.111"></a>
-<span class="sourceLineNo">112</span><a id="line.112">        setScheme(url.getScheme());</a>
-<span class="sourceLineNo">113</span><a id="line.113">        setHost(url.getHost());</a>
-<span class="sourceLineNo">114</span><a id="line.114">        setPort(url.getPort());</a>
-<span class="sourceLineNo">115</span><a id="line.115"></a>
-<span class="sourceLineNo">116</span><a id="line.116">        var token = node.get("token").asText();</a>
+<span class="sourceLineNo">110</span><a id="line.110">        if (node.has("url")) {</a>
+<span class="sourceLineNo">111</span><a id="line.111">            var url = URI.create(node.get("url").asText());</a>
+<span class="sourceLineNo">112</span><a id="line.112"></a>
+<span class="sourceLineNo">113</span><a id="line.113">            setScheme(url.getScheme());</a>
+<span class="sourceLineNo">114</span><a id="line.114">            setHost(url.getHost());</a>
+<span class="sourceLineNo">115</span><a id="line.115">            setPort(url.getPort());</a>
+<span class="sourceLineNo">116</span><a id="line.116">        }</a>
 <span class="sourceLineNo">117</span><a id="line.117"></a>
-<span class="sourceLineNo">118</span><a id="line.118">        setRequestInterceptor(t -&gt; t.header("Authorization", "Token " + token));</a>
-<span class="sourceLineNo">119</span><a id="line.119">    }</a>
-<span class="sourceLineNo">120</span><a id="line.120"></a>
-<span class="sourceLineNo">121</span><a id="line.121">    /**</a>
-<span class="sourceLineNo">122</span><a id="line.122">     * See {@link KernelsApi#apiKernelsGet()}.</a>
-<span class="sourceLineNo">123</span><a id="line.123">     *</a>
-<span class="sourceLineNo">124</span><a id="line.124">     * @return  The {@link List} of {@link Kernel}s.</a>
-<span class="sourceLineNo">125</span><a id="line.125">     */</a>
-<span class="sourceLineNo">126</span><a id="line.126">    public List&lt;Kernel&gt; getKernelList() throws ApiException {</a>
-<span class="sourceLineNo">127</span><a id="line.127">        return new KernelsApi(this).apiKernelsGet();</a>
-<span class="sourceLineNo">128</span><a id="line.128">    }</a>
-<span class="sourceLineNo">129</span><a id="line.129"></a>
-<span class="sourceLineNo">130</span><a id="line.130">    /**</a>
-<span class="sourceLineNo">131</span><a id="line.131">     * See {@link KernelsApi#apiKernelsKernelIdGet(UUID)}.</a>
-<span class="sourceLineNo">132</span><a id="line.132">     *</a>
-<span class="sourceLineNo">133</span><a id="line.133">     * @param   id              The kernel {@link UUID}.</a>
+<span class="sourceLineNo">118</span><a id="line.118">        if (node.has("token")) {</a>
+<span class="sourceLineNo">119</span><a id="line.119">            setRequestInterceptor(t -&gt; t.header("Authorization", "Token " + node.get("token").asText()));</a>
+<span class="sourceLineNo">120</span><a id="line.120">        }</a>
+<span class="sourceLineNo">121</span><a id="line.121">    }</a>
+<span class="sourceLineNo">122</span><a id="line.122"></a>
+<span class="sourceLineNo">123</span><a id="line.123">    /**</a>
+<span class="sourceLineNo">124</span><a id="line.124">     * See {@link KernelsApi#apiKernelsGet()}.</a>
+<span class="sourceLineNo">125</span><a id="line.125">     *</a>
+<span class="sourceLineNo">126</span><a id="line.126">     * @return  The {@link List} of {@link Kernel}s.</a>
+<span class="sourceLineNo">127</span><a id="line.127">     */</a>
+<span class="sourceLineNo">128</span><a id="line.128">    public List&lt;Kernel&gt; getKernelList() throws ApiException {</a>
+<span class="sourceLineNo">129</span><a id="line.129">        return new KernelsApi(this).apiKernelsGet();</a>
+<span class="sourceLineNo">130</span><a id="line.130">    }</a>
+<span class="sourceLineNo">131</span><a id="line.131"></a>
+<span class="sourceLineNo">132</span><a id="line.132">    /**</a>
+<span class="sourceLineNo">133</span><a id="line.133">     * See {@link KernelsApi#apiKernelsKernelIdGet(UUID)}.</a>
 <span class="sourceLineNo">134</span><a id="line.134">     *</a>
-<span class="sourceLineNo">135</span><a id="line.135">     * @return  The {@link Kernel} matching the argument ID.</a>
-<span class="sourceLineNo">136</span><a id="line.136">     */</a>
-<span class="sourceLineNo">137</span><a id="line.137">    public Kernel getKernel(UUID id) throws ApiException {</a>
-<span class="sourceLineNo">138</span><a id="line.138">        return new KernelsApi(this).apiKernelsKernelIdGet(id);</a>
-<span class="sourceLineNo">139</span><a id="line.139">    }</a>
-<span class="sourceLineNo">140</span><a id="line.140"></a>
-<span class="sourceLineNo">141</span><a id="line.141">    /**</a>
-<span class="sourceLineNo">142</span><a id="line.142">     * See {@link KernelspecsApi#apiKernelspecsGet()}.</a>
-<span class="sourceLineNo">143</span><a id="line.143">     *</a>
-<span class="sourceLineNo">144</span><a id="line.144">     * @return  The {@link Map} of {@link KernelSpec}s.</a>
-<span class="sourceLineNo">145</span><a id="line.145">     */</a>
-<span class="sourceLineNo">146</span><a id="line.146">    public Map&lt;String,KernelSpec&gt; getKernelSpecMap() throws ApiException {</a>
-<span class="sourceLineNo">147</span><a id="line.147">        return new KernelspecsApi(this).apiKernelspecsGet().getKernelspecs();</a>
-<span class="sourceLineNo">148</span><a id="line.148">    }</a>
-<span class="sourceLineNo">149</span><a id="line.149"></a>
-<span class="sourceLineNo">150</span><a id="line.150">    /**</a>
-<span class="sourceLineNo">151</span><a id="line.151">     * See {@link SessionsApi#apiSessionsGet()}.</a>
-<span class="sourceLineNo">152</span><a id="line.152">     *</a>
-<span class="sourceLineNo">153</span><a id="line.153">     * @return  The {@link List} of {@link Session}s.</a>
-<span class="sourceLineNo">154</span><a id="line.154">     */</a>
-<span class="sourceLineNo">155</span><a id="line.155">    public List&lt;Session&gt; getSessionList() throws ApiException {</a>
-<span class="sourceLineNo">156</span><a id="line.156">        return new SessionsApi(this).apiSessionsGet();</a>
-<span class="sourceLineNo">157</span><a id="line.157">    }</a>
-<span class="sourceLineNo">158</span><a id="line.158"></a>
-<span class="sourceLineNo">159</span><a id="line.159">    /**</a>
-<span class="sourceLineNo">160</span><a id="line.160">     * See {@link SessionsApi#apiSessionsSessionGet(UUID)}.</a>
-<span class="sourceLineNo">161</span><a id="line.161">     *</a>
-<span class="sourceLineNo">162</span><a id="line.162">     * @param   id              The session {@link UUID}.</a>
+<span class="sourceLineNo">135</span><a id="line.135">     * @param   id              The kernel {@link UUID}.</a>
+<span class="sourceLineNo">136</span><a id="line.136">     *</a>
+<span class="sourceLineNo">137</span><a id="line.137">     * @return  The {@link Kernel} matching the argument ID.</a>
+<span class="sourceLineNo">138</span><a id="line.138">     */</a>
+<span class="sourceLineNo">139</span><a id="line.139">    public Kernel getKernel(UUID id) throws ApiException {</a>
+<span class="sourceLineNo">140</span><a id="line.140">        return new KernelsApi(this).apiKernelsKernelIdGet(id);</a>
+<span class="sourceLineNo">141</span><a id="line.141">    }</a>
+<span class="sourceLineNo">142</span><a id="line.142"></a>
+<span class="sourceLineNo">143</span><a id="line.143">    /**</a>
+<span class="sourceLineNo">144</span><a id="line.144">     * See {@link KernelspecsApi#apiKernelspecsGet()}.</a>
+<span class="sourceLineNo">145</span><a id="line.145">     *</a>
+<span class="sourceLineNo">146</span><a id="line.146">     * @return  The {@link Map} of {@link KernelSpec}s.</a>
+<span class="sourceLineNo">147</span><a id="line.147">     */</a>
+<span class="sourceLineNo">148</span><a id="line.148">    public Map&lt;String,KernelSpec&gt; getKernelSpecMap() throws ApiException {</a>
+<span class="sourceLineNo">149</span><a id="line.149">        return new KernelspecsApi(this).apiKernelspecsGet().getKernelspecs();</a>
+<span class="sourceLineNo">150</span><a id="line.150">    }</a>
+<span class="sourceLineNo">151</span><a id="line.151"></a>
+<span class="sourceLineNo">152</span><a id="line.152">    /**</a>
+<span class="sourceLineNo">153</span><a id="line.153">     * See {@link SessionsApi#apiSessionsGet()}.</a>
+<span class="sourceLineNo">154</span><a id="line.154">     *</a>
+<span class="sourceLineNo">155</span><a id="line.155">     * @return  The {@link List} of {@link Session}s.</a>
+<span class="sourceLineNo">156</span><a id="line.156">     */</a>
+<span class="sourceLineNo">157</span><a id="line.157">    public List&lt;Session&gt; getSessionList() throws ApiException {</a>
+<span class="sourceLineNo">158</span><a id="line.158">        return new SessionsApi(this).apiSessionsGet();</a>
+<span class="sourceLineNo">159</span><a id="line.159">    }</a>
+<span class="sourceLineNo">160</span><a id="line.160"></a>
+<span class="sourceLineNo">161</span><a id="line.161">    /**</a>
+<span class="sourceLineNo">162</span><a id="line.162">     * See {@link SessionsApi#apiSessionsSessionGet(UUID)}.</a>
 <span class="sourceLineNo">163</span><a id="line.163">     *</a>
-<span class="sourceLineNo">164</span><a id="line.164">     * @return  The {@link Session} matching the argument ID.</a>
-<span class="sourceLineNo">165</span><a id="line.165">     */</a>
-<span class="sourceLineNo">166</span><a id="line.166">    public Session getSession(UUID id) throws ApiException {</a>
-<span class="sourceLineNo">167</span><a id="line.167">        return new SessionsApi(this).apiSessionsSessionGet(id);</a>
-<span class="sourceLineNo">168</span><a id="line.168">    }</a>
-<span class="sourceLineNo">169</span><a id="line.169"></a>
-<span class="sourceLineNo">170</span><a id="line.170">    /**</a>
-<span class="sourceLineNo">171</span><a id="line.171">     * See {@link TerminalsApi#apiTerminalsGet()}.</a>
-<span class="sourceLineNo">172</span><a id="line.172">     *</a>
-<span class="sourceLineNo">173</span><a id="line.173">     * @return  The {@link List} of {@link Terminal}s.</a>
-<span class="sourceLineNo">174</span><a id="line.174">     */</a>
-<span class="sourceLineNo">175</span><a id="line.175">    public List&lt;Terminal&gt; getTerminalList() throws ApiException {</a>
-<span class="sourceLineNo">176</span><a id="line.176">        return new TerminalsApi(this).apiTerminalsGet();</a>
-<span class="sourceLineNo">177</span><a id="line.177">    }</a>
-<span class="sourceLineNo">178</span><a id="line.178"></a>
-<span class="sourceLineNo">179</span><a id="line.179">    /**</a>
-<span class="sourceLineNo">180</span><a id="line.180">     * See {@link TerminalsApi#apiTerminalsTerminalIdGet(String)}.</a>
-<span class="sourceLineNo">181</span><a id="line.181">     *</a>
-<span class="sourceLineNo">182</span><a id="line.182">     * @param   id              The terminal ID.</a>
+<span class="sourceLineNo">164</span><a id="line.164">     * @param   id              The session {@link UUID}.</a>
+<span class="sourceLineNo">165</span><a id="line.165">     *</a>
+<span class="sourceLineNo">166</span><a id="line.166">     * @return  The {@link Session} matching the argument ID.</a>
+<span class="sourceLineNo">167</span><a id="line.167">     */</a>
+<span class="sourceLineNo">168</span><a id="line.168">    public Session getSession(UUID id) throws ApiException {</a>
+<span class="sourceLineNo">169</span><a id="line.169">        return new SessionsApi(this).apiSessionsSessionGet(id);</a>
+<span class="sourceLineNo">170</span><a id="line.170">    }</a>
+<span class="sourceLineNo">171</span><a id="line.171"></a>
+<span class="sourceLineNo">172</span><a id="line.172">    /**</a>
+<span class="sourceLineNo">173</span><a id="line.173">     * See {@link TerminalsApi#apiTerminalsGet()}.</a>
+<span class="sourceLineNo">174</span><a id="line.174">     *</a>
+<span class="sourceLineNo">175</span><a id="line.175">     * @return  The {@link List} of {@link Terminal}s.</a>
+<span class="sourceLineNo">176</span><a id="line.176">     */</a>
+<span class="sourceLineNo">177</span><a id="line.177">    public List&lt;Terminal&gt; getTerminalList() throws ApiException {</a>
+<span class="sourceLineNo">178</span><a id="line.178">        return new TerminalsApi(this).apiTerminalsGet();</a>
+<span class="sourceLineNo">179</span><a id="line.179">    }</a>
+<span class="sourceLineNo">180</span><a id="line.180"></a>
+<span class="sourceLineNo">181</span><a id="line.181">    /**</a>
+<span class="sourceLineNo">182</span><a id="line.182">     * See {@link TerminalsApi#apiTerminalsTerminalIdGet(String)}.</a>
 <span class="sourceLineNo">183</span><a id="line.183">     *</a>
-<span class="sourceLineNo">184</span><a id="line.184">     * @return  The {@link Terminal} matching the argument ID.</a>
-<span class="sourceLineNo">185</span><a id="line.185">     */</a>
-<span class="sourceLineNo">186</span><a id="line.186">    public Terminal getTerminal(String id) throws ApiException {</a>
-<span class="sourceLineNo">187</span><a id="line.187">        return new TerminalsApi(this).apiTerminalsTerminalIdGet(id);</a>
-<span class="sourceLineNo">188</span><a id="line.188">    }</a>
-<span class="sourceLineNo">189</span><a id="line.189">}</a>
+<span class="sourceLineNo">184</span><a id="line.184">     * @param   id              The terminal ID.</a>
+<span class="sourceLineNo">185</span><a id="line.185">     *</a>
+<span class="sourceLineNo">186</span><a id="line.186">     * @return  The {@link Terminal} matching the argument ID.</a>
+<span class="sourceLineNo">187</span><a id="line.187">     */</a>
+<span class="sourceLineNo">188</span><a id="line.188">    public Terminal getTerminal(String id) throws ApiException {</a>
+<span class="sourceLineNo">189</span><a id="line.189">        return new TerminalsApi(this).apiTerminalsTerminalIdGet(id);</a>
+<span class="sourceLineNo">190</span><a id="line.190">    }</a>
+<span class="sourceLineNo">191</span><a id="line.191">}</a>
 
 
 
