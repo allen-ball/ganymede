@@ -104,7 +104,7 @@
     <jse.target>11</jse.target>
     <maven.compiler.source>${jse.target}</maven.compiler.source>
 
-    <notebook.services.version>v6.4.0</notebook.services.version>
+    <notebook.services.version>v6.4.4</notebook.services.version>
     <notebook.services.spec>https://github.com/jupyter/notebook/raw/${notebook.services.version}/notebook/services/api/api.yaml</notebook.services.spec>
 
     <commonmark.version>0.18.0</commonmark.version>
