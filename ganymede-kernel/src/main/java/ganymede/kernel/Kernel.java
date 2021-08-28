@@ -51,6 +51,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+import picocli.CommandLine;
 
 import static java.util.stream.Collectors.toList;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -66,8 +69,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
-@SpringBootApplication
-@RestController
+@SpringBootApplication @RestController
+@Command
 @NoArgsConstructor @ToString @Log4j2
 public class Kernel extends Server implements KernelApi,
                                               ApplicationContextAware,
@@ -77,6 +80,7 @@ public class Kernel extends Server implements KernelApi,
     private static final String JSE_HELP_LINK_URL_FORMAT =
         "https://docs.oracle.com/en/java/javase/%1$s/docs/api/";
 
+    @Option(description = { "connection_file" }, names = { "-f" }, arity = "1")
     @Value("${connection-file:#{null}}")
     private String connection_file = null;
 
@@ -269,6 +273,10 @@ public class Kernel extends Server implements KernelApi,
 
     @Override
     public void run(ApplicationArguments arguments) throws Exception {
+        new CommandLine(this)
+            .setCaseInsensitiveEnumValuesAllowed(true)
+            .parseArgs(arguments.getNonOptionArgs().toArray(new String [] { }));
+
         try {
             if (connection_file != null) {
                 bind(connection_file);

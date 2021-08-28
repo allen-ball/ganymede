@@ -81,8 +81,8 @@ public class Javadoc {
     }
 
     /**
-     * Get a Javadoc link href from a possibly simple class name and a type
-     * ({@link Class}).
+     * Get a Javadoc link href from a possibly simple class name and an
+     * implementation type ({@link Class}).
      *
      * @param   name            The (possibly simple) class name.
      * @param   type            The {@link Class}.

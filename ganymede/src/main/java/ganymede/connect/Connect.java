@@ -30,6 +30,9 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+import picocli.CommandLine;
 
 /**
  * Ganymede Jupyter {@link ganymede.kernel.Kernel} {@link Connect} CLI.
@@ -42,13 +45,19 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 @SpringBootApplication
+@Command
 @NoArgsConstructor @ToString @Log4j2
 public class Connect implements ApplicationRunner {
+    @Option(description = { "connection_file" }, names = { "-f" }, arity = "1")
     @Value("${connection-file:#{null}}")
     private String connection_file = null;
 
     @Override
     public void run(ApplicationArguments arguments) throws Exception {
+        new CommandLine(this)
+            .setCaseInsensitiveEnumValuesAllowed(true)
+            .parseArgs(arguments.getNonOptionArgs().toArray(new String [] { }));
+
         try {
             var file = new File(connection_file);
             var node = ObjectMappers.JSON.readTree(file);

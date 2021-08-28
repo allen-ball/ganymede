@@ -39,6 +39,9 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.system.ApplicationHome;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+import picocli.CommandLine;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
@@ -54,19 +57,43 @@ import static org.springframework.util.FileSystemUtils.deleteRecursively;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 @SpringBootApplication
+@Command
 @NoArgsConstructor @ToString @Log4j2
 public class Install implements ApplicationRunner {
-    @Value("${id-prefix}")              private String id_prefix = null;
-    @Value("${id}")                     private String id = null;
-    @Value("${id-suffix}")              private String id_suffix = null;
-    @Value("${display-name-prefix}")    private String display_name_prefix = null;
-    @Value("${display-name}")           private String display_name = null;
-    @Value("${display-name-suffix}")    private String display_name_suffix = null;
-    @Value("${env:}")                   private List<String> envvars = null;
-    @Value("${copy-jar:true}")          private boolean copy_jar = true;
+    @Option(description = { "Install Ganymede kernel" }, names = { "-i" })
+    @Value("${install:#{null}}")
+    private Boolean install = null;
+
+    @Value("${id-prefix}")
+    private String id_prefix = null;
+
+    @Value("${id}")
+    private String id = null;
+
+    @Value("${id-suffix}")
+    private String id_suffix = null;
+
+    @Value("${display-name-prefix}")
+    private String display_name_prefix = null;
+
+    @Value("${display-name}")
+    private String display_name = null;
+
+    @Value("${display-name-suffix}")
+    private String display_name_suffix = null;
+
+    @Value("${env:}")
+    private List<String> envvars = null;
+
+    @Value("${copy-jar:true}")
+    private boolean copy_jar = true;
 
     @Override
     public void run(ApplicationArguments arguments) throws Exception {
+        new CommandLine(this)
+            .setCaseInsensitiveEnumValuesAllowed(true)
+            .parseArgs(arguments.getNonOptionArgs().toArray(new String [] { }));
+
         id =
             Stream.of(id_prefix, id, id_suffix)
             .map(String::strip)
@@ -173,8 +200,7 @@ public class Install implements ApplicationRunner {
                                 "-Djava.awt.headless=true",
                                 "-Djdk.disableLastUsageTracking=true"),
                       sysProperties.entrySet().stream().map(t -> "-D" + t),
-                      Stream.of("-jar", jar,
-                                "--connection-file={connection_file}"))
+                      Stream.of("-jar", jar, "-f", "{connection_file}"))
                 .flatMap(Function.identity())
                 .map(Object::toString)
                 .forEach(argv::add);

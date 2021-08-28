@@ -27,6 +27,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+import picocli.CommandLine;
 
 import static org.springframework.boot.WebApplicationType.NONE;
 
@@ -39,6 +42,7 @@ import static org.springframework.boot.WebApplicationType.NONE;
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
+@Command
 @NoArgsConstructor @ToString @Log4j2
 public class Launcher implements ApplicationRunner {
 
@@ -56,14 +60,20 @@ public class Launcher implements ApplicationRunner {
         new SpringApplicationBuilder(Launcher.class).web(NONE).run(argv);
     }
 
+    @Option(description = { "Install Ganymede kernel" }, names = { "-i" })
     @Value("${install:#{null}}")
     private Boolean install = null;
 
+    @Option(description = { "connection_file" }, names = { "-f" }, arity = "1")
     @Value("${connection-file:#{null}}")
     private String connection_file = null;
 
     @Override
     public void run(ApplicationArguments arguments) throws Exception {
+        new CommandLine(this)
+            .setCaseInsensitiveEnumValuesAllowed(true)
+            .parseArgs(arguments.getNonOptionArgs().toArray(new String [] { }));
+
         if (install == null) {
             install = arguments.getOptionNames().contains("install");
         }
