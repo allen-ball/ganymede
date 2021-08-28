@@ -122,8 +122,8 @@ public class SQL extends AbstractMagic {
                     index = "2", arity = "0..1")
         private String password = null;
 
-        @Option(description = { "Print query results.  true by default" },
-                names = "--no-print", negatable = true)
+        @Option(names = { "--no-print" }, negatable = true,
+                description = { "Print query results.  true by default" })
         private boolean print = true;
 
         public DSLContext dsl() {

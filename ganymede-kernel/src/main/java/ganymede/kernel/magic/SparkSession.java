@@ -116,8 +116,8 @@ public class SparkSession extends AbstractPropertiesMagic {
                     index = "1", arity = "0..1", defaultValue = "root")
         private String appName = null;
 
-        @Option(description = { "Enable Hive if available.  true by default" },
-                names = "--no-enable-hive-if-available", negatable = true)
+        @Option(names = { "--no-enable-hive-if-available" }, negatable = true,
+                description = { "Enable Hive if available.  true by default" })
         private boolean enableHiveIfAvailable = true;
     }
 }
