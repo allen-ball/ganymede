@@ -131,8 +131,8 @@
 <span class="sourceLineNo">122</span><a id="line.122">                    index = "2", arity = "0..1")</a>
 <span class="sourceLineNo">123</span><a id="line.123">        private String password = null;</a>
 <span class="sourceLineNo">124</span><a id="line.124"></a>
-<span class="sourceLineNo">125</span><a id="line.125">        @Option(description = { "Print query results.  true by default" },</a>
-<span class="sourceLineNo">126</span><a id="line.126">                names = "--no-print", negatable = true)</a>
+<span class="sourceLineNo">125</span><a id="line.125">        @Option(names = { "--no-print" }, negatable = true,</a>
+<span class="sourceLineNo">126</span><a id="line.126">                description = { "Print query results.  true by default" })</a>
 <span class="sourceLineNo">127</span><a id="line.127">        private boolean print = true;</a>
 <span class="sourceLineNo">128</span><a id="line.128"></a>
 <span class="sourceLineNo">129</span><a id="line.129">        public DSLContext dsl() {</a>
