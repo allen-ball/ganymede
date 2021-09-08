@@ -122,6 +122,8 @@
     <spark.version>3.1.2</spark.version>
     <tablesaw.version>0.38.5</tablesaw.version>
 
+    <maven-javadoc-plugin.version>3.3.1</maven-javadoc-plugin.version>
+
     <ball-api.version>${ball-parent.version}</ball-api.version>
   </properties>
   <dependencyManagement>
