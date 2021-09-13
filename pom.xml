@@ -119,10 +119,11 @@
     <kotlin-coroutines.version>1.5.2</kotlin-coroutines.version>
     <logback.version>1.2.6</logback.version>
     <netty.version>${netty.major.version}.68.Final</netty.version>
-    <netty-tcnative.version>2.0.42.Final</netty-tcnative.version>
+    <netty-tcnative.version>2.0.43.Final</netty-tcnative.version>
     <resolverVersion>1.7.2</resolverVersion>
     <scala.binary.version>2.12</scala.binary.version>
     <scala.version>${scala.binary.version}.10</scala.version>
+    <sisuInjectVersion>0.3.5</sisuInjectVersion>
     <spark.version>3.1.2</spark.version>
     <tablesaw.version>0.38.5</tablesaw.version>
 
@@ -221,6 +222,16 @@
         <groupId>org.commonmark</groupId>
         <artifactId>commonmark-ext-yaml-front-matter</artifactId>
         <version>${commonmark.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.sisu</groupId>
+        <artifactId>org.eclipse.sisu.inject</artifactId>
+        <version>${sisuInjectVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.sisu</groupId>
+        <artifactId>org.eclipse.sisu.plexus</artifactId>
+        <version>${sisuInjectVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.graalvm</groupId>
