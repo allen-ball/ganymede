@@ -115,7 +115,7 @@
     <jeromq.version>0.5.2</jeromq.version>
     <jersey.version>2.35</jersey.version>
     <jetty.version>10.0.6</jetty.version>
-    <kotlin.version>1.5.30</kotlin.version>
+    <kotlin.version>1.5.31</kotlin.version>
     <kotlin-coroutines.version>1.5.2</kotlin-coroutines.version>
     <logback.version>1.2.6</logback.version>
     <netty.version>${netty.major.version}.68.Final</netty.version>
