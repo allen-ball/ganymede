@@ -18,11 +18,9 @@ package ganymede.kernel;
  * limitations under the License.
  * ##########################################################################
  */
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.notebook.Magic;
-import ganymede.server.Message;
 import ganymede.server.Server;
 import ganymede.shell.Shell;
 import ganymede.util.ObjectMappers;
@@ -56,9 +54,6 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine;
 
 import static java.util.stream.Collectors.toList;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 /**
  * Ganymede Jupyter {@link Kernel}.
