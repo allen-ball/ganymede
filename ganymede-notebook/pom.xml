@@ -107,12 +107,8 @@
         <configuration>
           <outputDirectory>${project.build.outputDirectory}</outputDirectory>
           <links>
-            <link>
-              <url>https://allen-ball.github.io/ganymede/</url>
-            </link>
-            <link>
-              <url>https://docs.oracle.com/en/java/javase/${java.specification.version}/docs/api/</url>
-            </link>
+            <link><url>https://allen-ball.github.io/ganymede/</url></link>
+            <link><url>https://docs.oracle.com/en/java/javase/${java.specification.version}/docs/api/</url></link>
           </links>
         </configuration>
       </plugin>

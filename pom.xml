@@ -31,7 +31,7 @@
   <parent>
     <groupId>ball</groupId>
     <artifactId>parent</artifactId>
-    <version>20210820.0</version>
+    <version>20210930-SNAPSHOT</version>
     <relativePath/>
   </parent>
   <organization>
@@ -85,6 +85,25 @@
   </pluginRepositories>
   <profiles>
     <profile>
+      <id>scala-2.12</id>
+      <activation><activeByDefault>true</activeByDefault></activation>
+      <properties>
+        <scala.binary.version>2.12</scala.binary.version>
+        <scala.version>${scala.binary.version}.15</scala.version>
+        <jackson-bom.version>2.10.5.20201202</jackson-bom.version>
+      </properties>
+    </profile>
+    <profile>
+      <id>scala-2.13</id>
+      <activation><activeByDefault>false</activeByDefault></activation>
+      <properties>
+        <scala.binary.version>2.13</scala.binary.version>
+        <scala.version>${scala.binary.version}.5</scala.version>
+        <!-- <jackson-bom.version>2.12.5</jackson-bom.version> -->
+        <jackson-bom.version>2.10.5.20201202</jackson-bom.version>
+      </properties>
+    </profile>
+    <profile>
       <id>jeromq-SNAPSHOT</id>
       <repositories>
         <repository>
@@ -104,30 +123,15 @@
     <jse.target>11</jse.target>
     <maven.compiler.source>${jse.target}</maven.compiler.source>
 
-    <notebook.services.version>v6.4.4</notebook.services.version>
+    <notebook.services.version>v6.4.6</notebook.services.version>
     <notebook.services.spec>https://github.com/jupyter/notebook/raw/${notebook.services.version}/notebook/services/api/api.yaml</notebook.services.spec>
 
-    <commonmark.version>0.18.0</commonmark.version>
+    <commonmark.version>0.18.1</commonmark.version>
     <graal-sdk.version>0.33</graal-sdk.version>
-    <groovy.version>3.0.9</groovy.version>
-    <gson.version>2.8.8</gson.version>
-    <jackson-bom.version>2.10.5.20201202</jackson-bom.version>
     <jeromq.version>0.5.2</jeromq.version>
-    <jersey.version>2.35</jersey.version>
-    <jetty.version>10.0.6</jetty.version>
-    <kotlin.version>1.5.31</kotlin.version>
-    <kotlin-coroutines.version>1.5.2</kotlin-coroutines.version>
-    <logback.version>1.2.6</logback.version>
-    <netty.version>${netty.major.version}.68.Final</netty.version>
-    <netty-tcnative.version>2.0.43.Final</netty-tcnative.version>
-    <resolverVersion>1.7.2</resolverVersion>
-    <scala.binary.version>2.12</scala.binary.version>
-    <scala.version>${scala.binary.version}.10</scala.version>
-    <sisuInjectVersion>0.3.5</sisuInjectVersion>
+    <jetty.version>10.0.7</jetty.version>
     <spark.version>3.1.2</spark.version>
-    <tablesaw.version>0.38.5</tablesaw.version>
-
-    <maven-javadoc-plugin.version>3.3.1</maven-javadoc-plugin.version>
+    <tablesaw.version>0.42.0</tablesaw.version>
 
     <ball-api.version>${ball-parent.version}</ball-api.version>
   </properties>
@@ -146,17 +150,17 @@
       <dependency>
         <groupId>com.github.spotbugs</groupId>
         <artifactId>spotbugs-annotations</artifactId>
-        <version>4.3.0</version>
+        <version>4.5.0</version>
       </dependency>
       <dependency>
         <groupId>com.github.jknack</groupId>
         <artifactId>handlebars</artifactId>
-        <version>4.2.0</version>
+        <version>4.3.0</version>
       </dependency>
       <dependency>
         <groupId>info.picocli</groupId>
         <artifactId>picocli</artifactId>
-        <version>4.6.1</version>
+        <version>4.6.2</version>
       </dependency>
       <dependency>
         <groupId>io.springfox</groupId>
@@ -222,16 +226,6 @@
         <groupId>org.commonmark</groupId>
         <artifactId>commonmark-ext-yaml-front-matter</artifactId>
         <version>${commonmark.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.sisu</groupId>
-        <artifactId>org.eclipse.sisu.inject</artifactId>
-        <version>${sisuInjectVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.sisu</groupId>
-        <artifactId>org.eclipse.sisu.plexus</artifactId>
-        <version>${sisuInjectVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.graalvm</groupId>
