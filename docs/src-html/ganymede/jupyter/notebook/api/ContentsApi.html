@@ -42,818 +42,822 @@
 <span class="sourceLineNo">033</span><a id="line.33">import java.util.ArrayList;</a>
 <span class="sourceLineNo">034</span><a id="line.34">import java.util.List;</a>
 <span class="sourceLineNo">035</span><a id="line.35">import java.util.Map;</a>
-<span class="sourceLineNo">036</span><a id="line.36">import java.util.StringJoiner;</a>
-<span class="sourceLineNo">037</span><a id="line.37">import java.util.function.Consumer;</a>
-<span class="sourceLineNo">038</span><a id="line.38"></a>
-<span class="sourceLineNo">039</span><a id="line.39">@javax.annotation.processing.</a>
-<span class="sourceLineNo">040</span><a id="line.40">Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")</a>
-<span class="sourceLineNo">041</span><a id="line.41">public class ContentsApi {</a>
-<span class="sourceLineNo">042</span><a id="line.42">  private final HttpClient memberVarHttpClient;</a>
-<span class="sourceLineNo">043</span><a id="line.43">  private final ObjectMapper memberVarObjectMapper;</a>
-<span class="sourceLineNo">044</span><a id="line.44">  private final String memberVarBaseUri;</a>
-<span class="sourceLineNo">045</span><a id="line.45">  private final Consumer&lt;HttpRequest.Builder&gt; memberVarInterceptor;</a>
-<span class="sourceLineNo">046</span><a id="line.46">  private final Duration memberVarReadTimeout;</a>
-<span class="sourceLineNo">047</span><a id="line.47">  private final Consumer&lt;HttpResponse&lt;InputStream&gt;&gt;</a>
-<span class="sourceLineNo">048</span><a id="line.48">      memberVarResponseInterceptor;</a>
-<span class="sourceLineNo">049</span><a id="line.49"></a>
-<span class="sourceLineNo">050</span><a id="line.50">  public ContentsApi() { this(new ApiClient()); }</a>
-<span class="sourceLineNo">051</span><a id="line.51"></a>
-<span class="sourceLineNo">052</span><a id="line.52">  public ContentsApi(ApiClient apiClient) {</a>
-<span class="sourceLineNo">053</span><a id="line.53">    memberVarHttpClient = apiClient.getHttpClient();</a>
-<span class="sourceLineNo">054</span><a id="line.54">    memberVarObjectMapper = apiClient.getObjectMapper();</a>
-<span class="sourceLineNo">055</span><a id="line.55">    memberVarBaseUri = apiClient.getBaseUri();</a>
-<span class="sourceLineNo">056</span><a id="line.56">    memberVarInterceptor = apiClient.getRequestInterceptor();</a>
-<span class="sourceLineNo">057</span><a id="line.57">    memberVarReadTimeout = apiClient.getReadTimeout();</a>
-<span class="sourceLineNo">058</span><a id="line.58">    memberVarResponseInterceptor = apiClient.getResponseInterceptor();</a>
-<span class="sourceLineNo">059</span><a id="line.59">  }</a>
-<span class="sourceLineNo">060</span><a id="line.60"></a>
-<span class="sourceLineNo">061</span><a id="line.61">  protected ApiException getApiException(String operationId,</a>
-<span class="sourceLineNo">062</span><a id="line.62">                                         HttpResponse&lt;InputStream&gt; response)</a>
-<span class="sourceLineNo">063</span><a id="line.63">      throws IOException {</a>
-<span class="sourceLineNo">064</span><a id="line.64">    String body = response.body() == null</a>
-<span class="sourceLineNo">065</span><a id="line.65">                      ? null</a>
-<span class="sourceLineNo">066</span><a id="line.66">                      : new String(response.body().readAllBytes());</a>
-<span class="sourceLineNo">067</span><a id="line.67">    String message =</a>
-<span class="sourceLineNo">068</span><a id="line.68">        formatExceptionMessage(operationId, response.statusCode(), body);</a>
-<span class="sourceLineNo">069</span><a id="line.69">    return new ApiException(response.statusCode(), message, response.headers(),</a>
-<span class="sourceLineNo">070</span><a id="line.70">                            body);</a>
-<span class="sourceLineNo">071</span><a id="line.71">  }</a>
-<span class="sourceLineNo">072</span><a id="line.72"></a>
-<span class="sourceLineNo">073</span><a id="line.73">  private String formatExceptionMessage(String operationId, int statusCode,</a>
-<span class="sourceLineNo">074</span><a id="line.74">                                        String body) {</a>
-<span class="sourceLineNo">075</span><a id="line.75">    if (body == null || body.isEmpty()) {</a>
-<span class="sourceLineNo">076</span><a id="line.76">      body = "[no body]";</a>
-<span class="sourceLineNo">077</span><a id="line.77">    }</a>
-<span class="sourceLineNo">078</span><a id="line.78">    return operationId + " call failed with: " + statusCode + " - " + body;</a>
-<span class="sourceLineNo">079</span><a id="line.79">  }</a>
-<span class="sourceLineNo">080</span><a id="line.80"></a>
-<span class="sourceLineNo">081</span><a id="line.81">  /**</a>
-<span class="sourceLineNo">082</span><a id="line.82">   * Delete a checkpoint</a>
-<span class="sourceLineNo">083</span><a id="line.83">   *</a>
-<span class="sourceLineNo">084</span><a id="line.84">   * @param path file path (required)</a>
-<span class="sourceLineNo">085</span><a id="line.85">   * @param checkpointId Checkpoint id for a file (required)</a>
-<span class="sourceLineNo">086</span><a id="line.86">   * @throws ApiException if fails to make API call</a>
-<span class="sourceLineNo">087</span><a id="line.87">   */</a>
-<span class="sourceLineNo">088</span><a id="line.88">  public void apiContentsPathCheckpointsCheckpointIdDelete(String path,</a>
-<span class="sourceLineNo">089</span><a id="line.89">                                                           String checkpointId)</a>
-<span class="sourceLineNo">090</span><a id="line.90">      throws ApiException {</a>
-<span class="sourceLineNo">091</span><a id="line.91">    apiContentsPathCheckpointsCheckpointIdDeleteWithHttpInfo(path,</a>
-<span class="sourceLineNo">092</span><a id="line.92">                                                             checkpointId);</a>
-<span class="sourceLineNo">093</span><a id="line.93">  }</a>
-<span class="sourceLineNo">094</span><a id="line.94"></a>
-<span class="sourceLineNo">095</span><a id="line.95">  /**</a>
-<span class="sourceLineNo">096</span><a id="line.96">   * Delete a checkpoint</a>
-<span class="sourceLineNo">097</span><a id="line.97">   *</a>
-<span class="sourceLineNo">098</span><a id="line.98">   * @param path file path (required)</a>
-<span class="sourceLineNo">099</span><a id="line.99">   * @param checkpointId Checkpoint id for a file (required)</a>
-<span class="sourceLineNo">100</span><a id="line.100">   * @return ApiResponse&amp;lt;Void&amp;gt;</a>
-<span class="sourceLineNo">101</span><a id="line.101">   * @throws ApiException if fails to make API call</a>
-<span class="sourceLineNo">102</span><a id="line.102">   */</a>
-<span class="sourceLineNo">103</span><a id="line.103">  public ApiResponse&lt;Void&gt;</a>
-<span class="sourceLineNo">104</span><a id="line.104">  apiContentsPathCheckpointsCheckpointIdDeleteWithHttpInfo(String path,</a>
-<span class="sourceLineNo">105</span><a id="line.105">                                                           String checkpointId)</a>
-<span class="sourceLineNo">106</span><a id="line.106">      throws ApiException {</a>
-<span class="sourceLineNo">107</span><a id="line.107">    HttpRequest.Builder localVarRequestBuilder =</a>
-<span class="sourceLineNo">108</span><a id="line.108">        apiContentsPathCheckpointsCheckpointIdDeleteRequestBuilder(</a>
-<span class="sourceLineNo">109</span><a id="line.109">            path, checkpointId);</a>
-<span class="sourceLineNo">110</span><a id="line.110">    try {</a>
-<span class="sourceLineNo">111</span><a id="line.111">      HttpResponse&lt;InputStream&gt; localVarResponse =</a>
-<span class="sourceLineNo">112</span><a id="line.112">          memberVarHttpClient.send(localVarRequestBuilder.build(),</a>
-<span class="sourceLineNo">113</span><a id="line.113">                                   HttpResponse.BodyHandlers.ofInputStream());</a>
-<span class="sourceLineNo">114</span><a id="line.114">      if (memberVarResponseInterceptor != null) {</a>
-<span class="sourceLineNo">115</span><a id="line.115">        memberVarResponseInterceptor.accept(localVarResponse);</a>
-<span class="sourceLineNo">116</span><a id="line.116">      }</a>
-<span class="sourceLineNo">117</span><a id="line.117">      if (localVarResponse.statusCode() / 100 != 2) {</a>
-<span class="sourceLineNo">118</span><a id="line.118">        throw getApiException("apiContentsPathCheckpointsCheckpointIdDelete",</a>
-<span class="sourceLineNo">119</span><a id="line.119">                              localVarResponse);</a>
+<span class="sourceLineNo">036</span><a id="line.36">import java.util.Set;</a>
+<span class="sourceLineNo">037</span><a id="line.37">import java.util.StringJoiner;</a>
+<span class="sourceLineNo">038</span><a id="line.38">import java.util.function.Consumer;</a>
+<span class="sourceLineNo">039</span><a id="line.39"></a>
+<span class="sourceLineNo">040</span><a id="line.40">@javax.annotation.processing.</a>
+<span class="sourceLineNo">041</span><a id="line.41">Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")</a>
+<span class="sourceLineNo">042</span><a id="line.42">public class ContentsApi {</a>
+<span class="sourceLineNo">043</span><a id="line.43">  private final HttpClient memberVarHttpClient;</a>
+<span class="sourceLineNo">044</span><a id="line.44">  private final ObjectMapper memberVarObjectMapper;</a>
+<span class="sourceLineNo">045</span><a id="line.45">  private final String memberVarBaseUri;</a>
+<span class="sourceLineNo">046</span><a id="line.46">  private final Consumer&lt;HttpRequest.Builder&gt; memberVarInterceptor;</a>
+<span class="sourceLineNo">047</span><a id="line.47">  private final Duration memberVarReadTimeout;</a>
+<span class="sourceLineNo">048</span><a id="line.48">  private final Consumer&lt;HttpResponse&lt;InputStream&gt;&gt;</a>
+<span class="sourceLineNo">049</span><a id="line.49">      memberVarResponseInterceptor;</a>
+<span class="sourceLineNo">050</span><a id="line.50">  private final Consumer&lt;HttpResponse&lt;String&gt;&gt;</a>
+<span class="sourceLineNo">051</span><a id="line.51">      memberVarAsyncResponseInterceptor;</a>
+<span class="sourceLineNo">052</span><a id="line.52"></a>
+<span class="sourceLineNo">053</span><a id="line.53">  public ContentsApi() { this(new ApiClient()); }</a>
+<span class="sourceLineNo">054</span><a id="line.54"></a>
+<span class="sourceLineNo">055</span><a id="line.55">  public ContentsApi(ApiClient apiClient) {</a>
+<span class="sourceLineNo">056</span><a id="line.56">    memberVarHttpClient = apiClient.getHttpClient();</a>
+<span class="sourceLineNo">057</span><a id="line.57">    memberVarObjectMapper = apiClient.getObjectMapper();</a>
+<span class="sourceLineNo">058</span><a id="line.58">    memberVarBaseUri = apiClient.getBaseUri();</a>
+<span class="sourceLineNo">059</span><a id="line.59">    memberVarInterceptor = apiClient.getRequestInterceptor();</a>
+<span class="sourceLineNo">060</span><a id="line.60">    memberVarReadTimeout = apiClient.getReadTimeout();</a>
+<span class="sourceLineNo">061</span><a id="line.61">    memberVarResponseInterceptor = apiClient.getResponseInterceptor();</a>
+<span class="sourceLineNo">062</span><a id="line.62">    memberVarAsyncResponseInterceptor = apiClient.getAsyncResponseInterceptor();</a>
+<span class="sourceLineNo">063</span><a id="line.63">  }</a>
+<span class="sourceLineNo">064</span><a id="line.64"></a>
+<span class="sourceLineNo">065</span><a id="line.65">  protected ApiException getApiException(String operationId,</a>
+<span class="sourceLineNo">066</span><a id="line.66">                                         HttpResponse&lt;InputStream&gt; response)</a>
+<span class="sourceLineNo">067</span><a id="line.67">      throws IOException {</a>
+<span class="sourceLineNo">068</span><a id="line.68">    String body = response.body() == null</a>
+<span class="sourceLineNo">069</span><a id="line.69">                      ? null</a>
+<span class="sourceLineNo">070</span><a id="line.70">                      : new String(response.body().readAllBytes());</a>
+<span class="sourceLineNo">071</span><a id="line.71">    String message =</a>
+<span class="sourceLineNo">072</span><a id="line.72">        formatExceptionMessage(operationId, response.statusCode(), body);</a>
+<span class="sourceLineNo">073</span><a id="line.73">    return new ApiException(response.statusCode(), message, response.headers(),</a>
+<span class="sourceLineNo">074</span><a id="line.74">                            body);</a>
+<span class="sourceLineNo">075</span><a id="line.75">  }</a>
+<span class="sourceLineNo">076</span><a id="line.76"></a>
+<span class="sourceLineNo">077</span><a id="line.77">  private String formatExceptionMessage(String operationId, int statusCode,</a>
+<span class="sourceLineNo">078</span><a id="line.78">                                        String body) {</a>
+<span class="sourceLineNo">079</span><a id="line.79">    if (body == null || body.isEmpty()) {</a>
+<span class="sourceLineNo">080</span><a id="line.80">      body = "[no body]";</a>
+<span class="sourceLineNo">081</span><a id="line.81">    }</a>
+<span class="sourceLineNo">082</span><a id="line.82">    return operationId + " call failed with: " + statusCode + " - " + body;</a>
+<span class="sourceLineNo">083</span><a id="line.83">  }</a>
+<span class="sourceLineNo">084</span><a id="line.84"></a>
+<span class="sourceLineNo">085</span><a id="line.85">  /**</a>
+<span class="sourceLineNo">086</span><a id="line.86">   * Delete a checkpoint</a>
+<span class="sourceLineNo">087</span><a id="line.87">   *</a>
+<span class="sourceLineNo">088</span><a id="line.88">   * @param path file path (required)</a>
+<span class="sourceLineNo">089</span><a id="line.89">   * @param checkpointId Checkpoint id for a file (required)</a>
+<span class="sourceLineNo">090</span><a id="line.90">   * @throws ApiException if fails to make API call</a>
+<span class="sourceLineNo">091</span><a id="line.91">   */</a>
+<span class="sourceLineNo">092</span><a id="line.92">  public void apiContentsPathCheckpointsCheckpointIdDelete(String path,</a>
+<span class="sourceLineNo">093</span><a id="line.93">                                                           String checkpointId)</a>
+<span class="sourceLineNo">094</span><a id="line.94">      throws ApiException {</a>
+<span class="sourceLineNo">095</span><a id="line.95">    apiContentsPathCheckpointsCheckpointIdDeleteWithHttpInfo(path,</a>
+<span class="sourceLineNo">096</span><a id="line.96">                                                             checkpointId);</a>
+<span class="sourceLineNo">097</span><a id="line.97">  }</a>
+<span class="sourceLineNo">098</span><a id="line.98"></a>
+<span class="sourceLineNo">099</span><a id="line.99">  /**</a>
+<span class="sourceLineNo">100</span><a id="line.100">   * Delete a checkpoint</a>
+<span class="sourceLineNo">101</span><a id="line.101">   *</a>
+<span class="sourceLineNo">102</span><a id="line.102">   * @param path file path (required)</a>
+<span class="sourceLineNo">103</span><a id="line.103">   * @param checkpointId Checkpoint id for a file (required)</a>
+<span class="sourceLineNo">104</span><a id="line.104">   * @return ApiResponse&amp;lt;Void&amp;gt;</a>
+<span class="sourceLineNo">105</span><a id="line.105">   * @throws ApiException if fails to make API call</a>
+<span class="sourceLineNo">106</span><a id="line.106">   */</a>
+<span class="sourceLineNo">107</span><a id="line.107">  public ApiResponse&lt;Void&gt;</a>
+<span class="sourceLineNo">108</span><a id="line.108">  apiContentsPathCheckpointsCheckpointIdDeleteWithHttpInfo(String path,</a>
+<span class="sourceLineNo">109</span><a id="line.109">                                                           String checkpointId)</a>
+<span class="sourceLineNo">110</span><a id="line.110">      throws ApiException {</a>
+<span class="sourceLineNo">111</span><a id="line.111">    HttpRequest.Builder localVarRequestBuilder =</a>
+<span class="sourceLineNo">112</span><a id="line.112">        apiContentsPathCheckpointsCheckpointIdDeleteRequestBuilder(</a>
+<span class="sourceLineNo">113</span><a id="line.113">            path, checkpointId);</a>
+<span class="sourceLineNo">114</span><a id="line.114">    try {</a>
+<span class="sourceLineNo">115</span><a id="line.115">      HttpResponse&lt;InputStream&gt; localVarResponse =</a>
+<span class="sourceLineNo">116</span><a id="line.116">          memberVarHttpClient.send(localVarRequestBuilder.build(),</a>
+<span class="sourceLineNo">117</span><a id="line.117">                                   HttpResponse.BodyHandlers.ofInputStream());</a>
+<span class="sourceLineNo">118</span><a id="line.118">      if (memberVarResponseInterceptor != null) {</a>
+<span class="sourceLineNo">119</span><a id="line.119">        memberVarResponseInterceptor.accept(localVarResponse);</a>
 <span class="sourceLineNo">120</span><a id="line.120">      }</a>
-<span class="sourceLineNo">121</span><a id="line.121">      return new ApiResponse&lt;Void&gt;(localVarResponse.statusCode(),</a>
-<span class="sourceLineNo">122</span><a id="line.122">                                   localVarResponse.headers().map(), null);</a>
-<span class="sourceLineNo">123</span><a id="line.123">    } catch (IOException e) {</a>
-<span class="sourceLineNo">124</span><a id="line.124">      throw new ApiException(e);</a>
-<span class="sourceLineNo">125</span><a id="line.125">    } catch (InterruptedException e) {</a>
-<span class="sourceLineNo">126</span><a id="line.126">      Thread.currentThread().interrupt();</a>
-<span class="sourceLineNo">127</span><a id="line.127">      throw new ApiException(e);</a>
-<span class="sourceLineNo">128</span><a id="line.128">    }</a>
-<span class="sourceLineNo">129</span><a id="line.129">  }</a>
-<span class="sourceLineNo">130</span><a id="line.130"></a>
-<span class="sourceLineNo">131</span><a id="line.131">  private HttpRequest.Builder</a>
-<span class="sourceLineNo">132</span><a id="line.132">  apiContentsPathCheckpointsCheckpointIdDeleteRequestBuilder(</a>
-<span class="sourceLineNo">133</span><a id="line.133">      String path, String checkpointId) throws ApiException {</a>
-<span class="sourceLineNo">134</span><a id="line.134">    // verify the required parameter 'path' is set</a>
-<span class="sourceLineNo">135</span><a id="line.135">    if (path == null) {</a>
-<span class="sourceLineNo">136</span><a id="line.136">      throw new ApiException(</a>
-<span class="sourceLineNo">137</span><a id="line.137">          400,</a>
-<span class="sourceLineNo">138</span><a id="line.138">          "Missing the required parameter 'path' when calling apiContentsPathCheckpointsCheckpointIdDelete");</a>
-<span class="sourceLineNo">139</span><a id="line.139">    }</a>
-<span class="sourceLineNo">140</span><a id="line.140">    // verify the required parameter 'checkpointId' is set</a>
-<span class="sourceLineNo">141</span><a id="line.141">    if (checkpointId == null) {</a>
-<span class="sourceLineNo">142</span><a id="line.142">      throw new ApiException(</a>
-<span class="sourceLineNo">143</span><a id="line.143">          400,</a>
-<span class="sourceLineNo">144</span><a id="line.144">          "Missing the required parameter 'checkpointId' when calling apiContentsPathCheckpointsCheckpointIdDelete");</a>
-<span class="sourceLineNo">145</span><a id="line.145">    }</a>
-<span class="sourceLineNo">146</span><a id="line.146"></a>
-<span class="sourceLineNo">147</span><a id="line.147">    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();</a>
-<span class="sourceLineNo">148</span><a id="line.148"></a>
-<span class="sourceLineNo">149</span><a id="line.149">    String localVarPath =</a>
-<span class="sourceLineNo">150</span><a id="line.150">        "/api/contents/{path}/checkpoints/{checkpoint_id}"</a>
-<span class="sourceLineNo">151</span><a id="line.151">            .replace("{path}", ApiClient.urlEncode(path.toString()))</a>
-<span class="sourceLineNo">152</span><a id="line.152">            .replace("{checkpoint_id}",</a>
-<span class="sourceLineNo">153</span><a id="line.153">                     ApiClient.urlEncode(checkpointId.toString()));</a>
-<span class="sourceLineNo">154</span><a id="line.154"></a>
-<span class="sourceLineNo">155</span><a id="line.155">    localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));</a>
-<span class="sourceLineNo">156</span><a id="line.156"></a>
-<span class="sourceLineNo">157</span><a id="line.157">    localVarRequestBuilder.header("Accept", "application/json");</a>
+<span class="sourceLineNo">121</span><a id="line.121">      if (localVarResponse.statusCode() / 100 != 2) {</a>
+<span class="sourceLineNo">122</span><a id="line.122">        throw getApiException("apiContentsPathCheckpointsCheckpointIdDelete",</a>
+<span class="sourceLineNo">123</span><a id="line.123">                              localVarResponse);</a>
+<span class="sourceLineNo">124</span><a id="line.124">      }</a>
+<span class="sourceLineNo">125</span><a id="line.125">      return new ApiResponse&lt;Void&gt;(localVarResponse.statusCode(),</a>
+<span class="sourceLineNo">126</span><a id="line.126">                                   localVarResponse.headers().map(), null);</a>
+<span class="sourceLineNo">127</span><a id="line.127">    } catch (IOException e) {</a>
+<span class="sourceLineNo">128</span><a id="line.128">      throw new ApiException(e);</a>
+<span class="sourceLineNo">129</span><a id="line.129">    } catch (InterruptedException e) {</a>
+<span class="sourceLineNo">130</span><a id="line.130">      Thread.currentThread().interrupt();</a>
+<span class="sourceLineNo">131</span><a id="line.131">      throw new ApiException(e);</a>
+<span class="sourceLineNo">132</span><a id="line.132">    }</a>
+<span class="sourceLineNo">133</span><a id="line.133">  }</a>
+<span class="sourceLineNo">134</span><a id="line.134"></a>
+<span class="sourceLineNo">135</span><a id="line.135">  private HttpRequest.Builder</a>
+<span class="sourceLineNo">136</span><a id="line.136">  apiContentsPathCheckpointsCheckpointIdDeleteRequestBuilder(</a>
+<span class="sourceLineNo">137</span><a id="line.137">      String path, String checkpointId) throws ApiException {</a>
+<span class="sourceLineNo">138</span><a id="line.138">    // verify the required parameter 'path' is set</a>
+<span class="sourceLineNo">139</span><a id="line.139">    if (path == null) {</a>
+<span class="sourceLineNo">140</span><a id="line.140">      throw new ApiException(</a>
+<span class="sourceLineNo">141</span><a id="line.141">          400,</a>
+<span class="sourceLineNo">142</span><a id="line.142">          "Missing the required parameter 'path' when calling apiContentsPathCheckpointsCheckpointIdDelete");</a>
+<span class="sourceLineNo">143</span><a id="line.143">    }</a>
+<span class="sourceLineNo">144</span><a id="line.144">    // verify the required parameter 'checkpointId' is set</a>
+<span class="sourceLineNo">145</span><a id="line.145">    if (checkpointId == null) {</a>
+<span class="sourceLineNo">146</span><a id="line.146">      throw new ApiException(</a>
+<span class="sourceLineNo">147</span><a id="line.147">          400,</a>
+<span class="sourceLineNo">148</span><a id="line.148">          "Missing the required parameter 'checkpointId' when calling apiContentsPathCheckpointsCheckpointIdDelete");</a>
+<span class="sourceLineNo">149</span><a id="line.149">    }</a>
+<span class="sourceLineNo">150</span><a id="line.150"></a>
+<span class="sourceLineNo">151</span><a id="line.151">    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();</a>
+<span class="sourceLineNo">152</span><a id="line.152"></a>
+<span class="sourceLineNo">153</span><a id="line.153">    String localVarPath =</a>
+<span class="sourceLineNo">154</span><a id="line.154">        "/api/contents/{path}/checkpoints/{checkpoint_id}"</a>
+<span class="sourceLineNo">155</span><a id="line.155">            .replace("{path}", ApiClient.urlEncode(path.toString()))</a>
+<span class="sourceLineNo">156</span><a id="line.156">            .replace("{checkpoint_id}",</a>
+<span class="sourceLineNo">157</span><a id="line.157">                     ApiClient.urlEncode(checkpointId.toString()));</a>
 <span class="sourceLineNo">158</span><a id="line.158"></a>
-<span class="sourceLineNo">159</span><a id="line.159">    localVarRequestBuilder.method("DELETE",</a>
-<span class="sourceLineNo">160</span><a id="line.160">                                  HttpRequest.BodyPublishers.noBody());</a>
-<span class="sourceLineNo">161</span><a id="line.161">    if (memberVarReadTimeout != null) {</a>
-<span class="sourceLineNo">162</span><a id="line.162">      localVarRequestBuilder.timeout(memberVarReadTimeout);</a>
-<span class="sourceLineNo">163</span><a id="line.163">    }</a>
-<span class="sourceLineNo">164</span><a id="line.164">    if (memberVarInterceptor != null) {</a>
-<span class="sourceLineNo">165</span><a id="line.165">      memberVarInterceptor.accept(localVarRequestBuilder);</a>
-<span class="sourceLineNo">166</span><a id="line.166">    }</a>
-<span class="sourceLineNo">167</span><a id="line.167">    return localVarRequestBuilder;</a>
-<span class="sourceLineNo">168</span><a id="line.168">  }</a>
-<span class="sourceLineNo">169</span><a id="line.169">  /**</a>
-<span class="sourceLineNo">170</span><a id="line.170">   * Restore a file to a particular checkpointed state</a>
-<span class="sourceLineNo">171</span><a id="line.171">   *</a>
-<span class="sourceLineNo">172</span><a id="line.172">   * @param path file path (required)</a>
-<span class="sourceLineNo">173</span><a id="line.173">   * @param checkpointId Checkpoint id for a file (required)</a>
-<span class="sourceLineNo">174</span><a id="line.174">   * @throws ApiException if fails to make API call</a>
-<span class="sourceLineNo">175</span><a id="line.175">   */</a>
-<span class="sourceLineNo">176</span><a id="line.176">  public void apiContentsPathCheckpointsCheckpointIdPost(String path,</a>
-<span class="sourceLineNo">177</span><a id="line.177">                                                         String checkpointId)</a>
-<span class="sourceLineNo">178</span><a id="line.178">      throws ApiException {</a>
-<span class="sourceLineNo">179</span><a id="line.179">    apiContentsPathCheckpointsCheckpointIdPostWithHttpInfo(path, checkpointId);</a>
-<span class="sourceLineNo">180</span><a id="line.180">  }</a>
-<span class="sourceLineNo">181</span><a id="line.181"></a>
-<span class="sourceLineNo">182</span><a id="line.182">  /**</a>
-<span class="sourceLineNo">183</span><a id="line.183">   * Restore a file to a particular checkpointed state</a>
-<span class="sourceLineNo">184</span><a id="line.184">   *</a>
-<span class="sourceLineNo">185</span><a id="line.185">   * @param path file path (required)</a>
-<span class="sourceLineNo">186</span><a id="line.186">   * @param checkpointId Checkpoint id for a file (required)</a>
-<span class="sourceLineNo">187</span><a id="line.187">   * @return ApiResponse&amp;lt;Void&amp;gt;</a>
-<span class="sourceLineNo">188</span><a id="line.188">   * @throws ApiException if fails to make API call</a>
-<span class="sourceLineNo">189</span><a id="line.189">   */</a>
-<span class="sourceLineNo">190</span><a id="line.190">  public ApiResponse&lt;Void&gt;</a>
-<span class="sourceLineNo">191</span><a id="line.191">  apiContentsPathCheckpointsCheckpointIdPostWithHttpInfo(String path,</a>
-<span class="sourceLineNo">192</span><a id="line.192">                                                         String checkpointId)</a>
-<span class="sourceLineNo">193</span><a id="line.193">      throws ApiException {</a>
-<span class="sourceLineNo">194</span><a id="line.194">    HttpRequest.Builder localVarRequestBuilder =</a>
-<span class="sourceLineNo">195</span><a id="line.195">        apiContentsPathCheckpointsCheckpointIdPostRequestBuilder(path,</a>
-<span class="sourceLineNo">196</span><a id="line.196">                                                                 checkpointId);</a>
-<span class="sourceLineNo">197</span><a id="line.197">    try {</a>
-<span class="sourceLineNo">198</span><a id="line.198">      HttpResponse&lt;InputStream&gt; localVarResponse =</a>
-<span class="sourceLineNo">199</span><a id="line.199">          memberVarHttpClient.send(localVarRequestBuilder.build(),</a>
-<span class="sourceLineNo">200</span><a id="line.200">                                   HttpResponse.BodyHandlers.ofInputStream());</a>
-<span class="sourceLineNo">201</span><a id="line.201">      if (memberVarResponseInterceptor != null) {</a>
-<span class="sourceLineNo">202</span><a id="line.202">        memberVarResponseInterceptor.accept(localVarResponse);</a>
-<span class="sourceLineNo">203</span><a id="line.203">      }</a>
-<span class="sourceLineNo">204</span><a id="line.204">      if (localVarResponse.statusCode() / 100 != 2) {</a>
-<span class="sourceLineNo">205</span><a id="line.205">        throw getApiException("apiContentsPathCheckpointsCheckpointIdPost",</a>
-<span class="sourceLineNo">206</span><a id="line.206">                              localVarResponse);</a>
+<span class="sourceLineNo">159</span><a id="line.159">    localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));</a>
+<span class="sourceLineNo">160</span><a id="line.160"></a>
+<span class="sourceLineNo">161</span><a id="line.161">    localVarRequestBuilder.header("Accept", "application/json");</a>
+<span class="sourceLineNo">162</span><a id="line.162"></a>
+<span class="sourceLineNo">163</span><a id="line.163">    localVarRequestBuilder.method("DELETE",</a>
+<span class="sourceLineNo">164</span><a id="line.164">                                  HttpRequest.BodyPublishers.noBody());</a>
+<span class="sourceLineNo">165</span><a id="line.165">    if (memberVarReadTimeout != null) {</a>
+<span class="sourceLineNo">166</span><a id="line.166">      localVarRequestBuilder.timeout(memberVarReadTimeout);</a>
+<span class="sourceLineNo">167</span><a id="line.167">    }</a>
+<span class="sourceLineNo">168</span><a id="line.168">    if (memberVarInterceptor != null) {</a>
+<span class="sourceLineNo">169</span><a id="line.169">      memberVarInterceptor.accept(localVarRequestBuilder);</a>
+<span class="sourceLineNo">170</span><a id="line.170">    }</a>
+<span class="sourceLineNo">171</span><a id="line.171">    return localVarRequestBuilder;</a>
+<span class="sourceLineNo">172</span><a id="line.172">  }</a>
+<span class="sourceLineNo">173</span><a id="line.173">  /**</a>
+<span class="sourceLineNo">174</span><a id="line.174">   * Restore a file to a particular checkpointed state</a>
+<span class="sourceLineNo">175</span><a id="line.175">   *</a>
+<span class="sourceLineNo">176</span><a id="line.176">   * @param path file path (required)</a>
+<span class="sourceLineNo">177</span><a id="line.177">   * @param checkpointId Checkpoint id for a file (required)</a>
+<span class="sourceLineNo">178</span><a id="line.178">   * @throws ApiException if fails to make API call</a>
+<span class="sourceLineNo">179</span><a id="line.179">   */</a>
+<span class="sourceLineNo">180</span><a id="line.180">  public void apiContentsPathCheckpointsCheckpointIdPost(String path,</a>
+<span class="sourceLineNo">181</span><a id="line.181">                                                         String checkpointId)</a>
+<span class="sourceLineNo">182</span><a id="line.182">      throws ApiException {</a>
+<span class="sourceLineNo">183</span><a id="line.183">    apiContentsPathCheckpointsCheckpointIdPostWithHttpInfo(path, checkpointId);</a>
+<span class="sourceLineNo">184</span><a id="line.184">  }</a>
+<span class="sourceLineNo">185</span><a id="line.185"></a>
+<span class="sourceLineNo">186</span><a id="line.186">  /**</a>
+<span class="sourceLineNo">187</span><a id="line.187">   * Restore a file to a particular checkpointed state</a>
+<span class="sourceLineNo">188</span><a id="line.188">   *</a>
+<span class="sourceLineNo">189</span><a id="line.189">   * @param path file path (required)</a>
+<span class="sourceLineNo">190</span><a id="line.190">   * @param checkpointId Checkpoint id for a file (required)</a>
+<span class="sourceLineNo">191</span><a id="line.191">   * @return ApiResponse&amp;lt;Void&amp;gt;</a>
+<span class="sourceLineNo">192</span><a id="line.192">   * @throws ApiException if fails to make API call</a>
+<span class="sourceLineNo">193</span><a id="line.193">   */</a>
+<span class="sourceLineNo">194</span><a id="line.194">  public ApiResponse&lt;Void&gt;</a>
+<span class="sourceLineNo">195</span><a id="line.195">  apiContentsPathCheckpointsCheckpointIdPostWithHttpInfo(String path,</a>
+<span class="sourceLineNo">196</span><a id="line.196">                                                         String checkpointId)</a>
+<span class="sourceLineNo">197</span><a id="line.197">      throws ApiException {</a>
+<span class="sourceLineNo">198</span><a id="line.198">    HttpRequest.Builder localVarRequestBuilder =</a>
+<span class="sourceLineNo">199</span><a id="line.199">        apiContentsPathCheckpointsCheckpointIdPostRequestBuilder(path,</a>
+<span class="sourceLineNo">200</span><a id="line.200">                                                                 checkpointId);</a>
+<span class="sourceLineNo">201</span><a id="line.201">    try {</a>
+<span class="sourceLineNo">202</span><a id="line.202">      HttpResponse&lt;InputStream&gt; localVarResponse =</a>
+<span class="sourceLineNo">203</span><a id="line.203">          memberVarHttpClient.send(localVarRequestBuilder.build(),</a>
+<span class="sourceLineNo">204</span><a id="line.204">                                   HttpResponse.BodyHandlers.ofInputStream());</a>
+<span class="sourceLineNo">205</span><a id="line.205">      if (memberVarResponseInterceptor != null) {</a>
+<span class="sourceLineNo">206</span><a id="line.206">        memberVarResponseInterceptor.accept(localVarResponse);</a>
 <span class="sourceLineNo">207</span><a id="line.207">      }</a>
-<span class="sourceLineNo">208</span><a id="line.208">      return new ApiResponse&lt;Void&gt;(localVarResponse.statusCode(),</a>
-<span class="sourceLineNo">209</span><a id="line.209">                                   localVarResponse.headers().map(), null);</a>
-<span class="sourceLineNo">210</span><a id="line.210">    } catch (IOException e) {</a>
-<span class="sourceLineNo">211</span><a id="line.211">      throw new ApiException(e);</a>
-<span class="sourceLineNo">212</span><a id="line.212">    } catch (InterruptedException e) {</a>
-<span class="sourceLineNo">213</span><a id="line.213">      Thread.currentThread().interrupt();</a>
-<span class="sourceLineNo">214</span><a id="line.214">      throw new ApiException(e);</a>
-<span class="sourceLineNo">215</span><a id="line.215">    }</a>
-<span class="sourceLineNo">216</span><a id="line.216">  }</a>
-<span class="sourceLineNo">217</span><a id="line.217"></a>
-<span class="sourceLineNo">218</span><a id="line.218">  private HttpRequest.Builder</a>
-<span class="sourceLineNo">219</span><a id="line.219">  apiContentsPathCheckpointsCheckpointIdPostRequestBuilder(String path,</a>
-<span class="sourceLineNo">220</span><a id="line.220">                                                           String checkpointId)</a>
-<span class="sourceLineNo">221</span><a id="line.221">      throws ApiException {</a>
-<span class="sourceLineNo">222</span><a id="line.222">    // verify the required parameter 'path' is set</a>
-<span class="sourceLineNo">223</span><a id="line.223">    if (path == null) {</a>
-<span class="sourceLineNo">224</span><a id="line.224">      throw new ApiException(</a>
-<span class="sourceLineNo">225</span><a id="line.225">          400,</a>
-<span class="sourceLineNo">226</span><a id="line.226">          "Missing the required parameter 'path' when calling apiContentsPathCheckpointsCheckpointIdPost");</a>
-<span class="sourceLineNo">227</span><a id="line.227">    }</a>
-<span class="sourceLineNo">228</span><a id="line.228">    // verify the required parameter 'checkpointId' is set</a>
-<span class="sourceLineNo">229</span><a id="line.229">    if (checkpointId == null) {</a>
-<span class="sourceLineNo">230</span><a id="line.230">      throw new ApiException(</a>
-<span class="sourceLineNo">231</span><a id="line.231">          400,</a>
-<span class="sourceLineNo">232</span><a id="line.232">          "Missing the required parameter 'checkpointId' when calling apiContentsPathCheckpointsCheckpointIdPost");</a>
-<span class="sourceLineNo">233</span><a id="line.233">    }</a>
-<span class="sourceLineNo">234</span><a id="line.234"></a>
-<span class="sourceLineNo">235</span><a id="line.235">    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();</a>
-<span class="sourceLineNo">236</span><a id="line.236"></a>
-<span class="sourceLineNo">237</span><a id="line.237">    String localVarPath =</a>
-<span class="sourceLineNo">238</span><a id="line.238">        "/api/contents/{path}/checkpoints/{checkpoint_id}"</a>
-<span class="sourceLineNo">239</span><a id="line.239">            .replace("{path}", ApiClient.urlEncode(path.toString()))</a>
-<span class="sourceLineNo">240</span><a id="line.240">            .replace("{checkpoint_id}",</a>
-<span class="sourceLineNo">241</span><a id="line.241">                     ApiClient.urlEncode(checkpointId.toString()));</a>
-<span class="sourceLineNo">242</span><a id="line.242"></a>
-<span class="sourceLineNo">243</span><a id="line.243">    localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));</a>
-<span class="sourceLineNo">244</span><a id="line.244"></a>
-<span class="sourceLineNo">245</span><a id="line.245">    localVarRequestBuilder.header("Accept", "application/json");</a>
+<span class="sourceLineNo">208</span><a id="line.208">      if (localVarResponse.statusCode() / 100 != 2) {</a>
+<span class="sourceLineNo">209</span><a id="line.209">        throw getApiException("apiContentsPathCheckpointsCheckpointIdPost",</a>
+<span class="sourceLineNo">210</span><a id="line.210">                              localVarResponse);</a>
+<span class="sourceLineNo">211</span><a id="line.211">      }</a>
+<span class="sourceLineNo">212</span><a id="line.212">      return new ApiResponse&lt;Void&gt;(localVarResponse.statusCode(),</a>
+<span class="sourceLineNo">213</span><a id="line.213">                                   localVarResponse.headers().map(), null);</a>
+<span class="sourceLineNo">214</span><a id="line.214">    } catch (IOException e) {</a>
+<span class="sourceLineNo">215</span><a id="line.215">      throw new ApiException(e);</a>
+<span class="sourceLineNo">216</span><a id="line.216">    } catch (InterruptedException e) {</a>
+<span class="sourceLineNo">217</span><a id="line.217">      Thread.currentThread().interrupt();</a>
+<span class="sourceLineNo">218</span><a id="line.218">      throw new ApiException(e);</a>
+<span class="sourceLineNo">219</span><a id="line.219">    }</a>
+<span class="sourceLineNo">220</span><a id="line.220">  }</a>
+<span class="sourceLineNo">221</span><a id="line.221"></a>
+<span class="sourceLineNo">222</span><a id="line.222">  private HttpRequest.Builder</a>
+<span class="sourceLineNo">223</span><a id="line.223">  apiContentsPathCheckpointsCheckpointIdPostRequestBuilder(String path,</a>
+<span class="sourceLineNo">224</span><a id="line.224">                                                           String checkpointId)</a>
+<span class="sourceLineNo">225</span><a id="line.225">      throws ApiException {</a>
+<span class="sourceLineNo">226</span><a id="line.226">    // verify the required parameter 'path' is set</a>
+<span class="sourceLineNo">227</span><a id="line.227">    if (path == null) {</a>
+<span class="sourceLineNo">228</span><a id="line.228">      throw new ApiException(</a>
+<span class="sourceLineNo">229</span><a id="line.229">          400,</a>
+<span class="sourceLineNo">230</span><a id="line.230">          "Missing the required parameter 'path' when calling apiContentsPathCheckpointsCheckpointIdPost");</a>
+<span class="sourceLineNo">231</span><a id="line.231">    }</a>
+<span class="sourceLineNo">232</span><a id="line.232">    // verify the required parameter 'checkpointId' is set</a>
+<span class="sourceLineNo">233</span><a id="line.233">    if (checkpointId == null) {</a>
+<span class="sourceLineNo">234</span><a id="line.234">      throw new ApiException(</a>
+<span class="sourceLineNo">235</span><a id="line.235">          400,</a>
+<span class="sourceLineNo">236</span><a id="line.236">          "Missing the required parameter 'checkpointId' when calling apiContentsPathCheckpointsCheckpointIdPost");</a>
+<span class="sourceLineNo">237</span><a id="line.237">    }</a>
+<span class="sourceLineNo">238</span><a id="line.238"></a>
+<span class="sourceLineNo">239</span><a id="line.239">    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();</a>
+<span class="sourceLineNo">240</span><a id="line.240"></a>
+<span class="sourceLineNo">241</span><a id="line.241">    String localVarPath =</a>
+<span class="sourceLineNo">242</span><a id="line.242">        "/api/contents/{path}/checkpoints/{checkpoint_id}"</a>
+<span class="sourceLineNo">243</span><a id="line.243">            .replace("{path}", ApiClient.urlEncode(path.toString()))</a>
+<span class="sourceLineNo">244</span><a id="line.244">            .replace("{checkpoint_id}",</a>
+<span class="sourceLineNo">245</span><a id="line.245">                     ApiClient.urlEncode(checkpointId.toString()));</a>
 <span class="sourceLineNo">246</span><a id="line.246"></a>
-<span class="sourceLineNo">247</span><a id="line.247">    localVarRequestBuilder.method("POST", HttpRequest.BodyPublishers.noBody());</a>
-<span class="sourceLineNo">248</span><a id="line.248">    if (memberVarReadTimeout != null) {</a>
-<span class="sourceLineNo">249</span><a id="line.249">      localVarRequestBuilder.timeout(memberVarReadTimeout);</a>
-<span class="sourceLineNo">250</span><a id="line.250">    }</a>
-<span class="sourceLineNo">251</span><a id="line.251">    if (memberVarInterceptor != null) {</a>
-<span class="sourceLineNo">252</span><a id="line.252">      memberVarInterceptor.accept(localVarRequestBuilder);</a>
-<span class="sourceLineNo">253</span><a id="line.253">    }</a>
-<span class="sourceLineNo">254</span><a id="line.254">    return localVarRequestBuilder;</a>
-<span class="sourceLineNo">255</span><a id="line.255">  }</a>
-<span class="sourceLineNo">256</span><a id="line.256">  /**</a>
-<span class="sourceLineNo">257</span><a id="line.257">   * Get a list of checkpoints for a file</a>
-<span class="sourceLineNo">258</span><a id="line.258">   * List checkpoints for a given file. There will typically be zero or one</a>
-<span class="sourceLineNo">259</span><a id="line.259">   * results.</a>
-<span class="sourceLineNo">260</span><a id="line.260">   * @param path file path (required)</a>
-<span class="sourceLineNo">261</span><a id="line.261">   * @return List&amp;lt;Checkpoints&amp;gt;</a>
-<span class="sourceLineNo">262</span><a id="line.262">   * @throws ApiException if fails to make API call</a>
-<span class="sourceLineNo">263</span><a id="line.263">   */</a>
-<span class="sourceLineNo">264</span><a id="line.264">  public List&lt;Checkpoints&gt; apiContentsPathCheckpointsGet(String path)</a>
-<span class="sourceLineNo">265</span><a id="line.265">      throws ApiException {</a>
-<span class="sourceLineNo">266</span><a id="line.266">    ApiResponse&lt;List&lt;Checkpoints&gt;&gt; localVarResponse =</a>
-<span class="sourceLineNo">267</span><a id="line.267">        apiContentsPathCheckpointsGetWithHttpInfo(path);</a>
-<span class="sourceLineNo">268</span><a id="line.268">    return localVarResponse.getData();</a>
-<span class="sourceLineNo">269</span><a id="line.269">  }</a>
-<span class="sourceLineNo">270</span><a id="line.270"></a>
-<span class="sourceLineNo">271</span><a id="line.271">  /**</a>
-<span class="sourceLineNo">272</span><a id="line.272">   * Get a list of checkpoints for a file</a>
-<span class="sourceLineNo">273</span><a id="line.273">   * List checkpoints for a given file. There will typically be zero or one</a>
-<span class="sourceLineNo">274</span><a id="line.274">   * results.</a>
-<span class="sourceLineNo">275</span><a id="line.275">   * @param path file path (required)</a>
-<span class="sourceLineNo">276</span><a id="line.276">   * @return ApiResponse&amp;lt;List&amp;lt;Checkpoints&amp;gt;&amp;gt;</a>
-<span class="sourceLineNo">277</span><a id="line.277">   * @throws ApiException if fails to make API call</a>
-<span class="sourceLineNo">278</span><a id="line.278">   */</a>
-<span class="sourceLineNo">279</span><a id="line.279">  public ApiResponse&lt;List&lt;Checkpoints&gt;&gt;</a>
-<span class="sourceLineNo">280</span><a id="line.280">  apiContentsPathCheckpointsGetWithHttpInfo(String path) throws ApiException {</a>
-<span class="sourceLineNo">281</span><a id="line.281">    HttpRequest.Builder localVarRequestBuilder =</a>
-<span class="sourceLineNo">282</span><a id="line.282">        apiContentsPathCheckpointsGetRequestBuilder(path);</a>
-<span class="sourceLineNo">283</span><a id="line.283">    try {</a>
-<span class="sourceLineNo">284</span><a id="line.284">      HttpResponse&lt;InputStream&gt; localVarResponse =</a>
-<span class="sourceLineNo">285</span><a id="line.285">          memberVarHttpClient.send(localVarRequestBuilder.build(),</a>
-<span class="sourceLineNo">286</span><a id="line.286">                                   HttpResponse.BodyHandlers.ofInputStream());</a>
-<span class="sourceLineNo">287</span><a id="line.287">      if (memberVarResponseInterceptor != null) {</a>
-<span class="sourceLineNo">288</span><a id="line.288">        memberVarResponseInterceptor.accept(localVarResponse);</a>
-<span class="sourceLineNo">289</span><a id="line.289">      }</a>
-<span class="sourceLineNo">290</span><a id="line.290">      if (localVarResponse.statusCode() / 100 != 2) {</a>
-<span class="sourceLineNo">291</span><a id="line.291">        throw getApiException("apiContentsPathCheckpointsGet",</a>
-<span class="sourceLineNo">292</span><a id="line.292">                              localVarResponse);</a>
+<span class="sourceLineNo">247</span><a id="line.247">    localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));</a>
+<span class="sourceLineNo">248</span><a id="line.248"></a>
+<span class="sourceLineNo">249</span><a id="line.249">    localVarRequestBuilder.header("Accept", "application/json");</a>
+<span class="sourceLineNo">250</span><a id="line.250"></a>
+<span class="sourceLineNo">251</span><a id="line.251">    localVarRequestBuilder.method("POST", HttpRequest.BodyPublishers.noBody());</a>
+<span class="sourceLineNo">252</span><a id="line.252">    if (memberVarReadTimeout != null) {</a>
+<span class="sourceLineNo">253</span><a id="line.253">      localVarRequestBuilder.timeout(memberVarReadTimeout);</a>
+<span class="sourceLineNo">254</span><a id="line.254">    }</a>
+<span class="sourceLineNo">255</span><a id="line.255">    if (memberVarInterceptor != null) {</a>
+<span class="sourceLineNo">256</span><a id="line.256">      memberVarInterceptor.accept(localVarRequestBuilder);</a>
+<span class="sourceLineNo">257</span><a id="line.257">    }</a>
+<span class="sourceLineNo">258</span><a id="line.258">    return localVarRequestBuilder;</a>
+<span class="sourceLineNo">259</span><a id="line.259">  }</a>
+<span class="sourceLineNo">260</span><a id="line.260">  /**</a>
+<span class="sourceLineNo">261</span><a id="line.261">   * Get a list of checkpoints for a file</a>
+<span class="sourceLineNo">262</span><a id="line.262">   * List checkpoints for a given file. There will typically be zero or one</a>
+<span class="sourceLineNo">263</span><a id="line.263">   * results.</a>
+<span class="sourceLineNo">264</span><a id="line.264">   * @param path file path (required)</a>
+<span class="sourceLineNo">265</span><a id="line.265">   * @return List&amp;lt;Checkpoints&amp;gt;</a>
+<span class="sourceLineNo">266</span><a id="line.266">   * @throws ApiException if fails to make API call</a>
+<span class="sourceLineNo">267</span><a id="line.267">   */</a>
+<span class="sourceLineNo">268</span><a id="line.268">  public List&lt;Checkpoints&gt; apiContentsPathCheckpointsGet(String path)</a>
+<span class="sourceLineNo">269</span><a id="line.269">      throws ApiException {</a>
+<span class="sourceLineNo">270</span><a id="line.270">    ApiResponse&lt;List&lt;Checkpoints&gt;&gt; localVarResponse =</a>
+<span class="sourceLineNo">271</span><a id="line.271">        apiContentsPathCheckpointsGetWithHttpInfo(path);</a>
+<span class="sourceLineNo">272</span><a id="line.272">    return localVarResponse.getData();</a>
+<span class="sourceLineNo">273</span><a id="line.273">  }</a>
+<span class="sourceLineNo">274</span><a id="line.274"></a>
+<span class="sourceLineNo">275</span><a id="line.275">  /**</a>
+<span class="sourceLineNo">276</span><a id="line.276">   * Get a list of checkpoints for a file</a>
+<span class="sourceLineNo">277</span><a id="line.277">   * List checkpoints for a given file. There will typically be zero or one</a>
+<span class="sourceLineNo">278</span><a id="line.278">   * results.</a>
+<span class="sourceLineNo">279</span><a id="line.279">   * @param path file path (required)</a>
+<span class="sourceLineNo">280</span><a id="line.280">   * @return ApiResponse&amp;lt;List&amp;lt;Checkpoints&amp;gt;&amp;gt;</a>
+<span class="sourceLineNo">281</span><a id="line.281">   * @throws ApiException if fails to make API call</a>
+<span class="sourceLineNo">282</span><a id="line.282">   */</a>
+<span class="sourceLineNo">283</span><a id="line.283">  public ApiResponse&lt;List&lt;Checkpoints&gt;&gt;</a>
+<span class="sourceLineNo">284</span><a id="line.284">  apiContentsPathCheckpointsGetWithHttpInfo(String path) throws ApiException {</a>
+<span class="sourceLineNo">285</span><a id="line.285">    HttpRequest.Builder localVarRequestBuilder =</a>
+<span class="sourceLineNo">286</span><a id="line.286">        apiContentsPathCheckpointsGetRequestBuilder(path);</a>
+<span class="sourceLineNo">287</span><a id="line.287">    try {</a>
+<span class="sourceLineNo">288</span><a id="line.288">      HttpResponse&lt;InputStream&gt; localVarResponse =</a>
+<span class="sourceLineNo">289</span><a id="line.289">          memberVarHttpClient.send(localVarRequestBuilder.build(),</a>
+<span class="sourceLineNo">290</span><a id="line.290">                                   HttpResponse.BodyHandlers.ofInputStream());</a>
+<span class="sourceLineNo">291</span><a id="line.291">      if (memberVarResponseInterceptor != null) {</a>
+<span class="sourceLineNo">292</span><a id="line.292">        memberVarResponseInterceptor.accept(localVarResponse);</a>
 <span class="sourceLineNo">293</span><a id="line.293">      }</a>
-<span class="sourceLineNo">294</span><a id="line.294">      return new ApiResponse&lt;List&lt;Checkpoints&gt;&gt;(</a>
-<span class="sourceLineNo">295</span><a id="line.295">          localVarResponse.statusCode(), localVarResponse.headers().map(),</a>
-<span class="sourceLineNo">296</span><a id="line.296">          memberVarObjectMapper.readValue(</a>
-<span class="sourceLineNo">297</span><a id="line.297">              localVarResponse.body(),</a>
-<span class="sourceLineNo">298</span><a id="line.298">              new TypeReference&lt;List&lt;Checkpoints&gt;&gt;() {}));</a>
-<span class="sourceLineNo">299</span><a id="line.299">    } catch (IOException e) {</a>
-<span class="sourceLineNo">300</span><a id="line.300">      throw new ApiException(e);</a>
-<span class="sourceLineNo">301</span><a id="line.301">    } catch (InterruptedException e) {</a>
-<span class="sourceLineNo">302</span><a id="line.302">      Thread.currentThread().interrupt();</a>
-<span class="sourceLineNo">303</span><a id="line.303">      throw new ApiException(e);</a>
-<span class="sourceLineNo">304</span><a id="line.304">    }</a>
-<span class="sourceLineNo">305</span><a id="line.305">  }</a>
-<span class="sourceLineNo">306</span><a id="line.306"></a>
-<span class="sourceLineNo">307</span><a id="line.307">  private HttpRequest.Builder</a>
-<span class="sourceLineNo">308</span><a id="line.308">  apiContentsPathCheckpointsGetRequestBuilder(String path) throws ApiException {</a>
-<span class="sourceLineNo">309</span><a id="line.309">    // verify the required parameter 'path' is set</a>
-<span class="sourceLineNo">310</span><a id="line.310">    if (path == null) {</a>
-<span class="sourceLineNo">311</span><a id="line.311">      throw new ApiException(</a>
-<span class="sourceLineNo">312</span><a id="line.312">          400,</a>
-<span class="sourceLineNo">313</span><a id="line.313">          "Missing the required parameter 'path' when calling apiContentsPathCheckpointsGet");</a>
-<span class="sourceLineNo">314</span><a id="line.314">    }</a>
-<span class="sourceLineNo">315</span><a id="line.315"></a>
-<span class="sourceLineNo">316</span><a id="line.316">    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();</a>
-<span class="sourceLineNo">317</span><a id="line.317"></a>
-<span class="sourceLineNo">318</span><a id="line.318">    String localVarPath = "/api/contents/{path}/checkpoints".replace(</a>
-<span class="sourceLineNo">319</span><a id="line.319">        "{path}", ApiClient.urlEncode(path.toString()));</a>
-<span class="sourceLineNo">320</span><a id="line.320"></a>
-<span class="sourceLineNo">321</span><a id="line.321">    localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));</a>
-<span class="sourceLineNo">322</span><a id="line.322"></a>
-<span class="sourceLineNo">323</span><a id="line.323">    localVarRequestBuilder.header("Accept", "application/json");</a>
+<span class="sourceLineNo">294</span><a id="line.294">      if (localVarResponse.statusCode() / 100 != 2) {</a>
+<span class="sourceLineNo">295</span><a id="line.295">        throw getApiException("apiContentsPathCheckpointsGet",</a>
+<span class="sourceLineNo">296</span><a id="line.296">                              localVarResponse);</a>
+<span class="sourceLineNo">297</span><a id="line.297">      }</a>
+<span class="sourceLineNo">298</span><a id="line.298">      return new ApiResponse&lt;List&lt;Checkpoints&gt;&gt;(</a>
+<span class="sourceLineNo">299</span><a id="line.299">          localVarResponse.statusCode(), localVarResponse.headers().map(),</a>
+<span class="sourceLineNo">300</span><a id="line.300">          memberVarObjectMapper.readValue(</a>
+<span class="sourceLineNo">301</span><a id="line.301">              localVarResponse.body(),</a>
+<span class="sourceLineNo">302</span><a id="line.302">              new TypeReference&lt;List&lt;Checkpoints&gt;&gt;() {}));</a>
+<span class="sourceLineNo">303</span><a id="line.303">    } catch (IOException e) {</a>
+<span class="sourceLineNo">304</span><a id="line.304">      throw new ApiException(e);</a>
+<span class="sourceLineNo">305</span><a id="line.305">    } catch (InterruptedException e) {</a>
+<span class="sourceLineNo">306</span><a id="line.306">      Thread.currentThread().interrupt();</a>
+<span class="sourceLineNo">307</span><a id="line.307">      throw new ApiException(e);</a>
+<span class="sourceLineNo">308</span><a id="line.308">    }</a>
+<span class="sourceLineNo">309</span><a id="line.309">  }</a>
+<span class="sourceLineNo">310</span><a id="line.310"></a>
+<span class="sourceLineNo">311</span><a id="line.311">  private HttpRequest.Builder</a>
+<span class="sourceLineNo">312</span><a id="line.312">  apiContentsPathCheckpointsGetRequestBuilder(String path) throws ApiException {</a>
+<span class="sourceLineNo">313</span><a id="line.313">    // verify the required parameter 'path' is set</a>
+<span class="sourceLineNo">314</span><a id="line.314">    if (path == null) {</a>
+<span class="sourceLineNo">315</span><a id="line.315">      throw new ApiException(</a>
+<span class="sourceLineNo">316</span><a id="line.316">          400,</a>
+<span class="sourceLineNo">317</span><a id="line.317">          "Missing the required parameter 'path' when calling apiContentsPathCheckpointsGet");</a>
+<span class="sourceLineNo">318</span><a id="line.318">    }</a>
+<span class="sourceLineNo">319</span><a id="line.319"></a>
+<span class="sourceLineNo">320</span><a id="line.320">    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();</a>
+<span class="sourceLineNo">321</span><a id="line.321"></a>
+<span class="sourceLineNo">322</span><a id="line.322">    String localVarPath = "/api/contents/{path}/checkpoints".replace(</a>
+<span class="sourceLineNo">323</span><a id="line.323">        "{path}", ApiClient.urlEncode(path.toString()));</a>
 <span class="sourceLineNo">324</span><a id="line.324"></a>
-<span class="sourceLineNo">325</span><a id="line.325">    localVarRequestBuilder.method("GET", HttpRequest.BodyPublishers.noBody());</a>
-<span class="sourceLineNo">326</span><a id="line.326">    if (memberVarReadTimeout != null) {</a>
-<span class="sourceLineNo">327</span><a id="line.327">      localVarRequestBuilder.timeout(memberVarReadTimeout);</a>
-<span class="sourceLineNo">328</span><a id="line.328">    }</a>
-<span class="sourceLineNo">329</span><a id="line.329">    if (memberVarInterceptor != null) {</a>
-<span class="sourceLineNo">330</span><a id="line.330">      memberVarInterceptor.accept(localVarRequestBuilder);</a>
-<span class="sourceLineNo">331</span><a id="line.331">    }</a>
-<span class="sourceLineNo">332</span><a id="line.332">    return localVarRequestBuilder;</a>
-<span class="sourceLineNo">333</span><a id="line.333">  }</a>
-<span class="sourceLineNo">334</span><a id="line.334">  /**</a>
-<span class="sourceLineNo">335</span><a id="line.335">   * Create a new checkpoint for a file</a>
-<span class="sourceLineNo">336</span><a id="line.336">   * Create a new checkpoint with the current state of a file. With the default</a>
-<span class="sourceLineNo">337</span><a id="line.337">   * FileContentsManager, only one checkpoint is supported, so creating new</a>
-<span class="sourceLineNo">338</span><a id="line.338">   * checkpoints clobbers existing ones.</a>
-<span class="sourceLineNo">339</span><a id="line.339">   * @param path file path (required)</a>
-<span class="sourceLineNo">340</span><a id="line.340">   * @return Checkpoints</a>
-<span class="sourceLineNo">341</span><a id="line.341">   * @throws ApiException if fails to make API call</a>
-<span class="sourceLineNo">342</span><a id="line.342">   */</a>
-<span class="sourceLineNo">343</span><a id="line.343">  public Checkpoints apiContentsPathCheckpointsPost(String path)</a>
-<span class="sourceLineNo">344</span><a id="line.344">      throws ApiException {</a>
-<span class="sourceLineNo">345</span><a id="line.345">    ApiResponse&lt;Checkpoints&gt; localVarResponse =</a>
-<span class="sourceLineNo">346</span><a id="line.346">        apiContentsPathCheckpointsPostWithHttpInfo(path);</a>
-<span class="sourceLineNo">347</span><a id="line.347">    return localVarResponse.getData();</a>
-<span class="sourceLineNo">348</span><a id="line.348">  }</a>
-<span class="sourceLineNo">349</span><a id="line.349"></a>
-<span class="sourceLineNo">350</span><a id="line.350">  /**</a>
-<span class="sourceLineNo">351</span><a id="line.351">   * Create a new checkpoint for a file</a>
-<span class="sourceLineNo">352</span><a id="line.352">   * Create a new checkpoint with the current state of a file. With the default</a>
-<span class="sourceLineNo">353</span><a id="line.353">   * FileContentsManager, only one checkpoint is supported, so creating new</a>
-<span class="sourceLineNo">354</span><a id="line.354">   * checkpoints clobbers existing ones.</a>
-<span class="sourceLineNo">355</span><a id="line.355">   * @param path file path (required)</a>
-<span class="sourceLineNo">356</span><a id="line.356">   * @return ApiResponse&amp;lt;Checkpoints&amp;gt;</a>
-<span class="sourceLineNo">357</span><a id="line.357">   * @throws ApiException if fails to make API call</a>
-<span class="sourceLineNo">358</span><a id="line.358">   */</a>
-<span class="sourceLineNo">359</span><a id="line.359">  public ApiResponse&lt;Checkpoints&gt;</a>
-<span class="sourceLineNo">360</span><a id="line.360">  apiContentsPathCheckpointsPostWithHttpInfo(String path) throws ApiException {</a>
-<span class="sourceLineNo">361</span><a id="line.361">    HttpRequest.Builder localVarRequestBuilder =</a>
-<span class="sourceLineNo">362</span><a id="line.362">        apiContentsPathCheckpointsPostRequestBuilder(path);</a>
-<span class="sourceLineNo">363</span><a id="line.363">    try {</a>
-<span class="sourceLineNo">364</span><a id="line.364">      HttpResponse&lt;InputStream&gt; localVarResponse =</a>
-<span class="sourceLineNo">365</span><a id="line.365">          memberVarHttpClient.send(localVarRequestBuilder.build(),</a>
-<span class="sourceLineNo">366</span><a id="line.366">                                   HttpResponse.BodyHandlers.ofInputStream());</a>
-<span class="sourceLineNo">367</span><a id="line.367">      if (memberVarResponseInterceptor != null) {</a>
-<span class="sourceLineNo">368</span><a id="line.368">        memberVarResponseInterceptor.accept(localVarResponse);</a>
-<span class="sourceLineNo">369</span><a id="line.369">      }</a>
-<span class="sourceLineNo">370</span><a id="line.370">      if (localVarResponse.statusCode() / 100 != 2) {</a>
-<span class="sourceLineNo">371</span><a id="line.371">        throw getApiException("apiContentsPathCheckpointsPost",</a>
-<span class="sourceLineNo">372</span><a id="line.372">                              localVarResponse);</a>
+<span class="sourceLineNo">325</span><a id="line.325">    localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));</a>
+<span class="sourceLineNo">326</span><a id="line.326"></a>
+<span class="sourceLineNo">327</span><a id="line.327">    localVarRequestBuilder.header("Accept", "application/json");</a>
+<span class="sourceLineNo">328</span><a id="line.328"></a>
+<span class="sourceLineNo">329</span><a id="line.329">    localVarRequestBuilder.method("GET", HttpRequest.BodyPublishers.noBody());</a>
+<span class="sourceLineNo">330</span><a id="line.330">    if (memberVarReadTimeout != null) {</a>
+<span class="sourceLineNo">331</span><a id="line.331">      localVarRequestBuilder.timeout(memberVarReadTimeout);</a>
+<span class="sourceLineNo">332</span><a id="line.332">    }</a>
+<span class="sourceLineNo">333</span><a id="line.333">    if (memberVarInterceptor != null) {</a>
+<span class="sourceLineNo">334</span><a id="line.334">      memberVarInterceptor.accept(localVarRequestBuilder);</a>
+<span class="sourceLineNo">335</span><a id="line.335">    }</a>
+<span class="sourceLineNo">336</span><a id="line.336">    return localVarRequestBuilder;</a>
+<span class="sourceLineNo">337</span><a id="line.337">  }</a>
+<span class="sourceLineNo">338</span><a id="line.338">  /**</a>
+<span class="sourceLineNo">339</span><a id="line.339">   * Create a new checkpoint for a file</a>
+<span class="sourceLineNo">340</span><a id="line.340">   * Create a new checkpoint with the current state of a file. With the default</a>
+<span class="sourceLineNo">341</span><a id="line.341">   * FileContentsManager, only one checkpoint is supported, so creating new</a>
+<span class="sourceLineNo">342</span><a id="line.342">   * checkpoints clobbers existing ones.</a>
+<span class="sourceLineNo">343</span><a id="line.343">   * @param path file path (required)</a>
+<span class="sourceLineNo">344</span><a id="line.344">   * @return Checkpoints</a>
+<span class="sourceLineNo">345</span><a id="line.345">   * @throws ApiException if fails to make API call</a>
+<span class="sourceLineNo">346</span><a id="line.346">   */</a>
+<span class="sourceLineNo">347</span><a id="line.347">  public Checkpoints apiContentsPathCheckpointsPost(String path)</a>
+<span class="sourceLineNo">348</span><a id="line.348">      throws ApiException {</a>
+<span class="sourceLineNo">349</span><a id="line.349">    ApiResponse&lt;Checkpoints&gt; localVarResponse =</a>
+<span class="sourceLineNo">350</span><a id="line.350">        apiContentsPathCheckpointsPostWithHttpInfo(path);</a>
+<span class="sourceLineNo">351</span><a id="line.351">    return localVarResponse.getData();</a>
+<span class="sourceLineNo">352</span><a id="line.352">  }</a>
+<span class="sourceLineNo">353</span><a id="line.353"></a>
+<span class="sourceLineNo">354</span><a id="line.354">  /**</a>
+<span class="sourceLineNo">355</span><a id="line.355">   * Create a new checkpoint for a file</a>
+<span class="sourceLineNo">356</span><a id="line.356">   * Create a new checkpoint with the current state of a file. With the default</a>
+<span class="sourceLineNo">357</span><a id="line.357">   * FileContentsManager, only one checkpoint is supported, so creating new</a>
+<span class="sourceLineNo">358</span><a id="line.358">   * checkpoints clobbers existing ones.</a>
+<span class="sourceLineNo">359</span><a id="line.359">   * @param path file path (required)</a>
+<span class="sourceLineNo">360</span><a id="line.360">   * @return ApiResponse&amp;lt;Checkpoints&amp;gt;</a>
+<span class="sourceLineNo">361</span><a id="line.361">   * @throws ApiException if fails to make API call</a>
+<span class="sourceLineNo">362</span><a id="line.362">   */</a>
+<span class="sourceLineNo">363</span><a id="line.363">  public ApiResponse&lt;Checkpoints&gt;</a>
+<span class="sourceLineNo">364</span><a id="line.364">  apiContentsPathCheckpointsPostWithHttpInfo(String path) throws ApiException {</a>
+<span class="sourceLineNo">365</span><a id="line.365">    HttpRequest.Builder localVarRequestBuilder =</a>
+<span class="sourceLineNo">366</span><a id="line.366">        apiContentsPathCheckpointsPostRequestBuilder(path);</a>
+<span class="sourceLineNo">367</span><a id="line.367">    try {</a>
+<span class="sourceLineNo">368</span><a id="line.368">      HttpResponse&lt;InputStream&gt; localVarResponse =</a>
+<span class="sourceLineNo">369</span><a id="line.369">          memberVarHttpClient.send(localVarRequestBuilder.build(),</a>
+<span class="sourceLineNo">370</span><a id="line.370">                                   HttpResponse.BodyHandlers.ofInputStream());</a>
+<span class="sourceLineNo">371</span><a id="line.371">      if (memberVarResponseInterceptor != null) {</a>
+<span class="sourceLineNo">372</span><a id="line.372">        memberVarResponseInterceptor.accept(localVarResponse);</a>
 <span class="sourceLineNo">373</span><a id="line.373">      }</a>
-<span class="sourceLineNo">374</span><a id="line.374">      return new ApiResponse&lt;Checkpoints&gt;(</a>
-<span class="sourceLineNo">375</span><a id="line.375">          localVarResponse.statusCode(), localVarResponse.headers().map(),</a>
-<span class="sourceLineNo">376</span><a id="line.376">          memberVarObjectMapper.readValue(localVarResponse.body(),</a>
-<span class="sourceLineNo">377</span><a id="line.377">                                          new TypeReference&lt;Checkpoints&gt;() {}));</a>
-<span class="sourceLineNo">378</span><a id="line.378">    } catch (IOException e) {</a>
-<span class="sourceLineNo">379</span><a id="line.379">      throw new ApiException(e);</a>
-<span class="sourceLineNo">380</span><a id="line.380">    } catch (InterruptedException e) {</a>
-<span class="sourceLineNo">381</span><a id="line.381">      Thread.currentThread().interrupt();</a>
-<span class="sourceLineNo">382</span><a id="line.382">      throw new ApiException(e);</a>
-<span class="sourceLineNo">383</span><a id="line.383">    }</a>
-<span class="sourceLineNo">384</span><a id="line.384">  }</a>
-<span class="sourceLineNo">385</span><a id="line.385"></a>
-<span class="sourceLineNo">386</span><a id="line.386">  private HttpRequest.Builder</a>
-<span class="sourceLineNo">387</span><a id="line.387">  apiContentsPathCheckpointsPostRequestBuilder(String path)</a>
-<span class="sourceLineNo">388</span><a id="line.388">      throws ApiException {</a>
-<span class="sourceLineNo">389</span><a id="line.389">    // verify the required parameter 'path' is set</a>
-<span class="sourceLineNo">390</span><a id="line.390">    if (path == null) {</a>
-<span class="sourceLineNo">391</span><a id="line.391">      throw new ApiException(</a>
-<span class="sourceLineNo">392</span><a id="line.392">          400,</a>
-<span class="sourceLineNo">393</span><a id="line.393">          "Missing the required parameter 'path' when calling apiContentsPathCheckpointsPost");</a>
-<span class="sourceLineNo">394</span><a id="line.394">    }</a>
-<span class="sourceLineNo">395</span><a id="line.395"></a>
-<span class="sourceLineNo">396</span><a id="line.396">    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();</a>
-<span class="sourceLineNo">397</span><a id="line.397"></a>
-<span class="sourceLineNo">398</span><a id="line.398">    String localVarPath = "/api/contents/{path}/checkpoints".replace(</a>
-<span class="sourceLineNo">399</span><a id="line.399">        "{path}", ApiClient.urlEncode(path.toString()));</a>
-<span class="sourceLineNo">400</span><a id="line.400"></a>
-<span class="sourceLineNo">401</span><a id="line.401">    localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));</a>
-<span class="sourceLineNo">402</span><a id="line.402"></a>
-<span class="sourceLineNo">403</span><a id="line.403">    localVarRequestBuilder.header("Accept", "application/json");</a>
+<span class="sourceLineNo">374</span><a id="line.374">      if (localVarResponse.statusCode() / 100 != 2) {</a>
+<span class="sourceLineNo">375</span><a id="line.375">        throw getApiException("apiContentsPathCheckpointsPost",</a>
+<span class="sourceLineNo">376</span><a id="line.376">                              localVarResponse);</a>
+<span class="sourceLineNo">377</span><a id="line.377">      }</a>
+<span class="sourceLineNo">378</span><a id="line.378">      return new ApiResponse&lt;Checkpoints&gt;(</a>
+<span class="sourceLineNo">379</span><a id="line.379">          localVarResponse.statusCode(), localVarResponse.headers().map(),</a>
+<span class="sourceLineNo">380</span><a id="line.380">          memberVarObjectMapper.readValue(localVarResponse.body(),</a>
+<span class="sourceLineNo">381</span><a id="line.381">                                          new TypeReference&lt;Checkpoints&gt;() {}));</a>
+<span class="sourceLineNo">382</span><a id="line.382">    } catch (IOException e) {</a>
+<span class="sourceLineNo">383</span><a id="line.383">      throw new ApiException(e);</a>
+<span class="sourceLineNo">384</span><a id="line.384">    } catch (InterruptedException e) {</a>
+<span class="sourceLineNo">385</span><a id="line.385">      Thread.currentThread().interrupt();</a>
+<span class="sourceLineNo">386</span><a id="line.386">      throw new ApiException(e);</a>
+<span class="sourceLineNo">387</span><a id="line.387">    }</a>
+<span class="sourceLineNo">388</span><a id="line.388">  }</a>
+<span class="sourceLineNo">389</span><a id="line.389"></a>
+<span class="sourceLineNo">390</span><a id="line.390">  private HttpRequest.Builder</a>
+<span class="sourceLineNo">391</span><a id="line.391">  apiContentsPathCheckpointsPostRequestBuilder(String path)</a>
+<span class="sourceLineNo">392</span><a id="line.392">      throws ApiException {</a>
+<span class="sourceLineNo">393</span><a id="line.393">    // verify the required parameter 'path' is set</a>
+<span class="sourceLineNo">394</span><a id="line.394">    if (path == null) {</a>
+<span class="sourceLineNo">395</span><a id="line.395">      throw new ApiException(</a>
+<span class="sourceLineNo">396</span><a id="line.396">          400,</a>
+<span class="sourceLineNo">397</span><a id="line.397">          "Missing the required parameter 'path' when calling apiContentsPathCheckpointsPost");</a>
+<span class="sourceLineNo">398</span><a id="line.398">    }</a>
+<span class="sourceLineNo">399</span><a id="line.399"></a>
+<span class="sourceLineNo">400</span><a id="line.400">    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();</a>
+<span class="sourceLineNo">401</span><a id="line.401"></a>
+<span class="sourceLineNo">402</span><a id="line.402">    String localVarPath = "/api/contents/{path}/checkpoints".replace(</a>
+<span class="sourceLineNo">403</span><a id="line.403">        "{path}", ApiClient.urlEncode(path.toString()));</a>
 <span class="sourceLineNo">404</span><a id="line.404"></a>
-<span class="sourceLineNo">405</span><a id="line.405">    localVarRequestBuilder.method("POST", HttpRequest.BodyPublishers.noBody());</a>
-<span class="sourceLineNo">406</span><a id="line.406">    if (memberVarReadTimeout != null) {</a>
-<span class="sourceLineNo">407</span><a id="line.407">      localVarRequestBuilder.timeout(memberVarReadTimeout);</a>
-<span class="sourceLineNo">408</span><a id="line.408">    }</a>
-<span class="sourceLineNo">409</span><a id="line.409">    if (memberVarInterceptor != null) {</a>
-<span class="sourceLineNo">410</span><a id="line.410">      memberVarInterceptor.accept(localVarRequestBuilder);</a>
-<span class="sourceLineNo">411</span><a id="line.411">    }</a>
-<span class="sourceLineNo">412</span><a id="line.412">    return localVarRequestBuilder;</a>
-<span class="sourceLineNo">413</span><a id="line.413">  }</a>
-<span class="sourceLineNo">414</span><a id="line.414">  /**</a>
-<span class="sourceLineNo">415</span><a id="line.415">   * Delete a file in the given path</a>
-<span class="sourceLineNo">416</span><a id="line.416">   *</a>
-<span class="sourceLineNo">417</span><a id="line.417">   * @param path file path (required)</a>
-<span class="sourceLineNo">418</span><a id="line.418">   * @throws ApiException if fails to make API call</a>
-<span class="sourceLineNo">419</span><a id="line.419">   */</a>
-<span class="sourceLineNo">420</span><a id="line.420">  public void apiContentsPathDelete(String path) throws ApiException {</a>
-<span class="sourceLineNo">421</span><a id="line.421">    apiContentsPathDeleteWithHttpInfo(path);</a>
-<span class="sourceLineNo">422</span><a id="line.422">  }</a>
-<span class="sourceLineNo">423</span><a id="line.423"></a>
-<span class="sourceLineNo">424</span><a id="line.424">  /**</a>
-<span class="sourceLineNo">425</span><a id="line.425">   * Delete a file in the given path</a>
-<span class="sourceLineNo">426</span><a id="line.426">   *</a>
-<span class="sourceLineNo">427</span><a id="line.427">   * @param path file path (required)</a>
-<span class="sourceLineNo">428</span><a id="line.428">   * @return ApiResponse&amp;lt;Void&amp;gt;</a>
-<span class="sourceLineNo">429</span><a id="line.429">   * @throws ApiException if fails to make API call</a>
-<span class="sourceLineNo">430</span><a id="line.430">   */</a>
-<span class="sourceLineNo">431</span><a id="line.431">  public ApiResponse&lt;Void&gt; apiContentsPathDeleteWithHttpInfo(String path)</a>
-<span class="sourceLineNo">432</span><a id="line.432">      throws ApiException {</a>
-<span class="sourceLineNo">433</span><a id="line.433">    HttpRequest.Builder localVarRequestBuilder =</a>
-<span class="sourceLineNo">434</span><a id="line.434">        apiContentsPathDeleteRequestBuilder(path);</a>
-<span class="sourceLineNo">435</span><a id="line.435">    try {</a>
-<span class="sourceLineNo">436</span><a id="line.436">      HttpResponse&lt;InputStream&gt; localVarResponse =</a>
-<span class="sourceLineNo">437</span><a id="line.437">          memberVarHttpClient.send(localVarRequestBuilder.build(),</a>
-<span class="sourceLineNo">438</span><a id="line.438">                                   HttpResponse.BodyHandlers.ofInputStream());</a>
-<span class="sourceLineNo">439</span><a id="line.439">      if (memberVarResponseInterceptor != null) {</a>
-<span class="sourceLineNo">440</span><a id="line.440">        memberVarResponseInterceptor.accept(localVarResponse);</a>
-<span class="sourceLineNo">441</span><a id="line.441">      }</a>
-<span class="sourceLineNo">442</span><a id="line.442">      if (localVarResponse.statusCode() / 100 != 2) {</a>
-<span class="sourceLineNo">443</span><a id="line.443">        throw getApiException("apiContentsPathDelete", localVarResponse);</a>
-<span class="sourceLineNo">444</span><a id="line.444">      }</a>
-<span class="sourceLineNo">445</span><a id="line.445">      return new ApiResponse&lt;Void&gt;(localVarResponse.statusCode(),</a>
-<span class="sourceLineNo">446</span><a id="line.446">                                   localVarResponse.headers().map(), null);</a>
-<span class="sourceLineNo">447</span><a id="line.447">    } catch (IOException e) {</a>
-<span class="sourceLineNo">448</span><a id="line.448">      throw new ApiException(e);</a>
-<span class="sourceLineNo">449</span><a id="line.449">    } catch (InterruptedException e) {</a>
-<span class="sourceLineNo">450</span><a id="line.450">      Thread.currentThread().interrupt();</a>
-<span class="sourceLineNo">451</span><a id="line.451">      throw new ApiException(e);</a>
-<span class="sourceLineNo">452</span><a id="line.452">    }</a>
-<span class="sourceLineNo">453</span><a id="line.453">  }</a>
-<span class="sourceLineNo">454</span><a id="line.454"></a>
-<span class="sourceLineNo">455</span><a id="line.455">  private HttpRequest.Builder apiContentsPathDeleteRequestBuilder(String path)</a>
-<span class="sourceLineNo">456</span><a id="line.456">      throws ApiException {</a>
-<span class="sourceLineNo">457</span><a id="line.457">    // verify the required parameter 'path' is set</a>
-<span class="sourceLineNo">458</span><a id="line.458">    if (path == null) {</a>
-<span class="sourceLineNo">459</span><a id="line.459">      throw new ApiException(</a>
-<span class="sourceLineNo">460</span><a id="line.460">          400,</a>
-<span class="sourceLineNo">461</span><a id="line.461">          "Missing the required parameter 'path' when calling apiContentsPathDelete");</a>
-<span class="sourceLineNo">462</span><a id="line.462">    }</a>
-<span class="sourceLineNo">463</span><a id="line.463"></a>
-<span class="sourceLineNo">464</span><a id="line.464">    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();</a>
-<span class="sourceLineNo">465</span><a id="line.465"></a>
-<span class="sourceLineNo">466</span><a id="line.466">    String localVarPath = "/api/contents/{path}".replace(</a>
-<span class="sourceLineNo">467</span><a id="line.467">        "{path}", ApiClient.urlEncode(path.toString()));</a>
-<span class="sourceLineNo">468</span><a id="line.468"></a>
-<span class="sourceLineNo">469</span><a id="line.469">    localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));</a>
-<span class="sourceLineNo">470</span><a id="line.470"></a>
-<span class="sourceLineNo">471</span><a id="line.471">    localVarRequestBuilder.header("Accept", "application/json");</a>
+<span class="sourceLineNo">405</span><a id="line.405">    localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));</a>
+<span class="sourceLineNo">406</span><a id="line.406"></a>
+<span class="sourceLineNo">407</span><a id="line.407">    localVarRequestBuilder.header("Accept", "application/json");</a>
+<span class="sourceLineNo">408</span><a id="line.408"></a>
+<span class="sourceLineNo">409</span><a id="line.409">    localVarRequestBuilder.method("POST", HttpRequest.BodyPublishers.noBody());</a>
+<span class="sourceLineNo">410</span><a id="line.410">    if (memberVarReadTimeout != null) {</a>
+<span class="sourceLineNo">411</span><a id="line.411">      localVarRequestBuilder.timeout(memberVarReadTimeout);</a>
+<span class="sourceLineNo">412</span><a id="line.412">    }</a>
+<span class="sourceLineNo">413</span><a id="line.413">    if (memberVarInterceptor != null) {</a>
+<span class="sourceLineNo">414</span><a id="line.414">      memberVarInterceptor.accept(localVarRequestBuilder);</a>
+<span class="sourceLineNo">415</span><a id="line.415">    }</a>
+<span class="sourceLineNo">416</span><a id="line.416">    return localVarRequestBuilder;</a>
+<span class="sourceLineNo">417</span><a id="line.417">  }</a>
+<span class="sourceLineNo">418</span><a id="line.418">  /**</a>
+<span class="sourceLineNo">419</span><a id="line.419">   * Delete a file in the given path</a>
+<span class="sourceLineNo">420</span><a id="line.420">   *</a>
+<span class="sourceLineNo">421</span><a id="line.421">   * @param path file path (required)</a>
+<span class="sourceLineNo">422</span><a id="line.422">   * @throws ApiException if fails to make API call</a>
+<span class="sourceLineNo">423</span><a id="line.423">   */</a>
+<span class="sourceLineNo">424</span><a id="line.424">  public void apiContentsPathDelete(String path) throws ApiException {</a>
+<span class="sourceLineNo">425</span><a id="line.425">    apiContentsPathDeleteWithHttpInfo(path);</a>
+<span class="sourceLineNo">426</span><a id="line.426">  }</a>
+<span class="sourceLineNo">427</span><a id="line.427"></a>
+<span class="sourceLineNo">428</span><a id="line.428">  /**</a>
+<span class="sourceLineNo">429</span><a id="line.429">   * Delete a file in the given path</a>
+<span class="sourceLineNo">430</span><a id="line.430">   *</a>
+<span class="sourceLineNo">431</span><a id="line.431">   * @param path file path (required)</a>
+<span class="sourceLineNo">432</span><a id="line.432">   * @return ApiResponse&amp;lt;Void&amp;gt;</a>
+<span class="sourceLineNo">433</span><a id="line.433">   * @throws ApiException if fails to make API call</a>
+<span class="sourceLineNo">434</span><a id="line.434">   */</a>
+<span class="sourceLineNo">435</span><a id="line.435">  public ApiResponse&lt;Void&gt; apiContentsPathDeleteWithHttpInfo(String path)</a>
+<span class="sourceLineNo">436</span><a id="line.436">      throws ApiException {</a>
+<span class="sourceLineNo">437</span><a id="line.437">    HttpRequest.Builder localVarRequestBuilder =</a>
+<span class="sourceLineNo">438</span><a id="line.438">        apiContentsPathDeleteRequestBuilder(path);</a>
+<span class="sourceLineNo">439</span><a id="line.439">    try {</a>
+<span class="sourceLineNo">440</span><a id="line.440">      HttpResponse&lt;InputStream&gt; localVarResponse =</a>
+<span class="sourceLineNo">441</span><a id="line.441">          memberVarHttpClient.send(localVarRequestBuilder.build(),</a>
+<span class="sourceLineNo">442</span><a id="line.442">                                   HttpResponse.BodyHandlers.ofInputStream());</a>
+<span class="sourceLineNo">443</span><a id="line.443">      if (memberVarResponseInterceptor != null) {</a>
+<span class="sourceLineNo">444</span><a id="line.444">        memberVarResponseInterceptor.accept(localVarResponse);</a>
+<span class="sourceLineNo">445</span><a id="line.445">      }</a>
+<span class="sourceLineNo">446</span><a id="line.446">      if (localVarResponse.statusCode() / 100 != 2) {</a>
+<span class="sourceLineNo">447</span><a id="line.447">        throw getApiException("apiContentsPathDelete", localVarResponse);</a>
+<span class="sourceLineNo">448</span><a id="line.448">      }</a>
+<span class="sourceLineNo">449</span><a id="line.449">      return new ApiResponse&lt;Void&gt;(localVarResponse.statusCode(),</a>
+<span class="sourceLineNo">450</span><a id="line.450">                                   localVarResponse.headers().map(), null);</a>
+<span class="sourceLineNo">451</span><a id="line.451">    } catch (IOException e) {</a>
+<span class="sourceLineNo">452</span><a id="line.452">      throw new ApiException(e);</a>
+<span class="sourceLineNo">453</span><a id="line.453">    } catch (InterruptedException e) {</a>
+<span class="sourceLineNo">454</span><a id="line.454">      Thread.currentThread().interrupt();</a>
+<span class="sourceLineNo">455</span><a id="line.455">      throw new ApiException(e);</a>
+<span class="sourceLineNo">456</span><a id="line.456">    }</a>
+<span class="sourceLineNo">457</span><a id="line.457">  }</a>
+<span class="sourceLineNo">458</span><a id="line.458"></a>
+<span class="sourceLineNo">459</span><a id="line.459">  private HttpRequest.Builder apiContentsPathDeleteRequestBuilder(String path)</a>
+<span class="sourceLineNo">460</span><a id="line.460">      throws ApiException {</a>
+<span class="sourceLineNo">461</span><a id="line.461">    // verify the required parameter 'path' is set</a>
+<span class="sourceLineNo">462</span><a id="line.462">    if (path == null) {</a>
+<span class="sourceLineNo">463</span><a id="line.463">      throw new ApiException(</a>
+<span class="sourceLineNo">464</span><a id="line.464">          400,</a>
+<span class="sourceLineNo">465</span><a id="line.465">          "Missing the required parameter 'path' when calling apiContentsPathDelete");</a>
+<span class="sourceLineNo">466</span><a id="line.466">    }</a>
+<span class="sourceLineNo">467</span><a id="line.467"></a>
+<span class="sourceLineNo">468</span><a id="line.468">    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();</a>
+<span class="sourceLineNo">469</span><a id="line.469"></a>
+<span class="sourceLineNo">470</span><a id="line.470">    String localVarPath = "/api/contents/{path}".replace(</a>
+<span class="sourceLineNo">471</span><a id="line.471">        "{path}", ApiClient.urlEncode(path.toString()));</a>
 <span class="sourceLineNo">472</span><a id="line.472"></a>
-<span class="sourceLineNo">473</span><a id="line.473">    localVarRequestBuilder.method("DELETE",</a>
-<span class="sourceLineNo">474</span><a id="line.474">                                  HttpRequest.BodyPublishers.noBody());</a>
-<span class="sourceLineNo">475</span><a id="line.475">    if (memberVarReadTimeout != null) {</a>
-<span class="sourceLineNo">476</span><a id="line.476">      localVarRequestBuilder.timeout(memberVarReadTimeout);</a>
-<span class="sourceLineNo">477</span><a id="line.477">    }</a>
-<span class="sourceLineNo">478</span><a id="line.478">    if (memberVarInterceptor != null) {</a>
-<span class="sourceLineNo">479</span><a id="line.479">      memberVarInterceptor.accept(localVarRequestBuilder);</a>
-<span class="sourceLineNo">480</span><a id="line.480">    }</a>
-<span class="sourceLineNo">481</span><a id="line.481">    return localVarRequestBuilder;</a>
-<span class="sourceLineNo">482</span><a id="line.482">  }</a>
-<span class="sourceLineNo">483</span><a id="line.483">  /**</a>
-<span class="sourceLineNo">484</span><a id="line.484">   * Get contents of file or directory</a>
-<span class="sourceLineNo">485</span><a id="line.485">   * A client can optionally specify a type and/or format argument via URL</a>
-<span class="sourceLineNo">486</span><a id="line.486">   * parameter. When given, the Contents service shall return a model in the</a>
-<span class="sourceLineNo">487</span><a id="line.487">   * requested type and/or format. If the request cannot be satisfied, e.g.</a>
-<span class="sourceLineNo">488</span><a id="line.488">   * type&amp;#x3D;text is requested, but the file is binary, then the request shall</a>
-<span class="sourceLineNo">489</span><a id="line.489">   * fail with 400 and have a JSON response containing a &amp;#39;reason&amp;#39; field,</a>
-<span class="sourceLineNo">490</span><a id="line.490">   * with the value &amp;#39;bad format&amp;#39; or &amp;#39;bad type&amp;#39;, depending on</a>
-<span class="sourceLineNo">491</span><a id="line.491">   * what was requested.</a>
-<span class="sourceLineNo">492</span><a id="line.492">   * @param path file path (required)</a>
-<span class="sourceLineNo">493</span><a id="line.493">   * @param type File type (&amp;#39;file&amp;#39;, &amp;#39;directory&amp;#39;) (optional)</a>
-<span class="sourceLineNo">494</span><a id="line.494">   * @param format How file content should be returned (&amp;#39;text&amp;#39;,</a>
-<span class="sourceLineNo">495</span><a id="line.495">   *     &amp;#39;base64&amp;#39;) (optional)</a>
-<span class="sourceLineNo">496</span><a id="line.496">   * @param content Return content (0 for no content, 1 for return content)</a>
-<span class="sourceLineNo">497</span><a id="line.497">   *     (optional)</a>
-<span class="sourceLineNo">498</span><a id="line.498">   * @return Contents</a>
-<span class="sourceLineNo">499</span><a id="line.499">   * @throws ApiException if fails to make API call</a>
-<span class="sourceLineNo">500</span><a id="line.500">   */</a>
-<span class="sourceLineNo">501</span><a id="line.501">  public Contents apiContentsPathGet(String path, String type, String format,</a>
-<span class="sourceLineNo">502</span><a id="line.502">                                     Integer content) throws ApiException {</a>
-<span class="sourceLineNo">503</span><a id="line.503">    ApiResponse&lt;Contents&gt; localVarResponse =</a>
-<span class="sourceLineNo">504</span><a id="line.504">        apiContentsPathGetWithHttpInfo(path, type, format, content);</a>
-<span class="sourceLineNo">505</span><a id="line.505">    return localVarResponse.getData();</a>
-<span class="sourceLineNo">506</span><a id="line.506">  }</a>
-<span class="sourceLineNo">507</span><a id="line.507"></a>
-<span class="sourceLineNo">508</span><a id="line.508">  /**</a>
-<span class="sourceLineNo">509</span><a id="line.509">   * Get contents of file or directory</a>
-<span class="sourceLineNo">510</span><a id="line.510">   * A client can optionally specify a type and/or format argument via URL</a>
-<span class="sourceLineNo">511</span><a id="line.511">   * parameter. When given, the Contents service shall return a model in the</a>
-<span class="sourceLineNo">512</span><a id="line.512">   * requested type and/or format. If the request cannot be satisfied, e.g.</a>
-<span class="sourceLineNo">513</span><a id="line.513">   * type&amp;#x3D;text is requested, but the file is binary, then the request shall</a>
-<span class="sourceLineNo">514</span><a id="line.514">   * fail with 400 and have a JSON response containing a &amp;#39;reason&amp;#39; field,</a>
-<span class="sourceLineNo">515</span><a id="line.515">   * with the value &amp;#39;bad format&amp;#39; or &amp;#39;bad type&amp;#39;, depending on</a>
-<span class="sourceLineNo">516</span><a id="line.516">   * what was requested.</a>
-<span class="sourceLineNo">517</span><a id="line.517">   * @param path file path (required)</a>
-<span class="sourceLineNo">518</span><a id="line.518">   * @param type File type (&amp;#39;file&amp;#39;, &amp;#39;directory&amp;#39;) (optional)</a>
-<span class="sourceLineNo">519</span><a id="line.519">   * @param format How file content should be returned (&amp;#39;text&amp;#39;,</a>
-<span class="sourceLineNo">520</span><a id="line.520">   *     &amp;#39;base64&amp;#39;) (optional)</a>
-<span class="sourceLineNo">521</span><a id="line.521">   * @param content Return content (0 for no content, 1 for return content)</a>
-<span class="sourceLineNo">522</span><a id="line.522">   *     (optional)</a>
-<span class="sourceLineNo">523</span><a id="line.523">   * @return ApiResponse&amp;lt;Contents&amp;gt;</a>
-<span class="sourceLineNo">524</span><a id="line.524">   * @throws ApiException if fails to make API call</a>
-<span class="sourceLineNo">525</span><a id="line.525">   */</a>
-<span class="sourceLineNo">526</span><a id="line.526">  public ApiResponse&lt;Contents&gt;</a>
-<span class="sourceLineNo">527</span><a id="line.527">  apiContentsPathGetWithHttpInfo(String path, String type, String format,</a>
-<span class="sourceLineNo">528</span><a id="line.528">                                 Integer content) throws ApiException {</a>
-<span class="sourceLineNo">529</span><a id="line.529">    HttpRequest.Builder localVarRequestBuilder =</a>
-<span class="sourceLineNo">530</span><a id="line.530">        apiContentsPathGetRequestBuilder(path, type, format, content);</a>
-<span class="sourceLineNo">531</span><a id="line.531">    try {</a>
-<span class="sourceLineNo">532</span><a id="line.532">      HttpResponse&lt;InputStream&gt; localVarResponse =</a>
-<span class="sourceLineNo">533</span><a id="line.533">          memberVarHttpClient.send(localVarRequestBuilder.build(),</a>
-<span class="sourceLineNo">534</span><a id="line.534">                                   HttpResponse.BodyHandlers.ofInputStream());</a>
-<span class="sourceLineNo">535</span><a id="line.535">      if (memberVarResponseInterceptor != null) {</a>
-<span class="sourceLineNo">536</span><a id="line.536">        memberVarResponseInterceptor.accept(localVarResponse);</a>
-<span class="sourceLineNo">537</span><a id="line.537">      }</a>
-<span class="sourceLineNo">538</span><a id="line.538">      if (localVarResponse.statusCode() / 100 != 2) {</a>
-<span class="sourceLineNo">539</span><a id="line.539">        throw getApiException("apiContentsPathGet", localVarResponse);</a>
-<span class="sourceLineNo">540</span><a id="line.540">      }</a>
-<span class="sourceLineNo">541</span><a id="line.541">      return new ApiResponse&lt;Contents&gt;(</a>
-<span class="sourceLineNo">542</span><a id="line.542">          localVarResponse.statusCode(), localVarResponse.headers().map(),</a>
-<span class="sourceLineNo">543</span><a id="line.543">          memberVarObjectMapper.readValue(localVarResponse.body(),</a>
-<span class="sourceLineNo">544</span><a id="line.544">                                          new TypeReference&lt;Contents&gt;() {}));</a>
-<span class="sourceLineNo">545</span><a id="line.545">    } catch (IOException e) {</a>
-<span class="sourceLineNo">546</span><a id="line.546">      throw new ApiException(e);</a>
-<span class="sourceLineNo">547</span><a id="line.547">    } catch (InterruptedException e) {</a>
-<span class="sourceLineNo">548</span><a id="line.548">      Thread.currentThread().interrupt();</a>
-<span class="sourceLineNo">549</span><a id="line.549">      throw new ApiException(e);</a>
-<span class="sourceLineNo">550</span><a id="line.550">    }</a>
-<span class="sourceLineNo">551</span><a id="line.551">  }</a>
-<span class="sourceLineNo">552</span><a id="line.552"></a>
-<span class="sourceLineNo">553</span><a id="line.553">  private HttpRequest.Builder</a>
-<span class="sourceLineNo">554</span><a id="line.554">  apiContentsPathGetRequestBuilder(String path, String type, String format,</a>
-<span class="sourceLineNo">555</span><a id="line.555">                                   Integer content) throws ApiException {</a>
-<span class="sourceLineNo">556</span><a id="line.556">    // verify the required parameter 'path' is set</a>
-<span class="sourceLineNo">557</span><a id="line.557">    if (path == null) {</a>
-<span class="sourceLineNo">558</span><a id="line.558">      throw new ApiException(</a>
-<span class="sourceLineNo">559</span><a id="line.559">          400,</a>
-<span class="sourceLineNo">560</span><a id="line.560">          "Missing the required parameter 'path' when calling apiContentsPathGet");</a>
-<span class="sourceLineNo">561</span><a id="line.561">    }</a>
-<span class="sourceLineNo">562</span><a id="line.562"></a>
-<span class="sourceLineNo">563</span><a id="line.563">    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();</a>
-<span class="sourceLineNo">564</span><a id="line.564"></a>
-<span class="sourceLineNo">565</span><a id="line.565">    String localVarPath = "/api/contents/{path}".replace(</a>
-<span class="sourceLineNo">566</span><a id="line.566">        "{path}", ApiClient.urlEncode(path.toString()));</a>
-<span class="sourceLineNo">567</span><a id="line.567"></a>
-<span class="sourceLineNo">568</span><a id="line.568">    List&lt;Pair&gt; localVarQueryParams = new ArrayList&lt;&gt;();</a>
-<span class="sourceLineNo">569</span><a id="line.569">    localVarQueryParams.addAll(ApiClient.parameterToPairs("type", type));</a>
-<span class="sourceLineNo">570</span><a id="line.570">    localVarQueryParams.addAll(ApiClient.parameterToPairs("format", format));</a>
-<span class="sourceLineNo">571</span><a id="line.571">    localVarQueryParams.addAll(ApiClient.parameterToPairs("content", content));</a>
-<span class="sourceLineNo">572</span><a id="line.572"></a>
-<span class="sourceLineNo">573</span><a id="line.573">    if (!localVarQueryParams.isEmpty()) {</a>
-<span class="sourceLineNo">574</span><a id="line.574">      StringJoiner queryJoiner = new StringJoiner("&amp;");</a>
-<span class="sourceLineNo">575</span><a id="line.575">      localVarQueryParams.forEach(</a>
-<span class="sourceLineNo">576</span><a id="line.576">          p -&gt; queryJoiner.add(p.getName() + '=' + p.getValue()));</a>
-<span class="sourceLineNo">577</span><a id="line.577">      localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath +</a>
-<span class="sourceLineNo">578</span><a id="line.578">                                            '?' + queryJoiner.toString()));</a>
-<span class="sourceLineNo">579</span><a id="line.579">    } else {</a>
-<span class="sourceLineNo">580</span><a id="line.580">      localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));</a>
-<span class="sourceLineNo">581</span><a id="line.581">    }</a>
-<span class="sourceLineNo">582</span><a id="line.582"></a>
-<span class="sourceLineNo">583</span><a id="line.583">    localVarRequestBuilder.header("Accept", "application/json");</a>
-<span class="sourceLineNo">584</span><a id="line.584"></a>
-<span class="sourceLineNo">585</span><a id="line.585">    localVarRequestBuilder.method("GET", HttpRequest.BodyPublishers.noBody());</a>
-<span class="sourceLineNo">586</span><a id="line.586">    if (memberVarReadTimeout != null) {</a>
-<span class="sourceLineNo">587</span><a id="line.587">      localVarRequestBuilder.timeout(memberVarReadTimeout);</a>
-<span class="sourceLineNo">588</span><a id="line.588">    }</a>
-<span class="sourceLineNo">589</span><a id="line.589">    if (memberVarInterceptor != null) {</a>
-<span class="sourceLineNo">590</span><a id="line.590">      memberVarInterceptor.accept(localVarRequestBuilder);</a>
-<span class="sourceLineNo">591</span><a id="line.591">    }</a>
-<span class="sourceLineNo">592</span><a id="line.592">    return localVarRequestBuilder;</a>
-<span class="sourceLineNo">593</span><a id="line.593">  }</a>
-<span class="sourceLineNo">594</span><a id="line.594">  /**</a>
-<span class="sourceLineNo">595</span><a id="line.595">   * Rename a file or directory without re-uploading content</a>
-<span class="sourceLineNo">596</span><a id="line.596">   *</a>
-<span class="sourceLineNo">597</span><a id="line.597">   * @param path file path (required)</a>
-<span class="sourceLineNo">598</span><a id="line.598">   * @return Contents</a>
-<span class="sourceLineNo">599</span><a id="line.599">   * @throws ApiException if fails to make API call</a>
-<span class="sourceLineNo">600</span><a id="line.600">   */</a>
-<span class="sourceLineNo">601</span><a id="line.601">  public Contents apiContentsPathPatch(String path) throws ApiException {</a>
-<span class="sourceLineNo">602</span><a id="line.602">    ApiResponse&lt;Contents&gt; localVarResponse =</a>
-<span class="sourceLineNo">603</span><a id="line.603">        apiContentsPathPatchWithHttpInfo(path);</a>
-<span class="sourceLineNo">604</span><a id="line.604">    return localVarResponse.getData();</a>
-<span class="sourceLineNo">605</span><a id="line.605">  }</a>
-<span class="sourceLineNo">606</span><a id="line.606"></a>
-<span class="sourceLineNo">607</span><a id="line.607">  /**</a>
-<span class="sourceLineNo">608</span><a id="line.608">   * Rename a file or directory without re-uploading content</a>
-<span class="sourceLineNo">609</span><a id="line.609">   *</a>
-<span class="sourceLineNo">610</span><a id="line.610">   * @param path file path (required)</a>
-<span class="sourceLineNo">611</span><a id="line.611">   * @return ApiResponse&amp;lt;Contents&amp;gt;</a>
-<span class="sourceLineNo">612</span><a id="line.612">   * @throws ApiException if fails to make API call</a>
-<span class="sourceLineNo">613</span><a id="line.613">   */</a>
-<span class="sourceLineNo">614</span><a id="line.614">  public ApiResponse&lt;Contents&gt; apiContentsPathPatchWithHttpInfo(String path)</a>
-<span class="sourceLineNo">615</span><a id="line.615">      throws ApiException {</a>
-<span class="sourceLineNo">616</span><a id="line.616">    HttpRequest.Builder localVarRequestBuilder =</a>
-<span class="sourceLineNo">617</span><a id="line.617">        apiContentsPathPatchRequestBuilder(path);</a>
-<span class="sourceLineNo">618</span><a id="line.618">    try {</a>
-<span class="sourceLineNo">619</span><a id="line.619">      HttpResponse&lt;InputStream&gt; localVarResponse =</a>
-<span class="sourceLineNo">620</span><a id="line.620">          memberVarHttpClient.send(localVarRequestBuilder.build(),</a>
-<span class="sourceLineNo">621</span><a id="line.621">                                   HttpResponse.BodyHandlers.ofInputStream());</a>
-<span class="sourceLineNo">622</span><a id="line.622">      if (memberVarResponseInterceptor != null) {</a>
-<span class="sourceLineNo">623</span><a id="line.623">        memberVarResponseInterceptor.accept(localVarResponse);</a>
-<span class="sourceLineNo">624</span><a id="line.624">      }</a>
-<span class="sourceLineNo">625</span><a id="line.625">      if (localVarResponse.statusCode() / 100 != 2) {</a>
-<span class="sourceLineNo">626</span><a id="line.626">        throw getApiException("apiContentsPathPatch", localVarResponse);</a>
-<span class="sourceLineNo">627</span><a id="line.627">      }</a>
-<span class="sourceLineNo">628</span><a id="line.628">      return new ApiResponse&lt;Contents&gt;(</a>
-<span class="sourceLineNo">629</span><a id="line.629">          localVarResponse.statusCode(), localVarResponse.headers().map(),</a>
-<span class="sourceLineNo">630</span><a id="line.630">          memberVarObjectMapper.readValue(localVarResponse.body(),</a>
-<span class="sourceLineNo">631</span><a id="line.631">                                          new TypeReference&lt;Contents&gt;() {}));</a>
-<span class="sourceLineNo">632</span><a id="line.632">    } catch (IOException e) {</a>
-<span class="sourceLineNo">633</span><a id="line.633">      throw new ApiException(e);</a>
-<span class="sourceLineNo">634</span><a id="line.634">    } catch (InterruptedException e) {</a>
-<span class="sourceLineNo">635</span><a id="line.635">      Thread.currentThread().interrupt();</a>
-<span class="sourceLineNo">636</span><a id="line.636">      throw new ApiException(e);</a>
-<span class="sourceLineNo">637</span><a id="line.637">    }</a>
-<span class="sourceLineNo">638</span><a id="line.638">  }</a>
-<span class="sourceLineNo">639</span><a id="line.639"></a>
-<span class="sourceLineNo">640</span><a id="line.640">  private HttpRequest.Builder apiContentsPathPatchRequestBuilder(String path)</a>
-<span class="sourceLineNo">641</span><a id="line.641">      throws ApiException {</a>
-<span class="sourceLineNo">642</span><a id="line.642">    // verify the required parameter 'path' is set</a>
-<span class="sourceLineNo">643</span><a id="line.643">    if (path == null) {</a>
-<span class="sourceLineNo">644</span><a id="line.644">      throw new ApiException(</a>
-<span class="sourceLineNo">645</span><a id="line.645">          400,</a>
-<span class="sourceLineNo">646</span><a id="line.646">          "Missing the required parameter 'path' when calling apiContentsPathPatch");</a>
-<span class="sourceLineNo">647</span><a id="line.647">    }</a>
-<span class="sourceLineNo">648</span><a id="line.648"></a>
-<span class="sourceLineNo">649</span><a id="line.649">    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();</a>
-<span class="sourceLineNo">650</span><a id="line.650"></a>
-<span class="sourceLineNo">651</span><a id="line.651">    String localVarPath = "/api/contents/{path}".replace(</a>
-<span class="sourceLineNo">652</span><a id="line.652">        "{path}", ApiClient.urlEncode(path.toString()));</a>
-<span class="sourceLineNo">653</span><a id="line.653"></a>
-<span class="sourceLineNo">654</span><a id="line.654">    localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));</a>
-<span class="sourceLineNo">655</span><a id="line.655"></a>
-<span class="sourceLineNo">656</span><a id="line.656">    localVarRequestBuilder.header("Accept", "application/json");</a>
+<span class="sourceLineNo">473</span><a id="line.473">    localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));</a>
+<span class="sourceLineNo">474</span><a id="line.474"></a>
+<span class="sourceLineNo">475</span><a id="line.475">    localVarRequestBuilder.header("Accept", "application/json");</a>
+<span class="sourceLineNo">476</span><a id="line.476"></a>
+<span class="sourceLineNo">477</span><a id="line.477">    localVarRequestBuilder.method("DELETE",</a>
+<span class="sourceLineNo">478</span><a id="line.478">                                  HttpRequest.BodyPublishers.noBody());</a>
+<span class="sourceLineNo">479</span><a id="line.479">    if (memberVarReadTimeout != null) {</a>
+<span class="sourceLineNo">480</span><a id="line.480">      localVarRequestBuilder.timeout(memberVarReadTimeout);</a>
+<span class="sourceLineNo">481</span><a id="line.481">    }</a>
+<span class="sourceLineNo">482</span><a id="line.482">    if (memberVarInterceptor != null) {</a>
+<span class="sourceLineNo">483</span><a id="line.483">      memberVarInterceptor.accept(localVarRequestBuilder);</a>
+<span class="sourceLineNo">484</span><a id="line.484">    }</a>
+<span class="sourceLineNo">485</span><a id="line.485">    return localVarRequestBuilder;</a>
+<span class="sourceLineNo">486</span><a id="line.486">  }</a>
+<span class="sourceLineNo">487</span><a id="line.487">  /**</a>
+<span class="sourceLineNo">488</span><a id="line.488">   * Get contents of file or directory</a>
+<span class="sourceLineNo">489</span><a id="line.489">   * A client can optionally specify a type and/or format argument via URL</a>
+<span class="sourceLineNo">490</span><a id="line.490">   * parameter. When given, the Contents service shall return a model in the</a>
+<span class="sourceLineNo">491</span><a id="line.491">   * requested type and/or format. If the request cannot be satisfied, e.g.</a>
+<span class="sourceLineNo">492</span><a id="line.492">   * type&amp;#x3D;text is requested, but the file is binary, then the request shall</a>
+<span class="sourceLineNo">493</span><a id="line.493">   * fail with 400 and have a JSON response containing a &amp;#39;reason&amp;#39; field,</a>
+<span class="sourceLineNo">494</span><a id="line.494">   * with the value &amp;#39;bad format&amp;#39; or &amp;#39;bad type&amp;#39;, depending on</a>
+<span class="sourceLineNo">495</span><a id="line.495">   * what was requested.</a>
+<span class="sourceLineNo">496</span><a id="line.496">   * @param path file path (required)</a>
+<span class="sourceLineNo">497</span><a id="line.497">   * @param type File type (&amp;#39;file&amp;#39;, &amp;#39;directory&amp;#39;) (optional)</a>
+<span class="sourceLineNo">498</span><a id="line.498">   * @param format How file content should be returned (&amp;#39;text&amp;#39;,</a>
+<span class="sourceLineNo">499</span><a id="line.499">   *     &amp;#39;base64&amp;#39;) (optional)</a>
+<span class="sourceLineNo">500</span><a id="line.500">   * @param content Return content (0 for no content, 1 for return content)</a>
+<span class="sourceLineNo">501</span><a id="line.501">   *     (optional)</a>
+<span class="sourceLineNo">502</span><a id="line.502">   * @return Contents</a>
+<span class="sourceLineNo">503</span><a id="line.503">   * @throws ApiException if fails to make API call</a>
+<span class="sourceLineNo">504</span><a id="line.504">   */</a>
+<span class="sourceLineNo">505</span><a id="line.505">  public Contents apiContentsPathGet(String path, String type, String format,</a>
+<span class="sourceLineNo">506</span><a id="line.506">                                     Integer content) throws ApiException {</a>
+<span class="sourceLineNo">507</span><a id="line.507">    ApiResponse&lt;Contents&gt; localVarResponse =</a>
+<span class="sourceLineNo">508</span><a id="line.508">        apiContentsPathGetWithHttpInfo(path, type, format, content);</a>
+<span class="sourceLineNo">509</span><a id="line.509">    return localVarResponse.getData();</a>
+<span class="sourceLineNo">510</span><a id="line.510">  }</a>
+<span class="sourceLineNo">511</span><a id="line.511"></a>
+<span class="sourceLineNo">512</span><a id="line.512">  /**</a>
+<span class="sourceLineNo">513</span><a id="line.513">   * Get contents of file or directory</a>
+<span class="sourceLineNo">514</span><a id="line.514">   * A client can optionally specify a type and/or format argument via URL</a>
+<span class="sourceLineNo">515</span><a id="line.515">   * parameter. When given, the Contents service shall return a model in the</a>
+<span class="sourceLineNo">516</span><a id="line.516">   * requested type and/or format. If the request cannot be satisfied, e.g.</a>
+<span class="sourceLineNo">517</span><a id="line.517">   * type&amp;#x3D;text is requested, but the file is binary, then the request shall</a>
+<span class="sourceLineNo">518</span><a id="line.518">   * fail with 400 and have a JSON response containing a &amp;#39;reason&amp;#39; field,</a>
+<span class="sourceLineNo">519</span><a id="line.519">   * with the value &amp;#39;bad format&amp;#39; or &amp;#39;bad type&amp;#39;, depending on</a>
+<span class="sourceLineNo">520</span><a id="line.520">   * what was requested.</a>
+<span class="sourceLineNo">521</span><a id="line.521">   * @param path file path (required)</a>
+<span class="sourceLineNo">522</span><a id="line.522">   * @param type File type (&amp;#39;file&amp;#39;, &amp;#39;directory&amp;#39;) (optional)</a>
+<span class="sourceLineNo">523</span><a id="line.523">   * @param format How file content should be returned (&amp;#39;text&amp;#39;,</a>
+<span class="sourceLineNo">524</span><a id="line.524">   *     &amp;#39;base64&amp;#39;) (optional)</a>
+<span class="sourceLineNo">525</span><a id="line.525">   * @param content Return content (0 for no content, 1 for return content)</a>
+<span class="sourceLineNo">526</span><a id="line.526">   *     (optional)</a>
+<span class="sourceLineNo">527</span><a id="line.527">   * @return ApiResponse&amp;lt;Contents&amp;gt;</a>
+<span class="sourceLineNo">528</span><a id="line.528">   * @throws ApiException if fails to make API call</a>
+<span class="sourceLineNo">529</span><a id="line.529">   */</a>
+<span class="sourceLineNo">530</span><a id="line.530">  public ApiResponse&lt;Contents&gt;</a>
+<span class="sourceLineNo">531</span><a id="line.531">  apiContentsPathGetWithHttpInfo(String path, String type, String format,</a>
+<span class="sourceLineNo">532</span><a id="line.532">                                 Integer content) throws ApiException {</a>
+<span class="sourceLineNo">533</span><a id="line.533">    HttpRequest.Builder localVarRequestBuilder =</a>
+<span class="sourceLineNo">534</span><a id="line.534">        apiContentsPathGetRequestBuilder(path, type, format, content);</a>
+<span class="sourceLineNo">535</span><a id="line.535">    try {</a>
+<span class="sourceLineNo">536</span><a id="line.536">      HttpResponse&lt;InputStream&gt; localVarResponse =</a>
+<span class="sourceLineNo">537</span><a id="line.537">          memberVarHttpClient.send(localVarRequestBuilder.build(),</a>
+<span class="sourceLineNo">538</span><a id="line.538">                                   HttpResponse.BodyHandlers.ofInputStream());</a>
+<span class="sourceLineNo">539</span><a id="line.539">      if (memberVarResponseInterceptor != null) {</a>
+<span class="sourceLineNo">540</span><a id="line.540">        memberVarResponseInterceptor.accept(localVarResponse);</a>
+<span class="sourceLineNo">541</span><a id="line.541">      }</a>
+<span class="sourceLineNo">542</span><a id="line.542">      if (localVarResponse.statusCode() / 100 != 2) {</a>
+<span class="sourceLineNo">543</span><a id="line.543">        throw getApiException("apiContentsPathGet", localVarResponse);</a>
+<span class="sourceLineNo">544</span><a id="line.544">      }</a>
+<span class="sourceLineNo">545</span><a id="line.545">      return new ApiResponse&lt;Contents&gt;(</a>
+<span class="sourceLineNo">546</span><a id="line.546">          localVarResponse.statusCode(), localVarResponse.headers().map(),</a>
+<span class="sourceLineNo">547</span><a id="line.547">          memberVarObjectMapper.readValue(localVarResponse.body(),</a>
+<span class="sourceLineNo">548</span><a id="line.548">                                          new TypeReference&lt;Contents&gt;() {}));</a>
+<span class="sourceLineNo">549</span><a id="line.549">    } catch (IOException e) {</a>
+<span class="sourceLineNo">550</span><a id="line.550">      throw new ApiException(e);</a>
+<span class="sourceLineNo">551</span><a id="line.551">    } catch (InterruptedException e) {</a>
+<span class="sourceLineNo">552</span><a id="line.552">      Thread.currentThread().interrupt();</a>
+<span class="sourceLineNo">553</span><a id="line.553">      throw new ApiException(e);</a>
+<span class="sourceLineNo">554</span><a id="line.554">    }</a>
+<span class="sourceLineNo">555</span><a id="line.555">  }</a>
+<span class="sourceLineNo">556</span><a id="line.556"></a>
+<span class="sourceLineNo">557</span><a id="line.557">  private HttpRequest.Builder</a>
+<span class="sourceLineNo">558</span><a id="line.558">  apiContentsPathGetRequestBuilder(String path, String type, String format,</a>
+<span class="sourceLineNo">559</span><a id="line.559">                                   Integer content) throws ApiException {</a>
+<span class="sourceLineNo">560</span><a id="line.560">    // verify the required parameter 'path' is set</a>
+<span class="sourceLineNo">561</span><a id="line.561">    if (path == null) {</a>
+<span class="sourceLineNo">562</span><a id="line.562">      throw new ApiException(</a>
+<span class="sourceLineNo">563</span><a id="line.563">          400,</a>
+<span class="sourceLineNo">564</span><a id="line.564">          "Missing the required parameter 'path' when calling apiContentsPathGet");</a>
+<span class="sourceLineNo">565</span><a id="line.565">    }</a>
+<span class="sourceLineNo">566</span><a id="line.566"></a>
+<span class="sourceLineNo">567</span><a id="line.567">    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();</a>
+<span class="sourceLineNo">568</span><a id="line.568"></a>
+<span class="sourceLineNo">569</span><a id="line.569">    String localVarPath = "/api/contents/{path}".replace(</a>
+<span class="sourceLineNo">570</span><a id="line.570">        "{path}", ApiClient.urlEncode(path.toString()));</a>
+<span class="sourceLineNo">571</span><a id="line.571"></a>
+<span class="sourceLineNo">572</span><a id="line.572">    List&lt;Pair&gt; localVarQueryParams = new ArrayList&lt;&gt;();</a>
+<span class="sourceLineNo">573</span><a id="line.573">    localVarQueryParams.addAll(ApiClient.parameterToPairs("type", type));</a>
+<span class="sourceLineNo">574</span><a id="line.574">    localVarQueryParams.addAll(ApiClient.parameterToPairs("format", format));</a>
+<span class="sourceLineNo">575</span><a id="line.575">    localVarQueryParams.addAll(ApiClient.parameterToPairs("content", content));</a>
+<span class="sourceLineNo">576</span><a id="line.576"></a>
+<span class="sourceLineNo">577</span><a id="line.577">    if (!localVarQueryParams.isEmpty()) {</a>
+<span class="sourceLineNo">578</span><a id="line.578">      StringJoiner queryJoiner = new StringJoiner("&amp;");</a>
+<span class="sourceLineNo">579</span><a id="line.579">      localVarQueryParams.forEach(</a>
+<span class="sourceLineNo">580</span><a id="line.580">          p -&gt; queryJoiner.add(p.getName() + '=' + p.getValue()));</a>
+<span class="sourceLineNo">581</span><a id="line.581">      localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath +</a>
+<span class="sourceLineNo">582</span><a id="line.582">                                            '?' + queryJoiner.toString()));</a>
+<span class="sourceLineNo">583</span><a id="line.583">    } else {</a>
+<span class="sourceLineNo">584</span><a id="line.584">      localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));</a>
+<span class="sourceLineNo">585</span><a id="line.585">    }</a>
+<span class="sourceLineNo">586</span><a id="line.586"></a>
+<span class="sourceLineNo">587</span><a id="line.587">    localVarRequestBuilder.header("Accept", "application/json");</a>
+<span class="sourceLineNo">588</span><a id="line.588"></a>
+<span class="sourceLineNo">589</span><a id="line.589">    localVarRequestBuilder.method("GET", HttpRequest.BodyPublishers.noBody());</a>
+<span class="sourceLineNo">590</span><a id="line.590">    if (memberVarReadTimeout != null) {</a>
+<span class="sourceLineNo">591</span><a id="line.591">      localVarRequestBuilder.timeout(memberVarReadTimeout);</a>
+<span class="sourceLineNo">592</span><a id="line.592">    }</a>
+<span class="sourceLineNo">593</span><a id="line.593">    if (memberVarInterceptor != null) {</a>
+<span class="sourceLineNo">594</span><a id="line.594">      memberVarInterceptor.accept(localVarRequestBuilder);</a>
+<span class="sourceLineNo">595</span><a id="line.595">    }</a>
+<span class="sourceLineNo">596</span><a id="line.596">    return localVarRequestBuilder;</a>
+<span class="sourceLineNo">597</span><a id="line.597">  }</a>
+<span class="sourceLineNo">598</span><a id="line.598">  /**</a>
+<span class="sourceLineNo">599</span><a id="line.599">   * Rename a file or directory without re-uploading content</a>
+<span class="sourceLineNo">600</span><a id="line.600">   *</a>
+<span class="sourceLineNo">601</span><a id="line.601">   * @param path file path (required)</a>
+<span class="sourceLineNo">602</span><a id="line.602">   * @return Contents</a>
+<span class="sourceLineNo">603</span><a id="line.603">   * @throws ApiException if fails to make API call</a>
+<span class="sourceLineNo">604</span><a id="line.604">   */</a>
+<span class="sourceLineNo">605</span><a id="line.605">  public Contents apiContentsPathPatch(String path) throws ApiException {</a>
+<span class="sourceLineNo">606</span><a id="line.606">    ApiResponse&lt;Contents&gt; localVarResponse =</a>
+<span class="sourceLineNo">607</span><a id="line.607">        apiContentsPathPatchWithHttpInfo(path);</a>
+<span class="sourceLineNo">608</span><a id="line.608">    return localVarResponse.getData();</a>
+<span class="sourceLineNo">609</span><a id="line.609">  }</a>
+<span class="sourceLineNo">610</span><a id="line.610"></a>
+<span class="sourceLineNo">611</span><a id="line.611">  /**</a>
+<span class="sourceLineNo">612</span><a id="line.612">   * Rename a file or directory without re-uploading content</a>
+<span class="sourceLineNo">613</span><a id="line.613">   *</a>
+<span class="sourceLineNo">614</span><a id="line.614">   * @param path file path (required)</a>
+<span class="sourceLineNo">615</span><a id="line.615">   * @return ApiResponse&amp;lt;Contents&amp;gt;</a>
+<span class="sourceLineNo">616</span><a id="line.616">   * @throws ApiException if fails to make API call</a>
+<span class="sourceLineNo">617</span><a id="line.617">   */</a>
+<span class="sourceLineNo">618</span><a id="line.618">  public ApiResponse&lt;Contents&gt; apiContentsPathPatchWithHttpInfo(String path)</a>
+<span class="sourceLineNo">619</span><a id="line.619">      throws ApiException {</a>
+<span class="sourceLineNo">620</span><a id="line.620">    HttpRequest.Builder localVarRequestBuilder =</a>
+<span class="sourceLineNo">621</span><a id="line.621">        apiContentsPathPatchRequestBuilder(path);</a>
+<span class="sourceLineNo">622</span><a id="line.622">    try {</a>
+<span class="sourceLineNo">623</span><a id="line.623">      HttpResponse&lt;InputStream&gt; localVarResponse =</a>
+<span class="sourceLineNo">624</span><a id="line.624">          memberVarHttpClient.send(localVarRequestBuilder.build(),</a>
+<span class="sourceLineNo">625</span><a id="line.625">                                   HttpResponse.BodyHandlers.ofInputStream());</a>
+<span class="sourceLineNo">626</span><a id="line.626">      if (memberVarResponseInterceptor != null) {</a>
+<span class="sourceLineNo">627</span><a id="line.627">        memberVarResponseInterceptor.accept(localVarResponse);</a>
+<span class="sourceLineNo">628</span><a id="line.628">      }</a>
+<span class="sourceLineNo">629</span><a id="line.629">      if (localVarResponse.statusCode() / 100 != 2) {</a>
+<span class="sourceLineNo">630</span><a id="line.630">        throw getApiException("apiContentsPathPatch", localVarResponse);</a>
+<span class="sourceLineNo">631</span><a id="line.631">      }</a>
+<span class="sourceLineNo">632</span><a id="line.632">      return new ApiResponse&lt;Contents&gt;(</a>
+<span class="sourceLineNo">633</span><a id="line.633">          localVarResponse.statusCode(), localVarResponse.headers().map(),</a>
+<span class="sourceLineNo">634</span><a id="line.634">          memberVarObjectMapper.readValue(localVarResponse.body(),</a>
+<span class="sourceLineNo">635</span><a id="line.635">                                          new TypeReference&lt;Contents&gt;() {}));</a>
+<span class="sourceLineNo">636</span><a id="line.636">    } catch (IOException e) {</a>
+<span class="sourceLineNo">637</span><a id="line.637">      throw new ApiException(e);</a>
+<span class="sourceLineNo">638</span><a id="line.638">    } catch (InterruptedException e) {</a>
+<span class="sourceLineNo">639</span><a id="line.639">      Thread.currentThread().interrupt();</a>
+<span class="sourceLineNo">640</span><a id="line.640">      throw new ApiException(e);</a>
+<span class="sourceLineNo">641</span><a id="line.641">    }</a>
+<span class="sourceLineNo">642</span><a id="line.642">  }</a>
+<span class="sourceLineNo">643</span><a id="line.643"></a>
+<span class="sourceLineNo">644</span><a id="line.644">  private HttpRequest.Builder apiContentsPathPatchRequestBuilder(String path)</a>
+<span class="sourceLineNo">645</span><a id="line.645">      throws ApiException {</a>
+<span class="sourceLineNo">646</span><a id="line.646">    // verify the required parameter 'path' is set</a>
+<span class="sourceLineNo">647</span><a id="line.647">    if (path == null) {</a>
+<span class="sourceLineNo">648</span><a id="line.648">      throw new ApiException(</a>
+<span class="sourceLineNo">649</span><a id="line.649">          400,</a>
+<span class="sourceLineNo">650</span><a id="line.650">          "Missing the required parameter 'path' when calling apiContentsPathPatch");</a>
+<span class="sourceLineNo">651</span><a id="line.651">    }</a>
+<span class="sourceLineNo">652</span><a id="line.652"></a>
+<span class="sourceLineNo">653</span><a id="line.653">    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();</a>
+<span class="sourceLineNo">654</span><a id="line.654"></a>
+<span class="sourceLineNo">655</span><a id="line.655">    String localVarPath = "/api/contents/{path}".replace(</a>
+<span class="sourceLineNo">656</span><a id="line.656">        "{path}", ApiClient.urlEncode(path.toString()));</a>
 <span class="sourceLineNo">657</span><a id="line.657"></a>
-<span class="sourceLineNo">658</span><a id="line.658">    localVarRequestBuilder.method("PATCH", HttpRequest.BodyPublishers.noBody());</a>
-<span class="sourceLineNo">659</span><a id="line.659">    if (memberVarReadTimeout != null) {</a>
-<span class="sourceLineNo">660</span><a id="line.660">      localVarRequestBuilder.timeout(memberVarReadTimeout);</a>
-<span class="sourceLineNo">661</span><a id="line.661">    }</a>
-<span class="sourceLineNo">662</span><a id="line.662">    if (memberVarInterceptor != null) {</a>
-<span class="sourceLineNo">663</span><a id="line.663">      memberVarInterceptor.accept(localVarRequestBuilder);</a>
-<span class="sourceLineNo">664</span><a id="line.664">    }</a>
-<span class="sourceLineNo">665</span><a id="line.665">    return localVarRequestBuilder;</a>
-<span class="sourceLineNo">666</span><a id="line.666">  }</a>
-<span class="sourceLineNo">667</span><a id="line.667">  /**</a>
-<span class="sourceLineNo">668</span><a id="line.668">   * Create a new file in the specified path</a>
-<span class="sourceLineNo">669</span><a id="line.669">   * A POST to /api/contents/path creates a New untitled, empty file or</a>
-<span class="sourceLineNo">670</span><a id="line.670">   * directory. A POST to /api/contents/path with body {&amp;#39;copy_from&amp;#39;:</a>
-<span class="sourceLineNo">671</span><a id="line.671">   * &amp;#39;/path/to/OtherNotebook.ipynb&amp;#39;} creates a new copy of OtherNotebook</a>
-<span class="sourceLineNo">672</span><a id="line.672">   * in path.</a>
-<span class="sourceLineNo">673</span><a id="line.673">   * @param path file path (required)</a>
-<span class="sourceLineNo">674</span><a id="line.674">   * @param model  (optional)</a>
-<span class="sourceLineNo">675</span><a id="line.675">   * @return Contents</a>
-<span class="sourceLineNo">676</span><a id="line.676">   * @throws ApiException if fails to make API call</a>
-<span class="sourceLineNo">677</span><a id="line.677">   */</a>
-<span class="sourceLineNo">678</span><a id="line.678">  public Contents apiContentsPathPost(String path, InlineObject1 model)</a>
-<span class="sourceLineNo">679</span><a id="line.679">      throws ApiException {</a>
-<span class="sourceLineNo">680</span><a id="line.680">    ApiResponse&lt;Contents&gt; localVarResponse =</a>
-<span class="sourceLineNo">681</span><a id="line.681">        apiContentsPathPostWithHttpInfo(path, model);</a>
-<span class="sourceLineNo">682</span><a id="line.682">    return localVarResponse.getData();</a>
-<span class="sourceLineNo">683</span><a id="line.683">  }</a>
-<span class="sourceLineNo">684</span><a id="line.684"></a>
-<span class="sourceLineNo">685</span><a id="line.685">  /**</a>
-<span class="sourceLineNo">686</span><a id="line.686">   * Create a new file in the specified path</a>
-<span class="sourceLineNo">687</span><a id="line.687">   * A POST to /api/contents/path creates a New untitled, empty file or</a>
-<span class="sourceLineNo">688</span><a id="line.688">   * directory. A POST to /api/contents/path with body {&amp;#39;copy_from&amp;#39;:</a>
-<span class="sourceLineNo">689</span><a id="line.689">   * &amp;#39;/path/to/OtherNotebook.ipynb&amp;#39;} creates a new copy of OtherNotebook</a>
-<span class="sourceLineNo">690</span><a id="line.690">   * in path.</a>
-<span class="sourceLineNo">691</span><a id="line.691">   * @param path file path (required)</a>
-<span class="sourceLineNo">692</span><a id="line.692">   * @param model  (optional)</a>
-<span class="sourceLineNo">693</span><a id="line.693">   * @return ApiResponse&amp;lt;Contents&amp;gt;</a>
-<span class="sourceLineNo">694</span><a id="line.694">   * @throws ApiException if fails to make API call</a>
-<span class="sourceLineNo">695</span><a id="line.695">   */</a>
-<span class="sourceLineNo">696</span><a id="line.696">  public ApiResponse&lt;Contents&gt;</a>
-<span class="sourceLineNo">697</span><a id="line.697">  apiContentsPathPostWithHttpInfo(String path, InlineObject1 model)</a>
-<span class="sourceLineNo">698</span><a id="line.698">      throws ApiException {</a>
-<span class="sourceLineNo">699</span><a id="line.699">    HttpRequest.Builder localVarRequestBuilder =</a>
-<span class="sourceLineNo">700</span><a id="line.700">        apiContentsPathPostRequestBuilder(path, model);</a>
-<span class="sourceLineNo">701</span><a id="line.701">    try {</a>
-<span class="sourceLineNo">702</span><a id="line.702">      HttpResponse&lt;InputStream&gt; localVarResponse =</a>
-<span class="sourceLineNo">703</span><a id="line.703">          memberVarHttpClient.send(localVarRequestBuilder.build(),</a>
-<span class="sourceLineNo">704</span><a id="line.704">                                   HttpResponse.BodyHandlers.ofInputStream());</a>
-<span class="sourceLineNo">705</span><a id="line.705">      if (memberVarResponseInterceptor != null) {</a>
-<span class="sourceLineNo">706</span><a id="line.706">        memberVarResponseInterceptor.accept(localVarResponse);</a>
-<span class="sourceLineNo">707</span><a id="line.707">      }</a>
-<span class="sourceLineNo">708</span><a id="line.708">      if (localVarResponse.statusCode() / 100 != 2) {</a>
-<span class="sourceLineNo">709</span><a id="line.709">        throw getApiException("apiContentsPathPost", localVarResponse);</a>
-<span class="sourceLineNo">710</span><a id="line.710">      }</a>
-<span class="sourceLineNo">711</span><a id="line.711">      return new ApiResponse&lt;Contents&gt;(</a>
-<span class="sourceLineNo">712</span><a id="line.712">          localVarResponse.statusCode(), localVarResponse.headers().map(),</a>
-<span class="sourceLineNo">713</span><a id="line.713">          memberVarObjectMapper.readValue(localVarResponse.body(),</a>
-<span class="sourceLineNo">714</span><a id="line.714">                                          new TypeReference&lt;Contents&gt;() {}));</a>
-<span class="sourceLineNo">715</span><a id="line.715">    } catch (IOException e) {</a>
-<span class="sourceLineNo">716</span><a id="line.716">      throw new ApiException(e);</a>
-<span class="sourceLineNo">717</span><a id="line.717">    } catch (InterruptedException e) {</a>
-<span class="sourceLineNo">718</span><a id="line.718">      Thread.currentThread().interrupt();</a>
-<span class="sourceLineNo">719</span><a id="line.719">      throw new ApiException(e);</a>
-<span class="sourceLineNo">720</span><a id="line.720">    }</a>
-<span class="sourceLineNo">721</span><a id="line.721">  }</a>
-<span class="sourceLineNo">722</span><a id="line.722"></a>
-<span class="sourceLineNo">723</span><a id="line.723">  private HttpRequest.Builder</a>
-<span class="sourceLineNo">724</span><a id="line.724">  apiContentsPathPostRequestBuilder(String path, InlineObject1 model)</a>
-<span class="sourceLineNo">725</span><a id="line.725">      throws ApiException {</a>
-<span class="sourceLineNo">726</span><a id="line.726">    // verify the required parameter 'path' is set</a>
-<span class="sourceLineNo">727</span><a id="line.727">    if (path == null) {</a>
-<span class="sourceLineNo">728</span><a id="line.728">      throw new ApiException(</a>
-<span class="sourceLineNo">729</span><a id="line.729">          400,</a>
-<span class="sourceLineNo">730</span><a id="line.730">          "Missing the required parameter 'path' when calling apiContentsPathPost");</a>
-<span class="sourceLineNo">731</span><a id="line.731">    }</a>
-<span class="sourceLineNo">732</span><a id="line.732"></a>
-<span class="sourceLineNo">733</span><a id="line.733">    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();</a>
-<span class="sourceLineNo">734</span><a id="line.734"></a>
-<span class="sourceLineNo">735</span><a id="line.735">    String localVarPath = "/api/contents/{path}".replace(</a>
-<span class="sourceLineNo">736</span><a id="line.736">        "{path}", ApiClient.urlEncode(path.toString()));</a>
-<span class="sourceLineNo">737</span><a id="line.737"></a>
-<span class="sourceLineNo">738</span><a id="line.738">    localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));</a>
-<span class="sourceLineNo">739</span><a id="line.739"></a>
-<span class="sourceLineNo">740</span><a id="line.740">    localVarRequestBuilder.header("Content-Type", "application/json");</a>
-<span class="sourceLineNo">741</span><a id="line.741">    localVarRequestBuilder.header("Accept", "application/json");</a>
-<span class="sourceLineNo">742</span><a id="line.742"></a>
-<span class="sourceLineNo">743</span><a id="line.743">    try {</a>
-<span class="sourceLineNo">744</span><a id="line.744">      byte[] localVarPostBody = memberVarObjectMapper.writeValueAsBytes(model);</a>
-<span class="sourceLineNo">745</span><a id="line.745">      localVarRequestBuilder.method(</a>
-<span class="sourceLineNo">746</span><a id="line.746">          "POST", HttpRequest.BodyPublishers.ofByteArray(localVarPostBody));</a>
-<span class="sourceLineNo">747</span><a id="line.747">    } catch (IOException e) {</a>
-<span class="sourceLineNo">748</span><a id="line.748">      throw new ApiException(e);</a>
-<span class="sourceLineNo">749</span><a id="line.749">    }</a>
-<span class="sourceLineNo">750</span><a id="line.750">    if (memberVarReadTimeout != null) {</a>
-<span class="sourceLineNo">751</span><a id="line.751">      localVarRequestBuilder.timeout(memberVarReadTimeout);</a>
-<span class="sourceLineNo">752</span><a id="line.752">    }</a>
-<span class="sourceLineNo">753</span><a id="line.753">    if (memberVarInterceptor != null) {</a>
-<span class="sourceLineNo">754</span><a id="line.754">      memberVarInterceptor.accept(localVarRequestBuilder);</a>
-<span class="sourceLineNo">755</span><a id="line.755">    }</a>
-<span class="sourceLineNo">756</span><a id="line.756">    return localVarRequestBuilder;</a>
-<span class="sourceLineNo">757</span><a id="line.757">  }</a>
-<span class="sourceLineNo">758</span><a id="line.758">  /**</a>
-<span class="sourceLineNo">759</span><a id="line.759">   * Save or upload file.</a>
-<span class="sourceLineNo">760</span><a id="line.760">   * Saves the file in the location specified by name and path.  PUT is very</a>
-<span class="sourceLineNo">761</span><a id="line.761">   * similar to POST, but the requester specifies the name, whereas with POST,</a>
-<span class="sourceLineNo">762</span><a id="line.762">   * the server picks the name.</a>
-<span class="sourceLineNo">763</span><a id="line.763">   * @param path file path (required)</a>
-<span class="sourceLineNo">764</span><a id="line.764">   * @param model  (optional)</a>
-<span class="sourceLineNo">765</span><a id="line.765">   * @return Contents</a>
-<span class="sourceLineNo">766</span><a id="line.766">   * @throws ApiException if fails to make API call</a>
-<span class="sourceLineNo">767</span><a id="line.767">   */</a>
-<span class="sourceLineNo">768</span><a id="line.768">  public Contents apiContentsPathPut(String path, InlineObject model)</a>
-<span class="sourceLineNo">769</span><a id="line.769">      throws ApiException {</a>
-<span class="sourceLineNo">770</span><a id="line.770">    ApiResponse&lt;Contents&gt; localVarResponse =</a>
-<span class="sourceLineNo">771</span><a id="line.771">        apiContentsPathPutWithHttpInfo(path, model);</a>
-<span class="sourceLineNo">772</span><a id="line.772">    return localVarResponse.getData();</a>
-<span class="sourceLineNo">773</span><a id="line.773">  }</a>
-<span class="sourceLineNo">774</span><a id="line.774"></a>
-<span class="sourceLineNo">775</span><a id="line.775">  /**</a>
-<span class="sourceLineNo">776</span><a id="line.776">   * Save or upload file.</a>
-<span class="sourceLineNo">777</span><a id="line.777">   * Saves the file in the location specified by name and path.  PUT is very</a>
-<span class="sourceLineNo">778</span><a id="line.778">   * similar to POST, but the requester specifies the name, whereas with POST,</a>
-<span class="sourceLineNo">779</span><a id="line.779">   * the server picks the name.</a>
-<span class="sourceLineNo">780</span><a id="line.780">   * @param path file path (required)</a>
-<span class="sourceLineNo">781</span><a id="line.781">   * @param model  (optional)</a>
-<span class="sourceLineNo">782</span><a id="line.782">   * @return ApiResponse&amp;lt;Contents&amp;gt;</a>
-<span class="sourceLineNo">783</span><a id="line.783">   * @throws ApiException if fails to make API call</a>
-<span class="sourceLineNo">784</span><a id="line.784">   */</a>
-<span class="sourceLineNo">785</span><a id="line.785">  public ApiResponse&lt;Contents&gt;</a>
-<span class="sourceLineNo">786</span><a id="line.786">  apiContentsPathPutWithHttpInfo(String path, InlineObject model)</a>
-<span class="sourceLineNo">787</span><a id="line.787">      throws ApiException {</a>
-<span class="sourceLineNo">788</span><a id="line.788">    HttpRequest.Builder localVarRequestBuilder =</a>
-<span class="sourceLineNo">789</span><a id="line.789">        apiContentsPathPutRequestBuilder(path, model);</a>
-<span class="sourceLineNo">790</span><a id="line.790">    try {</a>
-<span class="sourceLineNo">791</span><a id="line.791">      HttpResponse&lt;InputStream&gt; localVarResponse =</a>
-<span class="sourceLineNo">792</span><a id="line.792">          memberVarHttpClient.send(localVarRequestBuilder.build(),</a>
-<span class="sourceLineNo">793</span><a id="line.793">                                   HttpResponse.BodyHandlers.ofInputStream());</a>
-<span class="sourceLineNo">794</span><a id="line.794">      if (memberVarResponseInterceptor != null) {</a>
-<span class="sourceLineNo">795</span><a id="line.795">        memberVarResponseInterceptor.accept(localVarResponse);</a>
-<span class="sourceLineNo">796</span><a id="line.796">      }</a>
-<span class="sourceLineNo">797</span><a id="line.797">      if (localVarResponse.statusCode() / 100 != 2) {</a>
-<span class="sourceLineNo">798</span><a id="line.798">        throw getApiException("apiContentsPathPut", localVarResponse);</a>
-<span class="sourceLineNo">799</span><a id="line.799">      }</a>
-<span class="sourceLineNo">800</span><a id="line.800">      return new ApiResponse&lt;Contents&gt;(</a>
-<span class="sourceLineNo">801</span><a id="line.801">          localVarResponse.statusCode(), localVarResponse.headers().map(),</a>
-<span class="sourceLineNo">802</span><a id="line.802">          memberVarObjectMapper.readValue(localVarResponse.body(),</a>
-<span class="sourceLineNo">803</span><a id="line.803">                                          new TypeReference&lt;Contents&gt;() {}));</a>
-<span class="sourceLineNo">804</span><a id="line.804">    } catch (IOException e) {</a>
-<span class="sourceLineNo">805</span><a id="line.805">      throw new ApiException(e);</a>
-<span class="sourceLineNo">806</span><a id="line.806">    } catch (InterruptedException e) {</a>
-<span class="sourceLineNo">807</span><a id="line.807">      Thread.currentThread().interrupt();</a>
-<span class="sourceLineNo">808</span><a id="line.808">      throw new ApiException(e);</a>
-<span class="sourceLineNo">809</span><a id="line.809">    }</a>
-<span class="sourceLineNo">810</span><a id="line.810">  }</a>
-<span class="sourceLineNo">811</span><a id="line.811"></a>
-<span class="sourceLineNo">812</span><a id="line.812">  private HttpRequest.Builder</a>
-<span class="sourceLineNo">813</span><a id="line.813">  apiContentsPathPutRequestBuilder(String path, InlineObject model)</a>
-<span class="sourceLineNo">814</span><a id="line.814">      throws ApiException {</a>
-<span class="sourceLineNo">815</span><a id="line.815">    // verify the required parameter 'path' is set</a>
-<span class="sourceLineNo">816</span><a id="line.816">    if (path == null) {</a>
-<span class="sourceLineNo">817</span><a id="line.817">      throw new ApiException(</a>
-<span class="sourceLineNo">818</span><a id="line.818">          400,</a>
-<span class="sourceLineNo">819</span><a id="line.819">          "Missing the required parameter 'path' when calling apiContentsPathPut");</a>
-<span class="sourceLineNo">820</span><a id="line.820">    }</a>
-<span class="sourceLineNo">821</span><a id="line.821"></a>
-<span class="sourceLineNo">822</span><a id="line.822">    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();</a>
-<span class="sourceLineNo">823</span><a id="line.823"></a>
-<span class="sourceLineNo">824</span><a id="line.824">    String localVarPath = "/api/contents/{path}".replace(</a>
-<span class="sourceLineNo">825</span><a id="line.825">        "{path}", ApiClient.urlEncode(path.toString()));</a>
-<span class="sourceLineNo">826</span><a id="line.826"></a>
-<span class="sourceLineNo">827</span><a id="line.827">    localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));</a>
-<span class="sourceLineNo">828</span><a id="line.828"></a>
-<span class="sourceLineNo">829</span><a id="line.829">    localVarRequestBuilder.header("Content-Type", "application/json");</a>
-<span class="sourceLineNo">830</span><a id="line.830">    localVarRequestBuilder.header("Accept", "application/json");</a>
-<span class="sourceLineNo">831</span><a id="line.831"></a>
-<span class="sourceLineNo">832</span><a id="line.832">    try {</a>
-<span class="sourceLineNo">833</span><a id="line.833">      byte[] localVarPostBody = memberVarObjectMapper.writeValueAsBytes(model);</a>
-<span class="sourceLineNo">834</span><a id="line.834">      localVarRequestBuilder.method(</a>
-<span class="sourceLineNo">835</span><a id="line.835">          "PUT", HttpRequest.BodyPublishers.ofByteArray(localVarPostBody));</a>
-<span class="sourceLineNo">836</span><a id="line.836">    } catch (IOException e) {</a>
-<span class="sourceLineNo">837</span><a id="line.837">      throw new ApiException(e);</a>
-<span class="sourceLineNo">838</span><a id="line.838">    }</a>
-<span class="sourceLineNo">839</span><a id="line.839">    if (memberVarReadTimeout != null) {</a>
-<span class="sourceLineNo">840</span><a id="line.840">      localVarRequestBuilder.timeout(memberVarReadTimeout);</a>
-<span class="sourceLineNo">841</span><a id="line.841">    }</a>
-<span class="sourceLineNo">842</span><a id="line.842">    if (memberVarInterceptor != null) {</a>
-<span class="sourceLineNo">843</span><a id="line.843">      memberVarInterceptor.accept(localVarRequestBuilder);</a>
-<span class="sourceLineNo">844</span><a id="line.844">    }</a>
-<span class="sourceLineNo">845</span><a id="line.845">    return localVarRequestBuilder;</a>
-<span class="sourceLineNo">846</span><a id="line.846">  }</a>
-<span class="sourceLineNo">847</span><a id="line.847">}</a>
+<span class="sourceLineNo">658</span><a id="line.658">    localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));</a>
+<span class="sourceLineNo">659</span><a id="line.659"></a>
+<span class="sourceLineNo">660</span><a id="line.660">    localVarRequestBuilder.header("Accept", "application/json");</a>
+<span class="sourceLineNo">661</span><a id="line.661"></a>
+<span class="sourceLineNo">662</span><a id="line.662">    localVarRequestBuilder.method("PATCH", HttpRequest.BodyPublishers.noBody());</a>
+<span class="sourceLineNo">663</span><a id="line.663">    if (memberVarReadTimeout != null) {</a>
+<span class="sourceLineNo">664</span><a id="line.664">      localVarRequestBuilder.timeout(memberVarReadTimeout);</a>
+<span class="sourceLineNo">665</span><a id="line.665">    }</a>
+<span class="sourceLineNo">666</span><a id="line.666">    if (memberVarInterceptor != null) {</a>
+<span class="sourceLineNo">667</span><a id="line.667">      memberVarInterceptor.accept(localVarRequestBuilder);</a>
+<span class="sourceLineNo">668</span><a id="line.668">    }</a>
+<span class="sourceLineNo">669</span><a id="line.669">    return localVarRequestBuilder;</a>
+<span class="sourceLineNo">670</span><a id="line.670">  }</a>
+<span class="sourceLineNo">671</span><a id="line.671">  /**</a>
+<span class="sourceLineNo">672</span><a id="line.672">   * Create a new file in the specified path</a>
+<span class="sourceLineNo">673</span><a id="line.673">   * A POST to /api/contents/path creates a New untitled, empty file or</a>
+<span class="sourceLineNo">674</span><a id="line.674">   * directory. A POST to /api/contents/path with body {&amp;#39;copy_from&amp;#39;:</a>
+<span class="sourceLineNo">675</span><a id="line.675">   * &amp;#39;/path/to/OtherNotebook.ipynb&amp;#39;} creates a new copy of OtherNotebook</a>
+<span class="sourceLineNo">676</span><a id="line.676">   * in path.</a>
+<span class="sourceLineNo">677</span><a id="line.677">   * @param path file path (required)</a>
+<span class="sourceLineNo">678</span><a id="line.678">   * @param model  (optional)</a>
+<span class="sourceLineNo">679</span><a id="line.679">   * @return Contents</a>
+<span class="sourceLineNo">680</span><a id="line.680">   * @throws ApiException if fails to make API call</a>
+<span class="sourceLineNo">681</span><a id="line.681">   */</a>
+<span class="sourceLineNo">682</span><a id="line.682">  public Contents apiContentsPathPost(String path, InlineObject1 model)</a>
+<span class="sourceLineNo">683</span><a id="line.683">      throws ApiException {</a>
+<span class="sourceLineNo">684</span><a id="line.684">    ApiResponse&lt;Contents&gt; localVarResponse =</a>
+<span class="sourceLineNo">685</span><a id="line.685">        apiContentsPathPostWithHttpInfo(path, model);</a>
+<span class="sourceLineNo">686</span><a id="line.686">    return localVarResponse.getData();</a>
+<span class="sourceLineNo">687</span><a id="line.687">  }</a>
+<span class="sourceLineNo">688</span><a id="line.688"></a>
+<span class="sourceLineNo">689</span><a id="line.689">  /**</a>
+<span class="sourceLineNo">690</span><a id="line.690">   * Create a new file in the specified path</a>
+<span class="sourceLineNo">691</span><a id="line.691">   * A POST to /api/contents/path creates a New untitled, empty file or</a>
+<span class="sourceLineNo">692</span><a id="line.692">   * directory. A POST to /api/contents/path with body {&amp;#39;copy_from&amp;#39;:</a>
+<span class="sourceLineNo">693</span><a id="line.693">   * &amp;#39;/path/to/OtherNotebook.ipynb&amp;#39;} creates a new copy of OtherNotebook</a>
+<span class="sourceLineNo">694</span><a id="line.694">   * in path.</a>
+<span class="sourceLineNo">695</span><a id="line.695">   * @param path file path (required)</a>
+<span class="sourceLineNo">696</span><a id="line.696">   * @param model  (optional)</a>
+<span class="sourceLineNo">697</span><a id="line.697">   * @return ApiResponse&amp;lt;Contents&amp;gt;</a>
+<span class="sourceLineNo">698</span><a id="line.698">   * @throws ApiException if fails to make API call</a>
+<span class="sourceLineNo">699</span><a id="line.699">   */</a>
+<span class="sourceLineNo">700</span><a id="line.700">  public ApiResponse&lt;Contents&gt;</a>
+<span class="sourceLineNo">701</span><a id="line.701">  apiContentsPathPostWithHttpInfo(String path, InlineObject1 model)</a>
+<span class="sourceLineNo">702</span><a id="line.702">      throws ApiException {</a>
+<span class="sourceLineNo">703</span><a id="line.703">    HttpRequest.Builder localVarRequestBuilder =</a>
+<span class="sourceLineNo">704</span><a id="line.704">        apiContentsPathPostRequestBuilder(path, model);</a>
+<span class="sourceLineNo">705</span><a id="line.705">    try {</a>
+<span class="sourceLineNo">706</span><a id="line.706">      HttpResponse&lt;InputStream&gt; localVarResponse =</a>
+<span class="sourceLineNo">707</span><a id="line.707">          memberVarHttpClient.send(localVarRequestBuilder.build(),</a>
+<span class="sourceLineNo">708</span><a id="line.708">                                   HttpResponse.BodyHandlers.ofInputStream());</a>
+<span class="sourceLineNo">709</span><a id="line.709">      if (memberVarResponseInterceptor != null) {</a>
+<span class="sourceLineNo">710</span><a id="line.710">        memberVarResponseInterceptor.accept(localVarResponse);</a>
+<span class="sourceLineNo">711</span><a id="line.711">      }</a>
+<span class="sourceLineNo">712</span><a id="line.712">      if (localVarResponse.statusCode() / 100 != 2) {</a>
+<span class="sourceLineNo">713</span><a id="line.713">        throw getApiException("apiContentsPathPost", localVarResponse);</a>
+<span class="sourceLineNo">714</span><a id="line.714">      }</a>
+<span class="sourceLineNo">715</span><a id="line.715">      return new ApiResponse&lt;Contents&gt;(</a>
+<span class="sourceLineNo">716</span><a id="line.716">          localVarResponse.statusCode(), localVarResponse.headers().map(),</a>
+<span class="sourceLineNo">717</span><a id="line.717">          memberVarObjectMapper.readValue(localVarResponse.body(),</a>
+<span class="sourceLineNo">718</span><a id="line.718">                                          new TypeReference&lt;Contents&gt;() {}));</a>
+<span class="sourceLineNo">719</span><a id="line.719">    } catch (IOException e) {</a>
+<span class="sourceLineNo">720</span><a id="line.720">      throw new ApiException(e);</a>
+<span class="sourceLineNo">721</span><a id="line.721">    } catch (InterruptedException e) {</a>
+<span class="sourceLineNo">722</span><a id="line.722">      Thread.currentThread().interrupt();</a>
+<span class="sourceLineNo">723</span><a id="line.723">      throw new ApiException(e);</a>
+<span class="sourceLineNo">724</span><a id="line.724">    }</a>
+<span class="sourceLineNo">725</span><a id="line.725">  }</a>
+<span class="sourceLineNo">726</span><a id="line.726"></a>
+<span class="sourceLineNo">727</span><a id="line.727">  private HttpRequest.Builder</a>
+<span class="sourceLineNo">728</span><a id="line.728">  apiContentsPathPostRequestBuilder(String path, InlineObject1 model)</a>
+<span class="sourceLineNo">729</span><a id="line.729">      throws ApiException {</a>
+<span class="sourceLineNo">730</span><a id="line.730">    // verify the required parameter 'path' is set</a>
+<span class="sourceLineNo">731</span><a id="line.731">    if (path == null) {</a>
+<span class="sourceLineNo">732</span><a id="line.732">      throw new ApiException(</a>
+<span class="sourceLineNo">733</span><a id="line.733">          400,</a>
+<span class="sourceLineNo">734</span><a id="line.734">          "Missing the required parameter 'path' when calling apiContentsPathPost");</a>
+<span class="sourceLineNo">735</span><a id="line.735">    }</a>
+<span class="sourceLineNo">736</span><a id="line.736"></a>
+<span class="sourceLineNo">737</span><a id="line.737">    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();</a>
+<span class="sourceLineNo">738</span><a id="line.738"></a>
+<span class="sourceLineNo">739</span><a id="line.739">    String localVarPath = "/api/contents/{path}".replace(</a>
+<span class="sourceLineNo">740</span><a id="line.740">        "{path}", ApiClient.urlEncode(path.toString()));</a>
+<span class="sourceLineNo">741</span><a id="line.741"></a>
+<span class="sourceLineNo">742</span><a id="line.742">    localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));</a>
+<span class="sourceLineNo">743</span><a id="line.743"></a>
+<span class="sourceLineNo">744</span><a id="line.744">    localVarRequestBuilder.header("Content-Type", "application/json");</a>
+<span class="sourceLineNo">745</span><a id="line.745">    localVarRequestBuilder.header("Accept", "application/json");</a>
+<span class="sourceLineNo">746</span><a id="line.746"></a>
+<span class="sourceLineNo">747</span><a id="line.747">    try {</a>
+<span class="sourceLineNo">748</span><a id="line.748">      byte[] localVarPostBody = memberVarObjectMapper.writeValueAsBytes(model);</a>
+<span class="sourceLineNo">749</span><a id="line.749">      localVarRequestBuilder.method(</a>
+<span class="sourceLineNo">750</span><a id="line.750">          "POST", HttpRequest.BodyPublishers.ofByteArray(localVarPostBody));</a>
+<span class="sourceLineNo">751</span><a id="line.751">    } catch (IOException e) {</a>
+<span class="sourceLineNo">752</span><a id="line.752">      throw new ApiException(e);</a>
+<span class="sourceLineNo">753</span><a id="line.753">    }</a>
+<span class="sourceLineNo">754</span><a id="line.754">    if (memberVarReadTimeout != null) {</a>
+<span class="sourceLineNo">755</span><a id="line.755">      localVarRequestBuilder.timeout(memberVarReadTimeout);</a>
+<span class="sourceLineNo">756</span><a id="line.756">    }</a>
+<span class="sourceLineNo">757</span><a id="line.757">    if (memberVarInterceptor != null) {</a>
+<span class="sourceLineNo">758</span><a id="line.758">      memberVarInterceptor.accept(localVarRequestBuilder);</a>
+<span class="sourceLineNo">759</span><a id="line.759">    }</a>
+<span class="sourceLineNo">760</span><a id="line.760">    return localVarRequestBuilder;</a>
+<span class="sourceLineNo">761</span><a id="line.761">  }</a>
+<span class="sourceLineNo">762</span><a id="line.762">  /**</a>
+<span class="sourceLineNo">763</span><a id="line.763">   * Save or upload file.</a>
+<span class="sourceLineNo">764</span><a id="line.764">   * Saves the file in the location specified by name and path.  PUT is very</a>
+<span class="sourceLineNo">765</span><a id="line.765">   * similar to POST, but the requester specifies the name, whereas with POST,</a>
+<span class="sourceLineNo">766</span><a id="line.766">   * the server picks the name.</a>
+<span class="sourceLineNo">767</span><a id="line.767">   * @param path file path (required)</a>
+<span class="sourceLineNo">768</span><a id="line.768">   * @param model  (optional)</a>
+<span class="sourceLineNo">769</span><a id="line.769">   * @return Contents</a>
+<span class="sourceLineNo">770</span><a id="line.770">   * @throws ApiException if fails to make API call</a>
+<span class="sourceLineNo">771</span><a id="line.771">   */</a>
+<span class="sourceLineNo">772</span><a id="line.772">  public Contents apiContentsPathPut(String path, InlineObject model)</a>
+<span class="sourceLineNo">773</span><a id="line.773">      throws ApiException {</a>
+<span class="sourceLineNo">774</span><a id="line.774">    ApiResponse&lt;Contents&gt; localVarResponse =</a>
+<span class="sourceLineNo">775</span><a id="line.775">        apiContentsPathPutWithHttpInfo(path, model);</a>
+<span class="sourceLineNo">776</span><a id="line.776">    return localVarResponse.getData();</a>
+<span class="sourceLineNo">777</span><a id="line.777">  }</a>
+<span class="sourceLineNo">778</span><a id="line.778"></a>
+<span class="sourceLineNo">779</span><a id="line.779">  /**</a>
+<span class="sourceLineNo">780</span><a id="line.780">   * Save or upload file.</a>
+<span class="sourceLineNo">781</span><a id="line.781">   * Saves the file in the location specified by name and path.  PUT is very</a>
+<span class="sourceLineNo">782</span><a id="line.782">   * similar to POST, but the requester specifies the name, whereas with POST,</a>
+<span class="sourceLineNo">783</span><a id="line.783">   * the server picks the name.</a>
+<span class="sourceLineNo">784</span><a id="line.784">   * @param path file path (required)</a>
+<span class="sourceLineNo">785</span><a id="line.785">   * @param model  (optional)</a>
+<span class="sourceLineNo">786</span><a id="line.786">   * @return ApiResponse&amp;lt;Contents&amp;gt;</a>
+<span class="sourceLineNo">787</span><a id="line.787">   * @throws ApiException if fails to make API call</a>
+<span class="sourceLineNo">788</span><a id="line.788">   */</a>
+<span class="sourceLineNo">789</span><a id="line.789">  public ApiResponse&lt;Contents&gt;</a>
+<span class="sourceLineNo">790</span><a id="line.790">  apiContentsPathPutWithHttpInfo(String path, InlineObject model)</a>
+<span class="sourceLineNo">791</span><a id="line.791">      throws ApiException {</a>
+<span class="sourceLineNo">792</span><a id="line.792">    HttpRequest.Builder localVarRequestBuilder =</a>
+<span class="sourceLineNo">793</span><a id="line.793">        apiContentsPathPutRequestBuilder(path, model);</a>
+<span class="sourceLineNo">794</span><a id="line.794">    try {</a>
+<span class="sourceLineNo">795</span><a id="line.795">      HttpResponse&lt;InputStream&gt; localVarResponse =</a>
+<span class="sourceLineNo">796</span><a id="line.796">          memberVarHttpClient.send(localVarRequestBuilder.build(),</a>
+<span class="sourceLineNo">797</span><a id="line.797">                                   HttpResponse.BodyHandlers.ofInputStream());</a>
+<span class="sourceLineNo">798</span><a id="line.798">      if (memberVarResponseInterceptor != null) {</a>
+<span class="sourceLineNo">799</span><a id="line.799">        memberVarResponseInterceptor.accept(localVarResponse);</a>
+<span class="sourceLineNo">800</span><a id="line.800">      }</a>
+<span class="sourceLineNo">801</span><a id="line.801">      if (localVarResponse.statusCode() / 100 != 2) {</a>
+<span class="sourceLineNo">802</span><a id="line.802">        throw getApiException("apiContentsPathPut", localVarResponse);</a>
+<span class="sourceLineNo">803</span><a id="line.803">      }</a>
+<span class="sourceLineNo">804</span><a id="line.804">      return new ApiResponse&lt;Contents&gt;(</a>
+<span class="sourceLineNo">805</span><a id="line.805">          localVarResponse.statusCode(), localVarResponse.headers().map(),</a>
+<span class="sourceLineNo">806</span><a id="line.806">          memberVarObjectMapper.readValue(localVarResponse.body(),</a>
+<span class="sourceLineNo">807</span><a id="line.807">                                          new TypeReference&lt;Contents&gt;() {}));</a>
+<span class="sourceLineNo">808</span><a id="line.808">    } catch (IOException e) {</a>
+<span class="sourceLineNo">809</span><a id="line.809">      throw new ApiException(e);</a>
+<span class="sourceLineNo">810</span><a id="line.810">    } catch (InterruptedException e) {</a>
+<span class="sourceLineNo">811</span><a id="line.811">      Thread.currentThread().interrupt();</a>
+<span class="sourceLineNo">812</span><a id="line.812">      throw new ApiException(e);</a>
+<span class="sourceLineNo">813</span><a id="line.813">    }</a>
+<span class="sourceLineNo">814</span><a id="line.814">  }</a>
+<span class="sourceLineNo">815</span><a id="line.815"></a>
+<span class="sourceLineNo">816</span><a id="line.816">  private HttpRequest.Builder</a>
+<span class="sourceLineNo">817</span><a id="line.817">  apiContentsPathPutRequestBuilder(String path, InlineObject model)</a>
+<span class="sourceLineNo">818</span><a id="line.818">      throws ApiException {</a>
+<span class="sourceLineNo">819</span><a id="line.819">    // verify the required parameter 'path' is set</a>
+<span class="sourceLineNo">820</span><a id="line.820">    if (path == null) {</a>
+<span class="sourceLineNo">821</span><a id="line.821">      throw new ApiException(</a>
+<span class="sourceLineNo">822</span><a id="line.822">          400,</a>
+<span class="sourceLineNo">823</span><a id="line.823">          "Missing the required parameter 'path' when calling apiContentsPathPut");</a>
+<span class="sourceLineNo">824</span><a id="line.824">    }</a>
+<span class="sourceLineNo">825</span><a id="line.825"></a>
+<span class="sourceLineNo">826</span><a id="line.826">    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();</a>
+<span class="sourceLineNo">827</span><a id="line.827"></a>
+<span class="sourceLineNo">828</span><a id="line.828">    String localVarPath = "/api/contents/{path}".replace(</a>
+<span class="sourceLineNo">829</span><a id="line.829">        "{path}", ApiClient.urlEncode(path.toString()));</a>
+<span class="sourceLineNo">830</span><a id="line.830"></a>
+<span class="sourceLineNo">831</span><a id="line.831">    localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));</a>
+<span class="sourceLineNo">832</span><a id="line.832"></a>
+<span class="sourceLineNo">833</span><a id="line.833">    localVarRequestBuilder.header("Content-Type", "application/json");</a>
+<span class="sourceLineNo">834</span><a id="line.834">    localVarRequestBuilder.header("Accept", "application/json");</a>
+<span class="sourceLineNo">835</span><a id="line.835"></a>
+<span class="sourceLineNo">836</span><a id="line.836">    try {</a>
+<span class="sourceLineNo">837</span><a id="line.837">      byte[] localVarPostBody = memberVarObjectMapper.writeValueAsBytes(model);</a>
+<span class="sourceLineNo">838</span><a id="line.838">      localVarRequestBuilder.method(</a>
+<span class="sourceLineNo">839</span><a id="line.839">          "PUT", HttpRequest.BodyPublishers.ofByteArray(localVarPostBody));</a>
+<span class="sourceLineNo">840</span><a id="line.840">    } catch (IOException e) {</a>
+<span class="sourceLineNo">841</span><a id="line.841">      throw new ApiException(e);</a>
+<span class="sourceLineNo">842</span><a id="line.842">    }</a>
+<span class="sourceLineNo">843</span><a id="line.843">    if (memberVarReadTimeout != null) {</a>
+<span class="sourceLineNo">844</span><a id="line.844">      localVarRequestBuilder.timeout(memberVarReadTimeout);</a>
+<span class="sourceLineNo">845</span><a id="line.845">    }</a>
+<span class="sourceLineNo">846</span><a id="line.846">    if (memberVarInterceptor != null) {</a>
+<span class="sourceLineNo">847</span><a id="line.847">      memberVarInterceptor.accept(localVarRequestBuilder);</a>
+<span class="sourceLineNo">848</span><a id="line.848">    }</a>
+<span class="sourceLineNo">849</span><a id="line.849">    return localVarRequestBuilder;</a>
+<span class="sourceLineNo">850</span><a id="line.850">  }</a>
+<span class="sourceLineNo">851</span><a id="line.851">}</a>
 
 
 

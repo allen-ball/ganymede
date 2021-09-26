@@ -34,187 +34,246 @@
 <span class="sourceLineNo">025</span><a id="line.25">import ball.xml.XalanConstants;</a>
 <span class="sourceLineNo">026</span><a id="line.26">import java.io.StringWriter;</a>
 <span class="sourceLineNo">027</span><a id="line.27">import java.net.URI;</a>
-<span class="sourceLineNo">028</span><a id="line.28">import java.util.Properties;</a>
-<span class="sourceLineNo">029</span><a id="line.29">import java.util.regex.Pattern;</a>
-<span class="sourceLineNo">030</span><a id="line.30">import javax.xml.transform.Transformer;</a>
-<span class="sourceLineNo">031</span><a id="line.31">import javax.xml.transform.TransformerFactory;</a>
-<span class="sourceLineNo">032</span><a id="line.32">import javax.xml.transform.dom.DOMSource;</a>
-<span class="sourceLineNo">033</span><a id="line.33">import javax.xml.transform.stream.StreamResult;</a>
-<span class="sourceLineNo">034</span><a id="line.34">import lombok.NoArgsConstructor;</a>
-<span class="sourceLineNo">035</span><a id="line.35">import lombok.ToString;</a>
-<span class="sourceLineNo">036</span><a id="line.36">import org.springframework.core.io.ClassPathResource;</a>
-<span class="sourceLineNo">037</span><a id="line.37">import org.w3c.dom.Element;</a>
-<span class="sourceLineNo">038</span><a id="line.38"></a>
-<span class="sourceLineNo">039</span><a id="line.39">import static org.apache.commons.lang3.StringUtils.isNotBlank;</a>
-<span class="sourceLineNo">040</span><a id="line.40">import static javax.xml.transform.OutputKeys.INDENT;</a>
-<span class="sourceLineNo">041</span><a id="line.41">import static javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION;</a>
+<span class="sourceLineNo">028</span><a id="line.28">import java.util.List;</a>
+<span class="sourceLineNo">029</span><a id="line.29">import java.util.Map;</a>
+<span class="sourceLineNo">030</span><a id="line.30">import java.util.Objects;</a>
+<span class="sourceLineNo">031</span><a id="line.31">import java.util.Properties;</a>
+<span class="sourceLineNo">032</span><a id="line.32">import java.util.regex.Pattern;</a>
+<span class="sourceLineNo">033</span><a id="line.33">import java.util.stream.Stream;</a>
+<span class="sourceLineNo">034</span><a id="line.34">import javax.xml.transform.Transformer;</a>
+<span class="sourceLineNo">035</span><a id="line.35">import javax.xml.transform.TransformerFactory;</a>
+<span class="sourceLineNo">036</span><a id="line.36">import javax.xml.transform.dom.DOMSource;</a>
+<span class="sourceLineNo">037</span><a id="line.37">import javax.xml.transform.stream.StreamResult;</a>
+<span class="sourceLineNo">038</span><a id="line.38">import lombok.NoArgsConstructor;</a>
+<span class="sourceLineNo">039</span><a id="line.39">import lombok.ToString;</a>
+<span class="sourceLineNo">040</span><a id="line.40">import org.springframework.core.io.ClassPathResource;</a>
+<span class="sourceLineNo">041</span><a id="line.41">import org.w3c.dom.Element;</a>
 <span class="sourceLineNo">042</span><a id="line.42"></a>
-<span class="sourceLineNo">043</span><a id="line.43">/**</a>
-<span class="sourceLineNo">044</span><a id="line.44"> * {@link Javadoc} utilities.</a>
-<span class="sourceLineNo">045</span><a id="line.45"> *</a>
-<span class="sourceLineNo">046</span><a id="line.46"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
-<span class="sourceLineNo">047</span><a id="line.47"> */</a>
-<span class="sourceLineNo">048</span><a id="line.48">@NoArgsConstructor @ToString</a>
-<span class="sourceLineNo">049</span><a id="line.49">public class Javadoc implements HTMLTemplates, XalanConstants {</a>
-<span class="sourceLineNo">050</span><a id="line.50">    @ToString.Exclude private final Properties properties = new Properties();</a>
-<span class="sourceLineNo">051</span><a id="line.51">    @ToString.Exclude private final Transformer transformer;</a>
-<span class="sourceLineNo">052</span><a id="line.52">    @ToString.Exclude private final FluentDocument document;</a>
-<span class="sourceLineNo">053</span><a id="line.53"></a>
-<span class="sourceLineNo">054</span><a id="line.54">    {</a>
-<span class="sourceLineNo">055</span><a id="line.55">        try (var in = new ClassPathResource("javadoc-map.properties").getInputStream()) {</a>
-<span class="sourceLineNo">056</span><a id="line.56">            properties.load(in);</a>
-<span class="sourceLineNo">057</span><a id="line.57"></a>
-<span class="sourceLineNo">058</span><a id="line.58">            transformer = TransformerFactory.newInstance().newTransformer();</a>
-<span class="sourceLineNo">059</span><a id="line.59">            transformer.setOutputProperty(OMIT_XML_DECLARATION, YES);</a>
-<span class="sourceLineNo">060</span><a id="line.60">            transformer.setOutputProperty(INDENT, NO);</a>
-<span class="sourceLineNo">061</span><a id="line.61"></a>
-<span class="sourceLineNo">062</span><a id="line.62">            document =</a>
-<span class="sourceLineNo">063</span><a id="line.63">                FluentDocumentBuilderFactory.newInstance()</a>
-<span class="sourceLineNo">064</span><a id="line.64">                .newDocumentBuilder()</a>
-<span class="sourceLineNo">065</span><a id="line.65">                .newDocument();</a>
-<span class="sourceLineNo">066</span><a id="line.66">            document</a>
-<span class="sourceLineNo">067</span><a id="line.67">                .add(element("html",</a>
-<span class="sourceLineNo">068</span><a id="line.68">                             element("head",</a>
-<span class="sourceLineNo">069</span><a id="line.69">                                     element("meta",</a>
-<span class="sourceLineNo">070</span><a id="line.70">                                             attr("charset", "utf-8"))),</a>
-<span class="sourceLineNo">071</span><a id="line.71">                             element("body")));</a>
-<span class="sourceLineNo">072</span><a id="line.72">        } catch (Exception exception) {</a>
-<span class="sourceLineNo">073</span><a id="line.73">            throw new ExceptionInInitializerError(exception);</a>
-<span class="sourceLineNo">074</span><a id="line.74">        }</a>
-<span class="sourceLineNo">075</span><a id="line.75">    }</a>
-<span class="sourceLineNo">076</span><a id="line.76"></a>
-<span class="sourceLineNo">077</span><a id="line.77">    /**</a>
-<span class="sourceLineNo">078</span><a id="line.78">     * Create am {@code &lt;a/&gt;} element from a possibly simple class name and</a>
-<span class="sourceLineNo">079</span><a id="line.79">     * an implementation type ({@link Class}).</a>
-<span class="sourceLineNo">080</span><a id="line.80">     *</a>
-<span class="sourceLineNo">081</span><a id="line.81">     * @param   name            The (possibly simple) class name.</a>
-<span class="sourceLineNo">082</span><a id="line.82">     * @param   type            The {@link Class}.</a>
-<span class="sourceLineNo">083</span><a id="line.83">     *</a>
-<span class="sourceLineNo">084</span><a id="line.84">     * @return  {@code &lt;a/&gt;} {@link Element} (serialized to {@link String})</a>
-<span class="sourceLineNo">085</span><a id="line.85">     */</a>
-<span class="sourceLineNo">086</span><a id="line.86">    public String a(String name, Class&lt;?&gt; type) {</a>
-<span class="sourceLineNo">087</span><a id="line.87">        var writer = new StringWriter();</a>
-<span class="sourceLineNo">088</span><a id="line.88">        var href = href(name, type);</a>
-<span class="sourceLineNo">089</span><a id="line.89"></a>
-<span class="sourceLineNo">090</span><a id="line.90">        if (name != null || href != null) {</a>
-<span class="sourceLineNo">091</span><a id="line.91">            var node = a(href, name);</a>
-<span class="sourceLineNo">092</span><a id="line.92"></a>
-<span class="sourceLineNo">093</span><a id="line.93">            ((Element) node).setAttribute("target", "_newtab");</a>
-<span class="sourceLineNo">094</span><a id="line.94"></a>
-<span class="sourceLineNo">095</span><a id="line.95">            try {</a>
-<span class="sourceLineNo">096</span><a id="line.96">                transformer.transform(new DOMSource(node), new StreamResult(writer));</a>
-<span class="sourceLineNo">097</span><a id="line.97">            } catch (RuntimeException exception) {</a>
-<span class="sourceLineNo">098</span><a id="line.98">                throw exception;</a>
-<span class="sourceLineNo">099</span><a id="line.99">            } catch (Error error) {</a>
-<span class="sourceLineNo">100</span><a id="line.100">                throw error;</a>
-<span class="sourceLineNo">101</span><a id="line.101">            } catch (Exception exception) {</a>
-<span class="sourceLineNo">102</span><a id="line.102">                throw new RuntimeException(exception);</a>
-<span class="sourceLineNo">103</span><a id="line.103">            }</a>
-<span class="sourceLineNo">104</span><a id="line.104">        }</a>
-<span class="sourceLineNo">105</span><a id="line.105"></a>
-<span class="sourceLineNo">106</span><a id="line.106">        return writer.toString();</a>
-<span class="sourceLineNo">107</span><a id="line.107">    }</a>
-<span class="sourceLineNo">108</span><a id="line.108"></a>
-<span class="sourceLineNo">109</span><a id="line.109">    /**</a>
-<span class="sourceLineNo">110</span><a id="line.110">     * Get a Javadoc link href from a canonical class name.</a>
-<span class="sourceLineNo">111</span><a id="line.111">     *</a>
-<span class="sourceLineNo">112</span><a id="line.112">     * @param   name            The canonical class name.</a>
-<span class="sourceLineNo">113</span><a id="line.113">     *</a>
-<span class="sourceLineNo">114</span><a id="line.114">     * @return  The URL (as a {@link String}) or {@code null} if the package</a>
-<span class="sourceLineNo">115</span><a id="line.115">     *          is not known.</a>
-<span class="sourceLineNo">116</span><a id="line.116">     */</a>
-<span class="sourceLineNo">117</span><a id="line.117">    public URI href(String name) {</a>
-<span class="sourceLineNo">118</span><a id="line.118">        URI uri = null;</a>
-<span class="sourceLineNo">119</span><a id="line.119"></a>
-<span class="sourceLineNo">120</span><a id="line.120">        if (name != null) {</a>
-<span class="sourceLineNo">121</span><a id="line.121">            var offset = name.lastIndexOf(".");</a>
-<span class="sourceLineNo">122</span><a id="line.122"></a>
-<span class="sourceLineNo">123</span><a id="line.123">            if (offset &gt; 0) {</a>
-<span class="sourceLineNo">124</span><a id="line.124">                uri = href(name.substring(0, offset), name.substring(offset + 1));</a>
-<span class="sourceLineNo">125</span><a id="line.125">            }</a>
-<span class="sourceLineNo">126</span><a id="line.126">        }</a>
-<span class="sourceLineNo">127</span><a id="line.127"></a>
-<span class="sourceLineNo">128</span><a id="line.128">        return uri;</a>
-<span class="sourceLineNo">129</span><a id="line.129">    }</a>
+<span class="sourceLineNo">043</span><a id="line.43">import static java.util.stream.Collectors.toMap;</a>
+<span class="sourceLineNo">044</span><a id="line.44">import static javax.xml.transform.OutputKeys.INDENT;</a>
+<span class="sourceLineNo">045</span><a id="line.45">import static javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION;</a>
+<span class="sourceLineNo">046</span><a id="line.46"></a>
+<span class="sourceLineNo">047</span><a id="line.47">/**</a>
+<span class="sourceLineNo">048</span><a id="line.48"> * {@link Javadoc} utilities.</a>
+<span class="sourceLineNo">049</span><a id="line.49"> *</a>
+<span class="sourceLineNo">050</span><a id="line.50"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
+<span class="sourceLineNo">051</span><a id="line.51"> */</a>
+<span class="sourceLineNo">052</span><a id="line.52">@NoArgsConstructor @ToString</a>
+<span class="sourceLineNo">053</span><a id="line.53">public class Javadoc implements HTMLTemplates, XalanConstants {</a>
+<span class="sourceLineNo">054</span><a id="line.54">    private static final Map&lt;String,Class&lt;?&gt;&gt; PRIMITIVES =</a>
+<span class="sourceLineNo">055</span><a id="line.55">        Stream.of(Boolean.TYPE, Byte.TYPE, Character.TYPE, Double.TYPE,</a>
+<span class="sourceLineNo">056</span><a id="line.56">                  Float.TYPE, Integer.TYPE, Long.TYPE, Short.TYPE, Void.TYPE)</a>
+<span class="sourceLineNo">057</span><a id="line.57">        .collect(toMap(k -&gt; k.getName(), v -&gt; v));</a>
+<span class="sourceLineNo">058</span><a id="line.58"></a>
+<span class="sourceLineNo">059</span><a id="line.59">    @ToString.Exclude private final Properties properties = new Properties();</a>
+<span class="sourceLineNo">060</span><a id="line.60">    @ToString.Exclude private final Transformer transformer;</a>
+<span class="sourceLineNo">061</span><a id="line.61">    @ToString.Exclude private final FluentDocument document;</a>
+<span class="sourceLineNo">062</span><a id="line.62"></a>
+<span class="sourceLineNo">063</span><a id="line.63">    {</a>
+<span class="sourceLineNo">064</span><a id="line.64">        try (var in = new ClassPathResource("javadoc-map.properties").getInputStream()) {</a>
+<span class="sourceLineNo">065</span><a id="line.65">            properties.load(in);</a>
+<span class="sourceLineNo">066</span><a id="line.66"></a>
+<span class="sourceLineNo">067</span><a id="line.67">            transformer = TransformerFactory.newInstance().newTransformer();</a>
+<span class="sourceLineNo">068</span><a id="line.68">            transformer.setOutputProperty(OMIT_XML_DECLARATION, YES);</a>
+<span class="sourceLineNo">069</span><a id="line.69">            transformer.setOutputProperty(INDENT, NO);</a>
+<span class="sourceLineNo">070</span><a id="line.70"></a>
+<span class="sourceLineNo">071</span><a id="line.71">            document =</a>
+<span class="sourceLineNo">072</span><a id="line.72">                FluentDocumentBuilderFactory.newInstance()</a>
+<span class="sourceLineNo">073</span><a id="line.73">                .newDocumentBuilder()</a>
+<span class="sourceLineNo">074</span><a id="line.74">                .newDocument();</a>
+<span class="sourceLineNo">075</span><a id="line.75">            document</a>
+<span class="sourceLineNo">076</span><a id="line.76">                .add(element("html",</a>
+<span class="sourceLineNo">077</span><a id="line.77">                             element("head",</a>
+<span class="sourceLineNo">078</span><a id="line.78">                                     element("meta",</a>
+<span class="sourceLineNo">079</span><a id="line.79">                                             attr("charset", "utf-8"))),</a>
+<span class="sourceLineNo">080</span><a id="line.80">                             element("body")));</a>
+<span class="sourceLineNo">081</span><a id="line.81">        } catch (Exception exception) {</a>
+<span class="sourceLineNo">082</span><a id="line.82">            throw new ExceptionInInitializerError(exception);</a>
+<span class="sourceLineNo">083</span><a id="line.83">        }</a>
+<span class="sourceLineNo">084</span><a id="line.84">    }</a>
+<span class="sourceLineNo">085</span><a id="line.85"></a>
+<span class="sourceLineNo">086</span><a id="line.86">    /**</a>
+<span class="sourceLineNo">087</span><a id="line.87">     * Create an {@code &lt;a/&gt;} element from a possibly simple class name and</a>
+<span class="sourceLineNo">088</span><a id="line.88">     * an implementation type ({@link Class}).</a>
+<span class="sourceLineNo">089</span><a id="line.89">     *</a>
+<span class="sourceLineNo">090</span><a id="line.90">     * @param   name            The (possibly simple) class name.</a>
+<span class="sourceLineNo">091</span><a id="line.91">     * @param   type            The {@link Class}.</a>
+<span class="sourceLineNo">092</span><a id="line.92">     *</a>
+<span class="sourceLineNo">093</span><a id="line.93">     * @return  {@code &lt;a/&gt;} {@link Element} (serialized to {@link String})</a>
+<span class="sourceLineNo">094</span><a id="line.94">     */</a>
+<span class="sourceLineNo">095</span><a id="line.95">    public String link(String name, Class&lt;?&gt; type) {</a>
+<span class="sourceLineNo">096</span><a id="line.96">        var writer = new StringWriter();</a>
+<span class="sourceLineNo">097</span><a id="line.97">        var declaredType = type;</a>
+<span class="sourceLineNo">098</span><a id="line.98"></a>
+<span class="sourceLineNo">099</span><a id="line.99">        if (name == null) {</a>
+<span class="sourceLineNo">100</span><a id="line.100">            if (type != null) {</a>
+<span class="sourceLineNo">101</span><a id="line.101">                var dimensions = "";</a>
+<span class="sourceLineNo">102</span><a id="line.102"></a>
+<span class="sourceLineNo">103</span><a id="line.103">                while (type.isArray()) {</a>
+<span class="sourceLineNo">104</span><a id="line.104">                    dimensions += "[]";</a>
+<span class="sourceLineNo">105</span><a id="line.105">                    type = type.getComponentType();</a>
+<span class="sourceLineNo">106</span><a id="line.106">                }</a>
+<span class="sourceLineNo">107</span><a id="line.107"></a>
+<span class="sourceLineNo">108</span><a id="line.108">                name = getCanonicalName(type);</a>
+<span class="sourceLineNo">109</span><a id="line.109">                name += dimensions;</a>
+<span class="sourceLineNo">110</span><a id="line.110">            }</a>
+<span class="sourceLineNo">111</span><a id="line.111">        }</a>
+<span class="sourceLineNo">112</span><a id="line.112"></a>
+<span class="sourceLineNo">113</span><a id="line.113">        if (name != null) {</a>
+<span class="sourceLineNo">114</span><a id="line.114">            var substrings = name.split("\\[|&lt;", 2);</a>
+<span class="sourceLineNo">115</span><a id="line.115">            var suffix = name.substring(substrings[0].length());</a>
+<span class="sourceLineNo">116</span><a id="line.116"></a>
+<span class="sourceLineNo">117</span><a id="line.117">            name = substrings[0];</a>
+<span class="sourceLineNo">118</span><a id="line.118"></a>
+<span class="sourceLineNo">119</span><a id="line.119">            declaredType = typeOf(name, List.of("java.lang"));</a>
+<span class="sourceLineNo">120</span><a id="line.120"></a>
+<span class="sourceLineNo">121</span><a id="line.121">            if (declaredType == null) {</a>
+<span class="sourceLineNo">122</span><a id="line.122">                if (type != null) {</a>
+<span class="sourceLineNo">123</span><a id="line.123">                    while (type.isArray()) {</a>
+<span class="sourceLineNo">124</span><a id="line.124">                        type = type.getComponentType();</a>
+<span class="sourceLineNo">125</span><a id="line.125">                    }</a>
+<span class="sourceLineNo">126</span><a id="line.126"></a>
+<span class="sourceLineNo">127</span><a id="line.127">                    declaredType = declaredTypeOf(name, type);</a>
+<span class="sourceLineNo">128</span><a id="line.128">                }</a>
+<span class="sourceLineNo">129</span><a id="line.129">            }</a>
 <span class="sourceLineNo">130</span><a id="line.130"></a>
-<span class="sourceLineNo">131</span><a id="line.131">    /**</a>
-<span class="sourceLineNo">132</span><a id="line.132">     * Get a Javadoc link href from a possibly simple class name and a value</a>
-<span class="sourceLineNo">133</span><a id="line.133">     * ({@link Object}).</a>
-<span class="sourceLineNo">134</span><a id="line.134">     *</a>
-<span class="sourceLineNo">135</span><a id="line.135">     * @param   name            The (possibly simple) class name.</a>
-<span class="sourceLineNo">136</span><a id="line.136">     * @param   value           The {@link Object}.</a>
-<span class="sourceLineNo">137</span><a id="line.137">     *</a>
-<span class="sourceLineNo">138</span><a id="line.138">     * @return  The URL (as a {@link URI}) or {@code null} if the package</a>
-<span class="sourceLineNo">139</span><a id="line.139">     *          cannot be determined.</a>
-<span class="sourceLineNo">140</span><a id="line.140">     */</a>
-<span class="sourceLineNo">141</span><a id="line.141">    public URI href(String name, Object value) {</a>
-<span class="sourceLineNo">142</span><a id="line.142">        return href(name, (value != null) ? value.getClass() : null);</a>
-<span class="sourceLineNo">143</span><a id="line.143">    }</a>
-<span class="sourceLineNo">144</span><a id="line.144"></a>
-<span class="sourceLineNo">145</span><a id="line.145">    /**</a>
-<span class="sourceLineNo">146</span><a id="line.146">     * Get a Javadoc link href from a possibly simple class name and an</a>
-<span class="sourceLineNo">147</span><a id="line.147">     * implementation type ({@link Class}).</a>
-<span class="sourceLineNo">148</span><a id="line.148">     *</a>
-<span class="sourceLineNo">149</span><a id="line.149">     * @param   name            The (possibly simple) class name.</a>
-<span class="sourceLineNo">150</span><a id="line.150">     * @param   type            The {@link Class}.</a>
-<span class="sourceLineNo">151</span><a id="line.151">     *</a>
-<span class="sourceLineNo">152</span><a id="line.152">     * @return  The URL (as a {@link URI}) or {@code null} if the package</a>
-<span class="sourceLineNo">153</span><a id="line.153">     *          cannot be determined.</a>
-<span class="sourceLineNo">154</span><a id="line.154">     */</a>
-<span class="sourceLineNo">155</span><a id="line.155">    public URI href(String name, Class&lt;?&gt; type) {</a>
-<span class="sourceLineNo">156</span><a id="line.156">        URI uri = null;</a>
+<span class="sourceLineNo">131</span><a id="line.131">            if (declaredType != null) {</a>
+<span class="sourceLineNo">132</span><a id="line.132">                name = getCanonicalName(declaredType);</a>
+<span class="sourceLineNo">133</span><a id="line.133">            }</a>
+<span class="sourceLineNo">134</span><a id="line.134"></a>
+<span class="sourceLineNo">135</span><a id="line.135">            name += suffix;</a>
+<span class="sourceLineNo">136</span><a id="line.136">        }</a>
+<span class="sourceLineNo">137</span><a id="line.137"></a>
+<span class="sourceLineNo">138</span><a id="line.138">        if (name != null) {</a>
+<span class="sourceLineNo">139</span><a id="line.139">            var node = code(name);</a>
+<span class="sourceLineNo">140</span><a id="line.140">            var href = href(declaredType);</a>
+<span class="sourceLineNo">141</span><a id="line.141"></a>
+<span class="sourceLineNo">142</span><a id="line.142">            if (href != null) {</a>
+<span class="sourceLineNo">143</span><a id="line.143">                node = a(href, node);</a>
+<span class="sourceLineNo">144</span><a id="line.144">                ((Element) node).setAttribute("target", "_newtab");</a>
+<span class="sourceLineNo">145</span><a id="line.145">            }</a>
+<span class="sourceLineNo">146</span><a id="line.146"></a>
+<span class="sourceLineNo">147</span><a id="line.147">            try {</a>
+<span class="sourceLineNo">148</span><a id="line.148">                transformer.transform(new DOMSource(node), new StreamResult(writer));</a>
+<span class="sourceLineNo">149</span><a id="line.149">            } catch (RuntimeException exception) {</a>
+<span class="sourceLineNo">150</span><a id="line.150">                throw exception;</a>
+<span class="sourceLineNo">151</span><a id="line.151">            } catch (Error error) {</a>
+<span class="sourceLineNo">152</span><a id="line.152">                throw error;</a>
+<span class="sourceLineNo">153</span><a id="line.153">            } catch (Throwable throwable) {</a>
+<span class="sourceLineNo">154</span><a id="line.154">                throw new RuntimeException(throwable);</a>
+<span class="sourceLineNo">155</span><a id="line.155">            }</a>
+<span class="sourceLineNo">156</span><a id="line.156">        }</a>
 <span class="sourceLineNo">157</span><a id="line.157"></a>
-<span class="sourceLineNo">158</span><a id="line.158">        if (name != null) {</a>
-<span class="sourceLineNo">159</span><a id="line.159">            if (name.lastIndexOf(".") != -1) {</a>
-<span class="sourceLineNo">160</span><a id="line.160">                uri = href(name);</a>
-<span class="sourceLineNo">161</span><a id="line.161">            } else {</a>
-<span class="sourceLineNo">162</span><a id="line.162">                if (type != null) {</a>
-<span class="sourceLineNo">163</span><a id="line.163">                    if (name.equals(type.getSimpleName())) {</a>
-<span class="sourceLineNo">164</span><a id="line.164">                        uri = href(type.getPackage().getName(), name);</a>
-<span class="sourceLineNo">165</span><a id="line.165">                    } else {</a>
-<span class="sourceLineNo">166</span><a id="line.166">                        uri = href(name, type.getSuperclass());</a>
-<span class="sourceLineNo">167</span><a id="line.167"></a>
-<span class="sourceLineNo">168</span><a id="line.168">                        if (uri == null) {</a>
-<span class="sourceLineNo">169</span><a id="line.169">                            for (Class&lt;?&gt; supertype : type.getInterfaces()) {</a>
-<span class="sourceLineNo">170</span><a id="line.170">                                uri = href(name, supertype);</a>
-<span class="sourceLineNo">171</span><a id="line.171"></a>
-<span class="sourceLineNo">172</span><a id="line.172">                                if (uri != null) {</a>
-<span class="sourceLineNo">173</span><a id="line.173">                                    break;</a>
-<span class="sourceLineNo">174</span><a id="line.174">                                }</a>
-<span class="sourceLineNo">175</span><a id="line.175">                            }</a>
-<span class="sourceLineNo">176</span><a id="line.176">                        }</a>
-<span class="sourceLineNo">177</span><a id="line.177">                    }</a>
+<span class="sourceLineNo">158</span><a id="line.158">        return writer.toString();</a>
+<span class="sourceLineNo">159</span><a id="line.159">    }</a>
+<span class="sourceLineNo">160</span><a id="line.160"></a>
+<span class="sourceLineNo">161</span><a id="line.161">    private Class&lt;?&gt; typeOf(String name, List&lt;String&gt; packages) {</a>
+<span class="sourceLineNo">162</span><a id="line.162">        var type = PRIMITIVES.get(name);</a>
+<span class="sourceLineNo">163</span><a id="line.163"></a>
+<span class="sourceLineNo">164</span><a id="line.164">        if (type == null) {</a>
+<span class="sourceLineNo">165</span><a id="line.165">            try {</a>
+<span class="sourceLineNo">166</span><a id="line.166">                type = Class.forName(name);</a>
+<span class="sourceLineNo">167</span><a id="line.167">            } catch (Exception exception) {</a>
+<span class="sourceLineNo">168</span><a id="line.168">            }</a>
+<span class="sourceLineNo">169</span><a id="line.169">        }</a>
+<span class="sourceLineNo">170</span><a id="line.170"></a>
+<span class="sourceLineNo">171</span><a id="line.171">        if (type == null) {</a>
+<span class="sourceLineNo">172</span><a id="line.172">            for (var pkg : packages) {</a>
+<span class="sourceLineNo">173</span><a id="line.173">                try {</a>
+<span class="sourceLineNo">174</span><a id="line.174">                    type = Class.forName(pkg + "." + type);</a>
+<span class="sourceLineNo">175</span><a id="line.175">                    break;</a>
+<span class="sourceLineNo">176</span><a id="line.176">                } catch (Exception exception) {</a>
+<span class="sourceLineNo">177</span><a id="line.177">                    continue;</a>
 <span class="sourceLineNo">178</span><a id="line.178">                }</a>
 <span class="sourceLineNo">179</span><a id="line.179">            }</a>
 <span class="sourceLineNo">180</span><a id="line.180">        }</a>
 <span class="sourceLineNo">181</span><a id="line.181"></a>
-<span class="sourceLineNo">182</span><a id="line.182">        return uri;</a>
+<span class="sourceLineNo">182</span><a id="line.182">        return type;</a>
 <span class="sourceLineNo">183</span><a id="line.183">    }</a>
 <span class="sourceLineNo">184</span><a id="line.184"></a>
-<span class="sourceLineNo">185</span><a id="line.185">    private URI href(String pkg, String name) {</a>
-<span class="sourceLineNo">186</span><a id="line.186">        String string = null;</a>
+<span class="sourceLineNo">185</span><a id="line.185">    private Class&lt;?&gt; declaredTypeOf(String name, Class&lt;?&gt; type) {</a>
+<span class="sourceLineNo">186</span><a id="line.186">        Class&lt;?&gt; declaredType = null;</a>
 <span class="sourceLineNo">187</span><a id="line.187"></a>
-<span class="sourceLineNo">188</span><a id="line.188">        if (isNotBlank(pkg) &amp;&amp; isNotBlank(name)) {</a>
-<span class="sourceLineNo">189</span><a id="line.189">            string = properties.getProperty(pkg);</a>
-<span class="sourceLineNo">190</span><a id="line.190"></a>
-<span class="sourceLineNo">191</span><a id="line.191">            if (string != null) {</a>
-<span class="sourceLineNo">192</span><a id="line.192">                var module = properties.getProperty(pkg + "-module");</a>
-<span class="sourceLineNo">193</span><a id="line.193"></a>
-<span class="sourceLineNo">194</span><a id="line.194">                if (module != null) {</a>
-<span class="sourceLineNo">195</span><a id="line.195">                    string += module + "/";</a>
-<span class="sourceLineNo">196</span><a id="line.196">                }</a>
+<span class="sourceLineNo">188</span><a id="line.188">        if (type != null) {</a>
+<span class="sourceLineNo">189</span><a id="line.189">            if (type.isPrimitive()</a>
+<span class="sourceLineNo">190</span><a id="line.190">                || type.getName().equals(name)</a>
+<span class="sourceLineNo">191</span><a id="line.191">                || type.getName().endsWith("." + name)</a>
+<span class="sourceLineNo">192</span><a id="line.192">                || getCanonicalName(type).equals(name)</a>
+<span class="sourceLineNo">193</span><a id="line.193">                || getCanonicalName(type).endsWith("." + name)) {</a>
+<span class="sourceLineNo">194</span><a id="line.194">                declaredType = type;</a>
+<span class="sourceLineNo">195</span><a id="line.195">            } else {</a>
+<span class="sourceLineNo">196</span><a id="line.196">                declaredType = declaredTypeOf(name, type.getSuperclass());</a>
 <span class="sourceLineNo">197</span><a id="line.197"></a>
-<span class="sourceLineNo">198</span><a id="line.198">                string += String.join("/", pkg.split(Pattern.quote(".")));</a>
-<span class="sourceLineNo">199</span><a id="line.199">                string += "/" + name + ".html" + "?is-external=true";</a>
-<span class="sourceLineNo">200</span><a id="line.200">            }</a>
-<span class="sourceLineNo">201</span><a id="line.201">        }</a>
-<span class="sourceLineNo">202</span><a id="line.202"></a>
-<span class="sourceLineNo">203</span><a id="line.203">        return (string != null) ? URI.create(string) : null;</a>
-<span class="sourceLineNo">204</span><a id="line.204">    }</a>
-<span class="sourceLineNo">205</span><a id="line.205"></a>
-<span class="sourceLineNo">206</span><a id="line.206">    @Override</a>
-<span class="sourceLineNo">207</span><a id="line.207">    public FluentDocument document() { return document; }</a>
-<span class="sourceLineNo">208</span><a id="line.208">}</a>
+<span class="sourceLineNo">198</span><a id="line.198">                if (declaredType == null) {</a>
+<span class="sourceLineNo">199</span><a id="line.199">                    for (Class&lt;?&gt; supertype : type.getInterfaces()) {</a>
+<span class="sourceLineNo">200</span><a id="line.200">                        declaredType = declaredTypeOf(name, supertype);</a>
+<span class="sourceLineNo">201</span><a id="line.201"></a>
+<span class="sourceLineNo">202</span><a id="line.202">                        if (declaredType != null) {</a>
+<span class="sourceLineNo">203</span><a id="line.203">                            break;</a>
+<span class="sourceLineNo">204</span><a id="line.204">                        }</a>
+<span class="sourceLineNo">205</span><a id="line.205">                    }</a>
+<span class="sourceLineNo">206</span><a id="line.206">                }</a>
+<span class="sourceLineNo">207</span><a id="line.207">            }</a>
+<span class="sourceLineNo">208</span><a id="line.208">        }</a>
+<span class="sourceLineNo">209</span><a id="line.209"></a>
+<span class="sourceLineNo">210</span><a id="line.210">        return declaredType;</a>
+<span class="sourceLineNo">211</span><a id="line.211">    }</a>
+<span class="sourceLineNo">212</span><a id="line.212"></a>
+<span class="sourceLineNo">213</span><a id="line.213">    private URI href(Class&lt;?&gt; type) {</a>
+<span class="sourceLineNo">214</span><a id="line.214">        String uri = null;</a>
+<span class="sourceLineNo">215</span><a id="line.215"></a>
+<span class="sourceLineNo">216</span><a id="line.216">        if (type != null &amp;&amp; (! type.isPrimitive())) {</a>
+<span class="sourceLineNo">217</span><a id="line.217">            var pkg = type.getPackageName();</a>
+<span class="sourceLineNo">218</span><a id="line.218"></a>
+<span class="sourceLineNo">219</span><a id="line.219">            uri = properties.getProperty(pkg);</a>
+<span class="sourceLineNo">220</span><a id="line.220"></a>
+<span class="sourceLineNo">221</span><a id="line.221">            if (uri != null) {</a>
+<span class="sourceLineNo">222</span><a id="line.222">                var module = properties.getProperty(pkg + "-module");</a>
+<span class="sourceLineNo">223</span><a id="line.223"></a>
+<span class="sourceLineNo">224</span><a id="line.224">                if (module != null) {</a>
+<span class="sourceLineNo">225</span><a id="line.225">                    uri += module + "/";</a>
+<span class="sourceLineNo">226</span><a id="line.226">                }</a>
+<span class="sourceLineNo">227</span><a id="line.227"></a>
+<span class="sourceLineNo">228</span><a id="line.228">                uri += String.join("/", pkg.split(Pattern.quote(".")));</a>
+<span class="sourceLineNo">229</span><a id="line.229"></a>
+<span class="sourceLineNo">230</span><a id="line.230">                var name = type.getSimpleName();</a>
+<span class="sourceLineNo">231</span><a id="line.231"></a>
+<span class="sourceLineNo">232</span><a id="line.232">                while (type.getEnclosingClass() != null) {</a>
+<span class="sourceLineNo">233</span><a id="line.233">                    type = type.getEnclosingClass();</a>
+<span class="sourceLineNo">234</span><a id="line.234">                    name = type.getSimpleName() + "." + name;</a>
+<span class="sourceLineNo">235</span><a id="line.235">                }</a>
+<span class="sourceLineNo">236</span><a id="line.236"></a>
+<span class="sourceLineNo">237</span><a id="line.237">                uri += "/" + name + ".html";</a>
+<span class="sourceLineNo">238</span><a id="line.238">                uri += "?is-external=true";</a>
+<span class="sourceLineNo">239</span><a id="line.239">            }</a>
+<span class="sourceLineNo">240</span><a id="line.240">        }</a>
+<span class="sourceLineNo">241</span><a id="line.241"></a>
+<span class="sourceLineNo">242</span><a id="line.242">        return (uri != null) ? URI.create(uri) : null;</a>
+<span class="sourceLineNo">243</span><a id="line.243">    }</a>
+<span class="sourceLineNo">244</span><a id="line.244"></a>
+<span class="sourceLineNo">245</span><a id="line.245">    private String getCanonicalName(Class&lt;?&gt; type) {</a>
+<span class="sourceLineNo">246</span><a id="line.246">        var name = type.getName();</a>
+<span class="sourceLineNo">247</span><a id="line.247"></a>
+<span class="sourceLineNo">248</span><a id="line.248">        return Objects.requireNonNullElse(type.getCanonicalName(), name);</a>
+<span class="sourceLineNo">249</span><a id="line.249">    }</a>
+<span class="sourceLineNo">250</span><a id="line.250"></a>
+<span class="sourceLineNo">251</span><a id="line.251">    private String getPackageQualifiedName(Class&lt;?&gt; type) {</a>
+<span class="sourceLineNo">252</span><a id="line.252">        var name = getCanonicalName(type);</a>
+<span class="sourceLineNo">253</span><a id="line.253"></a>
+<span class="sourceLineNo">254</span><a id="line.254">        if (! type.isPrimitive()) {</a>
+<span class="sourceLineNo">255</span><a id="line.255">            var prefix = type.getPackageName() + ".";</a>
+<span class="sourceLineNo">256</span><a id="line.256"></a>
+<span class="sourceLineNo">257</span><a id="line.257">            if (name.startsWith(prefix)) {</a>
+<span class="sourceLineNo">258</span><a id="line.258">                name = name.substring(prefix.length());</a>
+<span class="sourceLineNo">259</span><a id="line.259">            }</a>
+<span class="sourceLineNo">260</span><a id="line.260">        }</a>
+<span class="sourceLineNo">261</span><a id="line.261"></a>
+<span class="sourceLineNo">262</span><a id="line.262">        return name;</a>
+<span class="sourceLineNo">263</span><a id="line.263">    }</a>
+<span class="sourceLineNo">264</span><a id="line.264"></a>
+<span class="sourceLineNo">265</span><a id="line.265">    @Override</a>
+<span class="sourceLineNo">266</span><a id="line.266">    public FluentDocument document() { return document; }</a>
+<span class="sourceLineNo">267</span><a id="line.267">}</a>
 
 
 

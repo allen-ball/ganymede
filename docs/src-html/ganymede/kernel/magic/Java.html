@@ -56,19 +56,19 @@
 <span class="sourceLineNo">047</span><a id="line.47">public class Java extends AbstractMagic {</a>
 <span class="sourceLineNo">048</span><a id="line.48">    @Override</a>
 <span class="sourceLineNo">049</span><a id="line.49">    public void execute(String line0, String code, JsonNode metadata) throws Exception {</a>
-<span class="sourceLineNo">050</span><a id="line.50">        if (code.isBlank()) {</a>
-<span class="sourceLineNo">051</span><a id="line.51">            var resource = getClass().getSimpleName();</a>
-<span class="sourceLineNo">052</span><a id="line.52">            var map =</a>
-<span class="sourceLineNo">053</span><a id="line.53">                Map.&lt;String,Object&gt;of("bindings", context.context.getBindings(ENGINE_SCOPE),</a>
-<span class="sourceLineNo">054</span><a id="line.54">                                      "types", context.types,</a>
-<span class="sourceLineNo">055</span><a id="line.55">                                      "javadoc", new Javadoc());</a>
-<span class="sourceLineNo">056</span><a id="line.56">            var html = ThymeleafRenderer.process(getClass(), resource + ".html", "html", map);</a>
-<span class="sourceLineNo">057</span><a id="line.57">            var text = ThymeleafRenderer.process(getClass(), resource + ".text", "text", map);</a>
-<span class="sourceLineNo">058</span><a id="line.58"></a>
-<span class="sourceLineNo">059</span><a id="line.59">            new KernelRestClient().display(Message.mime_bundle(html, text));</a>
-<span class="sourceLineNo">060</span><a id="line.60">        } else {</a>
-<span class="sourceLineNo">061</span><a id="line.61">            throw new IllegalStateException();</a>
-<span class="sourceLineNo">062</span><a id="line.62">        }</a>
+<span class="sourceLineNo">050</span><a id="line.50">        if (! code.isBlank()) {</a>
+<span class="sourceLineNo">051</span><a id="line.51">            throw new IllegalStateException();</a>
+<span class="sourceLineNo">052</span><a id="line.52">        }</a>
+<span class="sourceLineNo">053</span><a id="line.53"></a>
+<span class="sourceLineNo">054</span><a id="line.54">        var resource = getClass().getSimpleName();</a>
+<span class="sourceLineNo">055</span><a id="line.55">        var map =</a>
+<span class="sourceLineNo">056</span><a id="line.56">            Map.&lt;String,Object&gt;of("bindings", context.context.getBindings(ENGINE_SCOPE),</a>
+<span class="sourceLineNo">057</span><a id="line.57">                                  "types", context.types,</a>
+<span class="sourceLineNo">058</span><a id="line.58">                                  "javadoc", new Javadoc());</a>
+<span class="sourceLineNo">059</span><a id="line.59">        var html = ThymeleafRenderer.process(getClass(), resource + ".html", "html", map);</a>
+<span class="sourceLineNo">060</span><a id="line.60">        var text = ThymeleafRenderer.process(getClass(), resource + ".text", "text", map);</a>
+<span class="sourceLineNo">061</span><a id="line.61"></a>
+<span class="sourceLineNo">062</span><a id="line.62">        new KernelRestClient().display(Message.mime_bundle(html, text));</a>
 <span class="sourceLineNo">063</span><a id="line.63">    }</a>
 <span class="sourceLineNo">064</span><a id="line.64">}</a>
 
