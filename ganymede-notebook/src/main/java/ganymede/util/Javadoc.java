@@ -25,8 +25,12 @@ import ball.xml.HTMLTemplates;
 import ball.xml.XalanConstants;
 import java.io.StringWriter;
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -36,7 +40,7 @@ import lombok.ToString;
 import org.springframework.core.io.ClassPathResource;
 import org.w3c.dom.Element;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static java.util.stream.Collectors.toMap;
 import static javax.xml.transform.OutputKeys.INDENT;
 import static javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION;
 
@@ -47,6 +51,11 @@ import static javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION;
  */
 @NoArgsConstructor @ToString
 public class Javadoc implements HTMLTemplates, XalanConstants {
+    private static final Map<String,Class<?>> PRIMITIVES =
+        Stream.of(Boolean.TYPE, Byte.TYPE, Character.TYPE, Double.TYPE,
+                  Float.TYPE, Integer.TYPE, Long.TYPE, Short.TYPE, Void.TYPE)
+        .collect(toMap(k -> k.getName(), v -> v));
+
     @ToString.Exclude private final Properties properties = new Properties();
     @ToString.Exclude private final Transformer transformer;
     @ToString.Exclude private final FluentDocument document;
@@ -75,7 +84,7 @@ public class Javadoc implements HTMLTemplates, XalanConstants {
     }
 
     /**
-     * Create am {@code <a/>} element from a possibly simple class name and
+     * Create an {@code <a/>} element from a possibly simple class name and
      * an implementation type ({@link Class}).
      *
      * @param   name            The (possibly simple) class name.
@@ -83,14 +92,57 @@ public class Javadoc implements HTMLTemplates, XalanConstants {
      *
      * @return  {@code <a/>} {@link Element} (serialized to {@link String})
      */
-    public String a(String name, Class<?> type) {
+    public String link(String name, Class<?> type) {
         var writer = new StringWriter();
-        var href = href(name, type);
+        var declaredType = type;
 
-        if (name != null || href != null) {
-            var node = a(href, name);
+        if (name == null) {
+            if (type != null) {
+                var dimensions = "";
 
-            ((Element) node).setAttribute("target", "_newtab");
+                while (type.isArray()) {
+                    dimensions += "[]";
+                    type = type.getComponentType();
+                }
+
+                name = getCanonicalName(type);
+                name += dimensions;
+            }
+        }
+
+        if (name != null) {
+            var substrings = name.split("\\[|<", 2);
+            var suffix = name.substring(substrings[0].length());
+
+            name = substrings[0];
+
+            declaredType = typeOf(name, List.of("java.lang"));
+
+            if (declaredType == null) {
+                if (type != null) {
+                    while (type.isArray()) {
+                        type = type.getComponentType();
+                    }
+
+                    declaredType = declaredTypeOf(name, type);
+                }
+            }
+
+            if (declaredType != null) {
+                name = getCanonicalName(declaredType);
+            }
+
+            name += suffix;
+        }
+
+        if (name != null) {
+            var node = code(name);
+            var href = href(declaredType);
+
+            if (href != null) {
+                node = a(href, node);
+                ((Element) node).setAttribute("target", "_newtab");
+            }
 
             try {
                 transformer.transform(new DOMSource(node), new StreamResult(writer));
@@ -98,109 +150,116 @@ public class Javadoc implements HTMLTemplates, XalanConstants {
                 throw exception;
             } catch (Error error) {
                 throw error;
-            } catch (Exception exception) {
-                throw new RuntimeException(exception);
+            } catch (Throwable throwable) {
+                throw new RuntimeException(throwable);
             }
         }
 
         return writer.toString();
     }
 
-    /**
-     * Get a Javadoc link href from a canonical class name.
-     *
-     * @param   name            The canonical class name.
-     *
-     * @return  The URL (as a {@link String}) or {@code null} if the package
-     *          is not known.
-     */
-    public URI href(String name) {
-        URI uri = null;
+    private Class<?> typeOf(String name, List<String> packages) {
+        var type = PRIMITIVES.get(name);
 
-        if (name != null) {
-            var offset = name.lastIndexOf(".");
-
-            if (offset > 0) {
-                uri = href(name.substring(0, offset), name.substring(offset + 1));
+        if (type == null) {
+            try {
+                type = Class.forName(name);
+            } catch (Exception exception) {
             }
         }
 
-        return uri;
+        if (type == null) {
+            for (var pkg : packages) {
+                try {
+                    type = Class.forName(pkg + "." + type);
+                    break;
+                } catch (Exception exception) {
+                    continue;
+                }
+            }
+        }
+
+        return type;
     }
 
-    /**
-     * Get a Javadoc link href from a possibly simple class name and a value
-     * ({@link Object}).
-     *
-     * @param   name            The (possibly simple) class name.
-     * @param   value           The {@link Object}.
-     *
-     * @return  The URL (as a {@link URI}) or {@code null} if the package
-     *          cannot be determined.
-     */
-    public URI href(String name, Object value) {
-        return href(name, (value != null) ? value.getClass() : null);
-    }
+    private Class<?> declaredTypeOf(String name, Class<?> type) {
+        Class<?> declaredType = null;
 
-    /**
-     * Get a Javadoc link href from a possibly simple class name and an
-     * implementation type ({@link Class}).
-     *
-     * @param   name            The (possibly simple) class name.
-     * @param   type            The {@link Class}.
-     *
-     * @return  The URL (as a {@link URI}) or {@code null} if the package
-     *          cannot be determined.
-     */
-    public URI href(String name, Class<?> type) {
-        URI uri = null;
-
-        if (name != null) {
-            if (name.lastIndexOf(".") != -1) {
-                uri = href(name);
+        if (type != null) {
+            if (type.isPrimitive()
+                || type.getName().equals(name)
+                || type.getName().endsWith("." + name)
+                || getCanonicalName(type).equals(name)
+                || getCanonicalName(type).endsWith("." + name)) {
+                declaredType = type;
             } else {
-                if (type != null) {
-                    if (name.equals(type.getSimpleName())) {
-                        uri = href(type.getPackage().getName(), name);
-                    } else {
-                        uri = href(name, type.getSuperclass());
+                declaredType = declaredTypeOf(name, type.getSuperclass());
 
-                        if (uri == null) {
-                            for (Class<?> supertype : type.getInterfaces()) {
-                                uri = href(name, supertype);
+                if (declaredType == null) {
+                    for (Class<?> supertype : type.getInterfaces()) {
+                        declaredType = declaredTypeOf(name, supertype);
 
-                                if (uri != null) {
-                                    break;
-                                }
-                            }
+                        if (declaredType != null) {
+                            break;
                         }
                     }
                 }
             }
         }
 
-        return uri;
+        return declaredType;
     }
 
-    private URI href(String pkg, String name) {
-        String string = null;
+    private URI href(Class<?> type) {
+        String uri = null;
 
-        if (isNotBlank(pkg) && isNotBlank(name)) {
-            string = properties.getProperty(pkg);
+        if (type != null && (! type.isPrimitive())) {
+            var pkg = type.getPackageName();
 
-            if (string != null) {
+            uri = properties.getProperty(pkg);
+
+            if (uri != null) {
                 var module = properties.getProperty(pkg + "-module");
 
                 if (module != null) {
-                    string += module + "/";
+                    uri += module + "/";
                 }
 
-                string += String.join("/", pkg.split(Pattern.quote(".")));
-                string += "/" + name + ".html" + "?is-external=true";
+                uri += String.join("/", pkg.split(Pattern.quote(".")));
+
+                var name = type.getSimpleName();
+
+                while (type.getEnclosingClass() != null) {
+                    type = type.getEnclosingClass();
+                    name = type.getSimpleName() + "." + name;
+                }
+
+                uri += "/" + name + ".html";
+                uri += "?is-external=true";
             }
         }
 
-        return (string != null) ? URI.create(string) : null;
+        return (uri != null) ? URI.create(uri) : null;
+    }
+
+    private String getCanonicalName(Class<?> type) {
+        var name = type.getName();
+
+        return Objects.requireNonNullElse(type.getCanonicalName(), name);
+    }
+
+    private String getPackageQualifiedName(Class<?> type) {
+        var name = getCanonicalName(type);
+
+        if (! type.isPrimitive()) {
+            var prefix = type.getPackageName() + ".";
+
+            if (name.startsWith(prefix)) {
+                name = name.substring(prefix.length());
+            }
+        }
+
+        return name;
     }
 
     @Override

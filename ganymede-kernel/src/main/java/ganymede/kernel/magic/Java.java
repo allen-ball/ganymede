@@ -47,18 +47,18 @@ import static javax.script.ScriptContext.ENGINE_SCOPE;
 public class Java extends AbstractMagic {
     @Override
     public void execute(String line0, String code, JsonNode metadata) throws Exception {
-        if (code.isBlank()) {
-            var resource = getClass().getSimpleName();
-            var map =
-                Map.<String,Object>of("bindings", context.context.getBindings(ENGINE_SCOPE),
-                                      "types", context.types,
-                                      "javadoc", new Javadoc());
-            var html = ThymeleafRenderer.process(getClass(), resource + ".html", "html", map);
-            var text = ThymeleafRenderer.process(getClass(), resource + ".text", "text", map);
-
-            new KernelRestClient().display(Message.mime_bundle(html, text));
-        } else {
+        if (! code.isBlank()) {
             throw new IllegalStateException();
         }
+
+        var resource = getClass().getSimpleName();
+        var map =
+            Map.<String,Object>of("bindings", context.context.getBindings(ENGINE_SCOPE),
+                                  "types", context.types,
+                                  "javadoc", new Javadoc());
+        var html = ThymeleafRenderer.process(getClass(), resource + ".html", "html", map);
+        var text = ThymeleafRenderer.process(getClass(), resource + ".text", "text", map);
+
+        new KernelRestClient().display(Message.mime_bundle(html, text));
     }
 }
