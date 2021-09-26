@@ -493,10 +493,10 @@ public class Shell implements AutoCloseable {
                                String code) {
             try {
                 var iterator = parse(jshell, code).entrySet().iterator();
+                var errored = false;
 
-                while (iterator.hasNext()) {
+                while ((! errored) && iterator.hasNext()) {
                     var entry = iterator.next();
-                    var errored = false;
                     var info = entry.getValue();
 
                     switch (info.completeness()) {
@@ -528,19 +528,17 @@ public class Shell implements AutoCloseable {
                             }
                         }
 
-                        if (! iterator.hasNext()) {
-                            if (! events.isEmpty()) {
-                                var event = events.get(events.size() - 1);
+                        if ((! errored) && (! iterator.hasNext()) && (! events.isEmpty())) {
+                            var event = events.get(events.size() - 1);
 
-                                switch (event.snippet().subKind()) {
-                                case TEMP_VAR_EXPRESSION_SUBKIND:
-                                case VAR_VALUE_SUBKIND:
-                                    kernel.print(Message.mime_bundle(unescape(event.value())));
-                                    break;
+                            switch (event.snippet().subKind()) {
+                            case TEMP_VAR_EXPRESSION_SUBKIND:
+                            case VAR_VALUE_SUBKIND:
+                                kernel.print(Message.mime_bundle(unescape(event.value())));
+                                break;
 
-                                default:
-                                    break;
-                                }
+                            default:
+                                break;
                             }
                         }
                         break;
@@ -548,10 +546,6 @@ public class Shell implements AutoCloseable {
                     default:
                         throw new IllegalStateException(String.valueOf(info.completeness()));
                         /* break; */
-                    }
-
-                    if (errored) {
-                        break;
                     }
                 }
             } catch (IncompleteParseException exception) {
