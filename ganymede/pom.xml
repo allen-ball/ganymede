@@ -57,6 +57,13 @@
     <dependency>
       <groupId>ball</groupId>
       <artifactId>ball-util</artifactId>
+      <exclusions>
+        <!-- Integrated in org.apache.velocity:velocity-engine-core -->
+        <exclusion>
+          <groupId>commons-io</groupId>
+          <artifactId>commons-io</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <!-- Servlet Container -->
     <dependency>
