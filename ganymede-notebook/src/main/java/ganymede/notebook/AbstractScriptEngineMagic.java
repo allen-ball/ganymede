@@ -88,13 +88,7 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic
      */
     protected boolean initialize(ScriptEngine engine) {
         var initialized = true;
-        var resource =
-            Optional.ofNullable(engine.getFactory().getExtensions()).stream()
-            .flatMap(List::stream)
-            .map(t -> getClass().getSimpleName() + "." + t)
-            .map(t -> new ClassPathResource(t, getClass()))
-            .filter(ClassPathResource::exists)
-            .findFirst().orElse(null);
+        var resource = getInitScript(engine.getFactory().getExtensions());
 
         if (initialized && resource != null) {
             try (var in = new InputStreamReader(resource.getInputStream(), UTF_8)) {
@@ -106,6 +100,26 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic
         }
 
         return initialized;
+    }
+
+    /**
+     * Method to locate {@link ScriptEngine} initialization script.
+     *
+     * @param   suffixes        The {@link List} of script suffixes.
+     *
+     * @return  Return the first resource that matches this class's simple
+     *          name and suffix (and exists).
+     */
+    protected ClassPathResource getInitScript(List<String> suffixes) {
+        var resource =
+            Optional.ofNullable(suffixes).stream()
+            .flatMap(List::stream)
+            .map(t -> getClass().getSimpleName() + "." + t)
+            .map(t -> new ClassPathResource(t, getClass()))
+            .filter(ClassPathResource::exists)
+            .findFirst().orElse(null);
+
+        return resource;
     }
 
     @Override
