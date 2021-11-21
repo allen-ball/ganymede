@@ -29,7 +29,8 @@ import java.util.List;
 public interface AnnotatedScriptEngineMagic extends AnnotatedMagic {
 
     /**
-     * Method to get the target {@link javax.script.ScriptEngine} name.
+     * Method to get the target {@link javax.script.ScriptEngine}
+     * {@link ScriptEngineName}.
      *
      * @return  The target {@link javax.script.ScriptEngine} name.
      */
@@ -45,7 +46,10 @@ public interface AnnotatedScriptEngineMagic extends AnnotatedMagic {
     }
 
     /**
-     * Method to get the target {@link javax.script.ScriptEngine} extensions.
+     * Method to get the target {@link javax.script.ScriptEngine}
+     * {@link Extensions}.  Creates a default {@link List} from
+     * {@link #getScriptEngineName()} if there is no {@link Extensions}
+     * annotation.
      *
      * @return  The target {@link javax.script.ScriptEngine} extensions.
      */
@@ -53,6 +57,6 @@ public interface AnnotatedScriptEngineMagic extends AnnotatedMagic {
         var annotation = getClass().getAnnotation(Extensions.class);
         var value = (annotation != null) ? annotation.value() : null;
 
-        return (value != null) ? List.of(value) : List.of();
+        return (value != null) ? List.of(value) : List.of(getScriptEngineName());
     }
 }
