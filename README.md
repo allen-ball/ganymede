@@ -657,7 +657,7 @@ Ibid.
 [↩](#ref4)
 
 
-[Ganymede Kernel]: .
+[Ganymede Kernel]: https://github.com/allen-ball/ganymede
 [Ganymede Kernel download]: https://github.com/allen-ball/ganymede/releases/download/v1.1.0.20210614/ganymede-kernel-1.1.0.20210614.jar
 [Ganymede API Javadoc]: https://allen-ball.github.io/ganymede/index.html?overview-summary.html
 [Magic]: https://allen-ball.github.io/ganymede/ganymede/shell/Magic.html
