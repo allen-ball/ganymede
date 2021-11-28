@@ -60,9 +60,17 @@ public class Connection {
      * @return  The parsed {@link Connection}.
      */
     public static Connection parse(File file) throws IOException {
+        var kernelId = UUID.randomUUID();
         var matcher = FILE_NAME_PATTERN.matcher(file.getName());
-        var kernelId =
-            matcher.matches() ? UUID.fromString(matcher.group("kernelId")) : null;
+
+        if (matcher.matches()) {
+            try {
+                kernelId = UUID.fromString(matcher.group("kernelId"));
+            } catch (Exception exception) {
+                log.warn("{}", exception.getMessage());
+            }
+        }
+
         var node = (ObjectNode) ObjectMappers.JSON.readTree(file);
         var digester =
             new HMACDigester(node.at("/signature_scheme").asText(),
