@@ -69,7 +69,10 @@ public class Message {
     protected ObjectNode content = new ObjectNode(JsonNodeFactory.instance);
     protected final List<byte[]> buffers = new LinkedList<>();
 
-    { msg_id(UUID.randomUUID().toString()); }
+    {
+        username(System.getProperty("user.name"));
+        msg_id(UUID.randomUUID().toString());
+    }
 
     public String msg_id() {
         JsonNode node = header().get(getCallingMethodName(1));
