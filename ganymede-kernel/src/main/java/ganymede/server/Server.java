@@ -62,7 +62,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
     private final Channel.IOPub iopub = new Channel.IOPub(this);
     private final Channel.Stdin stdin = new Stdin();
     private final Channel.Shell shell = new Shell();
-    private final NotebookServicesClient notebookServicesClient;
+    private NotebookServicesClient notebookServicesClient = null;
     private InputStream in = null;
     private PrintStreamBuffer out = null;
     private PrintStreamBuffer err = null;
@@ -82,7 +82,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
         try {
             notebookServicesClient = new NotebookServicesClient();
         } catch (Exception exception) {
-            throw new ExceptionInInitializerError(exception);
+            log.debug("{}", exception);
         }
     }
 
