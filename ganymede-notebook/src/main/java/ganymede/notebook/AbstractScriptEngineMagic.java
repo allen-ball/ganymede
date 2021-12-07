@@ -58,7 +58,7 @@ public abstract class AbstractScriptEngineMagic extends AbstractMagic
      */
     protected ScriptEngine engine() {
         if (engine == null) {
-            var manager = new ScriptEngineManager(getClass().getClassLoader());
+            var manager = new ScriptEngineManager(context.getClassLoader());
 
             engine = manager.getEngineByName(getScriptEngineName());
 

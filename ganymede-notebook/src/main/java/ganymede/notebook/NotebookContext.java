@@ -74,6 +74,7 @@ public class NotebookContext {
      */
     public static final String NAME = "$$";
 
+    private final ClassLoader loader = getClass().getClassLoader();
     private final KernelRestClient krc = new KernelRestClient();
     private final NotebookServicesClient nsc;
     private final UUID kernelId;
@@ -132,6 +133,14 @@ public class NotebookContext {
     public final SQL sql = new SQL();
 
     private final MagicMap magics = new MagicMap(Magic.class, t -> t.configure(this));
+
+    /**
+     * Method to get the {@link NotebookContext context}
+     * {@link ClassLoader}.
+     *
+     * @return  The {@link NotebookContext} {@link ClassLoader}.
+     */
+    public ClassLoader getClassLoader() { return loader; }
 
     /**
      * Method to update notebook context.

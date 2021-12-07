@@ -141,7 +141,7 @@ public class Scala extends AbstractScriptEngineMagic {
             try {
                 type =
                     Class.forName("scala.tools.nsc.interpreter.Scripted",
-                                  false, getClass().getClassLoader())
+                                  false, context.getClassLoader())
                     .asSubclass(ScriptEngine.class);
             } catch (ClassNotFoundException exception) {
             }
@@ -161,7 +161,7 @@ public class Scala extends AbstractScriptEngineMagic {
                  *     Console.withOut(System.out) { println($ctx.greeting) }
                  */
                 try {
-                    var manager = new ScriptEngineManager(getClass().getClassLoader());
+                    var manager = new ScriptEngineManager(context.getClassLoader());
                     var factory =
                         manager.getEngineFactories().stream()
                         .filter(t -> (! disjoint(t.getExtensions(), getExtensions())))
