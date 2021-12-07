@@ -19,7 +19,6 @@ package ganymede.notebook;
  * ##########################################################################
  */
 import com.fasterxml.jackson.databind.JsonNode;
-import ganymede.notebook.Magic;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Objects;

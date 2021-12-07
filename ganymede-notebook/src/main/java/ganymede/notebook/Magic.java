@@ -19,7 +19,6 @@ package ganymede.notebook;
  * ##########################################################################
  */
 import com.fasterxml.jackson.databind.JsonNode;
-import ganymede.notebook.NotebookContext;
 import java.util.Optional;
 import java.util.stream.Stream;
 import jdk.jshell.JShell;
@@ -92,7 +91,7 @@ public interface Magic {
     public completeness isComplete(String line0, String code);
 
     /**
-     * {@link JShell} configuation method.
+     * {@link JShell} configuration method.
      *
      * @param   context         The {@link NotebookContext}.
      */

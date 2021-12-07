@@ -28,7 +28,7 @@ import lombok.extern.log4j.Log4j2;
 import static lombok.AccessLevel.PROTECTED;
 
 /**
- * Abstract {@link Properties} {@link ganymede.notebook.Magic} base class.
+ * Abstract {@link Properties} {@link Magic} base class.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */

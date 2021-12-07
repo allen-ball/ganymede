@@ -18,10 +18,9 @@ package ganymede.notebook;
  * limitations under the License.
  * ##########################################################################
  */
-import ganymede.notebook.Magic;
 
 /**
- * {@link ganymede.notebook.Magic} annotation services.
+ * {@link Magic} annotation services.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */

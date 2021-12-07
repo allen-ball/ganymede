@@ -22,7 +22,6 @@ import ball.annotation.ServiceProviderFor;
 import ball.annotation.processing.AnnotatedProcessor;
 import ball.annotation.processing.For;
 import ball.annotation.processing.TargetMustExtend;
-import ganymede.notebook.Renderer;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -34,8 +33,7 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * {@link ganymede.notebook.RendererMap} key source
- * {@link java.lang.annotation.Annotation}.
+ * {@link RendererMap} key source {@link java.lang.annotation.Annotation}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */

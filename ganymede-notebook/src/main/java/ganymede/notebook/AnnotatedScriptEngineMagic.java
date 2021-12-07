@@ -18,7 +18,6 @@ package ganymede.notebook;
  * limitations under the License.
  * ##########################################################################
  */
-import ganymede.notebook.Magic;
 import java.util.List;
 
 /**

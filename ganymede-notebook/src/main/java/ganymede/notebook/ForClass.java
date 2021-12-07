@@ -22,7 +22,6 @@ import ball.annotation.ServiceProviderFor;
 import ball.annotation.processing.AnnotatedProcessor;
 import ball.annotation.processing.For;
 import ball.annotation.processing.TargetMustExtend;
-import ganymede.notebook.Renderer;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;

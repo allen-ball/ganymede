@@ -20,8 +20,6 @@ package ganymede.notebook;
  */
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import ganymede.notebook.ForClass;
-import ganymede.notebook.ForClassName;
 import ganymede.util.ServiceProviderMap;
 import java.util.Comparator;
 import java.util.Optional;

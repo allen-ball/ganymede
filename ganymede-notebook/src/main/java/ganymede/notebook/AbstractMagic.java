@@ -18,7 +18,6 @@ package ganymede.notebook;
  * limitations under the License.
  * ##########################################################################
  */
-import ganymede.notebook.NotebookContext;
 import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
 import org.springframework.util.PropertyPlaceholderHelper;
@@ -28,7 +27,7 @@ import picocli.CommandLine;
 import static lombok.AccessLevel.PROTECTED;
 
 /**
- * Abstract base class for {@link ganymede.notebook.Magic}s.
+ * Abstract base class for {@link Magic}s.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
