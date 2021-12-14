@@ -19,8 +19,6 @@ package ganymede.notebook;
  * ##########################################################################
  */
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import ganymede.notebook.ForClass;
-import ganymede.notebook.ForClassName;
 import java.util.Base64;
 import java.util.Optional;
 
@@ -67,6 +65,13 @@ public interface Renderer {
     public default Class<?> getRenderType() {
         return getRenderType(getClass());
     }
+
+    /**
+     * {@link RendererMap} configuration method.
+     *
+     * @param   renderers       The {@link RendererMap}.
+     */
+    public void configure(RendererMap renderers);
 
     /**
      * Method to render an {@link Object} to a {@code mime-bundle}.
