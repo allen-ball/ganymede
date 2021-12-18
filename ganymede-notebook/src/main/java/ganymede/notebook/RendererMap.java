@@ -55,7 +55,15 @@ public class RendererMap extends TreeMap<Class<?>,Renderer> {
         var value = provider.get().instance().orElse(null);
         var key = (value != null) ? value.getRenderType() : null;
 
-        return (key != null) ? computeIfAbsent(key, k -> value) : null;
+        return (key != null) ? computeIfAbsent(key, k -> configure(value)) : null;
+    }
+
+    private Renderer configure(Renderer renderer) {
+        if (renderer != null) {
+            renderer.configure(this);
+        }
+
+        return renderer;
     }
 
     /**
