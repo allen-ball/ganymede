@@ -20,6 +20,7 @@ package ganymede.kernel.renderer;
  */
 import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import ganymede.notebook.AbstractRenderer;
 import ganymede.notebook.ForClass;
 import ganymede.notebook.Renderer;
 import java.util.Map;
@@ -51,7 +52,7 @@ import static org.springframework.util.MimeTypeUtils.TEXT_XML_VALUE;
 @ServiceProviderFor({ Renderer.class })
 @ForClass(ThymeleafRenderer.Output.class)
 @NoArgsConstructor @ToString
-public class ThymeleafRenderer implements Renderer {
+public class ThymeleafRenderer extends AbstractRenderer {
     private static final StringTemplateResolver RESOLVER;
     private static final TemplateEngine ENGINE;
 

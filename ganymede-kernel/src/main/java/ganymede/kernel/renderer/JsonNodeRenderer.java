@@ -21,6 +21,7 @@ package ganymede.kernel.renderer;
 import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import ganymede.notebook.AbstractRenderer;
 import ganymede.notebook.ForClass;
 import ganymede.notebook.Renderer;
 import lombok.NoArgsConstructor;
@@ -36,7 +37,7 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 @ServiceProviderFor({ Renderer.class })
 @ForClass(JsonNode.class)
 @NoArgsConstructor @ToString
-public class JsonNodeRenderer implements Renderer {
+public class JsonNodeRenderer extends AbstractRenderer {
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
         var node = (JsonNode) object;
@@ -49,7 +50,7 @@ public class JsonNodeRenderer implements Renderer {
         }
 
         if (node != null) {
-            MAP.renderTo(bundle, node.toPrettyString());
+            renderers.renderTo(bundle, node.toPrettyString());
         }
     }
 }

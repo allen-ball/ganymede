@@ -20,6 +20,7 @@ package ganymede.kernel.renderer;
  */
 import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import ganymede.notebook.AbstractRenderer;
 import ganymede.notebook.ForClass;
 import ganymede.notebook.Renderer;
 import java.io.ByteArrayInputStream;
@@ -36,7 +37,7 @@ import lombok.ToString;
 @ServiceProviderFor({ Renderer.class })
 @ForClass(byte[].class)
 @NoArgsConstructor @ToString
-public class ImageRenderer implements Renderer {
+public class ImageRenderer extends AbstractRenderer {
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
         var bytes = (byte[]) object;

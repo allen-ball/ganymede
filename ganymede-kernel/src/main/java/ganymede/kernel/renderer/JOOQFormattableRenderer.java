@@ -20,6 +20,7 @@ package ganymede.kernel.renderer;
  */
 import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import ganymede.notebook.AbstractRenderer;
 import ganymede.notebook.ForClass;
 import ganymede.notebook.Renderer;
 import lombok.NoArgsConstructor;
@@ -36,7 +37,7 @@ import static org.springframework.util.MimeTypeUtils.TEXT_HTML_VALUE;
 @ServiceProviderFor({ Renderer.class })
 @ForClass(Formattable.class)
 @NoArgsConstructor @ToString
-public class JOOQFormattableRenderer implements Renderer {
+public class JOOQFormattableRenderer extends AbstractRenderer {
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
         var formattable = (Formattable) object;
@@ -45,6 +46,6 @@ public class JOOQFormattableRenderer implements Renderer {
             bundle.with(DATA).put(TEXT_HTML_VALUE, formattable.formatHTML());
         }
 
-        MAP.renderTo(bundle, formattable.format());
+        renderers.renderTo(bundle, formattable.format());
     }
 }

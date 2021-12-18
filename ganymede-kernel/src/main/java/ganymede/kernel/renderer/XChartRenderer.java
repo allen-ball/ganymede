@@ -20,6 +20,7 @@ package ganymede.kernel.renderer;
  */
 import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import ganymede.notebook.AbstractRenderer;
 import ganymede.notebook.ForClassName;
 import ganymede.notebook.Renderer;
 import java.io.IOException;
@@ -41,7 +42,7 @@ import static org.knowm.xchart.BitmapEncoder.BitmapFormat.PNG;
 @ServiceProviderFor({ Renderer.class })
 @ForClassName("org.knowm.xchart.internal.chartpart.Chart")
 @NoArgsConstructor @ToString
-public class XChartRenderer implements Renderer {
+public class XChartRenderer extends AbstractRenderer {
     @Override
     public Optional<XChartRenderer> instance() {
         return Optional.ofNullable(getRenderType()).map(t -> new Impl());
@@ -59,7 +60,7 @@ public class XChartRenderer implements Renderer {
             try {
                 var bytes = BitmapEncoder.getBitmapBytes((Chart) object, PNG);
 
-                MAP.renderTo(bundle, bytes);
+                renderers.renderTo(bundle, bytes);
             } catch (IOException exception) {
                 exception.printStackTrace(System.err);
             }

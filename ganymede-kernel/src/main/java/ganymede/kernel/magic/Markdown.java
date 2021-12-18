@@ -21,6 +21,7 @@ package ganymede.kernel.magic;
 import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.kernel.client.KernelRestClient;
+import ganymede.notebook.AbstractRenderer;
 import ganymede.notebook.Description;
 import ganymede.notebook.ForClass;
 import ganymede.notebook.Magic;
@@ -102,7 +103,7 @@ public class Markdown extends Handlebars {
     @ServiceProviderFor({ Renderer.class })
     @ForClass(Node.class)
     @NoArgsConstructor @ToString
-    public static class CommonMarkNodeRenderer implements Renderer {
+    public static class CommonMarkNodeRenderer extends AbstractRenderer {
         private HtmlRenderer html = HtmlRenderer.builder().extensions(EXTENSIONS).build();
         private TextContentRenderer text = TextContentRenderer.builder().extensions(EXTENSIONS).build();
 
@@ -114,7 +115,7 @@ public class Markdown extends Handlebars {
                 bundle.with(DATA).put(TEXT_HTML_VALUE, html.render(node));
             }
 
-            MAP.renderTo(bundle, text.render(node));
+            renderers.renderTo(bundle, text.render(node));
         }
     }
 }

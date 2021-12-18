@@ -20,6 +20,7 @@ package ganymede.kernel.renderer;
  */
 import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import ganymede.notebook.AbstractRenderer;
 import ganymede.notebook.ForClass;
 import ganymede.notebook.Renderer;
 import java.util.Map;
@@ -35,13 +36,13 @@ import lombok.ToString;
 @ServiceProviderFor({ Renderer.class })
 @ForClass(TableModel.class)
 @NoArgsConstructor @ToString
-public class TableModelRenderer implements Renderer {
+public class TableModelRenderer extends AbstractRenderer {
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
         var resource = getClass().getSimpleName() + ".html";
         var map = Map.<String,Object>of("model", (TableModel) object);
         var output = ThymeleafRenderer.process(getClass(), resource, "html", map);
 
-        MAP.renderTo(bundle, output);
+        renderers.renderTo(bundle, output);
     }
 }

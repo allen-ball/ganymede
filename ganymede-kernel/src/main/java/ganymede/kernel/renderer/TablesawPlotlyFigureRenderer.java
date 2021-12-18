@@ -21,6 +21,7 @@ package ganymede.kernel.renderer;
 import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.notebook.ForClassName;
+import ganymede.notebook.AbstractRenderer;
 import ganymede.notebook.Renderer;
 import java.util.Map;
 import java.util.Optional;
@@ -38,7 +39,7 @@ import tech.tablesaw.plotly.components.Figure;
 @ServiceProviderFor({ Renderer.class })
 @ForClassName("tech.tablesaw.plotly.components.Figure")
 @NoArgsConstructor @ToString
-public class TablesawPlotlyFigureRenderer implements Renderer {
+public class TablesawPlotlyFigureRenderer extends AbstractRenderer {
     @Override
     public Optional<TablesawPlotlyFigureRenderer> instance() {
         return Optional.ofNullable(getRenderType()).map(t -> new Impl());
@@ -58,7 +59,7 @@ public class TablesawPlotlyFigureRenderer implements Renderer {
             var map = Map.<String,Object>of("figure", (Figure) object);
             var output = ThymeleafRenderer.process(type, resource, "html", map);
 
-            MAP.renderTo(bundle, output);
+            renderers.renderTo(bundle, output);
         }
     }
 }

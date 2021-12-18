@@ -20,6 +20,7 @@ package ganymede.kernel.renderer;
  */
 import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import ganymede.notebook.AbstractRenderer;
 import ganymede.notebook.ForClassName;
 import ganymede.notebook.Renderer;
 import java.io.ByteArrayOutputStream;
@@ -49,7 +50,7 @@ import static org.springframework.util.MimeTypeUtils.TEXT_HTML_VALUE;
 @ServiceProviderFor({ Renderer.class })
 @ForClassName("org.jfree.chart.JFreeChart")
 @NoArgsConstructor @ToString
-public class JFreeChartRenderer implements Renderer {
+public class JFreeChartRenderer extends AbstractRenderer {
     @Override
     public Optional<JFreeChartRenderer> instance() {
         return Optional.ofNullable(getRenderType()).map(t -> new Impl());
@@ -80,7 +81,7 @@ public class JFreeChartRenderer implements Renderer {
 
                 var image = out.toByteArray();
 
-                MAP.renderTo(bundle, image);
+                renderers.renderTo(bundle, image);
 
                 if (! bundle.with(DATA).has(TEXT_HTML_VALUE)) {
                     var html = new StringWriter();

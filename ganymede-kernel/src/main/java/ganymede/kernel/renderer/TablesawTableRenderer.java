@@ -20,6 +20,7 @@ package ganymede.kernel.renderer;
  */
 import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import ganymede.notebook.AbstractRenderer;
 import ganymede.notebook.ForClassName;
 import ganymede.notebook.Renderer;
 /* import ganymede.util.ObjectMappers; */
@@ -43,7 +44,7 @@ import static tech.tablesaw.api.Table.defaultWriterRegistry;
 @ServiceProviderFor({ Renderer.class })
 @ForClassName("tech.tablesaw.api.Table")
 @NoArgsConstructor @ToString
-public class TablesawTableRenderer implements Renderer {
+public class TablesawTableRenderer extends AbstractRenderer {
     @Override
     public Optional<TablesawTableRenderer> instance() {
         return Optional.ofNullable(getRenderType()).map(t -> new Impl());
@@ -99,7 +100,7 @@ public class TablesawTableRenderer implements Renderer {
                     exception.printStackTrace(System.err);
                 }
 
-                MAP.renderTo(bundle, string);
+                renderers.renderTo(bundle, string);
             }
         }
 

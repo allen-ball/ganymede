@@ -20,6 +20,7 @@ package ganymede.kernel.renderer;
  */
 import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import ganymede.notebook.AbstractRenderer;
 import ganymede.notebook.ForClassName;
 import ganymede.notebook.Renderer;
 import java.util.Map;
@@ -36,7 +37,7 @@ import org.apache.spark.sql.SparkSession;
 @ServiceProviderFor({ Renderer.class })
 @ForClassName("org.apache.spark.sql.SparkSession")
 @NoArgsConstructor @ToString
-public class SparkSessionRenderer implements Renderer {
+public class SparkSessionRenderer extends AbstractRenderer {
     @Override
     public Optional<SparkSessionRenderer> instance() {
         return Optional.ofNullable(getRenderType()).map(t -> new Impl());
@@ -56,7 +57,7 @@ public class SparkSessionRenderer implements Renderer {
             var map = Map.<String,Object>of("session", (SparkSession) object);
             var output = ThymeleafRenderer.process(type, resource, "html", map);
 
-            MAP.renderTo(bundle, output);
+            renderers.renderTo(bundle, output);
         }
     }
 }

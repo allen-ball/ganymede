@@ -20,7 +20,6 @@ package ganymede.notebook;
  */
 import ball.annotation.ServiceProviderFor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import ganymede.notebook.Renderer;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
@@ -34,7 +33,7 @@ import static org.springframework.util.MimeTypeUtils.TEXT_PLAIN_VALUE;
 @ServiceProviderFor({ Renderer.class })
 @ForClass(Object.class)
 @NoArgsConstructor @ToString
-public class DefaultRenderer implements Renderer {
+public class DefaultRenderer extends AbstractRenderer {
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
         if (! bundle.with(DATA).has(TEXT_PLAIN_VALUE)) {
