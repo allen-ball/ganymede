@@ -3,7 +3,7 @@ package ganymede.install;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021 Allen D. Ball
+ * Copyright (C) 2021, 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -160,8 +160,7 @@ public class Install implements ApplicationRunner {
              * Maven local repository
              */
             if (sysPrefix) {
-                var repository =
-                    Paths.get(paths.at("/data").get(1).asText(), "repository");
+                var repository = Paths.get(paths.at("/data").get(1).asText(), "repository");
 
                 sysProperties.put("maven.repo.local", repository);
 
@@ -234,8 +233,7 @@ public class Install implements ApplicationRunner {
                 try (var in = getClass().getResourceAsStream(from)) {
                     copy(copyToByteArray(in), to);
                 } catch (Exception exception) {
-                    log.warn("Could not copy resource {} to {}",
-                             from, to, exception);
+                    log.warn("Could not copy resource {} to {}", from, to, exception);
                 }
             }
             /*

@@ -3,7 +3,7 @@ package ganymede.shell;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021 Allen D. Ball
+ * Copyright (C) 2021, 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,9 +44,7 @@ public abstract class Builtin extends AbstractMagic {
      * @param   err             The {@code err} {@link PrintStream}.
      * @param   application     The {@link Application} instance.
      */
-    public abstract void execute(Shell shell,
-                                 InputStream in, PrintStream out, PrintStream err,
-                                 Application application) throws Exception;
+    public abstract void execute(Shell shell, InputStream in, PrintStream out, PrintStream err, Application application) throws Exception;
 
     @Override
     public void execute(String line0, String code, JsonNode metadata) throws Exception {

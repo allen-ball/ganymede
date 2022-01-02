@@ -3,7 +3,7 @@ package ganymede.server;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021 Allen D. Ball
+ * Copyright (C) 2021, 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,8 +48,7 @@ public class Connection {
      * Provides named group "kernelId".
      */
     @CompileTimeCheck
-    public static final Pattern FILE_NAME_PATTERN =
-        Pattern.compile("(?i)^(kernel-|)(?<kernelId>[^.]+)[.]json$");
+    public static final Pattern FILE_NAME_PATTERN = Pattern.compile("(?i)^(kernel-|)(?<kernelId>[^.]+)[.]json$");
 
     /**
      * Static factory method.
@@ -72,9 +71,7 @@ public class Connection {
         }
 
         var node = (ObjectNode) ObjectMappers.JSON.readTree(file);
-        var digester =
-            new HMACDigester(node.at("/signature_scheme").asText(),
-                             node.at("/key").asText());
+        var digester = new HMACDigester(node.at("/signature_scheme").asText(), node.at("/key").asText());
 
         return new Connection(kernelId, node, digester);
     }

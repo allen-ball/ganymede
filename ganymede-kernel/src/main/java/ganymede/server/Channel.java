@@ -3,7 +3,7 @@ package ganymede.server;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021 Allen D. Ball
+ * Copyright (C) 2021, 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,9 +56,7 @@ public abstract class Channel {
         getDispatcherQueue().add(dispatcher);
         getServer().submit(dispatcher);
 
-        getServer()
-            .setCorePoolSize(Math.max(getServer().getActiveCount() + 4,
-                                      getServer().getCorePoolSize()));
+        getServer().setCorePoolSize(Math.max(getServer().getActiveCount() + 4, getServer().getCorePoolSize()));
     }
 
     /**

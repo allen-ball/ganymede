@@ -3,7 +3,7 @@ package ganymede.util;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021 Allen D. Ball
+ * Copyright (C) 2021, 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,8 +48,7 @@ public class PathPropertyMap extends TreeMap<String,String> {
             .filter(t -> t.getValue().toString().length() > 1)
             .filter(t -> (! t.getValue().toString().contains(SEPARATOR)))
             .filter(t -> new File(t.getValue().toString()).isAbsolute())
-            .forEach(t -> put(t.getValue().toString(),
-                              "${" + t.getKey().toString() + "}"));
+            .forEach(t -> put(t.getValue().toString(), "${" + t.getKey().toString() + "}"));
     }
 
     /**

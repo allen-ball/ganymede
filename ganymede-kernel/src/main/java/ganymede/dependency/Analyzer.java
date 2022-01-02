@@ -3,7 +3,7 @@ package ganymede.dependency;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021 Allen D. Ball
+ * Copyright (C) 2021, 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -141,8 +141,7 @@ public class Analyzer {
      */
     protected Stream<DefaultArtifact> parse(InputStream in) {
         var stream =
-            new BufferedReader(new InputStreamReader(in, UTF_8))
-            .lines()
+            new BufferedReader(new InputStreamReader(in, UTF_8)).lines()
             .map(String::strip)
             .map(t -> t.split(":"))
             .filter(t -> t.length > 3)

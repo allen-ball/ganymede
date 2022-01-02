@@ -3,7 +3,7 @@ package ganymede.kernel.magic;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021 Allen D. Ball
+ * Copyright (C) 2021, 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,20 +110,16 @@ public class SQL extends AbstractMagic {
 
     @Command @Data
     private class Arguments {
-        @Parameters(description = { "JDBC Connection URL" },
-                    index = "0", arity = "0..1")
+        @Parameters(description = { "JDBC Connection URL" }, index = "0", arity = "0..1")
         private String url = null;
 
-        @Parameters(description = { "JDBC Connection Username" },
-                    index = "1", arity = "0..1", defaultValue = "root")
+        @Parameters(description = { "JDBC Connection Username" }, index = "1", arity = "0..1", defaultValue = "root")
         private String username = null;
 
-        @Parameters(description = { "JDBC Connection Password" },
-                    index = "2", arity = "0..1")
+        @Parameters(description = { "JDBC Connection Password" }, index = "2", arity = "0..1")
         private String password = null;
 
-        @Option(names = { "--no-print" }, negatable = true,
-                description = { "Print query results.  true by default" })
+        @Option(names = { "--no-print" }, negatable = true, description = { "Print query results.  true by default" })
         private boolean print = true;
 
         public DSLContext dsl() {

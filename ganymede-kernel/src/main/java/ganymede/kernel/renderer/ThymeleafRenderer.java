@@ -3,7 +3,7 @@ package ganymede.kernel.renderer;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021 Allen D. Ball
+ * Copyright (C) 2021, 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,8 +76,7 @@ public class ThymeleafRenderer extends AbstractRenderer {
     public static Output process(String template, String mode, Map<String,Object> map) {
         RESOLVER.setTemplateMode(mode);
 
-        return new Output(RESOLVER.getTemplateMode(),
-                          ENGINE.process(template, new Context(null, map)));
+        return new Output(RESOLVER.getTemplateMode(), ENGINE.process(template, new Context(null, map)));
     }
 
     /**

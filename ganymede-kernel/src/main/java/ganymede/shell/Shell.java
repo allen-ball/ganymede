@@ -3,7 +3,7 @@ package ganymede.shell;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021 Allen D. Ball
+ * Copyright (C) 2021, 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,8 +67,7 @@ import static org.apache.logging.log4j.Level.WARN;
 @ToString @Log4j2
 public class Shell implements AutoCloseable {
     private static final String[] VMOPTIONS =
-        Stream.of("--illegal-access=permit",
-                  "--add-opens", "java.base/jdk.internal.misc=ALL-UNNAMED",
+        Stream.of("--illegal-access=permit", "--add-opens", "java.base/jdk.internal.misc=ALL-UNNAMED",
                   "-Dio.netty.tryReflectionSetAccessible=true",
                   "-Djava.awt.headless=true")
         .toArray(String[]::new);
@@ -405,9 +404,7 @@ public class Shell implements AutoCloseable {
     @NoArgsConstructor @ToString
     private class Java extends Builtin {
         @Override
-        public void execute(Shell shell,
-                            InputStream in, PrintStream out, PrintStream err,
-                            Application application) throws Exception {
+        public void execute(Shell shell, InputStream in, PrintStream out, PrintStream err, Application application) throws Exception {
             var code = application.getCode();
 
             if (! code.isBlank()) {
@@ -488,9 +485,7 @@ public class Shell implements AutoCloseable {
             throw new IllegalStateException();
         }
 
-        protected void execute(JShell jshell,
-                               InputStream in, PrintStream out, PrintStream err,
-                               String code) {
+        protected void execute(JShell jshell, InputStream in, PrintStream out, PrintStream err, String code) {
             try {
                 var iterator = parse(jshell, code).entrySet().iterator();
                 var errored = false;
@@ -519,9 +514,7 @@ public class Shell implements AutoCloseable {
                                 errored |= true;
 
                                 err.format("%s %s\n%s\n",
-                                           event.status(),
-                                           event.snippet().kind(),
-                                           event.snippet().source());
+                                           event.status(), event.snippet().kind(), event.snippet().source());
                                 jshell.diagnostics(event.snippet())
                                     .map(t -> t.getMessage(locale))
                                     .forEach(err::println);
@@ -549,11 +542,9 @@ public class Shell implements AutoCloseable {
                     }
                 }
             } catch (IncompleteParseException exception) {
-                err.format("Incomplete input:\n%s\n",
-                           code.substring(exception.getErrorOffset()));
+                err.format("Incomplete input:\n%s\n", code.substring(exception.getErrorOffset()));
             } catch (UnknownParseException exception) {
-                err.format("Unknown input:\n%s\n",
-                           code.substring(exception.getErrorOffset()));
+                err.format("Unknown input:\n%s\n", code.substring(exception.getErrorOffset()));
             } catch (Exception exception) {
                 exception.printStackTrace(err);
             } finally {

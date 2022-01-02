@@ -3,7 +3,7 @@ package ganymede.dependency;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021 Allen D. Ball
+ * Copyright (C) 2021, 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -323,9 +323,7 @@ public class Resolver extends Analyzer {
             try {
                 var request = new DependencyRequest(new CollectRequest(dependency, repositories), filter);
 
-                for (var result :
-                         system.resolveDependencies(session, request)
-                         .getArtifactResults()) {
+                for (var result : system.resolveDependencies(session, request).getArtifactResults()) {
                     if (result.isResolved()) {
                         var artifact = repository.resolve(result.getArtifact());
 
@@ -393,12 +391,10 @@ public class Resolver extends Analyzer {
         session.setCache(new DefaultRepositoryCache());
 
         var path =
-            Stream.of(pom().getLocalRepository(),
-                      System.getProperty("maven.repo.local"))
+            Stream.of(pom().getLocalRepository(), System.getProperty("maven.repo.local"))
             .filter(Objects::nonNull)
             .map(Paths::get)
-            .findFirst()
-            .orElse(Paths.get(System.getProperty("user.home"), ".m2", "repository"));
+            .findFirst().orElse(Paths.get(System.getProperty("user.home"), ".m2", "repository"));
         var local = new LocalRepository(path.toFile());
         var manager = system.newLocalRepositoryManager(session, local);
 

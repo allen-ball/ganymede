@@ -3,7 +3,7 @@ package ganymede.notebook;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021 Allen D. Ball
+ * Copyright (C) 2021, 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -272,9 +272,7 @@ public class NotebookContext {
      * @return  The boostrap code.
      */
     public static String bootstrap() {
-        var code =
-            String.format("var %1$s = %2$s.newNotebookContext();\n",
-                          NAME, Notebook.class.getCanonicalName());
+        var code = String.format("var %1$s = %2$s.newNotebookContext();\n", NAME, Notebook.class.getCanonicalName());
 
         for (var method : getNotebookFunctions()) {
             code += makeWrapperFor(NAME, method);
@@ -293,19 +291,15 @@ public class NotebookContext {
         }
 
         for (int i = 0; i < parameters.length; i += 1) {
-            parameters[i] =
-                String.format("%1$s %2$s",
-                              types[i].getTypeName(), arguments[i]);
+            parameters[i] = String.format("%1$s %2$s", types[i].getTypeName(), arguments[i]);
         }
 
         var plist = String.join(", ", parameters);
         var alist = String.join(", ", arguments);
 
         return String.format("%1$s %2$s(%3$s) { %4$s%5$s.%2$s(%6$s); }\n",
-                             method.getGenericReturnType().getTypeName(),
-                             method.getName(), plist,
-                             Void.TYPE.equals(method.getReturnType()) ? "" : "return ",
-                             instance, alist);
+                             method.getGenericReturnType().getTypeName(), method.getName(), plist,
+                             Void.TYPE.equals(method.getReturnType()) ? "" : "return ", instance, alist);
     }
 
     /**

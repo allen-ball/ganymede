@@ -3,7 +3,7 @@ package ganymede.kernel;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021 Allen D. Ball
+ * Copyright (C) 2021, 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,13 +67,9 @@ import static java.util.stream.Collectors.toList;
 @SpringBootApplication @RestController
 @Command
 @NoArgsConstructor @ToString @Log4j2
-public class Kernel extends Server implements KernelApi,
-                                              ApplicationContextAware,
-                                              ApplicationRunner {
-    private static final String JSE_HELP_LINK_TEXT_FORMAT =
-        "Java SE %1$s & JDK %1$s";
-    private static final String JSE_HELP_LINK_URL_FORMAT =
-        "https://docs.oracle.com/en/java/javase/%1$s/docs/api/";
+public class Kernel extends Server implements KernelApi, ApplicationContextAware, ApplicationRunner {
+    private static final String JSE_HELP_LINK_TEXT_FORMAT = "Java SE %1$s & JDK %1$s";
+    private static final String JSE_HELP_LINK_URL_FORMAT = "https://docs.oracle.com/en/java/javase/%1$s/docs/api/";
 
     @Option(description = { "connection_file" }, names = { "-f" }, arity = "1")
     @Value("${connection-file:#{null}}")

@@ -3,7 +3,7 @@ package ganymede.dependency;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021 Allen D. Ball
+ * Copyright (C) 2021, 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -134,8 +134,7 @@ public class POM {
             .filter(Objects::nonNull)
             .collect(toSet());
 
-        this.getRepositories()
-            .removeIf(t -> ids.contains(t.getId()) || urls.contains(t.getUrl()));
+        this.getRepositories().removeIf(t -> ids.contains(t.getId()) || urls.contains(t.getUrl()));
         this.getRepositories().addAll(that.getRepositories());
 
         var keys =
@@ -144,8 +143,7 @@ public class POM {
             .map(t -> toVersionlessId(t))
             .collect(toSet());
 
-        this.getDependencies()
-            .removeIf(t -> keys.contains(toVersionlessId(t.getArtifact())));
+        this.getDependencies().removeIf(t -> keys.contains(toVersionlessId(t.getArtifact())));
         this.getDependencies().addAll(that.getDependencies());
     }
 
@@ -187,9 +185,7 @@ public class POM {
         public DependencyDeserializer() { super(Dependency.class); }
 
         @Override
-        public Dependency deserialize(JsonParser parser,
-                                      DeserializationContext context) throws IOException,
-                                                                             JsonProcessingException {
+        public Dependency deserialize(JsonParser parser, DeserializationContext context) throws IOException, JsonProcessingException {
             JsonNode node = parser.getCodec().readTree(parser);
             Artifact artifact = null;
 
@@ -225,9 +221,7 @@ public class POM {
         public DependencySerializer() { super(Dependency.class); }
 
         @Override
-        public void serialize(Dependency value, JsonGenerator generator,
-                              SerializerProvider provider) throws IOException,
-                                                                  JsonProcessingException {
+        public void serialize(Dependency value, JsonGenerator generator, SerializerProvider provider) throws IOException, JsonProcessingException {
             var artifact = value.getArtifact();
             var string =
                 Stream.of(artifact.getGroupId(), artifact.getArtifactId(),
@@ -248,9 +242,7 @@ public class POM {
         public RemoteRepositoryDeserializer() { super(RemoteRepository.class); }
 
         @Override
-        public RemoteRepository deserialize(JsonParser parser,
-                                            DeserializationContext context) throws IOException,
-                                                                                   JsonProcessingException {
+        public RemoteRepository deserialize(JsonParser parser, DeserializationContext context) throws IOException, JsonProcessingException {
             JsonNode node = parser.getCodec().readTree(parser);
             var builder =
                 new RemoteRepository.Builder(asText(node, "id"),
@@ -258,15 +250,13 @@ public class POM {
                                              asText(node, "url"));
 
             if (node.has("releases")) {
-                var policy =
-                    parser.getCodec().treeToValue(node.get("releases"), RepositoryPolicy.class);
+                var policy = parser.getCodec().treeToValue(node.get("releases"), RepositoryPolicy.class);
 
                 builder.setReleasePolicy(policy);
             }
 
             if (node.has("snapshots")) {
-                var policy =
-                    parser.getCodec().treeToValue(node.get("snapshots"), RepositoryPolicy.class);
+                var policy = parser.getCodec().treeToValue(node.get("snapshots"), RepositoryPolicy.class);
 
                 builder.setSnapshotPolicy(policy);
             }
@@ -282,9 +272,7 @@ public class POM {
         public RemoteRepositorySerializer() { super(RemoteRepository.class); }
 
         @Override
-        public void serialize(RemoteRepository value, JsonGenerator generator,
-                              SerializerProvider provider) throws IOException,
-                                                                  JsonProcessingException {
+        public void serialize(RemoteRepository value, JsonGenerator generator, SerializerProvider provider) throws IOException, JsonProcessingException {
             var map = new LinkedHashMap<String,Object>();
 
             map.put("id", value.getId());
@@ -304,9 +292,7 @@ public class POM {
         public RepositoryPolicyDeserializer() { super(RepositoryPolicy.class); }
 
         @Override
-        public RepositoryPolicy deserialize(JsonParser parser,
-                                            DeserializationContext context) throws IOException,
-                                                                                   JsonProcessingException {
+        public RepositoryPolicy deserialize(JsonParser parser, DeserializationContext context) throws IOException, JsonProcessingException {
             JsonNode node = parser.getCodec().readTree(parser);
 
             return new RepositoryPolicy(node.has("enabled") ? node.get("enabled").asBoolean() : true,

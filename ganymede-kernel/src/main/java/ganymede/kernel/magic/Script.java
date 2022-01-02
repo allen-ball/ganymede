@@ -3,7 +3,7 @@ package ganymede.kernel.magic;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021 Allen D. Ball
+ * Copyright (C) 2021, 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,7 +67,6 @@ public class Script extends AbstractMagic {
     }
 
     protected String rewrite(String line0) {
-        return String.format("%s%s %s",
-                             CELL, "script", line0.substring(CELL.length()));
+        return String.format("%s%s %s", CELL, "script", line0.substring(CELL.length()));
     }
 }

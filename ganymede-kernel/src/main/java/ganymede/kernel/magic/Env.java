@@ -3,7 +3,7 @@ package ganymede.kernel.magic;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021 Allen D. Ball
+ * Copyright (C) 2021, 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,8 +43,7 @@ public class Env extends AbstractPropertiesMagic {
             var properties = compile(code);
 
             for (var entry : properties.entrySet()) {
-                throw new UnsupportedOperationException(System.getProperty("os.name")
-                                                        + ": Cannot set " + entry);
+                throw new UnsupportedOperationException(System.getProperty("os.name") + ": Cannot set " + entry);
             }
         } else {
             var properties = new Properties();

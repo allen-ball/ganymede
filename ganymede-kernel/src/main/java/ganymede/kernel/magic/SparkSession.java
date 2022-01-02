@@ -3,7 +3,7 @@ package ganymede.kernel.magic;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021 Allen D. Ball
+ * Copyright (C) 2021, 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,8 +62,7 @@ public class SparkSession extends AbstractPropertiesMagic {
             var config = new SparkConf();
 
             compile(code).entrySet().stream()
-                .forEach(t -> config.set(t.getKey().toString(),
-                                         String.valueOf(t.getValue())));
+                .forEach(t -> config.set(t.getKey().toString(), String.valueOf(t.getValue())));
 
             if (arguments.getMaster() != null) {
                 config.setMaster(arguments.getMaster());
@@ -108,12 +107,10 @@ public class SparkSession extends AbstractPropertiesMagic {
 
     @Command @Data
     private class Arguments {
-        @Parameters(description = { "Spark master" },
-                    index = "0", arity = "0..1")
+        @Parameters(description = { "Spark master" }, index = "0", arity = "0..1")
         private String master = null;
 
-        @Parameters(description = { "Spark appName" },
-                    index = "1", arity = "0..1", defaultValue = "root")
+        @Parameters(description = { "Spark appName" }, index = "1", arity = "0..1", defaultValue = "root")
         private String appName = null;
 
         @Option(names = { "--no-enable-hive-if-available" }, negatable = true,

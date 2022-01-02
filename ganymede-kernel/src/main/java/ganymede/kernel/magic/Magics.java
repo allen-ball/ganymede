@@ -3,7 +3,7 @@ package ganymede.kernel.magic;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021 Allen D. Ball
+ * Copyright (C) 2021, 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,8 +49,7 @@ public class Magics extends AbstractMagic {
         var rows =
             context.magics().values().stream()
             .distinct()
-            .map(t -> new Row(String.join(", ", t.getMagicNames()),
-                              t.getDescription(), t.getUsage()))
+            .map(t -> new Row(String.join(", ", t.getMagicNames()), t.getDescription(), t.getUsage()))
             .collect(toList());
         var map = Map.<String,Object>of("rows", rows);
         var html = ThymeleafRenderer.process(getClass(), resource + ".html", "html", map);

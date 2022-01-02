@@ -3,7 +3,7 @@ package ganymede.notebook;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021 Allen D. Ball
+ * Copyright (C) 2021, 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,8 +59,7 @@ public @interface Usage {
     @NoArgsConstructor @ToString
     public static class ProcessorImpl extends AnnotatedProcessor {
         @Override
-        public void process(RoundEnvironment roundEnv,
-                            TypeElement annotation, Element element) {
+        public void process(RoundEnvironment roundEnv, TypeElement annotation, Element element) {
             super.process(roundEnv, annotation, element);
 
             AnnotationMirror mirror = getAnnotationMirror(element, annotation);

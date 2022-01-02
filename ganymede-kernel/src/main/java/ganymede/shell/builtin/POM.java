@@ -3,7 +3,7 @@ package ganymede.shell.builtin;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021 Allen D. Ball
+ * Copyright (C) 2021, 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,9 +41,7 @@ import org.eclipse.aether.RepositoryException;
 @NoArgsConstructor @ToString @Log4j2
 public class POM extends Builtin {
     @Override
-    public void execute(Shell shell,
-                        InputStream in, PrintStream out, PrintStream err,
-                        Application application) throws Exception {
+    public void execute(Shell shell, InputStream in, PrintStream out, PrintStream err, Application application) throws Exception {
         try {
             var code = application.getCode();
 

@@ -3,7 +3,7 @@ package ganymede.kernel.magic;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021 Allen D. Ball
+ * Copyright (C) 2021, 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -140,8 +140,7 @@ public class Scala extends AbstractScriptEngineMagic {
 
             try {
                 type =
-                    Class.forName("scala.tools.nsc.interpreter.Scripted",
-                                  false, context.getClassLoader())
+                    Class.forName("scala.tools.nsc.interpreter.Scripted", false, context.getClassLoader())
                     .asSubclass(ScriptEngine.class);
             } catch (ClassNotFoundException exception) {
             }
@@ -176,8 +175,7 @@ public class Scala extends AbstractScriptEngineMagic {
 
                     var out = type.getMethod("apply$default$3").invoke(null);
                     var scripted =
-                        type.cast(type.getMethod("apply",
-                                                 ScriptEngineFactory.class, Settings.class, PrintWriter.class)
+                        type.cast(type.getMethod("apply", ScriptEngineFactory.class, Settings.class, PrintWriter.class)
                                   .invoke(null, factory, settings, out));
                     var bindings = context.context.getBindings(ENGINE_SCOPE);
 

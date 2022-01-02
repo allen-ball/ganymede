@@ -3,7 +3,7 @@ package ganymede.server;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021 Allen D. Ball
+ * Copyright (C) 2021, 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -394,8 +394,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
              * query.
              */
             if (request.content().hasNonNull("target_name")) {
-                var target_name =
-                    request.content().at("/target_name").asText();
+                var target_name = request.content().at("/target_name").asText();
                 var iterator = comms.fields();
 
                 while (iterator.hasNext()) {

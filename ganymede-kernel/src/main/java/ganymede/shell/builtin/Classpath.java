@@ -3,7 +3,7 @@ package ganymede.shell.builtin;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021 Allen D. Ball
+ * Copyright (C) 2021, 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,15 +45,12 @@ public class Classpath extends Builtin {
     private static final String SEPARATOR = System.getProperty("path.separator");
 
     @Override
-    public void execute(Shell shell,
-                        InputStream in, PrintStream out, PrintStream err,
-                        Application application) throws Exception {
+    public void execute(Shell shell, InputStream in, PrintStream out, PrintStream err, Application application) throws Exception {
         var code = application.getCode();
 
         if (! code.isBlank()) {
             var files =
-                HELPER.replacePlaceholders(code, System.getProperties())
-                .lines()
+                HELPER.replacePlaceholders(code, System.getProperties()).lines()
                 .filter(t -> (! t.isBlank()))
                 .map(String::strip)
                 .flatMap(t -> Stream.of(t.split(SEPARATOR)))

@@ -3,7 +3,7 @@ package ganymede.kernel.renderer;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021 Allen D. Ball
+ * Copyright (C) 2021, 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,8 +90,7 @@ public class JFreeChartRenderer extends AbstractRenderer {
                     var base64 = bundle.with(DATA).get(mimeType).asText();
 
                     try (var writer = new PrintWriter(html)) {
-                        writer.format("<img usemap=\"#%s\" src=\"data:%s;base64,%s\"/>\n",
-                                      name, mimeType, base64);
+                        writer.format("<img usemap=\"#%s\" src=\"data:%s;base64,%s\"/>\n", name, mimeType, base64);
                         ChartUtils.writeImageMap(writer, name, info, false);
                     }
 
