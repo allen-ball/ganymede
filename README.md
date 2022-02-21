@@ -634,7 +634,7 @@ Would generate:
 ## License
 
 [Ganymede Kernel] is released under the
-[Apache License][Apache License, Version 2.0].
+[Apache License, Version 2.0, January 2004].
 
 
 ## Endnotes
@@ -670,7 +670,7 @@ Ibid.
 
 [trig.ipynb]: https://github.com/allen-ball/ganymede-notebooks/blob/trunk/trig.ipynb
 
-[Apache License, Version 2.0]: https://www.apache.org/licenses/LICENSE-2.0
+[Apache License, Version 2.0, January 2004]: https://www.apache.org/licenses/LICENSE-2.0
 
 [Apache FreeMarker]: https://freemarker.apache.org/
 
