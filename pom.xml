@@ -31,7 +31,7 @@
   <parent>
     <groupId>ball</groupId>
     <artifactId>parent</artifactId>
-    <version>2022.0.0-SNAPSHOT</version>
+    <version>2022.0.0</version>
     <relativePath/>
   </parent>
   <organization>
@@ -47,7 +47,7 @@
     </license>
   </licenses>
   <scm>
-    <url>https://github.com/allen-ball/ganymede</url>
+    <url>https://github.com/allen-ball/ganymede.git</url>
   </scm>
   <distributionManagement>
     <downloadUrl>https://maven.pkg.github.com/allen-ball/${project.groupId}/</downloadUrl>
