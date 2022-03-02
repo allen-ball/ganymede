@@ -14,7 +14,6 @@ ganymede.kernel.client.api
 ganymede.kernel.client.model
 ganymede.kernel.magic
 ganymede.kernel.renderer
-ganymede.kernel.scala.magic
 ganymede.notebook
 ganymede.server
 ganymede.shell

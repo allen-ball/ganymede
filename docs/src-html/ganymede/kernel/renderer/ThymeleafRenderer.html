@@ -12,7 +12,7 @@
 <span class="sourceLineNo">003</span><a id="line.3"> * ##########################################################################</a>
 <span class="sourceLineNo">004</span><a id="line.4"> * Ganymede</a>
 <span class="sourceLineNo">005</span><a id="line.5"> * %%</a>
-<span class="sourceLineNo">006</span><a id="line.6"> * Copyright (C) 2021 Allen D. Ball</a>
+<span class="sourceLineNo">006</span><a id="line.6"> * Copyright (C) 2021, 2022 Allen D. Ball</a>
 <span class="sourceLineNo">007</span><a id="line.7"> * %%</a>
 <span class="sourceLineNo">008</span><a id="line.8"> * Licensed under the Apache License, Version 2.0 (the "License");</a>
 <span class="sourceLineNo">009</span><a id="line.9"> * you may not use this file except in compliance with the License.</a>
@@ -29,63 +29,63 @@
 <span class="sourceLineNo">020</span><a id="line.20"> */</a>
 <span class="sourceLineNo">021</span><a id="line.21">import ball.annotation.ServiceProviderFor;</a>
 <span class="sourceLineNo">022</span><a id="line.22">import com.fasterxml.jackson.databind.node.ObjectNode;</a>
-<span class="sourceLineNo">023</span><a id="line.23">import ganymede.notebook.ForClass;</a>
-<span class="sourceLineNo">024</span><a id="line.24">import ganymede.notebook.Renderer;</a>
-<span class="sourceLineNo">025</span><a id="line.25">import java.util.Map;</a>
-<span class="sourceLineNo">026</span><a id="line.26">import lombok.Data;</a>
-<span class="sourceLineNo">027</span><a id="line.27">import lombok.NoArgsConstructor;</a>
-<span class="sourceLineNo">028</span><a id="line.28">import lombok.ToString;</a>
-<span class="sourceLineNo">029</span><a id="line.29">import org.springframework.core.io.ClassPathResource;</a>
-<span class="sourceLineNo">030</span><a id="line.30">import org.springframework.util.StreamUtils;</a>
-<span class="sourceLineNo">031</span><a id="line.31">import org.thymeleaf.TemplateEngine;</a>
-<span class="sourceLineNo">032</span><a id="line.32">import org.thymeleaf.context.Context;</a>
-<span class="sourceLineNo">033</span><a id="line.33">import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;</a>
-<span class="sourceLineNo">034</span><a id="line.34">import org.thymeleaf.templatemode.TemplateMode;</a>
-<span class="sourceLineNo">035</span><a id="line.35">import org.thymeleaf.templateresolver.StringTemplateResolver;</a>
-<span class="sourceLineNo">036</span><a id="line.36"></a>
-<span class="sourceLineNo">037</span><a id="line.37">import static java.nio.charset.StandardCharsets.UTF_8;</a>
-<span class="sourceLineNo">038</span><a id="line.38">import static org.springframework.util.MimeTypeUtils.TEXT_HTML_VALUE;</a>
-<span class="sourceLineNo">039</span><a id="line.39">import static org.springframework.util.MimeTypeUtils.TEXT_PLAIN_VALUE;</a>
-<span class="sourceLineNo">040</span><a id="line.40">import static org.springframework.util.MimeTypeUtils.TEXT_XML_VALUE;</a>
-<span class="sourceLineNo">041</span><a id="line.41"></a>
-<span class="sourceLineNo">042</span><a id="line.42">/**</a>
-<span class="sourceLineNo">043</span><a id="line.43"> * Thymeleaf template {@link Renderer}.</a>
-<span class="sourceLineNo">044</span><a id="line.44"> *</a>
-<span class="sourceLineNo">045</span><a id="line.45"> * @see TemplateEngine</a>
-<span class="sourceLineNo">046</span><a id="line.46"> * @see StringTemplateResolver</a>
-<span class="sourceLineNo">047</span><a id="line.47"> * @see Java8TimeDialect</a>
-<span class="sourceLineNo">048</span><a id="line.48"> *</a>
-<span class="sourceLineNo">049</span><a id="line.49"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
-<span class="sourceLineNo">050</span><a id="line.50"> */</a>
-<span class="sourceLineNo">051</span><a id="line.51">@ServiceProviderFor({ Renderer.class })</a>
-<span class="sourceLineNo">052</span><a id="line.52">@ForClass(ThymeleafRenderer.Output.class)</a>
-<span class="sourceLineNo">053</span><a id="line.53">@NoArgsConstructor @ToString</a>
-<span class="sourceLineNo">054</span><a id="line.54">public class ThymeleafRenderer implements Renderer {</a>
-<span class="sourceLineNo">055</span><a id="line.55">    private static final StringTemplateResolver RESOLVER;</a>
-<span class="sourceLineNo">056</span><a id="line.56">    private static final TemplateEngine ENGINE;</a>
-<span class="sourceLineNo">057</span><a id="line.57"></a>
-<span class="sourceLineNo">058</span><a id="line.58">    static {</a>
-<span class="sourceLineNo">059</span><a id="line.59">        RESOLVER = new StringTemplateResolver();</a>
-<span class="sourceLineNo">060</span><a id="line.60"></a>
-<span class="sourceLineNo">061</span><a id="line.61">        ENGINE = new TemplateEngine();</a>
-<span class="sourceLineNo">062</span><a id="line.62">        ENGINE.setTemplateResolver(RESOLVER);</a>
-<span class="sourceLineNo">063</span><a id="line.63">        ENGINE.addDialect(new Java8TimeDialect());</a>
-<span class="sourceLineNo">064</span><a id="line.64">    }</a>
-<span class="sourceLineNo">065</span><a id="line.65"></a>
-<span class="sourceLineNo">066</span><a id="line.66">    /**</a>
-<span class="sourceLineNo">067</span><a id="line.67">     * Method to evaluate a template from a {@link String}.</a>
-<span class="sourceLineNo">068</span><a id="line.68">     *</a>
-<span class="sourceLineNo">069</span><a id="line.69">     * @param template      The template {@link String}.</a>
-<span class="sourceLineNo">070</span><a id="line.70">     * @param mode          The template resolver mode.</a>
-<span class="sourceLineNo">071</span><a id="line.71">     * @param map           The {@link Context} name-value pairs.</a>
-<span class="sourceLineNo">072</span><a id="line.72">     *</a>
-<span class="sourceLineNo">073</span><a id="line.73">     * @return  The {@link Output} to be renderered.</a>
-<span class="sourceLineNo">074</span><a id="line.74">     */</a>
-<span class="sourceLineNo">075</span><a id="line.75">    public static Output process(String template, String mode, Map&lt;String,Object&gt; map) {</a>
-<span class="sourceLineNo">076</span><a id="line.76">        RESOLVER.setTemplateMode(mode);</a>
-<span class="sourceLineNo">077</span><a id="line.77"></a>
-<span class="sourceLineNo">078</span><a id="line.78">        return new Output(RESOLVER.getTemplateMode(),</a>
-<span class="sourceLineNo">079</span><a id="line.79">                          ENGINE.process(template, new Context(null, map)));</a>
+<span class="sourceLineNo">023</span><a id="line.23">import ganymede.notebook.AbstractRenderer;</a>
+<span class="sourceLineNo">024</span><a id="line.24">import ganymede.notebook.ForClass;</a>
+<span class="sourceLineNo">025</span><a id="line.25">import ganymede.notebook.Renderer;</a>
+<span class="sourceLineNo">026</span><a id="line.26">import java.util.Map;</a>
+<span class="sourceLineNo">027</span><a id="line.27">import lombok.Data;</a>
+<span class="sourceLineNo">028</span><a id="line.28">import lombok.NoArgsConstructor;</a>
+<span class="sourceLineNo">029</span><a id="line.29">import lombok.ToString;</a>
+<span class="sourceLineNo">030</span><a id="line.30">import org.springframework.core.io.ClassPathResource;</a>
+<span class="sourceLineNo">031</span><a id="line.31">import org.springframework.util.StreamUtils;</a>
+<span class="sourceLineNo">032</span><a id="line.32">import org.thymeleaf.TemplateEngine;</a>
+<span class="sourceLineNo">033</span><a id="line.33">import org.thymeleaf.context.Context;</a>
+<span class="sourceLineNo">034</span><a id="line.34">import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;</a>
+<span class="sourceLineNo">035</span><a id="line.35">import org.thymeleaf.templatemode.TemplateMode;</a>
+<span class="sourceLineNo">036</span><a id="line.36">import org.thymeleaf.templateresolver.StringTemplateResolver;</a>
+<span class="sourceLineNo">037</span><a id="line.37"></a>
+<span class="sourceLineNo">038</span><a id="line.38">import static java.nio.charset.StandardCharsets.UTF_8;</a>
+<span class="sourceLineNo">039</span><a id="line.39">import static org.springframework.util.MimeTypeUtils.TEXT_HTML_VALUE;</a>
+<span class="sourceLineNo">040</span><a id="line.40">import static org.springframework.util.MimeTypeUtils.TEXT_PLAIN_VALUE;</a>
+<span class="sourceLineNo">041</span><a id="line.41">import static org.springframework.util.MimeTypeUtils.TEXT_XML_VALUE;</a>
+<span class="sourceLineNo">042</span><a id="line.42"></a>
+<span class="sourceLineNo">043</span><a id="line.43">/**</a>
+<span class="sourceLineNo">044</span><a id="line.44"> * Thymeleaf template {@link Renderer}.</a>
+<span class="sourceLineNo">045</span><a id="line.45"> *</a>
+<span class="sourceLineNo">046</span><a id="line.46"> * @see TemplateEngine</a>
+<span class="sourceLineNo">047</span><a id="line.47"> * @see StringTemplateResolver</a>
+<span class="sourceLineNo">048</span><a id="line.48"> * @see Java8TimeDialect</a>
+<span class="sourceLineNo">049</span><a id="line.49"> *</a>
+<span class="sourceLineNo">050</span><a id="line.50"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
+<span class="sourceLineNo">051</span><a id="line.51"> */</a>
+<span class="sourceLineNo">052</span><a id="line.52">@ServiceProviderFor({ Renderer.class })</a>
+<span class="sourceLineNo">053</span><a id="line.53">@ForClass(ThymeleafRenderer.Output.class)</a>
+<span class="sourceLineNo">054</span><a id="line.54">@NoArgsConstructor @ToString</a>
+<span class="sourceLineNo">055</span><a id="line.55">public class ThymeleafRenderer extends AbstractRenderer {</a>
+<span class="sourceLineNo">056</span><a id="line.56">    private static final StringTemplateResolver RESOLVER;</a>
+<span class="sourceLineNo">057</span><a id="line.57">    private static final TemplateEngine ENGINE;</a>
+<span class="sourceLineNo">058</span><a id="line.58"></a>
+<span class="sourceLineNo">059</span><a id="line.59">    static {</a>
+<span class="sourceLineNo">060</span><a id="line.60">        RESOLVER = new StringTemplateResolver();</a>
+<span class="sourceLineNo">061</span><a id="line.61"></a>
+<span class="sourceLineNo">062</span><a id="line.62">        ENGINE = new TemplateEngine();</a>
+<span class="sourceLineNo">063</span><a id="line.63">        ENGINE.setTemplateResolver(RESOLVER);</a>
+<span class="sourceLineNo">064</span><a id="line.64">        ENGINE.addDialect(new Java8TimeDialect());</a>
+<span class="sourceLineNo">065</span><a id="line.65">    }</a>
+<span class="sourceLineNo">066</span><a id="line.66"></a>
+<span class="sourceLineNo">067</span><a id="line.67">    /**</a>
+<span class="sourceLineNo">068</span><a id="line.68">     * Method to evaluate a template from a {@link String}.</a>
+<span class="sourceLineNo">069</span><a id="line.69">     *</a>
+<span class="sourceLineNo">070</span><a id="line.70">     * @param template      The template {@link String}.</a>
+<span class="sourceLineNo">071</span><a id="line.71">     * @param mode          The template resolver mode.</a>
+<span class="sourceLineNo">072</span><a id="line.72">     * @param map           The {@link Context} name-value pairs.</a>
+<span class="sourceLineNo">073</span><a id="line.73">     *</a>
+<span class="sourceLineNo">074</span><a id="line.74">     * @return  The {@link Output} to be renderered.</a>
+<span class="sourceLineNo">075</span><a id="line.75">     */</a>
+<span class="sourceLineNo">076</span><a id="line.76">    public static Output process(String template, String mode, Map&lt;String,Object&gt; map) {</a>
+<span class="sourceLineNo">077</span><a id="line.77">        RESOLVER.setTemplateMode(mode);</a>
+<span class="sourceLineNo">078</span><a id="line.78"></a>
+<span class="sourceLineNo">079</span><a id="line.79">        return new Output(RESOLVER.getTemplateMode(), ENGINE.process(template, new Context(null, map)));</a>
 <span class="sourceLineNo">080</span><a id="line.80">    }</a>
 <span class="sourceLineNo">081</span><a id="line.81"></a>
 <span class="sourceLineNo">082</span><a id="line.82">    /**</a>

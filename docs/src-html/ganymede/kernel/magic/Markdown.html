@@ -12,7 +12,7 @@
 <span class="sourceLineNo">003</span><a id="line.3"> * ##########################################################################</a>
 <span class="sourceLineNo">004</span><a id="line.4"> * Ganymede</a>
 <span class="sourceLineNo">005</span><a id="line.5"> * %%</a>
-<span class="sourceLineNo">006</span><a id="line.6"> * Copyright (C) 2021 Allen D. Ball</a>
+<span class="sourceLineNo">006</span><a id="line.6"> * Copyright (C) 2021, 2022 Allen D. Ball</a>
 <span class="sourceLineNo">007</span><a id="line.7"> * %%</a>
 <span class="sourceLineNo">008</span><a id="line.8"> * Licensed under the Apache License, Version 2.0 (the "License");</a>
 <span class="sourceLineNo">009</span><a id="line.9"> * you may not use this file except in compliance with the License.</a>
@@ -30,103 +30,104 @@
 <span class="sourceLineNo">021</span><a id="line.21">import ball.annotation.ServiceProviderFor;</a>
 <span class="sourceLineNo">022</span><a id="line.22">import com.fasterxml.jackson.databind.node.ObjectNode;</a>
 <span class="sourceLineNo">023</span><a id="line.23">import ganymede.kernel.client.KernelRestClient;</a>
-<span class="sourceLineNo">024</span><a id="line.24">import ganymede.notebook.Description;</a>
-<span class="sourceLineNo">025</span><a id="line.25">import ganymede.notebook.ForClass;</a>
-<span class="sourceLineNo">026</span><a id="line.26">import ganymede.notebook.Magic;</a>
-<span class="sourceLineNo">027</span><a id="line.27">import ganymede.notebook.Renderer;</a>
-<span class="sourceLineNo">028</span><a id="line.28">import ganymede.notebook.ScriptEngineName;</a>
-<span class="sourceLineNo">029</span><a id="line.29">import ganymede.server.Message;</a>
-<span class="sourceLineNo">030</span><a id="line.30">import java.util.ArrayList;</a>
-<span class="sourceLineNo">031</span><a id="line.31">import java.util.List;</a>
-<span class="sourceLineNo">032</span><a id="line.32">import lombok.NoArgsConstructor;</a>
-<span class="sourceLineNo">033</span><a id="line.33">import lombok.ToString;</a>
-<span class="sourceLineNo">034</span><a id="line.34">import lombok.extern.log4j.Log4j2;</a>
-<span class="sourceLineNo">035</span><a id="line.35">import org.commonmark.Extension;</a>
-<span class="sourceLineNo">036</span><a id="line.36">import org.commonmark.node.Node;</a>
-<span class="sourceLineNo">037</span><a id="line.37">import org.commonmark.parser.Parser;</a>
-<span class="sourceLineNo">038</span><a id="line.38">import org.commonmark.renderer.html.HtmlRenderer;</a>
-<span class="sourceLineNo">039</span><a id="line.39">import org.commonmark.renderer.text.TextContentRenderer;</a>
-<span class="sourceLineNo">040</span><a id="line.40"></a>
-<span class="sourceLineNo">041</span><a id="line.41">import static org.springframework.util.MimeTypeUtils.TEXT_HTML_VALUE;</a>
-<span class="sourceLineNo">042</span><a id="line.42"></a>
-<span class="sourceLineNo">043</span><a id="line.43">/**</a>
-<span class="sourceLineNo">044</span><a id="line.44"> * {@link Markdown} {@link Magic}.</a>
-<span class="sourceLineNo">045</span><a id="line.45"> *</a>
-<span class="sourceLineNo">046</span><a id="line.46"> * @see Parser</a>
-<span class="sourceLineNo">047</span><a id="line.47"> * @see HtmlRenderer</a>
-<span class="sourceLineNo">048</span><a id="line.48"> * @see TextContentRenderer</a>
-<span class="sourceLineNo">049</span><a id="line.49"> *</a>
-<span class="sourceLineNo">050</span><a id="line.50"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
-<span class="sourceLineNo">051</span><a id="line.51"> */</a>
-<span class="sourceLineNo">052</span><a id="line.52">@ServiceProviderFor({ Magic.class })</a>
-<span class="sourceLineNo">053</span><a id="line.53">@Description("Markdown template evaluator")</a>
-<span class="sourceLineNo">054</span><a id="line.54">@ScriptEngineName("handlebars")</a>
-<span class="sourceLineNo">055</span><a id="line.55">@NoArgsConstructor @ToString @Log4j2</a>
-<span class="sourceLineNo">056</span><a id="line.56">public class Markdown extends Handlebars {</a>
-<span class="sourceLineNo">057</span><a id="line.57">    private static final List&lt;Extension&gt; EXTENSIONS = new ArrayList&lt;&gt;();</a>
-<span class="sourceLineNo">058</span><a id="line.58"></a>
-<span class="sourceLineNo">059</span><a id="line.59">    /**</a>
-<span class="sourceLineNo">060</span><a id="line.60">     * Installed {@link Extension}s.</a>
-<span class="sourceLineNo">061</span><a id="line.61">     *</a>
-<span class="sourceLineNo">062</span><a id="line.62">     * {@include #TYPES}</a>
-<span class="sourceLineNo">063</span><a id="line.63">     */</a>
-<span class="sourceLineNo">064</span><a id="line.64">    public static final List&lt;Class&lt;? extends Extension&gt;&gt; TYPES =</a>
-<span class="sourceLineNo">065</span><a id="line.65">        List.of(org.commonmark.ext.autolink.AutolinkExtension.class,</a>
-<span class="sourceLineNo">066</span><a id="line.66">                org.commonmark.ext.gfm.strikethrough.StrikethroughExtension.class,</a>
-<span class="sourceLineNo">067</span><a id="line.67">                org.commonmark.ext.gfm.tables.TablesExtension.class,</a>
-<span class="sourceLineNo">068</span><a id="line.68">                org.commonmark.ext.heading.anchor.HeadingAnchorExtension.class,</a>
-<span class="sourceLineNo">069</span><a id="line.69">                org.commonmark.ext.image.attributes.ImageAttributesExtension.class,</a>
-<span class="sourceLineNo">070</span><a id="line.70">                org.commonmark.ext.ins.InsExtension.class,</a>
-<span class="sourceLineNo">071</span><a id="line.71">                org.commonmark.ext.task.list.items.TaskListItemsExtension.class,</a>
-<span class="sourceLineNo">072</span><a id="line.72">                org.commonmark.ext.front.matter.YamlFrontMatterExtension.class);</a>
-<span class="sourceLineNo">073</span><a id="line.73">    static {</a>
-<span class="sourceLineNo">074</span><a id="line.74">        try {</a>
-<span class="sourceLineNo">075</span><a id="line.75">            for (Class&lt;? extends Extension&gt; type : TYPES) {</a>
-<span class="sourceLineNo">076</span><a id="line.76">                var extension = (Extension) type.getMethod("create").invoke(null);</a>
-<span class="sourceLineNo">077</span><a id="line.77"></a>
-<span class="sourceLineNo">078</span><a id="line.78">                EXTENSIONS.add(extension);</a>
-<span class="sourceLineNo">079</span><a id="line.79">            }</a>
-<span class="sourceLineNo">080</span><a id="line.80">        } catch (Exception exception) {</a>
-<span class="sourceLineNo">081</span><a id="line.81">            throw new ExceptionInInitializerError(exception);</a>
-<span class="sourceLineNo">082</span><a id="line.82">        }</a>
-<span class="sourceLineNo">083</span><a id="line.83">    }</a>
-<span class="sourceLineNo">084</span><a id="line.84"></a>
-<span class="sourceLineNo">085</span><a id="line.85">    private final Parser parser = Parser.builder().extensions(EXTENSIONS).build();</a>
-<span class="sourceLineNo">086</span><a id="line.86"></a>
-<span class="sourceLineNo">087</span><a id="line.87">    @Override</a>
-<span class="sourceLineNo">088</span><a id="line.88">    protected void render(Object object) {</a>
-<span class="sourceLineNo">089</span><a id="line.89">        try {</a>
-<span class="sourceLineNo">090</span><a id="line.90">            var markdown = (String) object;</a>
-<span class="sourceLineNo">091</span><a id="line.91">            var node = parser.parse(markdown);</a>
-<span class="sourceLineNo">092</span><a id="line.92"></a>
-<span class="sourceLineNo">093</span><a id="line.93">            new KernelRestClient().print(Message.mime_bundle(node));</a>
-<span class="sourceLineNo">094</span><a id="line.94">        } catch (Exception exception) {</a>
-<span class="sourceLineNo">095</span><a id="line.95">            exception.printStackTrace(System.err);</a>
-<span class="sourceLineNo">096</span><a id="line.96">        }</a>
-<span class="sourceLineNo">097</span><a id="line.97">    }</a>
-<span class="sourceLineNo">098</span><a id="line.98"></a>
-<span class="sourceLineNo">099</span><a id="line.99">    /**</a>
-<span class="sourceLineNo">100</span><a id="line.100">     * CommonMark {@link Node} {@link Renderer} service provider.</a>
-<span class="sourceLineNo">101</span><a id="line.101">     */</a>
-<span class="sourceLineNo">102</span><a id="line.102">    @ServiceProviderFor({ Renderer.class })</a>
-<span class="sourceLineNo">103</span><a id="line.103">    @ForClass(Node.class)</a>
-<span class="sourceLineNo">104</span><a id="line.104">    @NoArgsConstructor @ToString</a>
-<span class="sourceLineNo">105</span><a id="line.105">    public static class CommonMarkNodeRenderer implements Renderer {</a>
-<span class="sourceLineNo">106</span><a id="line.106">        private HtmlRenderer html = HtmlRenderer.builder().extensions(EXTENSIONS).build();</a>
-<span class="sourceLineNo">107</span><a id="line.107">        private TextContentRenderer text = TextContentRenderer.builder().extensions(EXTENSIONS).build();</a>
-<span class="sourceLineNo">108</span><a id="line.108"></a>
-<span class="sourceLineNo">109</span><a id="line.109">        @Override</a>
-<span class="sourceLineNo">110</span><a id="line.110">        public void renderTo(ObjectNode bundle, Object object) {</a>
-<span class="sourceLineNo">111</span><a id="line.111">            var node = (Node) object;</a>
-<span class="sourceLineNo">112</span><a id="line.112"></a>
-<span class="sourceLineNo">113</span><a id="line.113">            if (! bundle.with(DATA).has(TEXT_HTML_VALUE)) {</a>
-<span class="sourceLineNo">114</span><a id="line.114">                bundle.with(DATA).put(TEXT_HTML_VALUE, html.render(node));</a>
-<span class="sourceLineNo">115</span><a id="line.115">            }</a>
-<span class="sourceLineNo">116</span><a id="line.116"></a>
-<span class="sourceLineNo">117</span><a id="line.117">            MAP.renderTo(bundle, text.render(node));</a>
-<span class="sourceLineNo">118</span><a id="line.118">        }</a>
-<span class="sourceLineNo">119</span><a id="line.119">    }</a>
-<span class="sourceLineNo">120</span><a id="line.120">}</a>
+<span class="sourceLineNo">024</span><a id="line.24">import ganymede.notebook.AbstractRenderer;</a>
+<span class="sourceLineNo">025</span><a id="line.25">import ganymede.notebook.Description;</a>
+<span class="sourceLineNo">026</span><a id="line.26">import ganymede.notebook.ForClass;</a>
+<span class="sourceLineNo">027</span><a id="line.27">import ganymede.notebook.Magic;</a>
+<span class="sourceLineNo">028</span><a id="line.28">import ganymede.notebook.Renderer;</a>
+<span class="sourceLineNo">029</span><a id="line.29">import ganymede.notebook.ScriptEngineName;</a>
+<span class="sourceLineNo">030</span><a id="line.30">import ganymede.server.Message;</a>
+<span class="sourceLineNo">031</span><a id="line.31">import java.util.ArrayList;</a>
+<span class="sourceLineNo">032</span><a id="line.32">import java.util.List;</a>
+<span class="sourceLineNo">033</span><a id="line.33">import lombok.NoArgsConstructor;</a>
+<span class="sourceLineNo">034</span><a id="line.34">import lombok.ToString;</a>
+<span class="sourceLineNo">035</span><a id="line.35">import lombok.extern.log4j.Log4j2;</a>
+<span class="sourceLineNo">036</span><a id="line.36">import org.commonmark.Extension;</a>
+<span class="sourceLineNo">037</span><a id="line.37">import org.commonmark.node.Node;</a>
+<span class="sourceLineNo">038</span><a id="line.38">import org.commonmark.parser.Parser;</a>
+<span class="sourceLineNo">039</span><a id="line.39">import org.commonmark.renderer.html.HtmlRenderer;</a>
+<span class="sourceLineNo">040</span><a id="line.40">import org.commonmark.renderer.text.TextContentRenderer;</a>
+<span class="sourceLineNo">041</span><a id="line.41"></a>
+<span class="sourceLineNo">042</span><a id="line.42">import static org.springframework.util.MimeTypeUtils.TEXT_HTML_VALUE;</a>
+<span class="sourceLineNo">043</span><a id="line.43"></a>
+<span class="sourceLineNo">044</span><a id="line.44">/**</a>
+<span class="sourceLineNo">045</span><a id="line.45"> * {@link Markdown} {@link Magic}.</a>
+<span class="sourceLineNo">046</span><a id="line.46"> *</a>
+<span class="sourceLineNo">047</span><a id="line.47"> * @see Parser</a>
+<span class="sourceLineNo">048</span><a id="line.48"> * @see HtmlRenderer</a>
+<span class="sourceLineNo">049</span><a id="line.49"> * @see TextContentRenderer</a>
+<span class="sourceLineNo">050</span><a id="line.50"> *</a>
+<span class="sourceLineNo">051</span><a id="line.51"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
+<span class="sourceLineNo">052</span><a id="line.52"> */</a>
+<span class="sourceLineNo">053</span><a id="line.53">@ServiceProviderFor({ Magic.class })</a>
+<span class="sourceLineNo">054</span><a id="line.54">@Description("Markdown template evaluator")</a>
+<span class="sourceLineNo">055</span><a id="line.55">@ScriptEngineName("handlebars")</a>
+<span class="sourceLineNo">056</span><a id="line.56">@NoArgsConstructor @ToString @Log4j2</a>
+<span class="sourceLineNo">057</span><a id="line.57">public class Markdown extends Handlebars {</a>
+<span class="sourceLineNo">058</span><a id="line.58">    private static final List&lt;Extension&gt; EXTENSIONS = new ArrayList&lt;&gt;();</a>
+<span class="sourceLineNo">059</span><a id="line.59"></a>
+<span class="sourceLineNo">060</span><a id="line.60">    /**</a>
+<span class="sourceLineNo">061</span><a id="line.61">     * Installed {@link Extension}s.</a>
+<span class="sourceLineNo">062</span><a id="line.62">     *</a>
+<span class="sourceLineNo">063</span><a id="line.63">     * {@include #TYPES}</a>
+<span class="sourceLineNo">064</span><a id="line.64">     */</a>
+<span class="sourceLineNo">065</span><a id="line.65">    public static final List&lt;Class&lt;? extends Extension&gt;&gt; TYPES =</a>
+<span class="sourceLineNo">066</span><a id="line.66">        List.of(org.commonmark.ext.autolink.AutolinkExtension.class,</a>
+<span class="sourceLineNo">067</span><a id="line.67">                org.commonmark.ext.gfm.strikethrough.StrikethroughExtension.class,</a>
+<span class="sourceLineNo">068</span><a id="line.68">                org.commonmark.ext.gfm.tables.TablesExtension.class,</a>
+<span class="sourceLineNo">069</span><a id="line.69">                org.commonmark.ext.heading.anchor.HeadingAnchorExtension.class,</a>
+<span class="sourceLineNo">070</span><a id="line.70">                org.commonmark.ext.image.attributes.ImageAttributesExtension.class,</a>
+<span class="sourceLineNo">071</span><a id="line.71">                org.commonmark.ext.ins.InsExtension.class,</a>
+<span class="sourceLineNo">072</span><a id="line.72">                org.commonmark.ext.task.list.items.TaskListItemsExtension.class,</a>
+<span class="sourceLineNo">073</span><a id="line.73">                org.commonmark.ext.front.matter.YamlFrontMatterExtension.class);</a>
+<span class="sourceLineNo">074</span><a id="line.74">    static {</a>
+<span class="sourceLineNo">075</span><a id="line.75">        try {</a>
+<span class="sourceLineNo">076</span><a id="line.76">            for (Class&lt;? extends Extension&gt; type : TYPES) {</a>
+<span class="sourceLineNo">077</span><a id="line.77">                var extension = (Extension) type.getMethod("create").invoke(null);</a>
+<span class="sourceLineNo">078</span><a id="line.78"></a>
+<span class="sourceLineNo">079</span><a id="line.79">                EXTENSIONS.add(extension);</a>
+<span class="sourceLineNo">080</span><a id="line.80">            }</a>
+<span class="sourceLineNo">081</span><a id="line.81">        } catch (Exception exception) {</a>
+<span class="sourceLineNo">082</span><a id="line.82">            throw new ExceptionInInitializerError(exception);</a>
+<span class="sourceLineNo">083</span><a id="line.83">        }</a>
+<span class="sourceLineNo">084</span><a id="line.84">    }</a>
+<span class="sourceLineNo">085</span><a id="line.85"></a>
+<span class="sourceLineNo">086</span><a id="line.86">    private final Parser parser = Parser.builder().extensions(EXTENSIONS).build();</a>
+<span class="sourceLineNo">087</span><a id="line.87"></a>
+<span class="sourceLineNo">088</span><a id="line.88">    @Override</a>
+<span class="sourceLineNo">089</span><a id="line.89">    protected void render(Object object) {</a>
+<span class="sourceLineNo">090</span><a id="line.90">        try {</a>
+<span class="sourceLineNo">091</span><a id="line.91">            var markdown = (String) object;</a>
+<span class="sourceLineNo">092</span><a id="line.92">            var node = parser.parse(markdown);</a>
+<span class="sourceLineNo">093</span><a id="line.93"></a>
+<span class="sourceLineNo">094</span><a id="line.94">            new KernelRestClient().print(Message.mime_bundle(node));</a>
+<span class="sourceLineNo">095</span><a id="line.95">        } catch (Exception exception) {</a>
+<span class="sourceLineNo">096</span><a id="line.96">            exception.printStackTrace(System.err);</a>
+<span class="sourceLineNo">097</span><a id="line.97">        }</a>
+<span class="sourceLineNo">098</span><a id="line.98">    }</a>
+<span class="sourceLineNo">099</span><a id="line.99"></a>
+<span class="sourceLineNo">100</span><a id="line.100">    /**</a>
+<span class="sourceLineNo">101</span><a id="line.101">     * CommonMark {@link Node} {@link Renderer} service provider.</a>
+<span class="sourceLineNo">102</span><a id="line.102">     */</a>
+<span class="sourceLineNo">103</span><a id="line.103">    @ServiceProviderFor({ Renderer.class })</a>
+<span class="sourceLineNo">104</span><a id="line.104">    @ForClass(Node.class)</a>
+<span class="sourceLineNo">105</span><a id="line.105">    @NoArgsConstructor @ToString</a>
+<span class="sourceLineNo">106</span><a id="line.106">    public static class CommonMarkNodeRenderer extends AbstractRenderer {</a>
+<span class="sourceLineNo">107</span><a id="line.107">        private HtmlRenderer html = HtmlRenderer.builder().extensions(EXTENSIONS).build();</a>
+<span class="sourceLineNo">108</span><a id="line.108">        private TextContentRenderer text = TextContentRenderer.builder().extensions(EXTENSIONS).build();</a>
+<span class="sourceLineNo">109</span><a id="line.109"></a>
+<span class="sourceLineNo">110</span><a id="line.110">        @Override</a>
+<span class="sourceLineNo">111</span><a id="line.111">        public void renderTo(ObjectNode bundle, Object object) {</a>
+<span class="sourceLineNo">112</span><a id="line.112">            var node = (Node) object;</a>
+<span class="sourceLineNo">113</span><a id="line.113"></a>
+<span class="sourceLineNo">114</span><a id="line.114">            if (! bundle.with(DATA).has(TEXT_HTML_VALUE)) {</a>
+<span class="sourceLineNo">115</span><a id="line.115">                bundle.with(DATA).put(TEXT_HTML_VALUE, html.render(node));</a>
+<span class="sourceLineNo">116</span><a id="line.116">            }</a>
+<span class="sourceLineNo">117</span><a id="line.117"></a>
+<span class="sourceLineNo">118</span><a id="line.118">            renderers.renderTo(bundle, text.render(node));</a>
+<span class="sourceLineNo">119</span><a id="line.119">        }</a>
+<span class="sourceLineNo">120</span><a id="line.120">    }</a>
+<span class="sourceLineNo">121</span><a id="line.121">}</a>
 
 
 

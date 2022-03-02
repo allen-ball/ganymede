@@ -62,191 +62,193 @@
 <span class="sourceLineNo">053</span><a id="line.53">  public static final String JSON_PROPERTY_EXECUTION_STATE = "execution_state";</a>
 <span class="sourceLineNo">054</span><a id="line.54">  private String executionState;</a>
 <span class="sourceLineNo">055</span><a id="line.55"></a>
-<span class="sourceLineNo">056</span><a id="line.56">  public Kernel id(UUID id) {</a>
-<span class="sourceLineNo">057</span><a id="line.57">    this.id = id;</a>
-<span class="sourceLineNo">058</span><a id="line.58">    return this;</a>
-<span class="sourceLineNo">059</span><a id="line.59">  }</a>
-<span class="sourceLineNo">060</span><a id="line.60"></a>
-<span class="sourceLineNo">061</span><a id="line.61">  /**</a>
-<span class="sourceLineNo">062</span><a id="line.62">   * uuid of kernel</a>
-<span class="sourceLineNo">063</span><a id="line.63">   * @return id</a>
-<span class="sourceLineNo">064</span><a id="line.64">   **/</a>
-<span class="sourceLineNo">065</span><a id="line.65">  @javax.annotation.Nonnull</a>
-<span class="sourceLineNo">066</span><a id="line.66">  @ApiModelProperty(required = true, value = "uuid of kernel")</a>
-<span class="sourceLineNo">067</span><a id="line.67">  @JsonProperty(JSON_PROPERTY_ID)</a>
-<span class="sourceLineNo">068</span><a id="line.68">  @JsonInclude(value = JsonInclude.Include.ALWAYS)</a>
-<span class="sourceLineNo">069</span><a id="line.69"></a>
-<span class="sourceLineNo">070</span><a id="line.70">  public UUID getId() {</a>
-<span class="sourceLineNo">071</span><a id="line.71">    return id;</a>
-<span class="sourceLineNo">072</span><a id="line.72">  }</a>
-<span class="sourceLineNo">073</span><a id="line.73"></a>
-<span class="sourceLineNo">074</span><a id="line.74">  @JsonProperty(JSON_PROPERTY_ID)</a>
-<span class="sourceLineNo">075</span><a id="line.75">  @JsonInclude(value = JsonInclude.Include.ALWAYS)</a>
-<span class="sourceLineNo">076</span><a id="line.76">  public void setId(UUID id) {</a>
-<span class="sourceLineNo">077</span><a id="line.77">    this.id = id;</a>
-<span class="sourceLineNo">078</span><a id="line.78">  }</a>
-<span class="sourceLineNo">079</span><a id="line.79"></a>
-<span class="sourceLineNo">080</span><a id="line.80">  public Kernel name(String name) {</a>
-<span class="sourceLineNo">081</span><a id="line.81">    this.name = name;</a>
-<span class="sourceLineNo">082</span><a id="line.82">    return this;</a>
-<span class="sourceLineNo">083</span><a id="line.83">  }</a>
-<span class="sourceLineNo">084</span><a id="line.84"></a>
-<span class="sourceLineNo">085</span><a id="line.85">  /**</a>
-<span class="sourceLineNo">086</span><a id="line.86">   * kernel spec name</a>
-<span class="sourceLineNo">087</span><a id="line.87">   * @return name</a>
-<span class="sourceLineNo">088</span><a id="line.88">   **/</a>
-<span class="sourceLineNo">089</span><a id="line.89">  @javax.annotation.Nonnull</a>
-<span class="sourceLineNo">090</span><a id="line.90">  @ApiModelProperty(required = true, value = "kernel spec name")</a>
-<span class="sourceLineNo">091</span><a id="line.91">  @JsonProperty(JSON_PROPERTY_NAME)</a>
-<span class="sourceLineNo">092</span><a id="line.92">  @JsonInclude(value = JsonInclude.Include.ALWAYS)</a>
-<span class="sourceLineNo">093</span><a id="line.93"></a>
-<span class="sourceLineNo">094</span><a id="line.94">  public String getName() {</a>
-<span class="sourceLineNo">095</span><a id="line.95">    return name;</a>
-<span class="sourceLineNo">096</span><a id="line.96">  }</a>
-<span class="sourceLineNo">097</span><a id="line.97"></a>
-<span class="sourceLineNo">098</span><a id="line.98">  @JsonProperty(JSON_PROPERTY_NAME)</a>
-<span class="sourceLineNo">099</span><a id="line.99">  @JsonInclude(value = JsonInclude.Include.ALWAYS)</a>
-<span class="sourceLineNo">100</span><a id="line.100">  public void setName(String name) {</a>
-<span class="sourceLineNo">101</span><a id="line.101">    this.name = name;</a>
-<span class="sourceLineNo">102</span><a id="line.102">  }</a>
-<span class="sourceLineNo">103</span><a id="line.103"></a>
-<span class="sourceLineNo">104</span><a id="line.104">  public Kernel lastActivity(String lastActivity) {</a>
-<span class="sourceLineNo">105</span><a id="line.105">    this.lastActivity = lastActivity;</a>
-<span class="sourceLineNo">106</span><a id="line.106">    return this;</a>
-<span class="sourceLineNo">107</span><a id="line.107">  }</a>
-<span class="sourceLineNo">108</span><a id="line.108"></a>
-<span class="sourceLineNo">109</span><a id="line.109">  /**</a>
-<span class="sourceLineNo">110</span><a id="line.110">   * ISO 8601 timestamp for the last-seen activity on this kernel. Use this in</a>
-<span class="sourceLineNo">111</span><a id="line.111">   *combination with execution_state &amp;#x3D;&amp;#x3D; &amp;#39;idle&amp;#39; to identify</a>
-<span class="sourceLineNo">112</span><a id="line.112">   *which kernels have been idle since a given time. Timestamps will be UTC,</a>
-<span class="sourceLineNo">113</span><a id="line.113">   *indicated &amp;#39;Z&amp;#39; suffix. Added in notebook server 5.0.</a>
-<span class="sourceLineNo">114</span><a id="line.114">   * @return lastActivity</a>
-<span class="sourceLineNo">115</span><a id="line.115">   **/</a>
-<span class="sourceLineNo">116</span><a id="line.116">  @javax.annotation.Nullable</a>
-<span class="sourceLineNo">117</span><a id="line.117">  @ApiModelProperty(</a>
-<span class="sourceLineNo">118</span><a id="line.118">      value =</a>
-<span class="sourceLineNo">119</span><a id="line.119">          "ISO 8601 timestamp for the last-seen activity on this kernel. Use this in combination with execution_state == 'idle' to identify which kernels have been idle since a given time. Timestamps will be UTC, indicated 'Z' suffix. Added in notebook server 5.0. ")</a>
-<span class="sourceLineNo">120</span><a id="line.120">  @JsonProperty(JSON_PROPERTY_LAST_ACTIVITY)</a>
-<span class="sourceLineNo">121</span><a id="line.121">  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)</a>
-<span class="sourceLineNo">122</span><a id="line.122"></a>
-<span class="sourceLineNo">123</span><a id="line.123">  public String</a>
-<span class="sourceLineNo">124</span><a id="line.124">  getLastActivity() {</a>
-<span class="sourceLineNo">125</span><a id="line.125">    return lastActivity;</a>
-<span class="sourceLineNo">126</span><a id="line.126">  }</a>
-<span class="sourceLineNo">127</span><a id="line.127"></a>
-<span class="sourceLineNo">128</span><a id="line.128">  @JsonProperty(JSON_PROPERTY_LAST_ACTIVITY)</a>
-<span class="sourceLineNo">129</span><a id="line.129">  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)</a>
-<span class="sourceLineNo">130</span><a id="line.130">  public void setLastActivity(String lastActivity) {</a>
-<span class="sourceLineNo">131</span><a id="line.131">    this.lastActivity = lastActivity;</a>
-<span class="sourceLineNo">132</span><a id="line.132">  }</a>
-<span class="sourceLineNo">133</span><a id="line.133"></a>
-<span class="sourceLineNo">134</span><a id="line.134">  public Kernel connections(BigDecimal connections) {</a>
-<span class="sourceLineNo">135</span><a id="line.135">    this.connections = connections;</a>
-<span class="sourceLineNo">136</span><a id="line.136">    return this;</a>
-<span class="sourceLineNo">137</span><a id="line.137">  }</a>
-<span class="sourceLineNo">138</span><a id="line.138"></a>
-<span class="sourceLineNo">139</span><a id="line.139">  /**</a>
-<span class="sourceLineNo">140</span><a id="line.140">   * The number of active connections to this kernel.</a>
-<span class="sourceLineNo">141</span><a id="line.141">   * @return connections</a>
-<span class="sourceLineNo">142</span><a id="line.142">   **/</a>
-<span class="sourceLineNo">143</span><a id="line.143">  @javax.annotation.Nullable</a>
-<span class="sourceLineNo">144</span><a id="line.144">  @ApiModelProperty(value = "The number of active connections to this kernel. ")</a>
-<span class="sourceLineNo">145</span><a id="line.145">  @JsonProperty(JSON_PROPERTY_CONNECTIONS)</a>
-<span class="sourceLineNo">146</span><a id="line.146">  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)</a>
-<span class="sourceLineNo">147</span><a id="line.147"></a>
-<span class="sourceLineNo">148</span><a id="line.148">  public BigDecimal getConnections() {</a>
-<span class="sourceLineNo">149</span><a id="line.149">    return connections;</a>
-<span class="sourceLineNo">150</span><a id="line.150">  }</a>
-<span class="sourceLineNo">151</span><a id="line.151"></a>
-<span class="sourceLineNo">152</span><a id="line.152">  @JsonProperty(JSON_PROPERTY_CONNECTIONS)</a>
-<span class="sourceLineNo">153</span><a id="line.153">  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)</a>
-<span class="sourceLineNo">154</span><a id="line.154">  public void setConnections(BigDecimal connections) {</a>
-<span class="sourceLineNo">155</span><a id="line.155">    this.connections = connections;</a>
-<span class="sourceLineNo">156</span><a id="line.156">  }</a>
-<span class="sourceLineNo">157</span><a id="line.157"></a>
-<span class="sourceLineNo">158</span><a id="line.158">  public Kernel executionState(String executionState) {</a>
-<span class="sourceLineNo">159</span><a id="line.159">    this.executionState = executionState;</a>
-<span class="sourceLineNo">160</span><a id="line.160">    return this;</a>
-<span class="sourceLineNo">161</span><a id="line.161">  }</a>
-<span class="sourceLineNo">162</span><a id="line.162"></a>
-<span class="sourceLineNo">163</span><a id="line.163">  /**</a>
-<span class="sourceLineNo">164</span><a id="line.164">   * Current execution state of the kernel (typically &amp;#39;idle&amp;#39; or</a>
-<span class="sourceLineNo">165</span><a id="line.165">   *&amp;#39;busy&amp;#39;, but may be other values, such as &amp;#39;starting&amp;#39;). Added</a>
-<span class="sourceLineNo">166</span><a id="line.166">   *in notebook server 5.0.</a>
-<span class="sourceLineNo">167</span><a id="line.167">   * @return executionState</a>
-<span class="sourceLineNo">168</span><a id="line.168">   **/</a>
-<span class="sourceLineNo">169</span><a id="line.169">  @javax.annotation.Nullable</a>
-<span class="sourceLineNo">170</span><a id="line.170">  @ApiModelProperty(</a>
-<span class="sourceLineNo">171</span><a id="line.171">      value =</a>
-<span class="sourceLineNo">172</span><a id="line.172">          "Current execution state of the kernel (typically 'idle' or 'busy', but may be other values, such as 'starting'). Added in notebook server 5.0. ")</a>
-<span class="sourceLineNo">173</span><a id="line.173">  @JsonProperty(JSON_PROPERTY_EXECUTION_STATE)</a>
-<span class="sourceLineNo">174</span><a id="line.174">  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)</a>
-<span class="sourceLineNo">175</span><a id="line.175"></a>
-<span class="sourceLineNo">176</span><a id="line.176">  public String</a>
-<span class="sourceLineNo">177</span><a id="line.177">  getExecutionState() {</a>
-<span class="sourceLineNo">178</span><a id="line.178">    return executionState;</a>
-<span class="sourceLineNo">179</span><a id="line.179">  }</a>
-<span class="sourceLineNo">180</span><a id="line.180"></a>
-<span class="sourceLineNo">181</span><a id="line.181">  @JsonProperty(JSON_PROPERTY_EXECUTION_STATE)</a>
-<span class="sourceLineNo">182</span><a id="line.182">  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)</a>
-<span class="sourceLineNo">183</span><a id="line.183">  public void setExecutionState(String executionState) {</a>
-<span class="sourceLineNo">184</span><a id="line.184">    this.executionState = executionState;</a>
-<span class="sourceLineNo">185</span><a id="line.185">  }</a>
-<span class="sourceLineNo">186</span><a id="line.186"></a>
-<span class="sourceLineNo">187</span><a id="line.187">  /**</a>
-<span class="sourceLineNo">188</span><a id="line.188">   * Return true if this Kernel object is equal to o.</a>
-<span class="sourceLineNo">189</span><a id="line.189">   */</a>
-<span class="sourceLineNo">190</span><a id="line.190">  @Override</a>
-<span class="sourceLineNo">191</span><a id="line.191">  public boolean equals(Object o) {</a>
-<span class="sourceLineNo">192</span><a id="line.192">    if (this == o) {</a>
-<span class="sourceLineNo">193</span><a id="line.193">      return true;</a>
-<span class="sourceLineNo">194</span><a id="line.194">    }</a>
-<span class="sourceLineNo">195</span><a id="line.195">    if (o == null || getClass() != o.getClass()) {</a>
-<span class="sourceLineNo">196</span><a id="line.196">      return false;</a>
-<span class="sourceLineNo">197</span><a id="line.197">    }</a>
-<span class="sourceLineNo">198</span><a id="line.198">    Kernel kernel = (Kernel)o;</a>
-<span class="sourceLineNo">199</span><a id="line.199">    return Objects.equals(this.id, kernel.id) &amp;&amp;</a>
-<span class="sourceLineNo">200</span><a id="line.200">        Objects.equals(this.name, kernel.name) &amp;&amp;</a>
-<span class="sourceLineNo">201</span><a id="line.201">        Objects.equals(this.lastActivity, kernel.lastActivity) &amp;&amp;</a>
-<span class="sourceLineNo">202</span><a id="line.202">        Objects.equals(this.connections, kernel.connections) &amp;&amp;</a>
-<span class="sourceLineNo">203</span><a id="line.203">        Objects.equals(this.executionState, kernel.executionState);</a>
-<span class="sourceLineNo">204</span><a id="line.204">  }</a>
-<span class="sourceLineNo">205</span><a id="line.205"></a>
-<span class="sourceLineNo">206</span><a id="line.206">  @Override</a>
-<span class="sourceLineNo">207</span><a id="line.207">  public int hashCode() {</a>
-<span class="sourceLineNo">208</span><a id="line.208">    return Objects.hash(id, name, lastActivity, connections, executionState);</a>
-<span class="sourceLineNo">209</span><a id="line.209">  }</a>
-<span class="sourceLineNo">210</span><a id="line.210"></a>
-<span class="sourceLineNo">211</span><a id="line.211">  @Override</a>
-<span class="sourceLineNo">212</span><a id="line.212">  public String toString() {</a>
-<span class="sourceLineNo">213</span><a id="line.213">    StringBuilder sb = new StringBuilder();</a>
-<span class="sourceLineNo">214</span><a id="line.214">    sb.append("class Kernel {\n");</a>
-<span class="sourceLineNo">215</span><a id="line.215">    sb.append("    id: ").append(toIndentedString(id)).append("\n");</a>
-<span class="sourceLineNo">216</span><a id="line.216">    sb.append("    name: ").append(toIndentedString(name)).append("\n");</a>
-<span class="sourceLineNo">217</span><a id="line.217">    sb.append("    lastActivity: ")</a>
-<span class="sourceLineNo">218</span><a id="line.218">        .append(toIndentedString(lastActivity))</a>
-<span class="sourceLineNo">219</span><a id="line.219">        .append("\n");</a>
-<span class="sourceLineNo">220</span><a id="line.220">    sb.append("    connections: ")</a>
-<span class="sourceLineNo">221</span><a id="line.221">        .append(toIndentedString(connections))</a>
-<span class="sourceLineNo">222</span><a id="line.222">        .append("\n");</a>
-<span class="sourceLineNo">223</span><a id="line.223">    sb.append("    executionState: ")</a>
-<span class="sourceLineNo">224</span><a id="line.224">        .append(toIndentedString(executionState))</a>
-<span class="sourceLineNo">225</span><a id="line.225">        .append("\n");</a>
-<span class="sourceLineNo">226</span><a id="line.226">    sb.append("}");</a>
-<span class="sourceLineNo">227</span><a id="line.227">    return sb.toString();</a>
-<span class="sourceLineNo">228</span><a id="line.228">  }</a>
-<span class="sourceLineNo">229</span><a id="line.229"></a>
-<span class="sourceLineNo">230</span><a id="line.230">  /**</a>
-<span class="sourceLineNo">231</span><a id="line.231">   * Convert the given object to string with each line indented by 4 spaces</a>
-<span class="sourceLineNo">232</span><a id="line.232">   * (except the first line).</a>
-<span class="sourceLineNo">233</span><a id="line.233">   */</a>
-<span class="sourceLineNo">234</span><a id="line.234">  private String toIndentedString(Object o) {</a>
-<span class="sourceLineNo">235</span><a id="line.235">    if (o == null) {</a>
-<span class="sourceLineNo">236</span><a id="line.236">      return "null";</a>
-<span class="sourceLineNo">237</span><a id="line.237">    }</a>
-<span class="sourceLineNo">238</span><a id="line.238">    return o.toString().replace("\n", "\n    ");</a>
-<span class="sourceLineNo">239</span><a id="line.239">  }</a>
-<span class="sourceLineNo">240</span><a id="line.240">}</a>
+<span class="sourceLineNo">056</span><a id="line.56">  public Kernel() {}</a>
+<span class="sourceLineNo">057</span><a id="line.57"></a>
+<span class="sourceLineNo">058</span><a id="line.58">  public Kernel id(UUID id) {</a>
+<span class="sourceLineNo">059</span><a id="line.59">    this.id = id;</a>
+<span class="sourceLineNo">060</span><a id="line.60">    return this;</a>
+<span class="sourceLineNo">061</span><a id="line.61">  }</a>
+<span class="sourceLineNo">062</span><a id="line.62"></a>
+<span class="sourceLineNo">063</span><a id="line.63">  /**</a>
+<span class="sourceLineNo">064</span><a id="line.64">   * uuid of kernel</a>
+<span class="sourceLineNo">065</span><a id="line.65">   * @return id</a>
+<span class="sourceLineNo">066</span><a id="line.66">   **/</a>
+<span class="sourceLineNo">067</span><a id="line.67">  @javax.annotation.Nonnull</a>
+<span class="sourceLineNo">068</span><a id="line.68">  @ApiModelProperty(required = true, value = "uuid of kernel")</a>
+<span class="sourceLineNo">069</span><a id="line.69">  @JsonProperty(JSON_PROPERTY_ID)</a>
+<span class="sourceLineNo">070</span><a id="line.70">  @JsonInclude(value = JsonInclude.Include.ALWAYS)</a>
+<span class="sourceLineNo">071</span><a id="line.71"></a>
+<span class="sourceLineNo">072</span><a id="line.72">  public UUID getId() {</a>
+<span class="sourceLineNo">073</span><a id="line.73">    return id;</a>
+<span class="sourceLineNo">074</span><a id="line.74">  }</a>
+<span class="sourceLineNo">075</span><a id="line.75"></a>
+<span class="sourceLineNo">076</span><a id="line.76">  @JsonProperty(JSON_PROPERTY_ID)</a>
+<span class="sourceLineNo">077</span><a id="line.77">  @JsonInclude(value = JsonInclude.Include.ALWAYS)</a>
+<span class="sourceLineNo">078</span><a id="line.78">  public void setId(UUID id) {</a>
+<span class="sourceLineNo">079</span><a id="line.79">    this.id = id;</a>
+<span class="sourceLineNo">080</span><a id="line.80">  }</a>
+<span class="sourceLineNo">081</span><a id="line.81"></a>
+<span class="sourceLineNo">082</span><a id="line.82">  public Kernel name(String name) {</a>
+<span class="sourceLineNo">083</span><a id="line.83">    this.name = name;</a>
+<span class="sourceLineNo">084</span><a id="line.84">    return this;</a>
+<span class="sourceLineNo">085</span><a id="line.85">  }</a>
+<span class="sourceLineNo">086</span><a id="line.86"></a>
+<span class="sourceLineNo">087</span><a id="line.87">  /**</a>
+<span class="sourceLineNo">088</span><a id="line.88">   * kernel spec name</a>
+<span class="sourceLineNo">089</span><a id="line.89">   * @return name</a>
+<span class="sourceLineNo">090</span><a id="line.90">   **/</a>
+<span class="sourceLineNo">091</span><a id="line.91">  @javax.annotation.Nonnull</a>
+<span class="sourceLineNo">092</span><a id="line.92">  @ApiModelProperty(required = true, value = "kernel spec name")</a>
+<span class="sourceLineNo">093</span><a id="line.93">  @JsonProperty(JSON_PROPERTY_NAME)</a>
+<span class="sourceLineNo">094</span><a id="line.94">  @JsonInclude(value = JsonInclude.Include.ALWAYS)</a>
+<span class="sourceLineNo">095</span><a id="line.95"></a>
+<span class="sourceLineNo">096</span><a id="line.96">  public String getName() {</a>
+<span class="sourceLineNo">097</span><a id="line.97">    return name;</a>
+<span class="sourceLineNo">098</span><a id="line.98">  }</a>
+<span class="sourceLineNo">099</span><a id="line.99"></a>
+<span class="sourceLineNo">100</span><a id="line.100">  @JsonProperty(JSON_PROPERTY_NAME)</a>
+<span class="sourceLineNo">101</span><a id="line.101">  @JsonInclude(value = JsonInclude.Include.ALWAYS)</a>
+<span class="sourceLineNo">102</span><a id="line.102">  public void setName(String name) {</a>
+<span class="sourceLineNo">103</span><a id="line.103">    this.name = name;</a>
+<span class="sourceLineNo">104</span><a id="line.104">  }</a>
+<span class="sourceLineNo">105</span><a id="line.105"></a>
+<span class="sourceLineNo">106</span><a id="line.106">  public Kernel lastActivity(String lastActivity) {</a>
+<span class="sourceLineNo">107</span><a id="line.107">    this.lastActivity = lastActivity;</a>
+<span class="sourceLineNo">108</span><a id="line.108">    return this;</a>
+<span class="sourceLineNo">109</span><a id="line.109">  }</a>
+<span class="sourceLineNo">110</span><a id="line.110"></a>
+<span class="sourceLineNo">111</span><a id="line.111">  /**</a>
+<span class="sourceLineNo">112</span><a id="line.112">   * ISO 8601 timestamp for the last-seen activity on this kernel. Use this in</a>
+<span class="sourceLineNo">113</span><a id="line.113">   *combination with execution_state &amp;#x3D;&amp;#x3D; &amp;#39;idle&amp;#39; to identify</a>
+<span class="sourceLineNo">114</span><a id="line.114">   *which kernels have been idle since a given time. Timestamps will be UTC,</a>
+<span class="sourceLineNo">115</span><a id="line.115">   *indicated &amp;#39;Z&amp;#39; suffix. Added in notebook server 5.0.</a>
+<span class="sourceLineNo">116</span><a id="line.116">   * @return lastActivity</a>
+<span class="sourceLineNo">117</span><a id="line.117">   **/</a>
+<span class="sourceLineNo">118</span><a id="line.118">  @javax.annotation.Nullable</a>
+<span class="sourceLineNo">119</span><a id="line.119">  @ApiModelProperty(</a>
+<span class="sourceLineNo">120</span><a id="line.120">      value =</a>
+<span class="sourceLineNo">121</span><a id="line.121">          "ISO 8601 timestamp for the last-seen activity on this kernel. Use this in combination with execution_state == 'idle' to identify which kernels have been idle since a given time. Timestamps will be UTC, indicated 'Z' suffix. Added in notebook server 5.0. ")</a>
+<span class="sourceLineNo">122</span><a id="line.122">  @JsonProperty(JSON_PROPERTY_LAST_ACTIVITY)</a>
+<span class="sourceLineNo">123</span><a id="line.123">  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)</a>
+<span class="sourceLineNo">124</span><a id="line.124"></a>
+<span class="sourceLineNo">125</span><a id="line.125">  public String</a>
+<span class="sourceLineNo">126</span><a id="line.126">  getLastActivity() {</a>
+<span class="sourceLineNo">127</span><a id="line.127">    return lastActivity;</a>
+<span class="sourceLineNo">128</span><a id="line.128">  }</a>
+<span class="sourceLineNo">129</span><a id="line.129"></a>
+<span class="sourceLineNo">130</span><a id="line.130">  @JsonProperty(JSON_PROPERTY_LAST_ACTIVITY)</a>
+<span class="sourceLineNo">131</span><a id="line.131">  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)</a>
+<span class="sourceLineNo">132</span><a id="line.132">  public void setLastActivity(String lastActivity) {</a>
+<span class="sourceLineNo">133</span><a id="line.133">    this.lastActivity = lastActivity;</a>
+<span class="sourceLineNo">134</span><a id="line.134">  }</a>
+<span class="sourceLineNo">135</span><a id="line.135"></a>
+<span class="sourceLineNo">136</span><a id="line.136">  public Kernel connections(BigDecimal connections) {</a>
+<span class="sourceLineNo">137</span><a id="line.137">    this.connections = connections;</a>
+<span class="sourceLineNo">138</span><a id="line.138">    return this;</a>
+<span class="sourceLineNo">139</span><a id="line.139">  }</a>
+<span class="sourceLineNo">140</span><a id="line.140"></a>
+<span class="sourceLineNo">141</span><a id="line.141">  /**</a>
+<span class="sourceLineNo">142</span><a id="line.142">   * The number of active connections to this kernel.</a>
+<span class="sourceLineNo">143</span><a id="line.143">   * @return connections</a>
+<span class="sourceLineNo">144</span><a id="line.144">   **/</a>
+<span class="sourceLineNo">145</span><a id="line.145">  @javax.annotation.Nullable</a>
+<span class="sourceLineNo">146</span><a id="line.146">  @ApiModelProperty(value = "The number of active connections to this kernel. ")</a>
+<span class="sourceLineNo">147</span><a id="line.147">  @JsonProperty(JSON_PROPERTY_CONNECTIONS)</a>
+<span class="sourceLineNo">148</span><a id="line.148">  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)</a>
+<span class="sourceLineNo">149</span><a id="line.149"></a>
+<span class="sourceLineNo">150</span><a id="line.150">  public BigDecimal getConnections() {</a>
+<span class="sourceLineNo">151</span><a id="line.151">    return connections;</a>
+<span class="sourceLineNo">152</span><a id="line.152">  }</a>
+<span class="sourceLineNo">153</span><a id="line.153"></a>
+<span class="sourceLineNo">154</span><a id="line.154">  @JsonProperty(JSON_PROPERTY_CONNECTIONS)</a>
+<span class="sourceLineNo">155</span><a id="line.155">  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)</a>
+<span class="sourceLineNo">156</span><a id="line.156">  public void setConnections(BigDecimal connections) {</a>
+<span class="sourceLineNo">157</span><a id="line.157">    this.connections = connections;</a>
+<span class="sourceLineNo">158</span><a id="line.158">  }</a>
+<span class="sourceLineNo">159</span><a id="line.159"></a>
+<span class="sourceLineNo">160</span><a id="line.160">  public Kernel executionState(String executionState) {</a>
+<span class="sourceLineNo">161</span><a id="line.161">    this.executionState = executionState;</a>
+<span class="sourceLineNo">162</span><a id="line.162">    return this;</a>
+<span class="sourceLineNo">163</span><a id="line.163">  }</a>
+<span class="sourceLineNo">164</span><a id="line.164"></a>
+<span class="sourceLineNo">165</span><a id="line.165">  /**</a>
+<span class="sourceLineNo">166</span><a id="line.166">   * Current execution state of the kernel (typically &amp;#39;idle&amp;#39; or</a>
+<span class="sourceLineNo">167</span><a id="line.167">   *&amp;#39;busy&amp;#39;, but may be other values, such as &amp;#39;starting&amp;#39;). Added</a>
+<span class="sourceLineNo">168</span><a id="line.168">   *in notebook server 5.0.</a>
+<span class="sourceLineNo">169</span><a id="line.169">   * @return executionState</a>
+<span class="sourceLineNo">170</span><a id="line.170">   **/</a>
+<span class="sourceLineNo">171</span><a id="line.171">  @javax.annotation.Nullable</a>
+<span class="sourceLineNo">172</span><a id="line.172">  @ApiModelProperty(</a>
+<span class="sourceLineNo">173</span><a id="line.173">      value =</a>
+<span class="sourceLineNo">174</span><a id="line.174">          "Current execution state of the kernel (typically 'idle' or 'busy', but may be other values, such as 'starting'). Added in notebook server 5.0. ")</a>
+<span class="sourceLineNo">175</span><a id="line.175">  @JsonProperty(JSON_PROPERTY_EXECUTION_STATE)</a>
+<span class="sourceLineNo">176</span><a id="line.176">  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)</a>
+<span class="sourceLineNo">177</span><a id="line.177"></a>
+<span class="sourceLineNo">178</span><a id="line.178">  public String</a>
+<span class="sourceLineNo">179</span><a id="line.179">  getExecutionState() {</a>
+<span class="sourceLineNo">180</span><a id="line.180">    return executionState;</a>
+<span class="sourceLineNo">181</span><a id="line.181">  }</a>
+<span class="sourceLineNo">182</span><a id="line.182"></a>
+<span class="sourceLineNo">183</span><a id="line.183">  @JsonProperty(JSON_PROPERTY_EXECUTION_STATE)</a>
+<span class="sourceLineNo">184</span><a id="line.184">  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)</a>
+<span class="sourceLineNo">185</span><a id="line.185">  public void setExecutionState(String executionState) {</a>
+<span class="sourceLineNo">186</span><a id="line.186">    this.executionState = executionState;</a>
+<span class="sourceLineNo">187</span><a id="line.187">  }</a>
+<span class="sourceLineNo">188</span><a id="line.188"></a>
+<span class="sourceLineNo">189</span><a id="line.189">  /**</a>
+<span class="sourceLineNo">190</span><a id="line.190">   * Return true if this Kernel object is equal to o.</a>
+<span class="sourceLineNo">191</span><a id="line.191">   */</a>
+<span class="sourceLineNo">192</span><a id="line.192">  @Override</a>
+<span class="sourceLineNo">193</span><a id="line.193">  public boolean equals(Object o) {</a>
+<span class="sourceLineNo">194</span><a id="line.194">    if (this == o) {</a>
+<span class="sourceLineNo">195</span><a id="line.195">      return true;</a>
+<span class="sourceLineNo">196</span><a id="line.196">    }</a>
+<span class="sourceLineNo">197</span><a id="line.197">    if (o == null || getClass() != o.getClass()) {</a>
+<span class="sourceLineNo">198</span><a id="line.198">      return false;</a>
+<span class="sourceLineNo">199</span><a id="line.199">    }</a>
+<span class="sourceLineNo">200</span><a id="line.200">    Kernel kernel = (Kernel)o;</a>
+<span class="sourceLineNo">201</span><a id="line.201">    return Objects.equals(this.id, kernel.id) &amp;&amp;</a>
+<span class="sourceLineNo">202</span><a id="line.202">        Objects.equals(this.name, kernel.name) &amp;&amp;</a>
+<span class="sourceLineNo">203</span><a id="line.203">        Objects.equals(this.lastActivity, kernel.lastActivity) &amp;&amp;</a>
+<span class="sourceLineNo">204</span><a id="line.204">        Objects.equals(this.connections, kernel.connections) &amp;&amp;</a>
+<span class="sourceLineNo">205</span><a id="line.205">        Objects.equals(this.executionState, kernel.executionState);</a>
+<span class="sourceLineNo">206</span><a id="line.206">  }</a>
+<span class="sourceLineNo">207</span><a id="line.207"></a>
+<span class="sourceLineNo">208</span><a id="line.208">  @Override</a>
+<span class="sourceLineNo">209</span><a id="line.209">  public int hashCode() {</a>
+<span class="sourceLineNo">210</span><a id="line.210">    return Objects.hash(id, name, lastActivity, connections, executionState);</a>
+<span class="sourceLineNo">211</span><a id="line.211">  }</a>
+<span class="sourceLineNo">212</span><a id="line.212"></a>
+<span class="sourceLineNo">213</span><a id="line.213">  @Override</a>
+<span class="sourceLineNo">214</span><a id="line.214">  public String toString() {</a>
+<span class="sourceLineNo">215</span><a id="line.215">    StringBuilder sb = new StringBuilder();</a>
+<span class="sourceLineNo">216</span><a id="line.216">    sb.append("class Kernel {\n");</a>
+<span class="sourceLineNo">217</span><a id="line.217">    sb.append("    id: ").append(toIndentedString(id)).append("\n");</a>
+<span class="sourceLineNo">218</span><a id="line.218">    sb.append("    name: ").append(toIndentedString(name)).append("\n");</a>
+<span class="sourceLineNo">219</span><a id="line.219">    sb.append("    lastActivity: ")</a>
+<span class="sourceLineNo">220</span><a id="line.220">        .append(toIndentedString(lastActivity))</a>
+<span class="sourceLineNo">221</span><a id="line.221">        .append("\n");</a>
+<span class="sourceLineNo">222</span><a id="line.222">    sb.append("    connections: ")</a>
+<span class="sourceLineNo">223</span><a id="line.223">        .append(toIndentedString(connections))</a>
+<span class="sourceLineNo">224</span><a id="line.224">        .append("\n");</a>
+<span class="sourceLineNo">225</span><a id="line.225">    sb.append("    executionState: ")</a>
+<span class="sourceLineNo">226</span><a id="line.226">        .append(toIndentedString(executionState))</a>
+<span class="sourceLineNo">227</span><a id="line.227">        .append("\n");</a>
+<span class="sourceLineNo">228</span><a id="line.228">    sb.append("}");</a>
+<span class="sourceLineNo">229</span><a id="line.229">    return sb.toString();</a>
+<span class="sourceLineNo">230</span><a id="line.230">  }</a>
+<span class="sourceLineNo">231</span><a id="line.231"></a>
+<span class="sourceLineNo">232</span><a id="line.232">  /**</a>
+<span class="sourceLineNo">233</span><a id="line.233">   * Convert the given object to string with each line indented by 4 spaces</a>
+<span class="sourceLineNo">234</span><a id="line.234">   * (except the first line).</a>
+<span class="sourceLineNo">235</span><a id="line.235">   */</a>
+<span class="sourceLineNo">236</span><a id="line.236">  private String toIndentedString(Object o) {</a>
+<span class="sourceLineNo">237</span><a id="line.237">    if (o == null) {</a>
+<span class="sourceLineNo">238</span><a id="line.238">      return "null";</a>
+<span class="sourceLineNo">239</span><a id="line.239">    }</a>
+<span class="sourceLineNo">240</span><a id="line.240">    return o.toString().replace("\n", "\n    ");</a>
+<span class="sourceLineNo">241</span><a id="line.241">  }</a>
+<span class="sourceLineNo">242</span><a id="line.242">}</a>
 
 
 

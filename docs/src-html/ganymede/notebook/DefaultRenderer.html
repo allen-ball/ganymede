@@ -12,7 +12,7 @@
 <span class="sourceLineNo">003</span><a id="line.3"> * ##########################################################################</a>
 <span class="sourceLineNo">004</span><a id="line.4"> * Ganymede</a>
 <span class="sourceLineNo">005</span><a id="line.5"> * %%</a>
-<span class="sourceLineNo">006</span><a id="line.6"> * Copyright (C) 2021 Allen D. Ball</a>
+<span class="sourceLineNo">006</span><a id="line.6"> * Copyright (C) 2021, 2022 Allen D. Ball</a>
 <span class="sourceLineNo">007</span><a id="line.7"> * %%</a>
 <span class="sourceLineNo">008</span><a id="line.8"> * Licensed under the Apache License, Version 2.0 (the "License");</a>
 <span class="sourceLineNo">009</span><a id="line.9"> * you may not use this file except in compliance with the License.</a>
@@ -29,28 +29,27 @@
 <span class="sourceLineNo">020</span><a id="line.20"> */</a>
 <span class="sourceLineNo">021</span><a id="line.21">import ball.annotation.ServiceProviderFor;</a>
 <span class="sourceLineNo">022</span><a id="line.22">import com.fasterxml.jackson.databind.node.ObjectNode;</a>
-<span class="sourceLineNo">023</span><a id="line.23">import ganymede.notebook.Renderer;</a>
-<span class="sourceLineNo">024</span><a id="line.24">import lombok.NoArgsConstructor;</a>
-<span class="sourceLineNo">025</span><a id="line.25">import lombok.ToString;</a>
-<span class="sourceLineNo">026</span><a id="line.26"></a>
-<span class="sourceLineNo">027</span><a id="line.27">import static org.springframework.util.MimeTypeUtils.TEXT_PLAIN_VALUE;</a>
-<span class="sourceLineNo">028</span><a id="line.28"></a>
-<span class="sourceLineNo">029</span><a id="line.29">/**</a>
-<span class="sourceLineNo">030</span><a id="line.30"> * Default {@link Object} {@link Renderer} service provider.</a>
-<span class="sourceLineNo">031</span><a id="line.31"> *</a>
-<span class="sourceLineNo">032</span><a id="line.32"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
-<span class="sourceLineNo">033</span><a id="line.33"> */</a>
-<span class="sourceLineNo">034</span><a id="line.34">@ServiceProviderFor({ Renderer.class })</a>
-<span class="sourceLineNo">035</span><a id="line.35">@ForClass(Object.class)</a>
-<span class="sourceLineNo">036</span><a id="line.36">@NoArgsConstructor @ToString</a>
-<span class="sourceLineNo">037</span><a id="line.37">public class DefaultRenderer implements Renderer {</a>
-<span class="sourceLineNo">038</span><a id="line.38">    @Override</a>
-<span class="sourceLineNo">039</span><a id="line.39">    public void renderTo(ObjectNode bundle, Object object) {</a>
-<span class="sourceLineNo">040</span><a id="line.40">        if (! bundle.with(DATA).has(TEXT_PLAIN_VALUE)) {</a>
-<span class="sourceLineNo">041</span><a id="line.41">            bundle.with(DATA).put(TEXT_PLAIN_VALUE, String.valueOf(object));</a>
-<span class="sourceLineNo">042</span><a id="line.42">        }</a>
-<span class="sourceLineNo">043</span><a id="line.43">    }</a>
-<span class="sourceLineNo">044</span><a id="line.44">}</a>
+<span class="sourceLineNo">023</span><a id="line.23">import lombok.NoArgsConstructor;</a>
+<span class="sourceLineNo">024</span><a id="line.24">import lombok.ToString;</a>
+<span class="sourceLineNo">025</span><a id="line.25"></a>
+<span class="sourceLineNo">026</span><a id="line.26">import static org.springframework.util.MimeTypeUtils.TEXT_PLAIN_VALUE;</a>
+<span class="sourceLineNo">027</span><a id="line.27"></a>
+<span class="sourceLineNo">028</span><a id="line.28">/**</a>
+<span class="sourceLineNo">029</span><a id="line.29"> * Default {@link Object} {@link Renderer} service provider.</a>
+<span class="sourceLineNo">030</span><a id="line.30"> *</a>
+<span class="sourceLineNo">031</span><a id="line.31"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
+<span class="sourceLineNo">032</span><a id="line.32"> */</a>
+<span class="sourceLineNo">033</span><a id="line.33">@ServiceProviderFor({ Renderer.class })</a>
+<span class="sourceLineNo">034</span><a id="line.34">@ForClass(Object.class)</a>
+<span class="sourceLineNo">035</span><a id="line.35">@NoArgsConstructor @ToString</a>
+<span class="sourceLineNo">036</span><a id="line.36">public class DefaultRenderer extends AbstractRenderer {</a>
+<span class="sourceLineNo">037</span><a id="line.37">    @Override</a>
+<span class="sourceLineNo">038</span><a id="line.38">    public void renderTo(ObjectNode bundle, Object object) {</a>
+<span class="sourceLineNo">039</span><a id="line.39">        if (! bundle.with(DATA).has(TEXT_PLAIN_VALUE)) {</a>
+<span class="sourceLineNo">040</span><a id="line.40">            bundle.with(DATA).put(TEXT_PLAIN_VALUE, String.valueOf(object));</a>
+<span class="sourceLineNo">041</span><a id="line.41">        }</a>
+<span class="sourceLineNo">042</span><a id="line.42">    }</a>
+<span class="sourceLineNo">043</span><a id="line.43">}</a>
 
 
 

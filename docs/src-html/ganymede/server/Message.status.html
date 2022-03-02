@@ -12,7 +12,7 @@
 <span class="sourceLineNo">003</span><a id="line.3"> * ##########################################################################</a>
 <span class="sourceLineNo">004</span><a id="line.4"> * Ganymede</a>
 <span class="sourceLineNo">005</span><a id="line.5"> * %%</a>
-<span class="sourceLineNo">006</span><a id="line.6"> * Copyright (C) 2021 Allen D. Ball</a>
+<span class="sourceLineNo">006</span><a id="line.6"> * Copyright (C) 2021, 2022 Allen D. Ball</a>
 <span class="sourceLineNo">007</span><a id="line.7"> * %%</a>
 <span class="sourceLineNo">008</span><a id="line.8"> * Licensed under the Apache License, Version 2.0 (the "License");</a>
 <span class="sourceLineNo">009</span><a id="line.9"> * you may not use this file except in compliance with the License.</a>
@@ -78,566 +78,568 @@
 <span class="sourceLineNo">069</span><a id="line.69">    protected ObjectNode content = new ObjectNode(JsonNodeFactory.instance);</a>
 <span class="sourceLineNo">070</span><a id="line.70">    protected final List&lt;byte[]&gt; buffers = new LinkedList&lt;&gt;();</a>
 <span class="sourceLineNo">071</span><a id="line.71"></a>
-<span class="sourceLineNo">072</span><a id="line.72">    { msg_id(UUID.randomUUID().toString()); }</a>
-<span class="sourceLineNo">073</span><a id="line.73"></a>
-<span class="sourceLineNo">074</span><a id="line.74">    public String msg_id() {</a>
-<span class="sourceLineNo">075</span><a id="line.75">        JsonNode node = header().get(getCallingMethodName(1));</a>
+<span class="sourceLineNo">072</span><a id="line.72">    {</a>
+<span class="sourceLineNo">073</span><a id="line.73">        username(System.getProperty("user.name"));</a>
+<span class="sourceLineNo">074</span><a id="line.74">        msg_id(UUID.randomUUID().toString());</a>
+<span class="sourceLineNo">075</span><a id="line.75">    }</a>
 <span class="sourceLineNo">076</span><a id="line.76"></a>
-<span class="sourceLineNo">077</span><a id="line.77">        return asText(node);</a>
-<span class="sourceLineNo">078</span><a id="line.78">    }</a>
+<span class="sourceLineNo">077</span><a id="line.77">    public String msg_id() {</a>
+<span class="sourceLineNo">078</span><a id="line.78">        JsonNode node = header().get(getCallingMethodName(1));</a>
 <span class="sourceLineNo">079</span><a id="line.79"></a>
-<span class="sourceLineNo">080</span><a id="line.80">    public Message msg_id(String value) {</a>
-<span class="sourceLineNo">081</span><a id="line.81">        header().put(getCallingMethodName(1), value);</a>
+<span class="sourceLineNo">080</span><a id="line.80">        return asText(node);</a>
+<span class="sourceLineNo">081</span><a id="line.81">    }</a>
 <span class="sourceLineNo">082</span><a id="line.82"></a>
-<span class="sourceLineNo">083</span><a id="line.83">        return this;</a>
-<span class="sourceLineNo">084</span><a id="line.84">    }</a>
+<span class="sourceLineNo">083</span><a id="line.83">    public Message msg_id(String value) {</a>
+<span class="sourceLineNo">084</span><a id="line.84">        header().put(getCallingMethodName(1), value);</a>
 <span class="sourceLineNo">085</span><a id="line.85"></a>
-<span class="sourceLineNo">086</span><a id="line.86">    public String msg_type() {</a>
-<span class="sourceLineNo">087</span><a id="line.87">        JsonNode node = header().get(getCallingMethodName(1));</a>
+<span class="sourceLineNo">086</span><a id="line.86">        return this;</a>
+<span class="sourceLineNo">087</span><a id="line.87">    }</a>
 <span class="sourceLineNo">088</span><a id="line.88"></a>
-<span class="sourceLineNo">089</span><a id="line.89">        return asText(node);</a>
-<span class="sourceLineNo">090</span><a id="line.90">    }</a>
+<span class="sourceLineNo">089</span><a id="line.89">    public String msg_type() {</a>
+<span class="sourceLineNo">090</span><a id="line.90">        JsonNode node = header().get(getCallingMethodName(1));</a>
 <span class="sourceLineNo">091</span><a id="line.91"></a>
-<span class="sourceLineNo">092</span><a id="line.92">    public Message msg_type(String value) {</a>
-<span class="sourceLineNo">093</span><a id="line.93">        header().put(getCallingMethodName(1), value);</a>
+<span class="sourceLineNo">092</span><a id="line.92">        return asText(node);</a>
+<span class="sourceLineNo">093</span><a id="line.93">    }</a>
 <span class="sourceLineNo">094</span><a id="line.94"></a>
-<span class="sourceLineNo">095</span><a id="line.95">        return this;</a>
-<span class="sourceLineNo">096</span><a id="line.96">    }</a>
+<span class="sourceLineNo">095</span><a id="line.95">    public Message msg_type(String value) {</a>
+<span class="sourceLineNo">096</span><a id="line.96">        header().put(getCallingMethodName(1), value);</a>
 <span class="sourceLineNo">097</span><a id="line.97"></a>
-<span class="sourceLineNo">098</span><a id="line.98">    public String session() {</a>
-<span class="sourceLineNo">099</span><a id="line.99">        JsonNode node = header().get(getCallingMethodName(1));</a>
+<span class="sourceLineNo">098</span><a id="line.98">        return this;</a>
+<span class="sourceLineNo">099</span><a id="line.99">    }</a>
 <span class="sourceLineNo">100</span><a id="line.100"></a>
-<span class="sourceLineNo">101</span><a id="line.101">        return asText(node);</a>
-<span class="sourceLineNo">102</span><a id="line.102">    }</a>
+<span class="sourceLineNo">101</span><a id="line.101">    public String session() {</a>
+<span class="sourceLineNo">102</span><a id="line.102">        JsonNode node = header().get(getCallingMethodName(1));</a>
 <span class="sourceLineNo">103</span><a id="line.103"></a>
-<span class="sourceLineNo">104</span><a id="line.104">    public Message session(String value) {</a>
-<span class="sourceLineNo">105</span><a id="line.105">        header().put(getCallingMethodName(1), value);</a>
+<span class="sourceLineNo">104</span><a id="line.104">        return asText(node);</a>
+<span class="sourceLineNo">105</span><a id="line.105">    }</a>
 <span class="sourceLineNo">106</span><a id="line.106"></a>
-<span class="sourceLineNo">107</span><a id="line.107">        return this;</a>
-<span class="sourceLineNo">108</span><a id="line.108">    }</a>
+<span class="sourceLineNo">107</span><a id="line.107">    public Message session(String value) {</a>
+<span class="sourceLineNo">108</span><a id="line.108">        header().put(getCallingMethodName(1), value);</a>
 <span class="sourceLineNo">109</span><a id="line.109"></a>
-<span class="sourceLineNo">110</span><a id="line.110">    public String username() {</a>
-<span class="sourceLineNo">111</span><a id="line.111">        JsonNode node = header().get(getCallingMethodName(1));</a>
+<span class="sourceLineNo">110</span><a id="line.110">        return this;</a>
+<span class="sourceLineNo">111</span><a id="line.111">    }</a>
 <span class="sourceLineNo">112</span><a id="line.112"></a>
-<span class="sourceLineNo">113</span><a id="line.113">        return asText(node);</a>
-<span class="sourceLineNo">114</span><a id="line.114">    }</a>
+<span class="sourceLineNo">113</span><a id="line.113">    public String username() {</a>
+<span class="sourceLineNo">114</span><a id="line.114">        JsonNode node = header().get(getCallingMethodName(1));</a>
 <span class="sourceLineNo">115</span><a id="line.115"></a>
-<span class="sourceLineNo">116</span><a id="line.116">    public Message username(String value) {</a>
-<span class="sourceLineNo">117</span><a id="line.117">        header().put(getCallingMethodName(1), value);</a>
+<span class="sourceLineNo">116</span><a id="line.116">        return asText(node);</a>
+<span class="sourceLineNo">117</span><a id="line.117">    }</a>
 <span class="sourceLineNo">118</span><a id="line.118"></a>
-<span class="sourceLineNo">119</span><a id="line.119">        return this;</a>
-<span class="sourceLineNo">120</span><a id="line.120">    }</a>
+<span class="sourceLineNo">119</span><a id="line.119">    public Message username(String value) {</a>
+<span class="sourceLineNo">120</span><a id="line.120">        header().put(getCallingMethodName(1), value);</a>
 <span class="sourceLineNo">121</span><a id="line.121"></a>
-<span class="sourceLineNo">122</span><a id="line.122">    public String date() {</a>
-<span class="sourceLineNo">123</span><a id="line.123">        JsonNode node = header().get(getCallingMethodName(1));</a>
+<span class="sourceLineNo">122</span><a id="line.122">        return this;</a>
+<span class="sourceLineNo">123</span><a id="line.123">    }</a>
 <span class="sourceLineNo">124</span><a id="line.124"></a>
-<span class="sourceLineNo">125</span><a id="line.125">        return asText(node);</a>
-<span class="sourceLineNo">126</span><a id="line.126">    }</a>
+<span class="sourceLineNo">125</span><a id="line.125">    public String date() {</a>
+<span class="sourceLineNo">126</span><a id="line.126">        JsonNode node = header().get(getCallingMethodName(1));</a>
 <span class="sourceLineNo">127</span><a id="line.127"></a>
-<span class="sourceLineNo">128</span><a id="line.128">    public Message date(String value) {</a>
-<span class="sourceLineNo">129</span><a id="line.129">        header().put(getCallingMethodName(1), value);</a>
+<span class="sourceLineNo">128</span><a id="line.128">        return asText(node);</a>
+<span class="sourceLineNo">129</span><a id="line.129">    }</a>
 <span class="sourceLineNo">130</span><a id="line.130"></a>
-<span class="sourceLineNo">131</span><a id="line.131">        return this;</a>
-<span class="sourceLineNo">132</span><a id="line.132">    }</a>
+<span class="sourceLineNo">131</span><a id="line.131">    public Message date(String value) {</a>
+<span class="sourceLineNo">132</span><a id="line.132">        header().put(getCallingMethodName(1), value);</a>
 <span class="sourceLineNo">133</span><a id="line.133"></a>
-<span class="sourceLineNo">134</span><a id="line.134">    public String version() {</a>
-<span class="sourceLineNo">135</span><a id="line.135">        JsonNode node = header().get(getCallingMethodName(1));</a>
+<span class="sourceLineNo">134</span><a id="line.134">        return this;</a>
+<span class="sourceLineNo">135</span><a id="line.135">    }</a>
 <span class="sourceLineNo">136</span><a id="line.136"></a>
-<span class="sourceLineNo">137</span><a id="line.137">        return asText(node);</a>
-<span class="sourceLineNo">138</span><a id="line.138">    }</a>
+<span class="sourceLineNo">137</span><a id="line.137">    public String version() {</a>
+<span class="sourceLineNo">138</span><a id="line.138">        JsonNode node = header().get(getCallingMethodName(1));</a>
 <span class="sourceLineNo">139</span><a id="line.139"></a>
-<span class="sourceLineNo">140</span><a id="line.140">    public Message version(String value) {</a>
-<span class="sourceLineNo">141</span><a id="line.141">        header().put(getCallingMethodName(1), value);</a>
+<span class="sourceLineNo">140</span><a id="line.140">        return asText(node);</a>
+<span class="sourceLineNo">141</span><a id="line.141">    }</a>
 <span class="sourceLineNo">142</span><a id="line.142"></a>
-<span class="sourceLineNo">143</span><a id="line.143">        return this;</a>
-<span class="sourceLineNo">144</span><a id="line.144">    }</a>
+<span class="sourceLineNo">143</span><a id="line.143">    public Message version(String value) {</a>
+<span class="sourceLineNo">144</span><a id="line.144">        header().put(getCallingMethodName(1), value);</a>
 <span class="sourceLineNo">145</span><a id="line.145"></a>
-<span class="sourceLineNo">146</span><a id="line.146">    private String asText(JsonNode node) {</a>
-<span class="sourceLineNo">147</span><a id="line.147">        return (node != null) ? node.asText() : null;</a>
-<span class="sourceLineNo">148</span><a id="line.148">    }</a>
-<span class="sourceLineNo">149</span><a id="line.149"></a>
-<span class="sourceLineNo">150</span><a id="line.150">    /**</a>
-<span class="sourceLineNo">151</span><a id="line.151">     * Parses a {@link Message} type for an "action".</a>
-<span class="sourceLineNo">152</span><a id="line.152">     *</a>
-<span class="sourceLineNo">153</span><a id="line.153">     * @return  The parsed action.</a>
-<span class="sourceLineNo">154</span><a id="line.154">     */</a>
-<span class="sourceLineNo">155</span><a id="line.155">    public String getMessageTypeAction() {</a>
-<span class="sourceLineNo">156</span><a id="line.156">        var action = msg_type().toLowerCase();</a>
-<span class="sourceLineNo">157</span><a id="line.157">        var index = action.lastIndexOf("_");</a>
-<span class="sourceLineNo">158</span><a id="line.158"></a>
-<span class="sourceLineNo">159</span><a id="line.159">        if (index != -1) {</a>
-<span class="sourceLineNo">160</span><a id="line.160">            action = action.substring(0, index);</a>
-<span class="sourceLineNo">161</span><a id="line.161">        }</a>
-<span class="sourceLineNo">162</span><a id="line.162"></a>
-<span class="sourceLineNo">163</span><a id="line.163">        return action;</a>
-<span class="sourceLineNo">164</span><a id="line.164">    }</a>
+<span class="sourceLineNo">146</span><a id="line.146">        return this;</a>
+<span class="sourceLineNo">147</span><a id="line.147">    }</a>
+<span class="sourceLineNo">148</span><a id="line.148"></a>
+<span class="sourceLineNo">149</span><a id="line.149">    private String asText(JsonNode node) {</a>
+<span class="sourceLineNo">150</span><a id="line.150">        return (node != null) ? node.asText() : null;</a>
+<span class="sourceLineNo">151</span><a id="line.151">    }</a>
+<span class="sourceLineNo">152</span><a id="line.152"></a>
+<span class="sourceLineNo">153</span><a id="line.153">    /**</a>
+<span class="sourceLineNo">154</span><a id="line.154">     * Parses a {@link Message} type for an "action".</a>
+<span class="sourceLineNo">155</span><a id="line.155">     *</a>
+<span class="sourceLineNo">156</span><a id="line.156">     * @return  The parsed action.</a>
+<span class="sourceLineNo">157</span><a id="line.157">     */</a>
+<span class="sourceLineNo">158</span><a id="line.158">    public String getMessageTypeAction() {</a>
+<span class="sourceLineNo">159</span><a id="line.159">        var action = msg_type().toLowerCase();</a>
+<span class="sourceLineNo">160</span><a id="line.160">        var index = action.lastIndexOf("_");</a>
+<span class="sourceLineNo">161</span><a id="line.161"></a>
+<span class="sourceLineNo">162</span><a id="line.162">        if (index != -1) {</a>
+<span class="sourceLineNo">163</span><a id="line.163">            action = action.substring(0, index);</a>
+<span class="sourceLineNo">164</span><a id="line.164">        }</a>
 <span class="sourceLineNo">165</span><a id="line.165"></a>
-<span class="sourceLineNo">166</span><a id="line.166">    /**</a>
-<span class="sourceLineNo">167</span><a id="line.167">     * Method to determine if this message is a "reply".</a>
-<span class="sourceLineNo">168</span><a id="line.168">     *</a>
-<span class="sourceLineNo">169</span><a id="line.169">     * @return  {@code true} if it is a "reply"; {@code false} otherwise.</a>
-<span class="sourceLineNo">170</span><a id="line.170">     */</a>
-<span class="sourceLineNo">171</span><a id="line.171">    public boolean isReply() {</a>
-<span class="sourceLineNo">172</span><a id="line.172">        var type = msg_type();</a>
-<span class="sourceLineNo">173</span><a id="line.173"></a>
-<span class="sourceLineNo">174</span><a id="line.174">        return type != null &amp;&amp; type.toLowerCase().endsWith("_reply");</a>
-<span class="sourceLineNo">175</span><a id="line.175">    }</a>
+<span class="sourceLineNo">166</span><a id="line.166">        return action;</a>
+<span class="sourceLineNo">167</span><a id="line.167">    }</a>
+<span class="sourceLineNo">168</span><a id="line.168"></a>
+<span class="sourceLineNo">169</span><a id="line.169">    /**</a>
+<span class="sourceLineNo">170</span><a id="line.170">     * Method to determine if this message is a "reply".</a>
+<span class="sourceLineNo">171</span><a id="line.171">     *</a>
+<span class="sourceLineNo">172</span><a id="line.172">     * @return  {@code true} if it is a "reply"; {@code false} otherwise.</a>
+<span class="sourceLineNo">173</span><a id="line.173">     */</a>
+<span class="sourceLineNo">174</span><a id="line.174">    public boolean isReply() {</a>
+<span class="sourceLineNo">175</span><a id="line.175">        var type = msg_type();</a>
 <span class="sourceLineNo">176</span><a id="line.176"></a>
-<span class="sourceLineNo">177</span><a id="line.177">    /**</a>
-<span class="sourceLineNo">178</span><a id="line.178">     * Method to determine if this message is a "request".</a>
-<span class="sourceLineNo">179</span><a id="line.179">     *</a>
-<span class="sourceLineNo">180</span><a id="line.180">     * @return  {@code true} if it is a "request"; {@code false} otherwise.</a>
-<span class="sourceLineNo">181</span><a id="line.181">     */</a>
-<span class="sourceLineNo">182</span><a id="line.182">    public boolean isRequest() {</a>
-<span class="sourceLineNo">183</span><a id="line.183">        var type = msg_type();</a>
-<span class="sourceLineNo">184</span><a id="line.184"></a>
-<span class="sourceLineNo">185</span><a id="line.185">        return type != null &amp;&amp; type.toLowerCase().endsWith("_request");</a>
-<span class="sourceLineNo">186</span><a id="line.186">    }</a>
+<span class="sourceLineNo">177</span><a id="line.177">        return type != null &amp;&amp; type.toLowerCase().endsWith("_reply");</a>
+<span class="sourceLineNo">178</span><a id="line.178">    }</a>
+<span class="sourceLineNo">179</span><a id="line.179"></a>
+<span class="sourceLineNo">180</span><a id="line.180">    /**</a>
+<span class="sourceLineNo">181</span><a id="line.181">     * Method to determine if this message is a "request".</a>
+<span class="sourceLineNo">182</span><a id="line.182">     *</a>
+<span class="sourceLineNo">183</span><a id="line.183">     * @return  {@code true} if it is a "request"; {@code false} otherwise.</a>
+<span class="sourceLineNo">184</span><a id="line.184">     */</a>
+<span class="sourceLineNo">185</span><a id="line.185">    public boolean isRequest() {</a>
+<span class="sourceLineNo">186</span><a id="line.186">        var type = msg_type();</a>
 <span class="sourceLineNo">187</span><a id="line.187"></a>
-<span class="sourceLineNo">188</span><a id="line.188">    /**</a>
-<span class="sourceLineNo">189</span><a id="line.189">     * Method to set status for a {@link Throwable}.</a>
-<span class="sourceLineNo">190</span><a id="line.190">     *</a>
-<span class="sourceLineNo">191</span><a id="line.191">     * @param   throwable       The {@link Throwable}.</a>
-<span class="sourceLineNo">192</span><a id="line.192">     * @param   evalue          The expression value.</a>
+<span class="sourceLineNo">188</span><a id="line.188">        return type != null &amp;&amp; type.toLowerCase().endsWith("_request");</a>
+<span class="sourceLineNo">189</span><a id="line.189">    }</a>
+<span class="sourceLineNo">190</span><a id="line.190"></a>
+<span class="sourceLineNo">191</span><a id="line.191">    /**</a>
+<span class="sourceLineNo">192</span><a id="line.192">     * Method to set status for a {@link Throwable}.</a>
 <span class="sourceLineNo">193</span><a id="line.193">     *</a>
-<span class="sourceLineNo">194</span><a id="line.194">     * @return  {@link.this} {@link Message} for chaining.</a>
-<span class="sourceLineNo">195</span><a id="line.195">     */</a>
-<span class="sourceLineNo">196</span><a id="line.196">    public Message status(Throwable throwable, String evalue) {</a>
-<span class="sourceLineNo">197</span><a id="line.197">        content().setAll(content(throwable, evalue));</a>
-<span class="sourceLineNo">198</span><a id="line.198"></a>
-<span class="sourceLineNo">199</span><a id="line.199">        return this;</a>
-<span class="sourceLineNo">200</span><a id="line.200">    }</a>
+<span class="sourceLineNo">194</span><a id="line.194">     * @param   throwable       The {@link Throwable}.</a>
+<span class="sourceLineNo">195</span><a id="line.195">     * @param   evalue          The expression value.</a>
+<span class="sourceLineNo">196</span><a id="line.196">     *</a>
+<span class="sourceLineNo">197</span><a id="line.197">     * @return  {@link.this} {@link Message} for chaining.</a>
+<span class="sourceLineNo">198</span><a id="line.198">     */</a>
+<span class="sourceLineNo">199</span><a id="line.199">    public Message status(Throwable throwable, String evalue) {</a>
+<span class="sourceLineNo">200</span><a id="line.200">        content().setAll(content(throwable, evalue));</a>
 <span class="sourceLineNo">201</span><a id="line.201"></a>
-<span class="sourceLineNo">202</span><a id="line.202">    /**</a>
-<span class="sourceLineNo">203</span><a id="line.203">     * Method to set status for a {@link Throwable}.</a>
-<span class="sourceLineNo">204</span><a id="line.204">     *</a>
-<span class="sourceLineNo">205</span><a id="line.205">     * @param   throwable       The {@link Throwable}.</a>
-<span class="sourceLineNo">206</span><a id="line.206">     *</a>
-<span class="sourceLineNo">207</span><a id="line.207">     * @return  {@link.this} {@link Message} for chaining.</a>
-<span class="sourceLineNo">208</span><a id="line.208">     */</a>
-<span class="sourceLineNo">209</span><a id="line.209">    public Message status(Throwable throwable) {</a>
-<span class="sourceLineNo">210</span><a id="line.210">        return status(throwable, throwable.getMessage());</a>
-<span class="sourceLineNo">211</span><a id="line.211">    }</a>
-<span class="sourceLineNo">212</span><a id="line.212"></a>
-<span class="sourceLineNo">213</span><a id="line.213">    /**</a>
-<span class="sourceLineNo">214</span><a id="line.214">     * Method to set status for a code {@link Magic.completeness} test.</a>
-<span class="sourceLineNo">215</span><a id="line.215">     *</a>
-<span class="sourceLineNo">216</span><a id="line.216">     * @param   completeness    The {@link Magic.completeness}.</a>
-<span class="sourceLineNo">217</span><a id="line.217">     *</a>
-<span class="sourceLineNo">218</span><a id="line.218">     * @return  {@link.this} {@link Message} for chaining.</a>
-<span class="sourceLineNo">219</span><a id="line.219">     */</a>
-<span class="sourceLineNo">220</span><a id="line.220">    public Message status(Magic.completeness completeness) {</a>
-<span class="sourceLineNo">221</span><a id="line.221">        content().put("status", completeness.name());</a>
-<span class="sourceLineNo">222</span><a id="line.222"></a>
-<span class="sourceLineNo">223</span><a id="line.223">        return this;</a>
-<span class="sourceLineNo">224</span><a id="line.224">    }</a>
+<span class="sourceLineNo">202</span><a id="line.202">        return this;</a>
+<span class="sourceLineNo">203</span><a id="line.203">    }</a>
+<span class="sourceLineNo">204</span><a id="line.204"></a>
+<span class="sourceLineNo">205</span><a id="line.205">    /**</a>
+<span class="sourceLineNo">206</span><a id="line.206">     * Method to set status for a {@link Throwable}.</a>
+<span class="sourceLineNo">207</span><a id="line.207">     *</a>
+<span class="sourceLineNo">208</span><a id="line.208">     * @param   throwable       The {@link Throwable}.</a>
+<span class="sourceLineNo">209</span><a id="line.209">     *</a>
+<span class="sourceLineNo">210</span><a id="line.210">     * @return  {@link.this} {@link Message} for chaining.</a>
+<span class="sourceLineNo">211</span><a id="line.211">     */</a>
+<span class="sourceLineNo">212</span><a id="line.212">    public Message status(Throwable throwable) {</a>
+<span class="sourceLineNo">213</span><a id="line.213">        return status(throwable, throwable.getMessage());</a>
+<span class="sourceLineNo">214</span><a id="line.214">    }</a>
+<span class="sourceLineNo">215</span><a id="line.215"></a>
+<span class="sourceLineNo">216</span><a id="line.216">    /**</a>
+<span class="sourceLineNo">217</span><a id="line.217">     * Method to set status for a code {@link Magic.completeness} test.</a>
+<span class="sourceLineNo">218</span><a id="line.218">     *</a>
+<span class="sourceLineNo">219</span><a id="line.219">     * @param   completeness    The {@link Magic.completeness}.</a>
+<span class="sourceLineNo">220</span><a id="line.220">     *</a>
+<span class="sourceLineNo">221</span><a id="line.221">     * @return  {@link.this} {@link Message} for chaining.</a>
+<span class="sourceLineNo">222</span><a id="line.222">     */</a>
+<span class="sourceLineNo">223</span><a id="line.223">    public Message status(Magic.completeness completeness) {</a>
+<span class="sourceLineNo">224</span><a id="line.224">        content().put("status", completeness.name());</a>
 <span class="sourceLineNo">225</span><a id="line.225"></a>
-<span class="sourceLineNo">226</span><a id="line.226">    /**</a>
-<span class="sourceLineNo">227</span><a id="line.227">     * Create a suitable reply {@link Message} for {@link.this}</a>
-<span class="sourceLineNo">228</span><a id="line.228">     * {@link Message}.  Copies {@link.this} {@link Message}'s envelope and</a>
-<span class="sourceLineNo">229</span><a id="line.229">     * buffers and initializes the message status to "OK".</a>
-<span class="sourceLineNo">230</span><a id="line.230">     *</a>
-<span class="sourceLineNo">231</span><a id="line.231">     * @return  The reply {@link Message}.</a>
-<span class="sourceLineNo">232</span><a id="line.232">     */</a>
-<span class="sourceLineNo">233</span><a id="line.233">    public Message reply() { return new Reply(this); }</a>
-<span class="sourceLineNo">234</span><a id="line.234"></a>
-<span class="sourceLineNo">235</span><a id="line.235">    /**</a>
-<span class="sourceLineNo">236</span><a id="line.236">     * Parameter to {@link Message#stream(Message.stream,String)}.</a>
-<span class="sourceLineNo">237</span><a id="line.237">     */</a>
-<span class="sourceLineNo">238</span><a id="line.238">    public enum stream { stderr, stdout };</a>
-<span class="sourceLineNo">239</span><a id="line.239"></a>
-<span class="sourceLineNo">240</span><a id="line.240">    /**</a>
-<span class="sourceLineNo">241</span><a id="line.241">     * See</a>
-<span class="sourceLineNo">242</span><a id="line.242">     * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#streams-stdout-stderr-etc stream}.</a>
-<span class="sourceLineNo">243</span><a id="line.243">     */</a>
-<span class="sourceLineNo">244</span><a id="line.244">    public Message stream(stream stream, String text) {</a>
-<span class="sourceLineNo">245</span><a id="line.245">        var message = new Pub(getCallingMethodName(1), this);</a>
-<span class="sourceLineNo">246</span><a id="line.246"></a>
-<span class="sourceLineNo">247</span><a id="line.247">        message.content().put("name", stream.name());</a>
-<span class="sourceLineNo">248</span><a id="line.248">        message.content().put("text", text);</a>
+<span class="sourceLineNo">226</span><a id="line.226">        return this;</a>
+<span class="sourceLineNo">227</span><a id="line.227">    }</a>
+<span class="sourceLineNo">228</span><a id="line.228"></a>
+<span class="sourceLineNo">229</span><a id="line.229">    /**</a>
+<span class="sourceLineNo">230</span><a id="line.230">     * Create a suitable reply {@link Message} for {@link.this}</a>
+<span class="sourceLineNo">231</span><a id="line.231">     * {@link Message}.  Copies {@link.this} {@link Message}'s envelope and</a>
+<span class="sourceLineNo">232</span><a id="line.232">     * buffers and initializes the message status to "OK".</a>
+<span class="sourceLineNo">233</span><a id="line.233">     *</a>
+<span class="sourceLineNo">234</span><a id="line.234">     * @return  The reply {@link Message}.</a>
+<span class="sourceLineNo">235</span><a id="line.235">     */</a>
+<span class="sourceLineNo">236</span><a id="line.236">    public Message reply() { return new Reply(this); }</a>
+<span class="sourceLineNo">237</span><a id="line.237"></a>
+<span class="sourceLineNo">238</span><a id="line.238">    /**</a>
+<span class="sourceLineNo">239</span><a id="line.239">     * Parameter to {@link Message#stream(Message.stream,String)}.</a>
+<span class="sourceLineNo">240</span><a id="line.240">     */</a>
+<span class="sourceLineNo">241</span><a id="line.241">    public enum stream { stderr, stdout };</a>
+<span class="sourceLineNo">242</span><a id="line.242"></a>
+<span class="sourceLineNo">243</span><a id="line.243">    /**</a>
+<span class="sourceLineNo">244</span><a id="line.244">     * See</a>
+<span class="sourceLineNo">245</span><a id="line.245">     * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#streams-stdout-stderr-etc stream}.</a>
+<span class="sourceLineNo">246</span><a id="line.246">     */</a>
+<span class="sourceLineNo">247</span><a id="line.247">    public Message stream(stream stream, String text) {</a>
+<span class="sourceLineNo">248</span><a id="line.248">        var message = new Pub(getCallingMethodName(1), this);</a>
 <span class="sourceLineNo">249</span><a id="line.249"></a>
-<span class="sourceLineNo">250</span><a id="line.250">        return message;</a>
-<span class="sourceLineNo">251</span><a id="line.251">    }</a>
+<span class="sourceLineNo">250</span><a id="line.250">        message.content().put("name", stream.name());</a>
+<span class="sourceLineNo">251</span><a id="line.251">        message.content().put("text", text);</a>
 <span class="sourceLineNo">252</span><a id="line.252"></a>
-<span class="sourceLineNo">253</span><a id="line.253">    /**</a>
-<span class="sourceLineNo">254</span><a id="line.254">     * See</a>
-<span class="sourceLineNo">255</span><a id="line.255">     * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#code-inputs execute_input}.</a>
-<span class="sourceLineNo">256</span><a id="line.256">     */</a>
-<span class="sourceLineNo">257</span><a id="line.257">    public Message execute_input(String code, int execution_count) {</a>
-<span class="sourceLineNo">258</span><a id="line.258">        var message = new Pub(getCallingMethodName(1), this);</a>
-<span class="sourceLineNo">259</span><a id="line.259"></a>
-<span class="sourceLineNo">260</span><a id="line.260">        message.content().put("code", code);</a>
-<span class="sourceLineNo">261</span><a id="line.261">        message.content().put("execution_count", execution_count);</a>
+<span class="sourceLineNo">253</span><a id="line.253">        return message;</a>
+<span class="sourceLineNo">254</span><a id="line.254">    }</a>
+<span class="sourceLineNo">255</span><a id="line.255"></a>
+<span class="sourceLineNo">256</span><a id="line.256">    /**</a>
+<span class="sourceLineNo">257</span><a id="line.257">     * See</a>
+<span class="sourceLineNo">258</span><a id="line.258">     * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#code-inputs execute_input}.</a>
+<span class="sourceLineNo">259</span><a id="line.259">     */</a>
+<span class="sourceLineNo">260</span><a id="line.260">    public Message execute_input(String code, int execution_count) {</a>
+<span class="sourceLineNo">261</span><a id="line.261">        var message = new Pub(getCallingMethodName(1), this);</a>
 <span class="sourceLineNo">262</span><a id="line.262"></a>
-<span class="sourceLineNo">263</span><a id="line.263">        return message;</a>
-<span class="sourceLineNo">264</span><a id="line.264">    }</a>
+<span class="sourceLineNo">263</span><a id="line.263">        message.content().put("code", code);</a>
+<span class="sourceLineNo">264</span><a id="line.264">        message.content().put("execution_count", execution_count);</a>
 <span class="sourceLineNo">265</span><a id="line.265"></a>
-<span class="sourceLineNo">266</span><a id="line.266">    /**</a>
-<span class="sourceLineNo">267</span><a id="line.267">     * See</a>
-<span class="sourceLineNo">268</span><a id="line.268">     * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#id6 execute_result}.</a>
-<span class="sourceLineNo">269</span><a id="line.269">     */</a>
-<span class="sourceLineNo">270</span><a id="line.270">    public Message execute_result(int execution_count, ObjectNode content) {</a>
-<span class="sourceLineNo">271</span><a id="line.271">        var message = new Pub(getCallingMethodName(1), this);</a>
-<span class="sourceLineNo">272</span><a id="line.272"></a>
-<span class="sourceLineNo">273</span><a id="line.273">        message.content().put("execution_count", execution_count);</a>
-<span class="sourceLineNo">274</span><a id="line.274">        message.content().setAll(content);</a>
+<span class="sourceLineNo">266</span><a id="line.266">        return message;</a>
+<span class="sourceLineNo">267</span><a id="line.267">    }</a>
+<span class="sourceLineNo">268</span><a id="line.268"></a>
+<span class="sourceLineNo">269</span><a id="line.269">    /**</a>
+<span class="sourceLineNo">270</span><a id="line.270">     * See</a>
+<span class="sourceLineNo">271</span><a id="line.271">     * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#id6 execute_result}.</a>
+<span class="sourceLineNo">272</span><a id="line.272">     */</a>
+<span class="sourceLineNo">273</span><a id="line.273">    public Message execute_result(int execution_count, ObjectNode content) {</a>
+<span class="sourceLineNo">274</span><a id="line.274">        var message = new Pub(getCallingMethodName(1), this);</a>
 <span class="sourceLineNo">275</span><a id="line.275"></a>
-<span class="sourceLineNo">276</span><a id="line.276">        return message;</a>
-<span class="sourceLineNo">277</span><a id="line.277">    }</a>
+<span class="sourceLineNo">276</span><a id="line.276">        message.content().put("execution_count", execution_count);</a>
+<span class="sourceLineNo">277</span><a id="line.277">        message.content().setAll(content);</a>
 <span class="sourceLineNo">278</span><a id="line.278"></a>
-<span class="sourceLineNo">279</span><a id="line.279">    /**</a>
-<span class="sourceLineNo">280</span><a id="line.280">     * See</a>
-<span class="sourceLineNo">281</span><a id="line.281">     * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#id6 execute_result}.</a>
-<span class="sourceLineNo">282</span><a id="line.282">     */</a>
-<span class="sourceLineNo">283</span><a id="line.283">    public Message execute_result(int execution_count, String stdout) {</a>
-<span class="sourceLineNo">284</span><a id="line.284">        return execute_result(execution_count, mime_bundle(stdout));</a>
-<span class="sourceLineNo">285</span><a id="line.285">    }</a>
-<span class="sourceLineNo">286</span><a id="line.286"></a>
-<span class="sourceLineNo">287</span><a id="line.287">    /**</a>
-<span class="sourceLineNo">288</span><a id="line.288">     * See</a>
-<span class="sourceLineNo">289</span><a id="line.289">     * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#display-data display_data}.</a>
-<span class="sourceLineNo">290</span><a id="line.290">     */</a>
-<span class="sourceLineNo">291</span><a id="line.291">    public Message display_data(ObjectNode content) {</a>
-<span class="sourceLineNo">292</span><a id="line.292">        var message = new Pub(getCallingMethodName(1), this);</a>
-<span class="sourceLineNo">293</span><a id="line.293"></a>
-<span class="sourceLineNo">294</span><a id="line.294">        message.content().setAll(content);</a>
-<span class="sourceLineNo">295</span><a id="line.295">        message.content().with("transient");</a>
+<span class="sourceLineNo">279</span><a id="line.279">        return message;</a>
+<span class="sourceLineNo">280</span><a id="line.280">    }</a>
+<span class="sourceLineNo">281</span><a id="line.281"></a>
+<span class="sourceLineNo">282</span><a id="line.282">    /**</a>
+<span class="sourceLineNo">283</span><a id="line.283">     * See</a>
+<span class="sourceLineNo">284</span><a id="line.284">     * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#id6 execute_result}.</a>
+<span class="sourceLineNo">285</span><a id="line.285">     */</a>
+<span class="sourceLineNo">286</span><a id="line.286">    public Message execute_result(int execution_count, String stdout) {</a>
+<span class="sourceLineNo">287</span><a id="line.287">        return execute_result(execution_count, mime_bundle(stdout));</a>
+<span class="sourceLineNo">288</span><a id="line.288">    }</a>
+<span class="sourceLineNo">289</span><a id="line.289"></a>
+<span class="sourceLineNo">290</span><a id="line.290">    /**</a>
+<span class="sourceLineNo">291</span><a id="line.291">     * See</a>
+<span class="sourceLineNo">292</span><a id="line.292">     * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#display-data display_data}.</a>
+<span class="sourceLineNo">293</span><a id="line.293">     */</a>
+<span class="sourceLineNo">294</span><a id="line.294">    public Message display_data(ObjectNode content) {</a>
+<span class="sourceLineNo">295</span><a id="line.295">        var message = new Pub(getCallingMethodName(1), this);</a>
 <span class="sourceLineNo">296</span><a id="line.296"></a>
-<span class="sourceLineNo">297</span><a id="line.297">        return message;</a>
-<span class="sourceLineNo">298</span><a id="line.298">    }</a>
+<span class="sourceLineNo">297</span><a id="line.297">        message.content().setAll(content);</a>
+<span class="sourceLineNo">298</span><a id="line.298">        message.content().with("transient");</a>
 <span class="sourceLineNo">299</span><a id="line.299"></a>
-<span class="sourceLineNo">300</span><a id="line.300">    /**</a>
-<span class="sourceLineNo">301</span><a id="line.301">     * See</a>
-<span class="sourceLineNo">302</span><a id="line.302">     * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#display-data display_data}.</a>
-<span class="sourceLineNo">303</span><a id="line.303">     */</a>
-<span class="sourceLineNo">304</span><a id="line.304">    public Message display_data(String stdout) {</a>
-<span class="sourceLineNo">305</span><a id="line.305">        return display_data(mime_bundle(stdout));</a>
-<span class="sourceLineNo">306</span><a id="line.306">    }</a>
-<span class="sourceLineNo">307</span><a id="line.307"></a>
-<span class="sourceLineNo">308</span><a id="line.308">    /**</a>
-<span class="sourceLineNo">309</span><a id="line.309">     * Parameter to {@link Message#status(Message.status)} and</a>
-<span class="sourceLineNo">310</span><a id="line.310">     * {@link Message#status(Message.status,Message)}.</a>
-<span class="sourceLineNo">311</span><a id="line.311">     */</a>
-<span class="sourceLineNo">312</span><a id="line.312">    public enum status { starting, busy, idle };</a>
-<span class="sourceLineNo">313</span><a id="line.313"></a>
-<span class="sourceLineNo">314</span><a id="line.314">    /**</a>
-<span class="sourceLineNo">315</span><a id="line.315">     * See</a>
-<span class="sourceLineNo">316</span><a id="line.316">     * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#kernel-status status}.</a>
-<span class="sourceLineNo">317</span><a id="line.317">     */</a>
-<span class="sourceLineNo">318</span><a id="line.318">    public static Message status(status status, Message request) {</a>
-<span class="sourceLineNo">319</span><a id="line.319">        var message = new Pub(getCallingMethodName(1), request);</a>
-<span class="sourceLineNo">320</span><a id="line.320"></a>
-<span class="sourceLineNo">321</span><a id="line.321">        message.content().put("execution_state", status.name());</a>
-<span class="sourceLineNo">322</span><a id="line.322"></a>
-<span class="sourceLineNo">323</span><a id="line.323">        return message;</a>
-<span class="sourceLineNo">324</span><a id="line.324">    }</a>
+<span class="sourceLineNo">300</span><a id="line.300">        return message;</a>
+<span class="sourceLineNo">301</span><a id="line.301">    }</a>
+<span class="sourceLineNo">302</span><a id="line.302"></a>
+<span class="sourceLineNo">303</span><a id="line.303">    /**</a>
+<span class="sourceLineNo">304</span><a id="line.304">     * See</a>
+<span class="sourceLineNo">305</span><a id="line.305">     * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#display-data display_data}.</a>
+<span class="sourceLineNo">306</span><a id="line.306">     */</a>
+<span class="sourceLineNo">307</span><a id="line.307">    public Message display_data(String stdout) {</a>
+<span class="sourceLineNo">308</span><a id="line.308">        return display_data(mime_bundle(stdout));</a>
+<span class="sourceLineNo">309</span><a id="line.309">    }</a>
+<span class="sourceLineNo">310</span><a id="line.310"></a>
+<span class="sourceLineNo">311</span><a id="line.311">    /**</a>
+<span class="sourceLineNo">312</span><a id="line.312">     * Parameter to {@link Message#status(Message.status)} and</a>
+<span class="sourceLineNo">313</span><a id="line.313">     * {@link Message#status(Message.status,Message)}.</a>
+<span class="sourceLineNo">314</span><a id="line.314">     */</a>
+<span class="sourceLineNo">315</span><a id="line.315">    public enum status { starting, busy, idle };</a>
+<span class="sourceLineNo">316</span><a id="line.316"></a>
+<span class="sourceLineNo">317</span><a id="line.317">    /**</a>
+<span class="sourceLineNo">318</span><a id="line.318">     * See</a>
+<span class="sourceLineNo">319</span><a id="line.319">     * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#kernel-status status}.</a>
+<span class="sourceLineNo">320</span><a id="line.320">     */</a>
+<span class="sourceLineNo">321</span><a id="line.321">    public static Message status(status status, Message request) {</a>
+<span class="sourceLineNo">322</span><a id="line.322">        var message = new Pub(getCallingMethodName(1), request);</a>
+<span class="sourceLineNo">323</span><a id="line.323"></a>
+<span class="sourceLineNo">324</span><a id="line.324">        message.content().put("execution_state", status.name());</a>
 <span class="sourceLineNo">325</span><a id="line.325"></a>
-<span class="sourceLineNo">326</span><a id="line.326">    /**</a>
-<span class="sourceLineNo">327</span><a id="line.327">     * See</a>
-<span class="sourceLineNo">328</span><a id="line.328">     * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#kernel-status status}.</a>
-<span class="sourceLineNo">329</span><a id="line.329">     */</a>
-<span class="sourceLineNo">330</span><a id="line.330">    public Message status(status status) { return status(status, this); }</a>
-<span class="sourceLineNo">331</span><a id="line.331"></a>
-<span class="sourceLineNo">332</span><a id="line.332">    /**</a>
-<span class="sourceLineNo">333</span><a id="line.333">     * Set the {@link date()} value if not already set.</a>
-<span class="sourceLineNo">334</span><a id="line.334">     *</a>
-<span class="sourceLineNo">335</span><a id="line.335">     * @return  {@link.this} {@link Message} for chaining.</a>
-<span class="sourceLineNo">336</span><a id="line.336">     */</a>
-<span class="sourceLineNo">337</span><a id="line.337">    public Message timestamp() {</a>
-<span class="sourceLineNo">338</span><a id="line.338">        if (date() == null) {</a>
-<span class="sourceLineNo">339</span><a id="line.339">            date(now(UTC).truncatedTo(MILLIS).format(ISO_INSTANT));</a>
-<span class="sourceLineNo">340</span><a id="line.340">        }</a>
-<span class="sourceLineNo">341</span><a id="line.341"></a>
-<span class="sourceLineNo">342</span><a id="line.342">        return this;</a>
-<span class="sourceLineNo">343</span><a id="line.343">    }</a>
+<span class="sourceLineNo">326</span><a id="line.326">        return message;</a>
+<span class="sourceLineNo">327</span><a id="line.327">    }</a>
+<span class="sourceLineNo">328</span><a id="line.328"></a>
+<span class="sourceLineNo">329</span><a id="line.329">    /**</a>
+<span class="sourceLineNo">330</span><a id="line.330">     * See</a>
+<span class="sourceLineNo">331</span><a id="line.331">     * {@link.uri https://jupyter-client.readthedocs.io/en/latest/messaging.html#kernel-status status}.</a>
+<span class="sourceLineNo">332</span><a id="line.332">     */</a>
+<span class="sourceLineNo">333</span><a id="line.333">    public Message status(status status) { return status(status, this); }</a>
+<span class="sourceLineNo">334</span><a id="line.334"></a>
+<span class="sourceLineNo">335</span><a id="line.335">    /**</a>
+<span class="sourceLineNo">336</span><a id="line.336">     * Set the {@link date()} value if not already set.</a>
+<span class="sourceLineNo">337</span><a id="line.337">     *</a>
+<span class="sourceLineNo">338</span><a id="line.338">     * @return  {@link.this} {@link Message} for chaining.</a>
+<span class="sourceLineNo">339</span><a id="line.339">     */</a>
+<span class="sourceLineNo">340</span><a id="line.340">    public Message timestamp() {</a>
+<span class="sourceLineNo">341</span><a id="line.341">        if (date() == null) {</a>
+<span class="sourceLineNo">342</span><a id="line.342">            date(now(UTC).truncatedTo(MILLIS).format(ISO_INSTANT));</a>
+<span class="sourceLineNo">343</span><a id="line.343">        }</a>
 <span class="sourceLineNo">344</span><a id="line.344"></a>
-<span class="sourceLineNo">345</span><a id="line.345">    /**</a>
-<span class="sourceLineNo">346</span><a id="line.346">     * Method to copy a {@link Message}.</a>
-<span class="sourceLineNo">347</span><a id="line.347">     *</a>
-<span class="sourceLineNo">348</span><a id="line.348">     * @return  A copy of {@link.this} {@link Message}.</a>
-<span class="sourceLineNo">349</span><a id="line.349">     */</a>
-<span class="sourceLineNo">350</span><a id="line.350">    public Message copy() { return new Copy(this); }</a>
-<span class="sourceLineNo">351</span><a id="line.351"></a>
-<span class="sourceLineNo">352</span><a id="line.352">    /**</a>
-<span class="sourceLineNo">353</span><a id="line.353">     * Method to serialize a {@link Message}.</a>
-<span class="sourceLineNo">354</span><a id="line.354">     *</a>
-<span class="sourceLineNo">355</span><a id="line.355">     * @param   digester        The {@link HMACDigester} (may be</a>
-<span class="sourceLineNo">356</span><a id="line.356">     *                          {@code null}).</a>
+<span class="sourceLineNo">345</span><a id="line.345">        return this;</a>
+<span class="sourceLineNo">346</span><a id="line.346">    }</a>
+<span class="sourceLineNo">347</span><a id="line.347"></a>
+<span class="sourceLineNo">348</span><a id="line.348">    /**</a>
+<span class="sourceLineNo">349</span><a id="line.349">     * Method to copy a {@link Message}.</a>
+<span class="sourceLineNo">350</span><a id="line.350">     *</a>
+<span class="sourceLineNo">351</span><a id="line.351">     * @return  A copy of {@link.this} {@link Message}.</a>
+<span class="sourceLineNo">352</span><a id="line.352">     */</a>
+<span class="sourceLineNo">353</span><a id="line.353">    public Message copy() { return new Copy(this); }</a>
+<span class="sourceLineNo">354</span><a id="line.354"></a>
+<span class="sourceLineNo">355</span><a id="line.355">    /**</a>
+<span class="sourceLineNo">356</span><a id="line.356">     * Method to serialize a {@link Message}.</a>
 <span class="sourceLineNo">357</span><a id="line.357">     *</a>
-<span class="sourceLineNo">358</span><a id="line.358">     * @return  The {@link List} of serialized frames.</a>
-<span class="sourceLineNo">359</span><a id="line.359">     */</a>
-<span class="sourceLineNo">360</span><a id="line.360">    public List&lt;byte[]&gt; serialize(HMACDigester digester) {</a>
-<span class="sourceLineNo">361</span><a id="line.361">        var frames = new LinkedList&lt;byte[]&gt;();</a>
-<span class="sourceLineNo">362</span><a id="line.362"></a>
-<span class="sourceLineNo">363</span><a id="line.363">        frames.addAll(envelope());</a>
-<span class="sourceLineNo">364</span><a id="line.364">        frames.add(DELIMITER_BYTES);</a>
+<span class="sourceLineNo">358</span><a id="line.358">     * @param   digester        The {@link HMACDigester} (may be</a>
+<span class="sourceLineNo">359</span><a id="line.359">     *                          {@code null}).</a>
+<span class="sourceLineNo">360</span><a id="line.360">     *</a>
+<span class="sourceLineNo">361</span><a id="line.361">     * @return  The {@link List} of serialized frames.</a>
+<span class="sourceLineNo">362</span><a id="line.362">     */</a>
+<span class="sourceLineNo">363</span><a id="line.363">    public List&lt;byte[]&gt; serialize(HMACDigester digester) {</a>
+<span class="sourceLineNo">364</span><a id="line.364">        var frames = new LinkedList&lt;byte[]&gt;();</a>
 <span class="sourceLineNo">365</span><a id="line.365"></a>
-<span class="sourceLineNo">366</span><a id="line.366">        var header = serialize(header());</a>
-<span class="sourceLineNo">367</span><a id="line.367">        var parentHeader = serialize(parentHeader());</a>
-<span class="sourceLineNo">368</span><a id="line.368">        var metadata = serialize(metadata());</a>
-<span class="sourceLineNo">369</span><a id="line.369">        var content = serialize(content());</a>
-<span class="sourceLineNo">370</span><a id="line.370"></a>
-<span class="sourceLineNo">371</span><a id="line.371">        var digest = "";</a>
-<span class="sourceLineNo">372</span><a id="line.372"></a>
-<span class="sourceLineNo">373</span><a id="line.373">        if (digester != null) {</a>
-<span class="sourceLineNo">374</span><a id="line.374">            digest = digester.digest(header, parentHeader, metadata, content);</a>
-<span class="sourceLineNo">375</span><a id="line.375">        }</a>
-<span class="sourceLineNo">376</span><a id="line.376"></a>
-<span class="sourceLineNo">377</span><a id="line.377">        Collections.addAll(frames,</a>
-<span class="sourceLineNo">378</span><a id="line.378">                           digest.getBytes(ZMQ.CHARSET),</a>
-<span class="sourceLineNo">379</span><a id="line.379">                           header, parentHeader, metadata, content);</a>
-<span class="sourceLineNo">380</span><a id="line.380"></a>
-<span class="sourceLineNo">381</span><a id="line.381">        frames.addAll(buffers());</a>
-<span class="sourceLineNo">382</span><a id="line.382"></a>
-<span class="sourceLineNo">383</span><a id="line.383">        return frames;</a>
-<span class="sourceLineNo">384</span><a id="line.384">    }</a>
+<span class="sourceLineNo">366</span><a id="line.366">        frames.addAll(envelope());</a>
+<span class="sourceLineNo">367</span><a id="line.367">        frames.add(DELIMITER_BYTES);</a>
+<span class="sourceLineNo">368</span><a id="line.368"></a>
+<span class="sourceLineNo">369</span><a id="line.369">        var header = serialize(header());</a>
+<span class="sourceLineNo">370</span><a id="line.370">        var parentHeader = serialize(parentHeader());</a>
+<span class="sourceLineNo">371</span><a id="line.371">        var metadata = serialize(metadata());</a>
+<span class="sourceLineNo">372</span><a id="line.372">        var content = serialize(content());</a>
+<span class="sourceLineNo">373</span><a id="line.373"></a>
+<span class="sourceLineNo">374</span><a id="line.374">        var digest = "";</a>
+<span class="sourceLineNo">375</span><a id="line.375"></a>
+<span class="sourceLineNo">376</span><a id="line.376">        if (digester != null) {</a>
+<span class="sourceLineNo">377</span><a id="line.377">            digest = digester.digest(header, parentHeader, metadata, content);</a>
+<span class="sourceLineNo">378</span><a id="line.378">        }</a>
+<span class="sourceLineNo">379</span><a id="line.379"></a>
+<span class="sourceLineNo">380</span><a id="line.380">        Collections.addAll(frames,</a>
+<span class="sourceLineNo">381</span><a id="line.381">                           digest.getBytes(ZMQ.CHARSET),</a>
+<span class="sourceLineNo">382</span><a id="line.382">                           header, parentHeader, metadata, content);</a>
+<span class="sourceLineNo">383</span><a id="line.383"></a>
+<span class="sourceLineNo">384</span><a id="line.384">        frames.addAll(buffers());</a>
 <span class="sourceLineNo">385</span><a id="line.385"></a>
-<span class="sourceLineNo">386</span><a id="line.386">    private byte[] serialize(JsonNode node) {</a>
-<span class="sourceLineNo">387</span><a id="line.387">        var string = "{}";</a>
+<span class="sourceLineNo">386</span><a id="line.386">        return frames;</a>
+<span class="sourceLineNo">387</span><a id="line.387">    }</a>
 <span class="sourceLineNo">388</span><a id="line.388"></a>
-<span class="sourceLineNo">389</span><a id="line.389">        try {</a>
-<span class="sourceLineNo">390</span><a id="line.390">            string = ObjectMappers.JSON.writeValueAsString(node);</a>
-<span class="sourceLineNo">391</span><a id="line.391">        } catch (Exception exception) {</a>
-<span class="sourceLineNo">392</span><a id="line.392">            log.warn("{}", exception);</a>
-<span class="sourceLineNo">393</span><a id="line.393">        }</a>
-<span class="sourceLineNo">394</span><a id="line.394"></a>
-<span class="sourceLineNo">395</span><a id="line.395">        return string.getBytes(ZMQ.CHARSET);</a>
-<span class="sourceLineNo">396</span><a id="line.396">    }</a>
+<span class="sourceLineNo">389</span><a id="line.389">    private byte[] serialize(JsonNode node) {</a>
+<span class="sourceLineNo">390</span><a id="line.390">        var string = "{}";</a>
+<span class="sourceLineNo">391</span><a id="line.391"></a>
+<span class="sourceLineNo">392</span><a id="line.392">        try {</a>
+<span class="sourceLineNo">393</span><a id="line.393">            string = ObjectMappers.JSON.writeValueAsString(node);</a>
+<span class="sourceLineNo">394</span><a id="line.394">        } catch (Exception exception) {</a>
+<span class="sourceLineNo">395</span><a id="line.395">            log.warn("{}", exception);</a>
+<span class="sourceLineNo">396</span><a id="line.396">        }</a>
 <span class="sourceLineNo">397</span><a id="line.397"></a>
-<span class="sourceLineNo">398</span><a id="line.398">    /**</a>
-<span class="sourceLineNo">399</span><a id="line.399">     * Method to receive a {@link Message} on a {@link ZMQ.Socket}.</a>
-<span class="sourceLineNo">400</span><a id="line.400">     *</a>
-<span class="sourceLineNo">401</span><a id="line.401">     * param    connection      The {@link Connection}.</a>
-<span class="sourceLineNo">402</span><a id="line.402">     * @param   socket          The {@link ZMQ.Socket}.</a>
-<span class="sourceLineNo">403</span><a id="line.403">     * @param   frame           The first message frame.</a>
-<span class="sourceLineNo">404</span><a id="line.404">     */</a>
-<span class="sourceLineNo">405</span><a id="line.405">    public static Message receive(Connection connection, ZMQ.Socket socket, byte[] frame) {</a>
-<span class="sourceLineNo">406</span><a id="line.406">        var envelope = new LinkedList&lt;byte[]&gt;();</a>
-<span class="sourceLineNo">407</span><a id="line.407"></a>
-<span class="sourceLineNo">408</span><a id="line.408">        while (! DELIMITER_ZDATA.equals(frame)) {</a>
-<span class="sourceLineNo">409</span><a id="line.409">            envelope.add(frame);</a>
+<span class="sourceLineNo">398</span><a id="line.398">        return string.getBytes(ZMQ.CHARSET);</a>
+<span class="sourceLineNo">399</span><a id="line.399">    }</a>
+<span class="sourceLineNo">400</span><a id="line.400"></a>
+<span class="sourceLineNo">401</span><a id="line.401">    /**</a>
+<span class="sourceLineNo">402</span><a id="line.402">     * Method to receive a {@link Message} on a {@link ZMQ.Socket}.</a>
+<span class="sourceLineNo">403</span><a id="line.403">     *</a>
+<span class="sourceLineNo">404</span><a id="line.404">     * param    connection      The {@link Connection}.</a>
+<span class="sourceLineNo">405</span><a id="line.405">     * @param   socket          The {@link ZMQ.Socket}.</a>
+<span class="sourceLineNo">406</span><a id="line.406">     * @param   frame           The first message frame.</a>
+<span class="sourceLineNo">407</span><a id="line.407">     */</a>
+<span class="sourceLineNo">408</span><a id="line.408">    public static Message receive(Connection connection, ZMQ.Socket socket, byte[] frame) {</a>
+<span class="sourceLineNo">409</span><a id="line.409">        var envelope = new LinkedList&lt;byte[]&gt;();</a>
 <span class="sourceLineNo">410</span><a id="line.410"></a>
-<span class="sourceLineNo">411</span><a id="line.411">            frame = recv(socket);</a>
-<span class="sourceLineNo">412</span><a id="line.412">        }</a>
+<span class="sourceLineNo">411</span><a id="line.411">        while (! DELIMITER_ZDATA.equals(frame)) {</a>
+<span class="sourceLineNo">412</span><a id="line.412">            envelope.add(frame);</a>
 <span class="sourceLineNo">413</span><a id="line.413"></a>
-<span class="sourceLineNo">414</span><a id="line.414">        var signature = recv(socket);</a>
-<span class="sourceLineNo">415</span><a id="line.415">        var header = recv(socket);</a>
-<span class="sourceLineNo">416</span><a id="line.416">        var parentHeader = recv(socket);</a>
-<span class="sourceLineNo">417</span><a id="line.417">        var metadata = recv(socket);</a>
-<span class="sourceLineNo">418</span><a id="line.418">        var content = recv(socket);</a>
-<span class="sourceLineNo">419</span><a id="line.419">        var buffers = new LinkedList&lt;byte[]&gt;();</a>
-<span class="sourceLineNo">420</span><a id="line.420"></a>
-<span class="sourceLineNo">421</span><a id="line.421">        while (socket.hasReceiveMore()) {</a>
-<span class="sourceLineNo">422</span><a id="line.422">            buffers.add(recv(socket));</a>
-<span class="sourceLineNo">423</span><a id="line.423">        }</a>
-<span class="sourceLineNo">424</span><a id="line.424"></a>
-<span class="sourceLineNo">425</span><a id="line.425">        var digester = connection.getDigester();</a>
-<span class="sourceLineNo">426</span><a id="line.426"></a>
-<span class="sourceLineNo">427</span><a id="line.427">        if (digester != null) {</a>
-<span class="sourceLineNo">428</span><a id="line.428">            if (! digester.verify(new String(signature, ZMQ.CHARSET),</a>
-<span class="sourceLineNo">429</span><a id="line.429">                                  header, parentHeader, metadata, content)) {</a>
-<span class="sourceLineNo">430</span><a id="line.430">                throw new SecurityException("Invalid signature");</a>
-<span class="sourceLineNo">431</span><a id="line.431">            }</a>
-<span class="sourceLineNo">432</span><a id="line.432">        }</a>
-<span class="sourceLineNo">433</span><a id="line.433"></a>
-<span class="sourceLineNo">434</span><a id="line.434">        var message = new Message(connection);</a>
+<span class="sourceLineNo">414</span><a id="line.414">            frame = recv(socket);</a>
+<span class="sourceLineNo">415</span><a id="line.415">        }</a>
+<span class="sourceLineNo">416</span><a id="line.416"></a>
+<span class="sourceLineNo">417</span><a id="line.417">        var signature = recv(socket);</a>
+<span class="sourceLineNo">418</span><a id="line.418">        var header = recv(socket);</a>
+<span class="sourceLineNo">419</span><a id="line.419">        var parentHeader = recv(socket);</a>
+<span class="sourceLineNo">420</span><a id="line.420">        var metadata = recv(socket);</a>
+<span class="sourceLineNo">421</span><a id="line.421">        var content = recv(socket);</a>
+<span class="sourceLineNo">422</span><a id="line.422">        var buffers = new LinkedList&lt;byte[]&gt;();</a>
+<span class="sourceLineNo">423</span><a id="line.423"></a>
+<span class="sourceLineNo">424</span><a id="line.424">        while (socket.hasReceiveMore()) {</a>
+<span class="sourceLineNo">425</span><a id="line.425">            buffers.add(recv(socket));</a>
+<span class="sourceLineNo">426</span><a id="line.426">        }</a>
+<span class="sourceLineNo">427</span><a id="line.427"></a>
+<span class="sourceLineNo">428</span><a id="line.428">        var digester = connection.getDigester();</a>
+<span class="sourceLineNo">429</span><a id="line.429"></a>
+<span class="sourceLineNo">430</span><a id="line.430">        if (digester != null) {</a>
+<span class="sourceLineNo">431</span><a id="line.431">            if (! digester.verify(new String(signature, ZMQ.CHARSET), header, parentHeader, metadata, content)) {</a>
+<span class="sourceLineNo">432</span><a id="line.432">                throw new SecurityException("Invalid signature");</a>
+<span class="sourceLineNo">433</span><a id="line.433">            }</a>
+<span class="sourceLineNo">434</span><a id="line.434">        }</a>
 <span class="sourceLineNo">435</span><a id="line.435"></a>
-<span class="sourceLineNo">436</span><a id="line.436">        message.envelope().addAll(envelope);</a>
-<span class="sourceLineNo">437</span><a id="line.437">        message.header().setAll(deserialize(header));</a>
-<span class="sourceLineNo">438</span><a id="line.438">        message.parentHeader().setAll(deserialize(parentHeader));</a>
-<span class="sourceLineNo">439</span><a id="line.439">        message.metadata().setAll(deserialize(metadata));</a>
-<span class="sourceLineNo">440</span><a id="line.440">        message.content().setAll(deserialize(content));</a>
-<span class="sourceLineNo">441</span><a id="line.441">        message.buffers().addAll(buffers);</a>
-<span class="sourceLineNo">442</span><a id="line.442"></a>
-<span class="sourceLineNo">443</span><a id="line.443">        return message;</a>
-<span class="sourceLineNo">444</span><a id="line.444">    }</a>
-<span class="sourceLineNo">445</span><a id="line.445"></a>
-<span class="sourceLineNo">446</span><a id="line.446">    private static byte[] recv(ZMQ.Socket socket) {</a>
-<span class="sourceLineNo">447</span><a id="line.447">        return Objects.requireNonNull(socket.recv(ZMQ.DONTWAIT));</a>
-<span class="sourceLineNo">448</span><a id="line.448">    }</a>
-<span class="sourceLineNo">449</span><a id="line.449"></a>
-<span class="sourceLineNo">450</span><a id="line.450">    private static ObjectNode deserialize(byte[] bytes) {</a>
-<span class="sourceLineNo">451</span><a id="line.451">        ObjectNode value = null;</a>
-<span class="sourceLineNo">452</span><a id="line.452"></a>
-<span class="sourceLineNo">453</span><a id="line.453">        try {</a>
-<span class="sourceLineNo">454</span><a id="line.454">            value = (ObjectNode) ObjectMappers.JSON.readTree(new String(bytes, ZMQ.CHARSET));</a>
-<span class="sourceLineNo">455</span><a id="line.455">        } catch (Exception exception) {</a>
-<span class="sourceLineNo">456</span><a id="line.456">            log.warn("{}", exception);</a>
-<span class="sourceLineNo">457</span><a id="line.457">        }</a>
-<span class="sourceLineNo">458</span><a id="line.458"></a>
-<span class="sourceLineNo">459</span><a id="line.459">        return value;</a>
-<span class="sourceLineNo">460</span><a id="line.460">    }</a>
-<span class="sourceLineNo">461</span><a id="line.461"></a>
-<span class="sourceLineNo">462</span><a id="line.462">    /**</a>
-<span class="sourceLineNo">463</span><a id="line.463">     * Method to create a "standard" error node.  If both arguments are</a>
-<span class="sourceLineNo">464</span><a id="line.464">     * {@code null} then an {@link ObjectNode} with {@code status = "ok"} is</a>
-<span class="sourceLineNo">465</span><a id="line.465">     * created.</a>
-<span class="sourceLineNo">466</span><a id="line.466">     *</a>
-<span class="sourceLineNo">467</span><a id="line.467">     * @param   throwable       The {@link Throwable} source of the error.</a>
-<span class="sourceLineNo">468</span><a id="line.468">     * @param   evalue          The expression value.</a>
-<span class="sourceLineNo">469</span><a id="line.469">     *</a>
-<span class="sourceLineNo">470</span><a id="line.470">     * @return  The corresponding {@link ObjectNode}.</a>
-<span class="sourceLineNo">471</span><a id="line.471">     */</a>
-<span class="sourceLineNo">472</span><a id="line.472">    public static ObjectNode content(Throwable throwable, String evalue) {</a>
-<span class="sourceLineNo">473</span><a id="line.473">        var node = new ObjectNode(JsonNodeFactory.instance);</a>
-<span class="sourceLineNo">474</span><a id="line.474"></a>
-<span class="sourceLineNo">475</span><a id="line.475">        if (throwable != null || evalue != null) {</a>
-<span class="sourceLineNo">476</span><a id="line.476">            node.put("status", "error");</a>
-<span class="sourceLineNo">477</span><a id="line.477">            node.put("ename", throwable.getClass().getCanonicalName());</a>
-<span class="sourceLineNo">478</span><a id="line.478">            node.put("evalue", evalue);</a>
-<span class="sourceLineNo">479</span><a id="line.479"></a>
-<span class="sourceLineNo">480</span><a id="line.480">            var array = node.putArray("traceback");</a>
+<span class="sourceLineNo">436</span><a id="line.436">        var message = new Message(connection);</a>
+<span class="sourceLineNo">437</span><a id="line.437"></a>
+<span class="sourceLineNo">438</span><a id="line.438">        message.envelope().addAll(envelope);</a>
+<span class="sourceLineNo">439</span><a id="line.439">        message.header().setAll(deserialize(header));</a>
+<span class="sourceLineNo">440</span><a id="line.440">        message.parentHeader().setAll(deserialize(parentHeader));</a>
+<span class="sourceLineNo">441</span><a id="line.441">        message.metadata().setAll(deserialize(metadata));</a>
+<span class="sourceLineNo">442</span><a id="line.442">        message.content().setAll(deserialize(content));</a>
+<span class="sourceLineNo">443</span><a id="line.443">        message.buffers().addAll(buffers);</a>
+<span class="sourceLineNo">444</span><a id="line.444"></a>
+<span class="sourceLineNo">445</span><a id="line.445">        return message;</a>
+<span class="sourceLineNo">446</span><a id="line.446">    }</a>
+<span class="sourceLineNo">447</span><a id="line.447"></a>
+<span class="sourceLineNo">448</span><a id="line.448">    private static byte[] recv(ZMQ.Socket socket) {</a>
+<span class="sourceLineNo">449</span><a id="line.449">        return Objects.requireNonNull(socket.recv(ZMQ.DONTWAIT));</a>
+<span class="sourceLineNo">450</span><a id="line.450">    }</a>
+<span class="sourceLineNo">451</span><a id="line.451"></a>
+<span class="sourceLineNo">452</span><a id="line.452">    private static ObjectNode deserialize(byte[] bytes) {</a>
+<span class="sourceLineNo">453</span><a id="line.453">        ObjectNode value = null;</a>
+<span class="sourceLineNo">454</span><a id="line.454"></a>
+<span class="sourceLineNo">455</span><a id="line.455">        try {</a>
+<span class="sourceLineNo">456</span><a id="line.456">            value = (ObjectNode) ObjectMappers.JSON.readTree(new String(bytes, ZMQ.CHARSET));</a>
+<span class="sourceLineNo">457</span><a id="line.457">        } catch (Exception exception) {</a>
+<span class="sourceLineNo">458</span><a id="line.458">            log.warn("{}", exception);</a>
+<span class="sourceLineNo">459</span><a id="line.459">        }</a>
+<span class="sourceLineNo">460</span><a id="line.460"></a>
+<span class="sourceLineNo">461</span><a id="line.461">        return value;</a>
+<span class="sourceLineNo">462</span><a id="line.462">    }</a>
+<span class="sourceLineNo">463</span><a id="line.463"></a>
+<span class="sourceLineNo">464</span><a id="line.464">    /**</a>
+<span class="sourceLineNo">465</span><a id="line.465">     * Method to create a "standard" error node.  If both arguments are</a>
+<span class="sourceLineNo">466</span><a id="line.466">     * {@code null} then an {@link ObjectNode} with {@code status = "ok"} is</a>
+<span class="sourceLineNo">467</span><a id="line.467">     * created.</a>
+<span class="sourceLineNo">468</span><a id="line.468">     *</a>
+<span class="sourceLineNo">469</span><a id="line.469">     * @param   throwable       The {@link Throwable} source of the error.</a>
+<span class="sourceLineNo">470</span><a id="line.470">     * @param   evalue          The expression value.</a>
+<span class="sourceLineNo">471</span><a id="line.471">     *</a>
+<span class="sourceLineNo">472</span><a id="line.472">     * @return  The corresponding {@link ObjectNode}.</a>
+<span class="sourceLineNo">473</span><a id="line.473">     */</a>
+<span class="sourceLineNo">474</span><a id="line.474">    public static ObjectNode content(Throwable throwable, String evalue) {</a>
+<span class="sourceLineNo">475</span><a id="line.475">        var node = new ObjectNode(JsonNodeFactory.instance);</a>
+<span class="sourceLineNo">476</span><a id="line.476"></a>
+<span class="sourceLineNo">477</span><a id="line.477">        if (throwable != null || evalue != null) {</a>
+<span class="sourceLineNo">478</span><a id="line.478">            node.put("status", "error");</a>
+<span class="sourceLineNo">479</span><a id="line.479">            node.put("ename", throwable.getClass().getCanonicalName());</a>
+<span class="sourceLineNo">480</span><a id="line.480">            node.put("evalue", evalue);</a>
 <span class="sourceLineNo">481</span><a id="line.481"></a>
-<span class="sourceLineNo">482</span><a id="line.482">            if (throwable != null) {</a>
-<span class="sourceLineNo">483</span><a id="line.483">                var buffer = new PrintStreamBuffer();</a>
-<span class="sourceLineNo">484</span><a id="line.484"></a>
-<span class="sourceLineNo">485</span><a id="line.485">                throwable.printStackTrace(buffer);</a>
-<span class="sourceLineNo">486</span><a id="line.486">                Stream.of(buffer.toString().split("\\R"))</a>
-<span class="sourceLineNo">487</span><a id="line.487">                    .forEach(t -&gt; array.add(t));</a>
-<span class="sourceLineNo">488</span><a id="line.488">            }</a>
-<span class="sourceLineNo">489</span><a id="line.489">        } else {</a>
-<span class="sourceLineNo">490</span><a id="line.490">            node.put("status", "ok");</a>
-<span class="sourceLineNo">491</span><a id="line.491">        }</a>
-<span class="sourceLineNo">492</span><a id="line.492"></a>
-<span class="sourceLineNo">493</span><a id="line.493">        return node;</a>
-<span class="sourceLineNo">494</span><a id="line.494">    }</a>
-<span class="sourceLineNo">495</span><a id="line.495"></a>
-<span class="sourceLineNo">496</span><a id="line.496">    /**</a>
-<span class="sourceLineNo">497</span><a id="line.497">     * Method to create {@link #execute_result(int,ObjectNode)}</a>
-<span class="sourceLineNo">498</span><a id="line.498">     * {@link Message} {@code mime-bundle}.</a>
-<span class="sourceLineNo">499</span><a id="line.499">     *</a>
-<span class="sourceLineNo">500</span><a id="line.500">     * @param   object          The {@link Object} to encode.</a>
-<span class="sourceLineNo">501</span><a id="line.501">     * @param   alternates      Optional alternate representations.</a>
-<span class="sourceLineNo">502</span><a id="line.502">     *</a>
-<span class="sourceLineNo">503</span><a id="line.503">     * @return  The {@link Message} {@code mime-bundle}.</a>
-<span class="sourceLineNo">504</span><a id="line.504">     */</a>
-<span class="sourceLineNo">505</span><a id="line.505">    public static ObjectNode mime_bundle(Object object, Object... alternates) {</a>
-<span class="sourceLineNo">506</span><a id="line.506">        return Renderer.MAP.render(object, alternates);</a>
-<span class="sourceLineNo">507</span><a id="line.507">    }</a>
-<span class="sourceLineNo">508</span><a id="line.508"></a>
-<span class="sourceLineNo">509</span><a id="line.509">    private static String getCallingMethodName(int skip) {</a>
-<span class="sourceLineNo">510</span><a id="line.510">        String name =</a>
-<span class="sourceLineNo">511</span><a id="line.511">            WALKER.walk(t -&gt; t.map(StackWalker.StackFrame::getMethodName)</a>
-<span class="sourceLineNo">512</span><a id="line.512">                                  .skip(skip)</a>
-<span class="sourceLineNo">513</span><a id="line.513">                                  .findFirst())</a>
-<span class="sourceLineNo">514</span><a id="line.514">            .get();</a>
-<span class="sourceLineNo">515</span><a id="line.515"></a>
-<span class="sourceLineNo">516</span><a id="line.516">        return name;</a>
-<span class="sourceLineNo">517</span><a id="line.517">    }</a>
-<span class="sourceLineNo">518</span><a id="line.518"></a>
-<span class="sourceLineNo">519</span><a id="line.519">    /**</a>
-<span class="sourceLineNo">520</span><a id="line.520">     * Method to send a {@link Message}.</a>
-<span class="sourceLineNo">521</span><a id="line.521">     *</a>
-<span class="sourceLineNo">522</span><a id="line.522">     * param    connection      The {@link Connection}.</a>
-<span class="sourceLineNo">523</span><a id="line.523">     * @param   socket          The {@link ZMQ.Socket}.</a>
-<span class="sourceLineNo">524</span><a id="line.524">     */</a>
-<span class="sourceLineNo">525</span><a id="line.525">    public void send(Connection connection, ZMQ.Socket socket) {</a>
-<span class="sourceLineNo">526</span><a id="line.526">        var list = serialize(connection.getDigester());</a>
-<span class="sourceLineNo">527</span><a id="line.527">        var iterator = list.iterator();</a>
-<span class="sourceLineNo">528</span><a id="line.528"></a>
-<span class="sourceLineNo">529</span><a id="line.529">        while (iterator.hasNext()) {</a>
-<span class="sourceLineNo">530</span><a id="line.530">            var frame = iterator.next();</a>
-<span class="sourceLineNo">531</span><a id="line.531"></a>
-<span class="sourceLineNo">532</span><a id="line.532">            socket.send(frame, iterator.hasNext() ? ZMQ.SNDMORE : 0);</a>
-<span class="sourceLineNo">533</span><a id="line.533">        }</a>
-<span class="sourceLineNo">534</span><a id="line.534">    }</a>
-<span class="sourceLineNo">535</span><a id="line.535"></a>
-<span class="sourceLineNo">536</span><a id="line.536">    /**</a>
-<span class="sourceLineNo">537</span><a id="line.537">     * Convenience method to return {@link #header}, {@link #parentHeader},</a>
-<span class="sourceLineNo">538</span><a id="line.538">     * {@link metadata}, and {@link #content} wrapped in an</a>
-<span class="sourceLineNo">539</span><a id="line.539">     * {@link ObjectNode}.</a>
-<span class="sourceLineNo">540</span><a id="line.540">     *</a>
-<span class="sourceLineNo">541</span><a id="line.541">     * @return The {@link ObjectNode}.</a>
-<span class="sourceLineNo">542</span><a id="line.542">     */</a>
-<span class="sourceLineNo">543</span><a id="line.543">    public ObjectNode asObjectNode() {</a>
-<span class="sourceLineNo">544</span><a id="line.544">        var node = new ObjectNode(JsonNodeFactory.instance);</a>
-<span class="sourceLineNo">545</span><a id="line.545"></a>
-<span class="sourceLineNo">546</span><a id="line.546">        node.set("header", header);</a>
-<span class="sourceLineNo">547</span><a id="line.547">        node.set("parentHeader", parentHeader);</a>
-<span class="sourceLineNo">548</span><a id="line.548">        node.set("metadata", metadata);</a>
-<span class="sourceLineNo">549</span><a id="line.549">        node.set("content", content);</a>
-<span class="sourceLineNo">550</span><a id="line.550"></a>
-<span class="sourceLineNo">551</span><a id="line.551">        return node;</a>
-<span class="sourceLineNo">552</span><a id="line.552">    }</a>
-<span class="sourceLineNo">553</span><a id="line.553"></a>
-<span class="sourceLineNo">554</span><a id="line.554">    @Override</a>
-<span class="sourceLineNo">555</span><a id="line.555">    public String toString() {</a>
-<span class="sourceLineNo">556</span><a id="line.556">        var string =</a>
-<span class="sourceLineNo">557</span><a id="line.557">            Stream.of(envelope().stream().map(ZData::new),</a>
-<span class="sourceLineNo">558</span><a id="line.558">                      Stream.of(DELIMITER_STRING, "DIGEST"),</a>
-<span class="sourceLineNo">559</span><a id="line.559">                      Stream.of(header(), parentHeader(), metadata(), content())</a>
-<span class="sourceLineNo">560</span><a id="line.560">                      .map(t -&gt; t.toPrettyString()),</a>
-<span class="sourceLineNo">561</span><a id="line.561">                      buffers().stream().map(ZData::new))</a>
-<span class="sourceLineNo">562</span><a id="line.562">            .flatMap(t -&gt; t)</a>
-<span class="sourceLineNo">563</span><a id="line.563">            .map(Object::toString)</a>
-<span class="sourceLineNo">564</span><a id="line.564">            .collect(joining("\n"));</a>
-<span class="sourceLineNo">565</span><a id="line.565"></a>
-<span class="sourceLineNo">566</span><a id="line.566">        return string;</a>
-<span class="sourceLineNo">567</span><a id="line.567">    }</a>
-<span class="sourceLineNo">568</span><a id="line.568"></a>
-<span class="sourceLineNo">569</span><a id="line.569">    private static class Copy extends Message {</a>
-<span class="sourceLineNo">570</span><a id="line.570">        public Copy(Message message) {</a>
-<span class="sourceLineNo">571</span><a id="line.571">            super(null);</a>
-<span class="sourceLineNo">572</span><a id="line.572"></a>
-<span class="sourceLineNo">573</span><a id="line.573">            envelope().addAll(message.envelope());</a>
-<span class="sourceLineNo">574</span><a id="line.574">            header().setAll(message.header());</a>
-<span class="sourceLineNo">575</span><a id="line.575">            parentHeader().setAll(message.parentHeader());</a>
-<span class="sourceLineNo">576</span><a id="line.576">            metadata().setAll(message.metadata());</a>
-<span class="sourceLineNo">577</span><a id="line.577">            content().setAll(message.content());</a>
-<span class="sourceLineNo">578</span><a id="line.578">            buffers().addAll(message.buffers());</a>
-<span class="sourceLineNo">579</span><a id="line.579">        }</a>
-<span class="sourceLineNo">580</span><a id="line.580">    }</a>
-<span class="sourceLineNo">581</span><a id="line.581"></a>
-<span class="sourceLineNo">582</span><a id="line.582">    private static abstract class Child extends Message {</a>
-<span class="sourceLineNo">583</span><a id="line.583">        protected Child(String msg_type, Message request) {</a>
-<span class="sourceLineNo">584</span><a id="line.584">            super(null);</a>
-<span class="sourceLineNo">585</span><a id="line.585"></a>
-<span class="sourceLineNo">586</span><a id="line.586">            if (msg_type != null) {</a>
-<span class="sourceLineNo">587</span><a id="line.587">                msg_type(msg_type);</a>
-<span class="sourceLineNo">588</span><a id="line.588">            }</a>
-<span class="sourceLineNo">589</span><a id="line.589"></a>
-<span class="sourceLineNo">590</span><a id="line.590">            if (request != null) {</a>
-<span class="sourceLineNo">591</span><a id="line.591">                parentHeader().setAll(request.header());</a>
-<span class="sourceLineNo">592</span><a id="line.592">            }</a>
-<span class="sourceLineNo">593</span><a id="line.593">        }</a>
-<span class="sourceLineNo">594</span><a id="line.594">    }</a>
-<span class="sourceLineNo">595</span><a id="line.595"></a>
-<span class="sourceLineNo">596</span><a id="line.596">    private static class Reply extends Child {</a>
-<span class="sourceLineNo">597</span><a id="line.597">        public Reply(Message request) {</a>
-<span class="sourceLineNo">598</span><a id="line.598">            super(request.getMessageTypeAction() + "_reply", request);</a>
-<span class="sourceLineNo">599</span><a id="line.599"></a>
-<span class="sourceLineNo">600</span><a id="line.600">            if (request.isRequest()) {</a>
-<span class="sourceLineNo">601</span><a id="line.601">                envelope().addAll(request.envelope());</a>
-<span class="sourceLineNo">602</span><a id="line.602">                content().setAll(content(null, null));</a>
-<span class="sourceLineNo">603</span><a id="line.603">                buffers().addAll(request.buffers());</a>
-<span class="sourceLineNo">604</span><a id="line.604">            } else {</a>
-<span class="sourceLineNo">605</span><a id="line.605">                throw new IllegalStateException("Source message is not a request");</a>
-<span class="sourceLineNo">606</span><a id="line.606">            }</a>
-<span class="sourceLineNo">607</span><a id="line.607">        }</a>
-<span class="sourceLineNo">608</span><a id="line.608">    }</a>
-<span class="sourceLineNo">609</span><a id="line.609"></a>
-<span class="sourceLineNo">610</span><a id="line.610">    private static class Pub extends Child {</a>
-<span class="sourceLineNo">611</span><a id="line.611">        public Pub(String msg_type, Message request) {</a>
-<span class="sourceLineNo">612</span><a id="line.612">            super(msg_type, request);</a>
-<span class="sourceLineNo">613</span><a id="line.613"></a>
-<span class="sourceLineNo">614</span><a id="line.614">            envelope().clear();</a>
+<span class="sourceLineNo">482</span><a id="line.482">            var array = node.putArray("traceback");</a>
+<span class="sourceLineNo">483</span><a id="line.483"></a>
+<span class="sourceLineNo">484</span><a id="line.484">            if (throwable != null) {</a>
+<span class="sourceLineNo">485</span><a id="line.485">                var buffer = new PrintStreamBuffer();</a>
+<span class="sourceLineNo">486</span><a id="line.486"></a>
+<span class="sourceLineNo">487</span><a id="line.487">                throwable.printStackTrace(buffer);</a>
+<span class="sourceLineNo">488</span><a id="line.488">                Stream.of(buffer.toString().split("\\R"))</a>
+<span class="sourceLineNo">489</span><a id="line.489">                    .forEach(t -&gt; array.add(t));</a>
+<span class="sourceLineNo">490</span><a id="line.490">            }</a>
+<span class="sourceLineNo">491</span><a id="line.491">        } else {</a>
+<span class="sourceLineNo">492</span><a id="line.492">            node.put("status", "ok");</a>
+<span class="sourceLineNo">493</span><a id="line.493">        }</a>
+<span class="sourceLineNo">494</span><a id="line.494"></a>
+<span class="sourceLineNo">495</span><a id="line.495">        return node;</a>
+<span class="sourceLineNo">496</span><a id="line.496">    }</a>
+<span class="sourceLineNo">497</span><a id="line.497"></a>
+<span class="sourceLineNo">498</span><a id="line.498">    /**</a>
+<span class="sourceLineNo">499</span><a id="line.499">     * Method to create {@link #execute_result(int,ObjectNode)}</a>
+<span class="sourceLineNo">500</span><a id="line.500">     * {@link Message} {@code mime-bundle}.</a>
+<span class="sourceLineNo">501</span><a id="line.501">     *</a>
+<span class="sourceLineNo">502</span><a id="line.502">     * @param   object          The {@link Object} to encode.</a>
+<span class="sourceLineNo">503</span><a id="line.503">     * @param   alternates      Optional alternate representations.</a>
+<span class="sourceLineNo">504</span><a id="line.504">     *</a>
+<span class="sourceLineNo">505</span><a id="line.505">     * @return  The {@link Message} {@code mime-bundle}.</a>
+<span class="sourceLineNo">506</span><a id="line.506">     */</a>
+<span class="sourceLineNo">507</span><a id="line.507">    public static ObjectNode mime_bundle(Object object, Object... alternates) {</a>
+<span class="sourceLineNo">508</span><a id="line.508">        return Renderer.MAP.render(object, alternates);</a>
+<span class="sourceLineNo">509</span><a id="line.509">    }</a>
+<span class="sourceLineNo">510</span><a id="line.510"></a>
+<span class="sourceLineNo">511</span><a id="line.511">    private static String getCallingMethodName(int skip) {</a>
+<span class="sourceLineNo">512</span><a id="line.512">        String name =</a>
+<span class="sourceLineNo">513</span><a id="line.513">            WALKER.walk(t -&gt; t.map(StackWalker.StackFrame::getMethodName)</a>
+<span class="sourceLineNo">514</span><a id="line.514">                                  .skip(skip)</a>
+<span class="sourceLineNo">515</span><a id="line.515">                                  .findFirst())</a>
+<span class="sourceLineNo">516</span><a id="line.516">            .get();</a>
+<span class="sourceLineNo">517</span><a id="line.517"></a>
+<span class="sourceLineNo">518</span><a id="line.518">        return name;</a>
+<span class="sourceLineNo">519</span><a id="line.519">    }</a>
+<span class="sourceLineNo">520</span><a id="line.520"></a>
+<span class="sourceLineNo">521</span><a id="line.521">    /**</a>
+<span class="sourceLineNo">522</span><a id="line.522">     * Method to send a {@link Message}.</a>
+<span class="sourceLineNo">523</span><a id="line.523">     *</a>
+<span class="sourceLineNo">524</span><a id="line.524">     * param    connection      The {@link Connection}.</a>
+<span class="sourceLineNo">525</span><a id="line.525">     * @param   socket          The {@link ZMQ.Socket}.</a>
+<span class="sourceLineNo">526</span><a id="line.526">     */</a>
+<span class="sourceLineNo">527</span><a id="line.527">    public void send(Connection connection, ZMQ.Socket socket) {</a>
+<span class="sourceLineNo">528</span><a id="line.528">        var list = serialize(connection.getDigester());</a>
+<span class="sourceLineNo">529</span><a id="line.529">        var iterator = list.iterator();</a>
+<span class="sourceLineNo">530</span><a id="line.530"></a>
+<span class="sourceLineNo">531</span><a id="line.531">        while (iterator.hasNext()) {</a>
+<span class="sourceLineNo">532</span><a id="line.532">            var frame = iterator.next();</a>
+<span class="sourceLineNo">533</span><a id="line.533"></a>
+<span class="sourceLineNo">534</span><a id="line.534">            socket.send(frame, iterator.hasNext() ? ZMQ.SNDMORE : 0);</a>
+<span class="sourceLineNo">535</span><a id="line.535">        }</a>
+<span class="sourceLineNo">536</span><a id="line.536">    }</a>
+<span class="sourceLineNo">537</span><a id="line.537"></a>
+<span class="sourceLineNo">538</span><a id="line.538">    /**</a>
+<span class="sourceLineNo">539</span><a id="line.539">     * Convenience method to return {@link #header}, {@link #parentHeader},</a>
+<span class="sourceLineNo">540</span><a id="line.540">     * {@link metadata}, and {@link #content} wrapped in an</a>
+<span class="sourceLineNo">541</span><a id="line.541">     * {@link ObjectNode}.</a>
+<span class="sourceLineNo">542</span><a id="line.542">     *</a>
+<span class="sourceLineNo">543</span><a id="line.543">     * @return The {@link ObjectNode}.</a>
+<span class="sourceLineNo">544</span><a id="line.544">     */</a>
+<span class="sourceLineNo">545</span><a id="line.545">    public ObjectNode asObjectNode() {</a>
+<span class="sourceLineNo">546</span><a id="line.546">        var node = new ObjectNode(JsonNodeFactory.instance);</a>
+<span class="sourceLineNo">547</span><a id="line.547"></a>
+<span class="sourceLineNo">548</span><a id="line.548">        node.set("header", header);</a>
+<span class="sourceLineNo">549</span><a id="line.549">        node.set("parentHeader", parentHeader);</a>
+<span class="sourceLineNo">550</span><a id="line.550">        node.set("metadata", metadata);</a>
+<span class="sourceLineNo">551</span><a id="line.551">        node.set("content", content);</a>
+<span class="sourceLineNo">552</span><a id="line.552"></a>
+<span class="sourceLineNo">553</span><a id="line.553">        return node;</a>
+<span class="sourceLineNo">554</span><a id="line.554">    }</a>
+<span class="sourceLineNo">555</span><a id="line.555"></a>
+<span class="sourceLineNo">556</span><a id="line.556">    @Override</a>
+<span class="sourceLineNo">557</span><a id="line.557">    public String toString() {</a>
+<span class="sourceLineNo">558</span><a id="line.558">        var string =</a>
+<span class="sourceLineNo">559</span><a id="line.559">            Stream.of(envelope().stream().map(ZData::new),</a>
+<span class="sourceLineNo">560</span><a id="line.560">                      Stream.of(DELIMITER_STRING, "DIGEST"),</a>
+<span class="sourceLineNo">561</span><a id="line.561">                      Stream.of(header(), parentHeader(), metadata(), content())</a>
+<span class="sourceLineNo">562</span><a id="line.562">                      .map(t -&gt; t.toPrettyString()),</a>
+<span class="sourceLineNo">563</span><a id="line.563">                      buffers().stream().map(ZData::new))</a>
+<span class="sourceLineNo">564</span><a id="line.564">            .flatMap(t -&gt; t)</a>
+<span class="sourceLineNo">565</span><a id="line.565">            .map(Object::toString)</a>
+<span class="sourceLineNo">566</span><a id="line.566">            .collect(joining("\n"));</a>
+<span class="sourceLineNo">567</span><a id="line.567"></a>
+<span class="sourceLineNo">568</span><a id="line.568">        return string;</a>
+<span class="sourceLineNo">569</span><a id="line.569">    }</a>
+<span class="sourceLineNo">570</span><a id="line.570"></a>
+<span class="sourceLineNo">571</span><a id="line.571">    private static class Copy extends Message {</a>
+<span class="sourceLineNo">572</span><a id="line.572">        public Copy(Message message) {</a>
+<span class="sourceLineNo">573</span><a id="line.573">            super(null);</a>
+<span class="sourceLineNo">574</span><a id="line.574"></a>
+<span class="sourceLineNo">575</span><a id="line.575">            envelope().addAll(message.envelope());</a>
+<span class="sourceLineNo">576</span><a id="line.576">            header().setAll(message.header());</a>
+<span class="sourceLineNo">577</span><a id="line.577">            parentHeader().setAll(message.parentHeader());</a>
+<span class="sourceLineNo">578</span><a id="line.578">            metadata().setAll(message.metadata());</a>
+<span class="sourceLineNo">579</span><a id="line.579">            content().setAll(message.content());</a>
+<span class="sourceLineNo">580</span><a id="line.580">            buffers().addAll(message.buffers());</a>
+<span class="sourceLineNo">581</span><a id="line.581">        }</a>
+<span class="sourceLineNo">582</span><a id="line.582">    }</a>
+<span class="sourceLineNo">583</span><a id="line.583"></a>
+<span class="sourceLineNo">584</span><a id="line.584">    private static abstract class Child extends Message {</a>
+<span class="sourceLineNo">585</span><a id="line.585">        protected Child(String msg_type, Message request) {</a>
+<span class="sourceLineNo">586</span><a id="line.586">            super(null);</a>
+<span class="sourceLineNo">587</span><a id="line.587"></a>
+<span class="sourceLineNo">588</span><a id="line.588">            if (msg_type != null) {</a>
+<span class="sourceLineNo">589</span><a id="line.589">                msg_type(msg_type);</a>
+<span class="sourceLineNo">590</span><a id="line.590">            }</a>
+<span class="sourceLineNo">591</span><a id="line.591"></a>
+<span class="sourceLineNo">592</span><a id="line.592">            if (request != null) {</a>
+<span class="sourceLineNo">593</span><a id="line.593">                parentHeader().setAll(request.header());</a>
+<span class="sourceLineNo">594</span><a id="line.594">            }</a>
+<span class="sourceLineNo">595</span><a id="line.595">        }</a>
+<span class="sourceLineNo">596</span><a id="line.596">    }</a>
+<span class="sourceLineNo">597</span><a id="line.597"></a>
+<span class="sourceLineNo">598</span><a id="line.598">    private static class Reply extends Child {</a>
+<span class="sourceLineNo">599</span><a id="line.599">        public Reply(Message request) {</a>
+<span class="sourceLineNo">600</span><a id="line.600">            super(request.getMessageTypeAction() + "_reply", request);</a>
+<span class="sourceLineNo">601</span><a id="line.601"></a>
+<span class="sourceLineNo">602</span><a id="line.602">            if (request.isRequest()) {</a>
+<span class="sourceLineNo">603</span><a id="line.603">                envelope().addAll(request.envelope());</a>
+<span class="sourceLineNo">604</span><a id="line.604">                content().setAll(content(null, null));</a>
+<span class="sourceLineNo">605</span><a id="line.605">                buffers().addAll(request.buffers());</a>
+<span class="sourceLineNo">606</span><a id="line.606">            } else {</a>
+<span class="sourceLineNo">607</span><a id="line.607">                throw new IllegalStateException("Source message is not a request");</a>
+<span class="sourceLineNo">608</span><a id="line.608">            }</a>
+<span class="sourceLineNo">609</span><a id="line.609">        }</a>
+<span class="sourceLineNo">610</span><a id="line.610">    }</a>
+<span class="sourceLineNo">611</span><a id="line.611"></a>
+<span class="sourceLineNo">612</span><a id="line.612">    private static class Pub extends Child {</a>
+<span class="sourceLineNo">613</span><a id="line.613">        public Pub(String msg_type, Message request) {</a>
+<span class="sourceLineNo">614</span><a id="line.614">            super(msg_type, request);</a>
 <span class="sourceLineNo">615</span><a id="line.615"></a>
-<span class="sourceLineNo">616</span><a id="line.616">            var topic = msg_type;</a>
+<span class="sourceLineNo">616</span><a id="line.616">            envelope().clear();</a>
 <span class="sourceLineNo">617</span><a id="line.617"></a>
-<span class="sourceLineNo">618</span><a id="line.618">            if (request != null &amp;&amp; request.connection != null) {</a>
-<span class="sourceLineNo">619</span><a id="line.619">                var kernelId = request.connection.getKernelId();</a>
-<span class="sourceLineNo">620</span><a id="line.620"></a>
-<span class="sourceLineNo">621</span><a id="line.621">                if (kernelId != null) {</a>
-<span class="sourceLineNo">622</span><a id="line.622">                    topic = String.format("kernel.%s.%s", kernelId, msg_type);</a>
-<span class="sourceLineNo">623</span><a id="line.623">                }</a>
-<span class="sourceLineNo">624</span><a id="line.624">            }</a>
-<span class="sourceLineNo">625</span><a id="line.625"></a>
-<span class="sourceLineNo">626</span><a id="line.626">            if (topic != null) {</a>
-<span class="sourceLineNo">627</span><a id="line.627">                envelope().add(topic.getBytes(ZMQ.CHARSET));</a>
-<span class="sourceLineNo">628</span><a id="line.628">            }</a>
-<span class="sourceLineNo">629</span><a id="line.629">        }</a>
-<span class="sourceLineNo">630</span><a id="line.630">    }</a>
-<span class="sourceLineNo">631</span><a id="line.631">}</a>
+<span class="sourceLineNo">618</span><a id="line.618">            var topic = msg_type;</a>
+<span class="sourceLineNo">619</span><a id="line.619"></a>
+<span class="sourceLineNo">620</span><a id="line.620">            if (request != null &amp;&amp; request.connection != null) {</a>
+<span class="sourceLineNo">621</span><a id="line.621">                var kernelId = request.connection.getKernelId();</a>
+<span class="sourceLineNo">622</span><a id="line.622"></a>
+<span class="sourceLineNo">623</span><a id="line.623">                if (kernelId != null) {</a>
+<span class="sourceLineNo">624</span><a id="line.624">                    topic = String.format("kernel.%s.%s", kernelId, msg_type);</a>
+<span class="sourceLineNo">625</span><a id="line.625">                }</a>
+<span class="sourceLineNo">626</span><a id="line.626">            }</a>
+<span class="sourceLineNo">627</span><a id="line.627"></a>
+<span class="sourceLineNo">628</span><a id="line.628">            if (topic != null) {</a>
+<span class="sourceLineNo">629</span><a id="line.629">                envelope().add(topic.getBytes(ZMQ.CHARSET));</a>
+<span class="sourceLineNo">630</span><a id="line.630">            }</a>
+<span class="sourceLineNo">631</span><a id="line.631">        }</a>
+<span class="sourceLineNo">632</span><a id="line.632">    }</a>
+<span class="sourceLineNo">633</span><a id="line.633">}</a>
 
 
 

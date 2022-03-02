@@ -12,7 +12,7 @@
 <span class="sourceLineNo">003</span><a id="line.3"> * ##########################################################################</a>
 <span class="sourceLineNo">004</span><a id="line.4"> * Ganymede</a>
 <span class="sourceLineNo">005</span><a id="line.5"> * %%</a>
-<span class="sourceLineNo">006</span><a id="line.6"> * Copyright (C) 2021 Allen D. Ball</a>
+<span class="sourceLineNo">006</span><a id="line.6"> * Copyright (C) 2021, 2022 Allen D. Ball</a>
 <span class="sourceLineNo">007</span><a id="line.7"> * %%</a>
 <span class="sourceLineNo">008</span><a id="line.8"> * Licensed under the Apache License, Version 2.0 (the "License");</a>
 <span class="sourceLineNo">009</span><a id="line.9"> * you may not use this file except in compliance with the License.</a>
@@ -119,27 +119,23 @@
 <span class="sourceLineNo">110</span><a id="line.110"></a>
 <span class="sourceLineNo">111</span><a id="line.111">    @Command @Data</a>
 <span class="sourceLineNo">112</span><a id="line.112">    private class Arguments {</a>
-<span class="sourceLineNo">113</span><a id="line.113">        @Parameters(description = { "JDBC Connection URL" },</a>
-<span class="sourceLineNo">114</span><a id="line.114">                    index = "0", arity = "0..1")</a>
-<span class="sourceLineNo">115</span><a id="line.115">        private String url = null;</a>
-<span class="sourceLineNo">116</span><a id="line.116"></a>
-<span class="sourceLineNo">117</span><a id="line.117">        @Parameters(description = { "JDBC Connection Username" },</a>
-<span class="sourceLineNo">118</span><a id="line.118">                    index = "1", arity = "0..1", defaultValue = "root")</a>
-<span class="sourceLineNo">119</span><a id="line.119">        private String username = null;</a>
-<span class="sourceLineNo">120</span><a id="line.120"></a>
-<span class="sourceLineNo">121</span><a id="line.121">        @Parameters(description = { "JDBC Connection Password" },</a>
-<span class="sourceLineNo">122</span><a id="line.122">                    index = "2", arity = "0..1")</a>
-<span class="sourceLineNo">123</span><a id="line.123">        private String password = null;</a>
+<span class="sourceLineNo">113</span><a id="line.113">        @Parameters(description = { "JDBC Connection URL" }, index = "0", arity = "0..1")</a>
+<span class="sourceLineNo">114</span><a id="line.114">        private String url = null;</a>
+<span class="sourceLineNo">115</span><a id="line.115"></a>
+<span class="sourceLineNo">116</span><a id="line.116">        @Parameters(description = { "JDBC Connection Username" }, index = "1", arity = "0..1", defaultValue = "root")</a>
+<span class="sourceLineNo">117</span><a id="line.117">        private String username = null;</a>
+<span class="sourceLineNo">118</span><a id="line.118"></a>
+<span class="sourceLineNo">119</span><a id="line.119">        @Parameters(description = { "JDBC Connection Password" }, index = "2", arity = "0..1")</a>
+<span class="sourceLineNo">120</span><a id="line.120">        private String password = null;</a>
+<span class="sourceLineNo">121</span><a id="line.121"></a>
+<span class="sourceLineNo">122</span><a id="line.122">        @Option(names = { "--no-print" }, negatable = true, description = { "Print query results.  true by default" })</a>
+<span class="sourceLineNo">123</span><a id="line.123">        private boolean print = true;</a>
 <span class="sourceLineNo">124</span><a id="line.124"></a>
-<span class="sourceLineNo">125</span><a id="line.125">        @Option(names = { "--no-print" }, negatable = true,</a>
-<span class="sourceLineNo">126</span><a id="line.126">                description = { "Print query results.  true by default" })</a>
-<span class="sourceLineNo">127</span><a id="line.127">        private boolean print = true;</a>
-<span class="sourceLineNo">128</span><a id="line.128"></a>
-<span class="sourceLineNo">129</span><a id="line.129">        public DSLContext dsl() {</a>
-<span class="sourceLineNo">130</span><a id="line.130">            return context.sql.connect(getUrl(), getUsername(), getPassword());</a>
-<span class="sourceLineNo">131</span><a id="line.131">        }</a>
-<span class="sourceLineNo">132</span><a id="line.132">    }</a>
-<span class="sourceLineNo">133</span><a id="line.133">}</a>
+<span class="sourceLineNo">125</span><a id="line.125">        public DSLContext dsl() {</a>
+<span class="sourceLineNo">126</span><a id="line.126">            return context.sql.connect(getUrl(), getUsername(), getPassword());</a>
+<span class="sourceLineNo">127</span><a id="line.127">        }</a>
+<span class="sourceLineNo">128</span><a id="line.128">    }</a>
+<span class="sourceLineNo">129</span><a id="line.129">}</a>
 
 
 

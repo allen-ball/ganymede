@@ -12,7 +12,7 @@
 <span class="sourceLineNo">003</span><a id="line.3"> * ##########################################################################</a>
 <span class="sourceLineNo">004</span><a id="line.4"> * Ganymede</a>
 <span class="sourceLineNo">005</span><a id="line.5"> * %%</a>
-<span class="sourceLineNo">006</span><a id="line.6"> * Copyright (C) 2021 Allen D. Ball</a>
+<span class="sourceLineNo">006</span><a id="line.6"> * Copyright (C) 2021, 2022 Allen D. Ball</a>
 <span class="sourceLineNo">007</span><a id="line.7"> * %%</a>
 <span class="sourceLineNo">008</span><a id="line.8"> * Licensed under the Apache License, Version 2.0 (the "License");</a>
 <span class="sourceLineNo">009</span><a id="line.9"> * you may not use this file except in compliance with the License.</a>
@@ -150,43 +150,42 @@
 <span class="sourceLineNo">141</span><a id="line.141">     */</a>
 <span class="sourceLineNo">142</span><a id="line.142">    protected Stream&lt;DefaultArtifact&gt; parse(InputStream in) {</a>
 <span class="sourceLineNo">143</span><a id="line.143">        var stream =</a>
-<span class="sourceLineNo">144</span><a id="line.144">            new BufferedReader(new InputStreamReader(in, UTF_8))</a>
-<span class="sourceLineNo">145</span><a id="line.145">            .lines()</a>
-<span class="sourceLineNo">146</span><a id="line.146">            .map(String::strip)</a>
-<span class="sourceLineNo">147</span><a id="line.147">            .map(t -&gt; t.split(":"))</a>
-<span class="sourceLineNo">148</span><a id="line.148">            .filter(t -&gt; t.length &gt; 3)</a>
-<span class="sourceLineNo">149</span><a id="line.149">            .map(t -&gt; new DefaultArtifact(t[0], t[1], null, t[2], t[3]));</a>
-<span class="sourceLineNo">150</span><a id="line.150"></a>
-<span class="sourceLineNo">151</span><a id="line.151">        return stream;</a>
-<span class="sourceLineNo">152</span><a id="line.152">    }</a>
-<span class="sourceLineNo">153</span><a id="line.153"></a>
-<span class="sourceLineNo">154</span><a id="line.154">    private static final List&lt;List&lt;String&gt;&gt; CANDIDATES =</a>
-<span class="sourceLineNo">155</span><a id="line.155">        List.of(List.of("Bundle-SymbolicName", "Bundle-Name", "Bundle-Version"),</a>
-<span class="sourceLineNo">156</span><a id="line.156">                List.of("Implementation-Vendor-Id", "Implementation-Title", "Implementation-Version"),</a>
-<span class="sourceLineNo">157</span><a id="line.157">                List.of("Implementation-Vendor", "Implementation-Title", "Implementation-Version"));</a>
-<span class="sourceLineNo">158</span><a id="line.158"></a>
-<span class="sourceLineNo">159</span><a id="line.159">    private DefaultArtifact getArtifactFrom(Attributes attributes, File file) {</a>
-<span class="sourceLineNo">160</span><a id="line.160">        var coordinates =</a>
-<span class="sourceLineNo">161</span><a id="line.161">            CANDIDATES.stream()</a>
-<span class="sourceLineNo">162</span><a id="line.162">            .map(t -&gt; t.stream()</a>
-<span class="sourceLineNo">163</span><a id="line.163">                       .map(attributes::getValue)</a>
-<span class="sourceLineNo">164</span><a id="line.164">                       .filter(Objects::nonNull)</a>
-<span class="sourceLineNo">165</span><a id="line.165">                       .map(Object::toString)</a>
-<span class="sourceLineNo">166</span><a id="line.166">                       .collect(toList()))</a>
-<span class="sourceLineNo">167</span><a id="line.167">            .filter(t -&gt; t.size() == 3)</a>
-<span class="sourceLineNo">168</span><a id="line.168">            .findFirst().orElse(null);</a>
-<span class="sourceLineNo">169</span><a id="line.169"></a>
-<span class="sourceLineNo">170</span><a id="line.170">        return (coordinates != null) ? artifact(coordinates, file) : null;</a>
-<span class="sourceLineNo">171</span><a id="line.171">    }</a>
-<span class="sourceLineNo">172</span><a id="line.172"></a>
-<span class="sourceLineNo">173</span><a id="line.173">    private DefaultArtifact artifact(String g, String a, String v, File file) {</a>
-<span class="sourceLineNo">174</span><a id="line.174">        return new DefaultArtifact(g, a, null, "jar", v, Map.of(), file);</a>
-<span class="sourceLineNo">175</span><a id="line.175">    }</a>
-<span class="sourceLineNo">176</span><a id="line.176"></a>
-<span class="sourceLineNo">177</span><a id="line.177">    private DefaultArtifact artifact(List&lt;String&gt; coordinates, File file) {</a>
-<span class="sourceLineNo">178</span><a id="line.178">        return artifact(coordinates.get(0), coordinates.get(1), coordinates.get(2), file);</a>
-<span class="sourceLineNo">179</span><a id="line.179">    }</a>
-<span class="sourceLineNo">180</span><a id="line.180">}</a>
+<span class="sourceLineNo">144</span><a id="line.144">            new BufferedReader(new InputStreamReader(in, UTF_8)).lines()</a>
+<span class="sourceLineNo">145</span><a id="line.145">            .map(String::strip)</a>
+<span class="sourceLineNo">146</span><a id="line.146">            .map(t -&gt; t.split(":"))</a>
+<span class="sourceLineNo">147</span><a id="line.147">            .filter(t -&gt; t.length &gt; 3)</a>
+<span class="sourceLineNo">148</span><a id="line.148">            .map(t -&gt; new DefaultArtifact(t[0], t[1], null, t[2], t[3]));</a>
+<span class="sourceLineNo">149</span><a id="line.149"></a>
+<span class="sourceLineNo">150</span><a id="line.150">        return stream;</a>
+<span class="sourceLineNo">151</span><a id="line.151">    }</a>
+<span class="sourceLineNo">152</span><a id="line.152"></a>
+<span class="sourceLineNo">153</span><a id="line.153">    private static final List&lt;List&lt;String&gt;&gt; CANDIDATES =</a>
+<span class="sourceLineNo">154</span><a id="line.154">        List.of(List.of("Bundle-SymbolicName", "Bundle-Name", "Bundle-Version"),</a>
+<span class="sourceLineNo">155</span><a id="line.155">                List.of("Implementation-Vendor-Id", "Implementation-Title", "Implementation-Version"),</a>
+<span class="sourceLineNo">156</span><a id="line.156">                List.of("Implementation-Vendor", "Implementation-Title", "Implementation-Version"));</a>
+<span class="sourceLineNo">157</span><a id="line.157"></a>
+<span class="sourceLineNo">158</span><a id="line.158">    private DefaultArtifact getArtifactFrom(Attributes attributes, File file) {</a>
+<span class="sourceLineNo">159</span><a id="line.159">        var coordinates =</a>
+<span class="sourceLineNo">160</span><a id="line.160">            CANDIDATES.stream()</a>
+<span class="sourceLineNo">161</span><a id="line.161">            .map(t -&gt; t.stream()</a>
+<span class="sourceLineNo">162</span><a id="line.162">                       .map(attributes::getValue)</a>
+<span class="sourceLineNo">163</span><a id="line.163">                       .filter(Objects::nonNull)</a>
+<span class="sourceLineNo">164</span><a id="line.164">                       .map(Object::toString)</a>
+<span class="sourceLineNo">165</span><a id="line.165">                       .collect(toList()))</a>
+<span class="sourceLineNo">166</span><a id="line.166">            .filter(t -&gt; t.size() == 3)</a>
+<span class="sourceLineNo">167</span><a id="line.167">            .findFirst().orElse(null);</a>
+<span class="sourceLineNo">168</span><a id="line.168"></a>
+<span class="sourceLineNo">169</span><a id="line.169">        return (coordinates != null) ? artifact(coordinates, file) : null;</a>
+<span class="sourceLineNo">170</span><a id="line.170">    }</a>
+<span class="sourceLineNo">171</span><a id="line.171"></a>
+<span class="sourceLineNo">172</span><a id="line.172">    private DefaultArtifact artifact(String g, String a, String v, File file) {</a>
+<span class="sourceLineNo">173</span><a id="line.173">        return new DefaultArtifact(g, a, null, "jar", v, Map.of(), file);</a>
+<span class="sourceLineNo">174</span><a id="line.174">    }</a>
+<span class="sourceLineNo">175</span><a id="line.175"></a>
+<span class="sourceLineNo">176</span><a id="line.176">    private DefaultArtifact artifact(List&lt;String&gt; coordinates, File file) {</a>
+<span class="sourceLineNo">177</span><a id="line.177">        return artifact(coordinates.get(0), coordinates.get(1), coordinates.get(2), file);</a>
+<span class="sourceLineNo">178</span><a id="line.178">    }</a>
+<span class="sourceLineNo">179</span><a id="line.179">}</a>
 
 
 

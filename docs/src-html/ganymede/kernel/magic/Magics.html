@@ -12,7 +12,7 @@
 <span class="sourceLineNo">003</span><a id="line.3"> * ##########################################################################</a>
 <span class="sourceLineNo">004</span><a id="line.4"> * Ganymede</a>
 <span class="sourceLineNo">005</span><a id="line.5"> * %%</a>
-<span class="sourceLineNo">006</span><a id="line.6"> * Copyright (C) 2021 Allen D. Ball</a>
+<span class="sourceLineNo">006</span><a id="line.6"> * Copyright (C) 2021, 2022 Allen D. Ball</a>
 <span class="sourceLineNo">007</span><a id="line.7"> * %%</a>
 <span class="sourceLineNo">008</span><a id="line.8"> * Licensed under the Apache License, Version 2.0 (the "License");</a>
 <span class="sourceLineNo">009</span><a id="line.9"> * you may not use this file except in compliance with the License.</a>
@@ -58,23 +58,22 @@
 <span class="sourceLineNo">049</span><a id="line.49">        var rows =</a>
 <span class="sourceLineNo">050</span><a id="line.50">            context.magics().values().stream()</a>
 <span class="sourceLineNo">051</span><a id="line.51">            .distinct()</a>
-<span class="sourceLineNo">052</span><a id="line.52">            .map(t -&gt; new Row(String.join(", ", t.getMagicNames()),</a>
-<span class="sourceLineNo">053</span><a id="line.53">                              t.getDescription(), t.getUsage()))</a>
-<span class="sourceLineNo">054</span><a id="line.54">            .collect(toList());</a>
-<span class="sourceLineNo">055</span><a id="line.55">        var map = Map.&lt;String,Object&gt;of("rows", rows);</a>
-<span class="sourceLineNo">056</span><a id="line.56">        var html = ThymeleafRenderer.process(getClass(), resource + ".html", "html", map);</a>
-<span class="sourceLineNo">057</span><a id="line.57">        var text = ThymeleafRenderer.process(getClass(), resource + ".text", "text", map);</a>
-<span class="sourceLineNo">058</span><a id="line.58"></a>
-<span class="sourceLineNo">059</span><a id="line.59">        new KernelRestClient().print(Message.mime_bundle(html, text));</a>
-<span class="sourceLineNo">060</span><a id="line.60">    }</a>
-<span class="sourceLineNo">061</span><a id="line.61"></a>
-<span class="sourceLineNo">062</span><a id="line.62">    @Data</a>
-<span class="sourceLineNo">063</span><a id="line.63">    private class Row {</a>
-<span class="sourceLineNo">064</span><a id="line.64">        private final String names;</a>
-<span class="sourceLineNo">065</span><a id="line.65">        private final String description;</a>
-<span class="sourceLineNo">066</span><a id="line.66">        private final String usage;</a>
-<span class="sourceLineNo">067</span><a id="line.67">    }</a>
-<span class="sourceLineNo">068</span><a id="line.68">}</a>
+<span class="sourceLineNo">052</span><a id="line.52">            .map(t -&gt; new Row(String.join(", ", t.getMagicNames()), t.getDescription(), t.getUsage()))</a>
+<span class="sourceLineNo">053</span><a id="line.53">            .collect(toList());</a>
+<span class="sourceLineNo">054</span><a id="line.54">        var map = Map.&lt;String,Object&gt;of("rows", rows);</a>
+<span class="sourceLineNo">055</span><a id="line.55">        var html = ThymeleafRenderer.process(getClass(), resource + ".html", "html", map);</a>
+<span class="sourceLineNo">056</span><a id="line.56">        var text = ThymeleafRenderer.process(getClass(), resource + ".text", "text", map);</a>
+<span class="sourceLineNo">057</span><a id="line.57"></a>
+<span class="sourceLineNo">058</span><a id="line.58">        new KernelRestClient().print(Message.mime_bundle(html, text));</a>
+<span class="sourceLineNo">059</span><a id="line.59">    }</a>
+<span class="sourceLineNo">060</span><a id="line.60"></a>
+<span class="sourceLineNo">061</span><a id="line.61">    @Data</a>
+<span class="sourceLineNo">062</span><a id="line.62">    private class Row {</a>
+<span class="sourceLineNo">063</span><a id="line.63">        private final String names;</a>
+<span class="sourceLineNo">064</span><a id="line.64">        private final String description;</a>
+<span class="sourceLineNo">065</span><a id="line.65">        private final String usage;</a>
+<span class="sourceLineNo">066</span><a id="line.66">    }</a>
+<span class="sourceLineNo">067</span><a id="line.67">}</a>
 
 
 

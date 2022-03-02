@@ -12,7 +12,7 @@
 <span class="sourceLineNo">003</span><a id="line.3"> * ##########################################################################</a>
 <span class="sourceLineNo">004</span><a id="line.4"> * Ganymede</a>
 <span class="sourceLineNo">005</span><a id="line.5"> * %%</a>
-<span class="sourceLineNo">006</span><a id="line.6"> * Copyright (C) 2021 Allen D. Ball</a>
+<span class="sourceLineNo">006</span><a id="line.6"> * Copyright (C) 2021, 2022 Allen D. Ball</a>
 <span class="sourceLineNo">007</span><a id="line.7"> * %%</a>
 <span class="sourceLineNo">008</span><a id="line.8"> * Licensed under the Apache License, Version 2.0 (the "License");</a>
 <span class="sourceLineNo">009</span><a id="line.9"> * you may not use this file except in compliance with the License.</a>
@@ -57,76 +57,81 @@
 <span class="sourceLineNo">048</span><a id="line.48">     * Provides named group "kernelId".</a>
 <span class="sourceLineNo">049</span><a id="line.49">     */</a>
 <span class="sourceLineNo">050</span><a id="line.50">    @CompileTimeCheck</a>
-<span class="sourceLineNo">051</span><a id="line.51">    public static final Pattern FILE_NAME_PATTERN =</a>
-<span class="sourceLineNo">052</span><a id="line.52">        Pattern.compile("(?i)^(kernel-|)(?&lt;kernelId&gt;[^.]+)[.]json$");</a>
-<span class="sourceLineNo">053</span><a id="line.53"></a>
-<span class="sourceLineNo">054</span><a id="line.54">    /**</a>
-<span class="sourceLineNo">055</span><a id="line.55">     * Static factory method.</a>
-<span class="sourceLineNo">056</span><a id="line.56">     *</a>
-<span class="sourceLineNo">057</span><a id="line.57">     * @param   file            The {@link File} describing the</a>
-<span class="sourceLineNo">058</span><a id="line.58">     *                          {@link Connection}.</a>
-<span class="sourceLineNo">059</span><a id="line.59">     *</a>
-<span class="sourceLineNo">060</span><a id="line.60">     * @return  The parsed {@link Connection}.</a>
-<span class="sourceLineNo">061</span><a id="line.61">     */</a>
-<span class="sourceLineNo">062</span><a id="line.62">    public static Connection parse(File file) throws IOException {</a>
+<span class="sourceLineNo">051</span><a id="line.51">    public static final Pattern FILE_NAME_PATTERN = Pattern.compile("(?i)^(kernel-|)(?&lt;kernelId&gt;[^.]+)[.]json$");</a>
+<span class="sourceLineNo">052</span><a id="line.52"></a>
+<span class="sourceLineNo">053</span><a id="line.53">    /**</a>
+<span class="sourceLineNo">054</span><a id="line.54">     * Static factory method.</a>
+<span class="sourceLineNo">055</span><a id="line.55">     *</a>
+<span class="sourceLineNo">056</span><a id="line.56">     * @param   file            The {@link File} describing the</a>
+<span class="sourceLineNo">057</span><a id="line.57">     *                          {@link Connection}.</a>
+<span class="sourceLineNo">058</span><a id="line.58">     *</a>
+<span class="sourceLineNo">059</span><a id="line.59">     * @return  The parsed {@link Connection}.</a>
+<span class="sourceLineNo">060</span><a id="line.60">     */</a>
+<span class="sourceLineNo">061</span><a id="line.61">    public static Connection parse(File file) throws IOException {</a>
+<span class="sourceLineNo">062</span><a id="line.62">        var kernelId = UUID.randomUUID();</a>
 <span class="sourceLineNo">063</span><a id="line.63">        var matcher = FILE_NAME_PATTERN.matcher(file.getName());</a>
-<span class="sourceLineNo">064</span><a id="line.64">        var kernelId =</a>
-<span class="sourceLineNo">065</span><a id="line.65">            matcher.matches() ? UUID.fromString(matcher.group("kernelId")) : null;</a>
-<span class="sourceLineNo">066</span><a id="line.66">        var node = (ObjectNode) ObjectMappers.JSON.readTree(file);</a>
-<span class="sourceLineNo">067</span><a id="line.67">        var digester =</a>
-<span class="sourceLineNo">068</span><a id="line.68">            new HMACDigester(node.at("/signature_scheme").asText(),</a>
-<span class="sourceLineNo">069</span><a id="line.69">                             node.at("/key").asText());</a>
-<span class="sourceLineNo">070</span><a id="line.70"></a>
-<span class="sourceLineNo">071</span><a id="line.71">        return new Connection(kernelId, node, digester);</a>
-<span class="sourceLineNo">072</span><a id="line.72">    }</a>
-<span class="sourceLineNo">073</span><a id="line.73"></a>
-<span class="sourceLineNo">074</span><a id="line.74">    @NonNull private final UUID kernelId;</a>
-<span class="sourceLineNo">075</span><a id="line.75">    @NonNull private final ObjectNode node;</a>
-<span class="sourceLineNo">076</span><a id="line.76">    @NonNull private final HMACDigester digester;</a>
-<span class="sourceLineNo">077</span><a id="line.77"></a>
-<span class="sourceLineNo">078</span><a id="line.78">    /**</a>
-<span class="sourceLineNo">079</span><a id="line.79">     * Method to connect a kernel's {@link Channel}s.</a>
-<span class="sourceLineNo">080</span><a id="line.80">     *</a>
-<span class="sourceLineNo">081</span><a id="line.81">     * @param   shell           The {@link Channel.Shell Shell}</a>
-<span class="sourceLineNo">082</span><a id="line.82">     *                          {@link Channel}.</a>
-<span class="sourceLineNo">083</span><a id="line.83">     * @param   control         The {@link Channel.Control Control}</a>
-<span class="sourceLineNo">084</span><a id="line.84">     *                          {@link Channel}.</a>
-<span class="sourceLineNo">085</span><a id="line.85">     * @param   iopub           The {@link Channel.IOPub IOPub}</a>
-<span class="sourceLineNo">086</span><a id="line.86">     *                          {@link Channel}.</a>
-<span class="sourceLineNo">087</span><a id="line.87">     * @param   stdin           The {@link Channel.Stdin Stdin}</a>
-<span class="sourceLineNo">088</span><a id="line.88">     *                          {@link Channel}.</a>
-<span class="sourceLineNo">089</span><a id="line.89">     * @param   heartbeat       The {@link Channel.Heartbeat Heartbeat}</a>
-<span class="sourceLineNo">090</span><a id="line.90">     *                          {@link Channel}.</a>
-<span class="sourceLineNo">091</span><a id="line.91">     */</a>
-<span class="sourceLineNo">092</span><a id="line.92">    public void connect(Channel.Shell shell, Channel.Control control,</a>
-<span class="sourceLineNo">093</span><a id="line.93">                        Channel.IOPub iopub, Channel.Stdin stdin,</a>
-<span class="sourceLineNo">094</span><a id="line.94">                        Channel.Heartbeat heartbeat) {</a>
-<span class="sourceLineNo">095</span><a id="line.95">        var digester = getDigester();</a>
-<span class="sourceLineNo">096</span><a id="line.96"></a>
-<span class="sourceLineNo">097</span><a id="line.97">        shell.connect(this, getAddress("shell_port"));</a>
-<span class="sourceLineNo">098</span><a id="line.98">        control.connect(this, getAddress("control_port"));</a>
-<span class="sourceLineNo">099</span><a id="line.99">        iopub.connect(this, getAddress("iopub_port"));</a>
-<span class="sourceLineNo">100</span><a id="line.100">        stdin.connect(this, getAddress("stdin_port"));</a>
-<span class="sourceLineNo">101</span><a id="line.101">        heartbeat.connect(this, getAddress("hb_port"));</a>
-<span class="sourceLineNo">102</span><a id="line.102">    }</a>
-<span class="sourceLineNo">103</span><a id="line.103"></a>
-<span class="sourceLineNo">104</span><a id="line.104">    /**</a>
-<span class="sourceLineNo">105</span><a id="line.105">     * Method to get the address corresponding to port name (JSON field).</a>
-<span class="sourceLineNo">106</span><a id="line.106">     *</a>
-<span class="sourceLineNo">107</span><a id="line.107">     * @param   portName        The JSON field specifying the desired port.</a>
-<span class="sourceLineNo">108</span><a id="line.108">     *</a>
-<span class="sourceLineNo">109</span><a id="line.109">     * @return  The address (as a {@link String}).</a>
-<span class="sourceLineNo">110</span><a id="line.110">     */</a>
-<span class="sourceLineNo">111</span><a id="line.111">    public String getAddress(String portName) {</a>
-<span class="sourceLineNo">112</span><a id="line.112">        String address =</a>
-<span class="sourceLineNo">113</span><a id="line.113">            String.format("%s://%s:%d",</a>
-<span class="sourceLineNo">114</span><a id="line.114">                          node.at("/transport").asText(),</a>
-<span class="sourceLineNo">115</span><a id="line.115">                          node.at("/ip").asText(),</a>
-<span class="sourceLineNo">116</span><a id="line.116">                          node.at("/" + portName).asInt());</a>
-<span class="sourceLineNo">117</span><a id="line.117"></a>
-<span class="sourceLineNo">118</span><a id="line.118">        return address;</a>
-<span class="sourceLineNo">119</span><a id="line.119">    }</a>
-<span class="sourceLineNo">120</span><a id="line.120">}</a>
+<span class="sourceLineNo">064</span><a id="line.64"></a>
+<span class="sourceLineNo">065</span><a id="line.65">        if (matcher.matches()) {</a>
+<span class="sourceLineNo">066</span><a id="line.66">            try {</a>
+<span class="sourceLineNo">067</span><a id="line.67">                kernelId = UUID.fromString(matcher.group("kernelId"));</a>
+<span class="sourceLineNo">068</span><a id="line.68">            } catch (Exception exception) {</a>
+<span class="sourceLineNo">069</span><a id="line.69">                log.warn("{}", exception.getMessage());</a>
+<span class="sourceLineNo">070</span><a id="line.70">            }</a>
+<span class="sourceLineNo">071</span><a id="line.71">        }</a>
+<span class="sourceLineNo">072</span><a id="line.72"></a>
+<span class="sourceLineNo">073</span><a id="line.73">        var node = (ObjectNode) ObjectMappers.JSON.readTree(file);</a>
+<span class="sourceLineNo">074</span><a id="line.74">        var digester = new HMACDigester(node.at("/signature_scheme").asText(), node.at("/key").asText());</a>
+<span class="sourceLineNo">075</span><a id="line.75"></a>
+<span class="sourceLineNo">076</span><a id="line.76">        return new Connection(kernelId, node, digester);</a>
+<span class="sourceLineNo">077</span><a id="line.77">    }</a>
+<span class="sourceLineNo">078</span><a id="line.78"></a>
+<span class="sourceLineNo">079</span><a id="line.79">    @NonNull private final UUID kernelId;</a>
+<span class="sourceLineNo">080</span><a id="line.80">    @NonNull private final ObjectNode node;</a>
+<span class="sourceLineNo">081</span><a id="line.81">    @NonNull private final HMACDigester digester;</a>
+<span class="sourceLineNo">082</span><a id="line.82"></a>
+<span class="sourceLineNo">083</span><a id="line.83">    /**</a>
+<span class="sourceLineNo">084</span><a id="line.84">     * Method to connect a kernel's {@link Channel}s.</a>
+<span class="sourceLineNo">085</span><a id="line.85">     *</a>
+<span class="sourceLineNo">086</span><a id="line.86">     * @param   shell           The {@link Channel.Shell Shell}</a>
+<span class="sourceLineNo">087</span><a id="line.87">     *                          {@link Channel}.</a>
+<span class="sourceLineNo">088</span><a id="line.88">     * @param   control         The {@link Channel.Control Control}</a>
+<span class="sourceLineNo">089</span><a id="line.89">     *                          {@link Channel}.</a>
+<span class="sourceLineNo">090</span><a id="line.90">     * @param   iopub           The {@link Channel.IOPub IOPub}</a>
+<span class="sourceLineNo">091</span><a id="line.91">     *                          {@link Channel}.</a>
+<span class="sourceLineNo">092</span><a id="line.92">     * @param   stdin           The {@link Channel.Stdin Stdin}</a>
+<span class="sourceLineNo">093</span><a id="line.93">     *                          {@link Channel}.</a>
+<span class="sourceLineNo">094</span><a id="line.94">     * @param   heartbeat       The {@link Channel.Heartbeat Heartbeat}</a>
+<span class="sourceLineNo">095</span><a id="line.95">     *                          {@link Channel}.</a>
+<span class="sourceLineNo">096</span><a id="line.96">     */</a>
+<span class="sourceLineNo">097</span><a id="line.97">    public void connect(Channel.Shell shell, Channel.Control control,</a>
+<span class="sourceLineNo">098</span><a id="line.98">                        Channel.IOPub iopub, Channel.Stdin stdin,</a>
+<span class="sourceLineNo">099</span><a id="line.99">                        Channel.Heartbeat heartbeat) {</a>
+<span class="sourceLineNo">100</span><a id="line.100">        var digester = getDigester();</a>
+<span class="sourceLineNo">101</span><a id="line.101"></a>
+<span class="sourceLineNo">102</span><a id="line.102">        shell.connect(this, getAddress("shell_port"));</a>
+<span class="sourceLineNo">103</span><a id="line.103">        control.connect(this, getAddress("control_port"));</a>
+<span class="sourceLineNo">104</span><a id="line.104">        iopub.connect(this, getAddress("iopub_port"));</a>
+<span class="sourceLineNo">105</span><a id="line.105">        stdin.connect(this, getAddress("stdin_port"));</a>
+<span class="sourceLineNo">106</span><a id="line.106">        heartbeat.connect(this, getAddress("hb_port"));</a>
+<span class="sourceLineNo">107</span><a id="line.107">    }</a>
+<span class="sourceLineNo">108</span><a id="line.108"></a>
+<span class="sourceLineNo">109</span><a id="line.109">    /**</a>
+<span class="sourceLineNo">110</span><a id="line.110">     * Method to get the address corresponding to port name (JSON field).</a>
+<span class="sourceLineNo">111</span><a id="line.111">     *</a>
+<span class="sourceLineNo">112</span><a id="line.112">     * @param   portName        The JSON field specifying the desired port.</a>
+<span class="sourceLineNo">113</span><a id="line.113">     *</a>
+<span class="sourceLineNo">114</span><a id="line.114">     * @return  The address (as a {@link String}).</a>
+<span class="sourceLineNo">115</span><a id="line.115">     */</a>
+<span class="sourceLineNo">116</span><a id="line.116">    public String getAddress(String portName) {</a>
+<span class="sourceLineNo">117</span><a id="line.117">        String address =</a>
+<span class="sourceLineNo">118</span><a id="line.118">            String.format("%s://%s:%d",</a>
+<span class="sourceLineNo">119</span><a id="line.119">                          node.at("/transport").asText(),</a>
+<span class="sourceLineNo">120</span><a id="line.120">                          node.at("/ip").asText(),</a>
+<span class="sourceLineNo">121</span><a id="line.121">                          node.at("/" + portName).asInt());</a>
+<span class="sourceLineNo">122</span><a id="line.122"></a>
+<span class="sourceLineNo">123</span><a id="line.123">        return address;</a>
+<span class="sourceLineNo">124</span><a id="line.124">    }</a>
+<span class="sourceLineNo">125</span><a id="line.125">}</a>
 
 
 
