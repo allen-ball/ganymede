@@ -23,15 +23,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <name>Ganymede Parent POM</name>
   <groupId>ganymede</groupId>
   <artifactId>parent</artifactId>
   <version>2.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>Ganymede Parent POM</description>
+  <url>https://github.com/allen-ball/ganymede</url>
   <parent>
     <groupId>ball</groupId>
     <artifactId>parent</artifactId>
-    <version>2022.0.1</version>
+    <version>2022.1.1</version>
     <relativePath/>
   </parent>
   <organization>
@@ -85,25 +87,6 @@
   </pluginRepositories>
   <profiles>
     <profile>
-      <id>scala-2.12</id>
-      <activation><activeByDefault>true</activeByDefault></activation>
-      <properties>
-        <scala.binary.version>2.12</scala.binary.version>
-        <scala.version>${scala.binary.version}.15</scala.version>
-        <jackson-bom.version>2.10.5.20201202</jackson-bom.version>
-      </properties>
-    </profile>
-    <profile>
-      <id>scala-2.13</id>
-      <activation><activeByDefault>false</activeByDefault></activation>
-      <properties>
-        <scala.binary.version>2.13</scala.binary.version>
-        <scala.version>${scala.binary.version}.5</scala.version>
-        <!-- <jackson-bom.version>2.12.5</jackson-bom.version> -->
-        <jackson-bom.version>2.10.5.20201202</jackson-bom.version>
-      </properties>
-    </profile>
-    <profile>
       <id>jeromq-SNAPSHOT</id>
       <repositories>
         <repository>
@@ -120,17 +103,19 @@
   </profiles>
   <properties>
     <license.skipUpdateProjectLicense>true</license.skipUpdateProjectLicense>
-    <jse.target>11</jse.target>
-    <maven.compiler.source>${jse.target}</maven.compiler.source>
+    <maven.compiler.release>11</maven.compiler.release>
 
-    <notebook.services.version>v6.4.8</notebook.services.version>
+    <notebook.services.version>6.4.12</notebook.services.version>
     <notebook.services.spec>https://github.com/jupyter/notebook/raw/${notebook.services.version}/notebook/services/api/api.yaml</notebook.services.spec>
 
-    <commonmark.version>0.18.2</commonmark.version>
-    <graal-sdk.version>0.33</graal-sdk.version>
-    <jeromq.version>0.5.2</jeromq.version>
     <spark.version>3.1.2</spark.version>
-    <tablesaw.version>0.42.0</tablesaw.version>
+    <scala.binary.version>2.12</scala.binary.version>
+    <scala.version>${scala.binary.version}.15</scala.version>
+    <jackson-bom.version>2.10.5.20201202</jackson-bom.version>
+
+    <commonmark.version>0.19.0</commonmark.version>
+    <jeromq.version>0.5.2</jeromq.version>
+    <tablesaw.version>0.43.1</tablesaw.version>
 
     <ball-api.version>${ball-parent.version}</ball-api.version>
   </properties>
@@ -147,11 +132,6 @@
         <version>${ball-util.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.github.spotbugs</groupId>
-        <artifactId>spotbugs-annotations</artifactId>
-        <version>4.5.3</version>
-      </dependency>
-      <dependency>
         <groupId>com.github.jknack</groupId>
         <artifactId>handlebars</artifactId>
         <version>4.3.0</version>
@@ -159,7 +139,7 @@
       <dependency>
         <groupId>info.picocli</groupId>
         <artifactId>picocli</artifactId>
-        <version>4.6.2</version>
+        <version>4.6.3</version>
       </dependency>
       <dependency>
         <groupId>io.springfox</groupId>
@@ -225,11 +205,6 @@
         <groupId>org.commonmark</groupId>
         <artifactId>commonmark-ext-yaml-front-matter</artifactId>
         <version>${commonmark.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.graalvm</groupId>
-        <artifactId>graal-sdk</artifactId>
-        <version>${graal-sdk.version}</version>
       </dependency>
       <dependency>
         <groupId>org.jfree</groupId>

@@ -23,10 +23,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <name>Ganymede Jupyter Kernel</name>
   <groupId>ganymede</groupId>
   <artifactId>ganymede-kernel</artifactId>
   <packaging>jar</packaging>
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>Ganymede Jupyter Kernel</description>
   <parent>
     <groupId>ganymede</groupId>
     <artifactId>parent</artifactId>
@@ -300,6 +301,12 @@
             <link><url>https://allen-ball.github.io/ganymede/</url></link>
             <link><url>https://docs.oracle.com/en/java/javase/${java.specification.version}/docs/api/</url></link>
           </links>
+          <offlinelinks>
+            <offlinelink>
+              <artifact>org.graalvm.sdk:*</artifact>
+              <url>https://www.graalvm.org/sdk/javadoc/</url>
+            </offlinelink>
+          </offlinelinks>
         </configuration>
       </plugin>
       <plugin>

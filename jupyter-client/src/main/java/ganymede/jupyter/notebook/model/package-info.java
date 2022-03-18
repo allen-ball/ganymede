@@ -1,5 +1,5 @@
 /**
- * {@link.uri https://github.com/jupyter/notebook/blob/v6.4.8/notebook/services/api/api.yaml target=newtab https://github.com/jupyter/notebook/blob/v6.4.8/notebook/services/api/api.yaml}
+ * {@link.uri https://github.com/jupyter/notebook/blob/6.4.12/notebook/services/api/api.yaml target=newtab https://github.com/jupyter/notebook/blob/6.4.12/notebook/services/api/api.yaml}
  * model classes.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}

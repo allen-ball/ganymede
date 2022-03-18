@@ -23,10 +23,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <name>Ganymede Kernel Client</name>
   <groupId>ganymede</groupId>
   <artifactId>ganymede-client</artifactId>
   <packaging>jar</packaging>
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>Ganymede Kernel Client</description>
   <parent>
     <groupId>ganymede</groupId>
     <artifactId>parent</artifactId>

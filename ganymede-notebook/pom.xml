@@ -23,10 +23,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <name>Ganymede Notebook API and JShell Application</name>
   <groupId>ganymede</groupId>
   <artifactId>ganymede-notebook</artifactId>
   <packaging>jar</packaging>
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>Ganymede Notebook API and JShell Application</description>
   <parent>
     <groupId>ganymede</groupId>
     <artifactId>parent</artifactId>

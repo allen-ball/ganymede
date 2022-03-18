@@ -23,10 +23,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <name>Ganymede JAR</name>
   <groupId>ganymede</groupId>
   <artifactId>ganymede</artifactId>
   <packaging>jar</packaging>
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>Ganymede JAR</description>
   <parent>
     <groupId>ganymede</groupId>
     <artifactId>parent</artifactId>
@@ -135,7 +136,7 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.graalvm</groupId>
+      <groupId>org.graalvm.sdk</groupId>
       <artifactId>graal-sdk</artifactId>
       <scope>provided</scope>
     </dependency>
@@ -257,8 +258,6 @@
                 <exclude>META-INF/*.RSA</exclude>
                 <exclude>META-INF/*.SF</exclude>
                 <exclude>META-INF/DEPENDENCIES</exclude>
-                <exclude>META-INF/LICENSE.md</exclude>
-                <exclude>META-INF/NOTICE.md</exclude>
                 <exclude>META-INF/README.txt</exclude>
                 <exclude>META-INF/spring-configuration-metadata.json</exclude>
                 <exclude>META-INF/additional-spring-configuration-metadata.json</exclude>
