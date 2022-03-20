@@ -292,12 +292,12 @@ classpath.  The `pom` magic resolves and downloads [Maven][Apache Maven]
 artifacts and then adds those artifacts to the classpath.
 
 The [trig.ipynb] notebook demonstrates the use of the `pom` magic to resolve
-the `org.knowm.xchart:xchart:3.8.0` artifact and its transient dependencies.
+the `org.knowm.xchart:xchart:LATEST` artifact and its transient dependencies.
 
 ```yaml
 %%pom
 dependencies:
-- org.knowm.xchart:xchart:3.8.0
+- org.knowm.xchart:xchart:LATEST
 ```
 
 The POM is expressed in [YAML] and repositories and dependencies may be
