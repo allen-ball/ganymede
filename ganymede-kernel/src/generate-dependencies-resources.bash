@@ -6,7 +6,7 @@ for artifact in ${*}; do
     IFS=":"; read -ra GAV <<< "${artifact}"
     G="${GAV[0]}"
     A="${GAV[1]}"
-    V="${GAV[2]}"
+    V="${GAV[${#GAV[@]}-1]]}"
 
     mvn -B dependency:get -Dartifact="${G}:${A}:${V}"
 
