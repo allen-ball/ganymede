@@ -1,0 +1,5 @@
+org.scala-lang:scala-compiler:jar:2.13.8
+   org.scala-lang:scala-library:jar:2.13.8:compile
+   org.scala-lang:scala-reflect:jar:2.13.8:compile
+   org.jline:jline:jar:3.21.0:compile
+   net.java.dev.jna:jna:jar:5.9.0:compile
