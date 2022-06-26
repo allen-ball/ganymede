@@ -23,20 +23,21 @@ import ganymede.notebook.AbstractScriptEngineMagic;
 import ganymede.notebook.Description;
 import ganymede.notebook.Magic;
 import ganymede.notebook.MagicNames;
-import ganymede.notebook.ScriptEngineName;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * {@link Mustache} {@link Magic}.
+ * Mustache {@link Magic}.
+ *
+ * See {@link com.samskivert.mustache.Mustache}
+ * and {@link.uri https://mustache.github.io/mustache.5.html Mustache Manual}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 @ServiceProviderFor({ Magic.class })
 @MagicNames({ "mustache", "handlebars" })
-@Description("Mustache (Handlebars) template evaluator")
-@ScriptEngineName("handlebars")
+@Description("Mustache template evaluator")
 @NoArgsConstructor @ToString @Log4j2
 public class Mustache extends AbstractScriptEngineMagic {
     @Override

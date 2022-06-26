@@ -33,13 +33,12 @@ import lombok.extern.log4j.Log4j2;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 @ServiceProviderFor({ ScriptEngineFactory.class })
-@Names({ "handlebars" })
-@Parameter(name = ScriptEngine.NAME, value = "handlebars")
-@Parameter(name = ScriptEngine.ENGINE, value = "handlebars")
-@Parameter(name = ScriptEngine.ENGINE_VERSION, value = "4.2")
-@Parameter(name = ScriptEngine.LANGUAGE, value = "handlebars")
-@Parameter(name = ScriptEngine.LANGUAGE_VERSION, value = "4.2")
-@Extensions({ "ftl" })
+@Names({ "mustache" })
+@Parameter(name = ScriptEngine.NAME, value = "mustache")
+@Parameter(name = ScriptEngine.ENGINE, value = "mustache")
+@Parameter(name = ScriptEngine.ENGINE_VERSION, value = "1.0")
+@Parameter(name = ScriptEngine.LANGUAGE, value = "mustache")
+@Parameter(name = ScriptEngine.LANGUAGE_VERSION, value = "1.0")
 @NoArgsConstructor @ToString @Log4j2
 public class MustacheScriptEngineFactory extends AbstractScriptEngineFactory {
     @Override

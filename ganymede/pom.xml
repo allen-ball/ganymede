@@ -228,12 +228,6 @@
           <createDependencyReducedPom>true</createDependencyReducedPom>
           <filters>
             <filter>
-              <artifact>com.github.jknack:handlebars</artifact>
-              <excludes>
-                <exclude>META-INF/maven/org.apache.commons/commons-lang3/*</exclude>
-              </excludes>
-            </filter>
-            <filter>
               <artifact>org.codehaus.groovy:groovy-*</artifact>
               <excludes>
                 <exclude>META-INF/groovy-release-info.properties</exclude>

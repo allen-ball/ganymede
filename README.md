@@ -21,7 +21,7 @@ This kernel offers the following additional features:
     * [Kotlin]
 
 * Templates (via any of [Thymeleaf], [Markdown] ([CommonMark]) with
-  [Mustache][Handlebars.java], [FreeMarker][Apache FreeMarker], and
+  [JMustache], [FreeMarker][Apache FreeMarker], and
   [Velocity][Apache Velocity])
 
 * Support for [Apache Spark] and [Scala] binary distributions
@@ -207,10 +207,6 @@ cell magic is `java`.
         <td>Execute code in groovy REPL</td>
       </tr>
       <tr>
-        <td>mustache, handlebars</td>
-        <td>Mustache (Handlebars) template evaluator</td>
-      </tr>
-      <tr>
         <td>html</td>
         <td>HTML template evaluator</td>
       </tr>
@@ -233,6 +229,10 @@ cell magic is `java`.
       <tr>
         <td>markdown</td>
         <td>Markdown template evaluator</td>
+      </tr>
+      <tr>
+        <td>mustache, handlebars</td>
+        <td>Mustache template evaluator</td>
       </tr>
       <tr>
         <td>perl</td>
@@ -499,10 +499,10 @@ for `%%!bash`, `%%!perl`, etc., respectively.
 
 A number of templating languages are supported as magics:
 
-* [Markdown] ([CommonMark] preprocessed with [Handlebars.java])
+* [Markdown] ([CommonMark] preprocessed with [JMustache])
 * [Apache FreeMarker]
 * [Apache Velocity]
-* [Handlebars.java]
+* [JMustache]
 * [Thymeleaf]
 
 The following subsections provide examples of the `markdown` and `thymeleaf`
@@ -511,10 +511,10 @@ installation instructions for discussion of enabling the [Hide Input]
 extension so only the template output is displayed in the notebook.
 
 
-### Markdown and Handlebars.java
+### Markdown and JMustache
 
-The template magic `markdown` provides [Markdown] processing with
-[Handlebars][Handlebars.java] preprocessing:
+The template magic `markdown` provides [Markdown] processing with [JMustache]
+preprocessing:
 
 ```java
 %%java
@@ -535,8 +535,8 @@ var fib =
 %%markdown
 | Index | Value |
 | --- | --- |
-{{#each fib}}| {{@index}} | {{this}} |
-{{/each}}
+{{#fib}}| {{-index}} | {{this}} |
+{{/fib}}
 ```
 
 <table>
@@ -693,8 +693,6 @@ Ibid.
 
 [Groovy]: https://groovy-lang.org/
 
-[Handlebars.java]: https://github.com/jknack/handlebars.java
-
 [Java API]: https://docs.oracle.com/en/java/javase/11/docs/api
 [JShell]: https://docs.oracle.com/en/java/javase/11/docs/api/jdk.jshell/jdk/jshell/JShell.html?is-external=true
 [List]: https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html?is-external=true
@@ -705,6 +703,8 @@ Ibid.
 [JDBC]: https://docs.oracle.com/javase/8/docs/technotes/guides/jdbc/
 
 [JFreeChart]: https://github.com/jfree/jfreechart
+
+[JMustache]: https://github.com/samskivert/jmustache
 
 [jOOQ]: https://www.jooq.org/doc/latest/manual
 [Query]: https://www.jooq.org/javadoc/latest/org.jooq/org/jooq/Query.html?is-external=true

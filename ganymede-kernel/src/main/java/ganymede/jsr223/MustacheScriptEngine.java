@@ -18,8 +18,7 @@ package ganymede.jsr223;
  * limitations under the License.
  * ##########################################################################
  */
-import com.github.jknack.handlebars.Context;
-import com.github.jknack.handlebars.Handlebars;
+import com.samskivert.mustache.Mustache;
 import javax.script.ScriptContext;
 import javax.script.ScriptException;
 import lombok.Data;
@@ -34,19 +33,15 @@ import static javax.script.ScriptContext.ENGINE_SCOPE;
 import static lombok.AccessLevel.PROTECTED;
 
 /**
- * Mustache {@link javax.script.ScriptEngine}.
+ * {@link Mustache} {@link javax.script.ScriptEngine}.
  *
  * {@bean.info}
- *
- * @see Handlebars
- * @see Context
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 @RequiredArgsConstructor(access = PROTECTED) @Getter @ToString @Log4j2
 public class MustacheScriptEngine extends AbstractScriptEngine {
     private final MustacheScriptEngineFactory factory;
-    private final Handlebars handlebars = new Handlebars();
 
     @Override
     public String eval(String script, ScriptContext context) throws ScriptException {
@@ -55,10 +50,9 @@ public class MustacheScriptEngine extends AbstractScriptEngine {
         try {
             var arguments = new Arguments();
             var result = parse(context, arguments);
-            var template = handlebars.compileInline(script);
-            var bindings = context.getBindings(ENGINE_SCOPE);
+            var template = Mustache.compiler().compile(script);
 
-            out = template.apply(Context.newContext(bindings));
+            out = template.execute(context.getBindings(ENGINE_SCOPE));
         } catch (ParameterException exception) {
             System.err.println(exception.getMessage());
             System.err.println();
