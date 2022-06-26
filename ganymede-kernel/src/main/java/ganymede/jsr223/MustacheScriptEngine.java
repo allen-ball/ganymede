@@ -34,7 +34,7 @@ import static javax.script.ScriptContext.ENGINE_SCOPE;
 import static lombok.AccessLevel.PROTECTED;
 
 /**
- * Handlebars {@link javax.script.ScriptEngine}.
+ * Mustache {@link javax.script.ScriptEngine}.
  *
  * {@bean.info}
  *
@@ -44,8 +44,8 @@ import static lombok.AccessLevel.PROTECTED;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 @RequiredArgsConstructor(access = PROTECTED) @Getter @ToString @Log4j2
-public class HandlebarsScriptEngine extends AbstractScriptEngine {
-    private final HandlebarsScriptEngineFactory factory;
+public class MustacheScriptEngine extends AbstractScriptEngine {
+    private final MustacheScriptEngineFactory factory;
     private final Handlebars handlebars = new Handlebars();
 
     @Override

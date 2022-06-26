@@ -21,7 +21,7 @@ This kernel offers the following additional features:
     * [Kotlin]
 
 * Templates (via any of [Thymeleaf], [Markdown] ([CommonMark]) with
-  [Handlebars][Handlebars.java], [FreeMarker][Apache FreeMarker], and
+  [Mustache][Handlebars.java], [FreeMarker][Apache FreeMarker], and
   [Velocity][Apache Velocity])
 
 * Support for [Apache Spark] and [Scala] binary distributions
@@ -207,8 +207,8 @@ cell magic is `java`.
         <td>Execute code in groovy REPL</td>
       </tr>
       <tr>
-        <td>handlebars</td>
-        <td>Handlebars template evaluator</td>
+        <td>mustache, handlebars</td>
+        <td>Mustache (Handlebars) template evaluator</td>
       </tr>
       <tr>
         <td>html</td>

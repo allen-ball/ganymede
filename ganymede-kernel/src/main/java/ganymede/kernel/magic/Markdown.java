@@ -52,9 +52,9 @@ import static org.springframework.util.MimeTypeUtils.TEXT_HTML_VALUE;
  */
 @ServiceProviderFor({ Magic.class })
 @Description("Markdown template evaluator")
-@ScriptEngineName("handlebars")
+@ScriptEngineName("mustache")
 @NoArgsConstructor @ToString @Log4j2
-public class Markdown extends Handlebars {
+public class Markdown extends Mustache {
     private static final List<Extension> EXTENSIONS = new ArrayList<>();
 
     /**

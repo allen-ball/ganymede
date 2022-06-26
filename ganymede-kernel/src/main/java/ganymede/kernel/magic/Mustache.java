@@ -1,4 +1,4 @@
-package ganymede.jsr223;
+package ganymede.kernel.magic;
 /*-
  * ##########################################################################
  * Ganymede
@@ -19,39 +19,28 @@ package ganymede.jsr223;
  * ##########################################################################
  */
 import ball.annotation.ServiceProviderFor;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineFactory;
+import ganymede.notebook.AbstractScriptEngineMagic;
+import ganymede.notebook.Description;
+import ganymede.notebook.Magic;
+import ganymede.notebook.MagicNames;
+import ganymede.notebook.ScriptEngineName;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * Handlebars {@link ScriptEngineFactory}.
- *
- * {@bean.info}
+ * {@link Mustache} {@link Magic}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
-@ServiceProviderFor({ ScriptEngineFactory.class })
-@Names({ "handlebars" })
-@Parameter(name = ScriptEngine.NAME, value = "handlebars")
-@Parameter(name = ScriptEngine.ENGINE, value = "handlebars")
-@Parameter(name = ScriptEngine.ENGINE_VERSION, value = "4.2")
-@Parameter(name = ScriptEngine.LANGUAGE, value = "handlebars")
-@Parameter(name = ScriptEngine.LANGUAGE_VERSION, value = "4.2")
-@Extensions({ "ftl" })
+@ServiceProviderFor({ Magic.class })
+@MagicNames({ "mustache", "handlebars" })
+@Description("Mustache (Handlebars) template evaluator")
+@ScriptEngineName("handlebars")
 @NoArgsConstructor @ToString @Log4j2
-public class HandlebarsScriptEngineFactory extends AbstractScriptEngineFactory {
+public class Mustache extends AbstractScriptEngineMagic {
     @Override
-    public HandlebarsScriptEngine getScriptEngine() {
-        HandlebarsScriptEngine engine = null;
-
-        try {
-            engine = new HandlebarsScriptEngine(this);
-        } catch (Throwable throwable) {
-            log.warn("{}", throwable);
-        }
-
-        return engine;
+    protected void render(Object object) {
+        context.print(object);
     }
 }
