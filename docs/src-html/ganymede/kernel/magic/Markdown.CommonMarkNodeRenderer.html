@@ -61,9 +61,9 @@
 <span class="sourceLineNo">052</span><a id="line.52"> */</a>
 <span class="sourceLineNo">053</span><a id="line.53">@ServiceProviderFor({ Magic.class })</a>
 <span class="sourceLineNo">054</span><a id="line.54">@Description("Markdown template evaluator")</a>
-<span class="sourceLineNo">055</span><a id="line.55">@ScriptEngineName("handlebars")</a>
+<span class="sourceLineNo">055</span><a id="line.55">@ScriptEngineName("mustache")</a>
 <span class="sourceLineNo">056</span><a id="line.56">@NoArgsConstructor @ToString @Log4j2</a>
-<span class="sourceLineNo">057</span><a id="line.57">public class Markdown extends Handlebars {</a>
+<span class="sourceLineNo">057</span><a id="line.57">public class Markdown extends Mustache {</a>
 <span class="sourceLineNo">058</span><a id="line.58">    private static final List&lt;Extension&gt; EXTENSIONS = new ArrayList&lt;&gt;();</a>
 <span class="sourceLineNo">059</span><a id="line.59"></a>
 <span class="sourceLineNo">060</span><a id="line.60">    /**</a>

@@ -31,24 +31,28 @@
 <span class="sourceLineNo">022</span><a id="line.22">import ganymede.notebook.AbstractScriptEngineMagic;</a>
 <span class="sourceLineNo">023</span><a id="line.23">import ganymede.notebook.Description;</a>
 <span class="sourceLineNo">024</span><a id="line.24">import ganymede.notebook.Magic;</a>
-<span class="sourceLineNo">025</span><a id="line.25">import lombok.NoArgsConstructor;</a>
-<span class="sourceLineNo">026</span><a id="line.26">import lombok.ToString;</a>
-<span class="sourceLineNo">027</span><a id="line.27">import lombok.extern.log4j.Log4j2;</a>
-<span class="sourceLineNo">028</span><a id="line.28"></a>
-<span class="sourceLineNo">029</span><a id="line.29">/**</a>
-<span class="sourceLineNo">030</span><a id="line.30"> * {@link Handlebars} {@link Magic}.</a>
-<span class="sourceLineNo">031</span><a id="line.31"> *</a>
-<span class="sourceLineNo">032</span><a id="line.32"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
-<span class="sourceLineNo">033</span><a id="line.33"> */</a>
-<span class="sourceLineNo">034</span><a id="line.34">@ServiceProviderFor({ Magic.class })</a>
-<span class="sourceLineNo">035</span><a id="line.35">@Description("Handlebars template evaluator")</a>
-<span class="sourceLineNo">036</span><a id="line.36">@NoArgsConstructor @ToString @Log4j2</a>
-<span class="sourceLineNo">037</span><a id="line.37">public class Handlebars extends AbstractScriptEngineMagic {</a>
-<span class="sourceLineNo">038</span><a id="line.38">    @Override</a>
-<span class="sourceLineNo">039</span><a id="line.39">    protected void render(Object object) {</a>
-<span class="sourceLineNo">040</span><a id="line.40">        context.print(object);</a>
-<span class="sourceLineNo">041</span><a id="line.41">    }</a>
-<span class="sourceLineNo">042</span><a id="line.42">}</a>
+<span class="sourceLineNo">025</span><a id="line.25">import ganymede.notebook.MagicNames;</a>
+<span class="sourceLineNo">026</span><a id="line.26">import lombok.NoArgsConstructor;</a>
+<span class="sourceLineNo">027</span><a id="line.27">import lombok.ToString;</a>
+<span class="sourceLineNo">028</span><a id="line.28">import lombok.extern.log4j.Log4j2;</a>
+<span class="sourceLineNo">029</span><a id="line.29"></a>
+<span class="sourceLineNo">030</span><a id="line.30">/**</a>
+<span class="sourceLineNo">031</span><a id="line.31"> * {@link Mustache} {@link Magic}.</a>
+<span class="sourceLineNo">032</span><a id="line.32"> *</a>
+<span class="sourceLineNo">033</span><a id="line.33"> * See {@link.uri https://mustache.github.io/mustache.5.html Msutache Manual}.</a>
+<span class="sourceLineNo">034</span><a id="line.34"> *</a>
+<span class="sourceLineNo">035</span><a id="line.35"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
+<span class="sourceLineNo">036</span><a id="line.36"> */</a>
+<span class="sourceLineNo">037</span><a id="line.37">@ServiceProviderFor({ Magic.class })</a>
+<span class="sourceLineNo">038</span><a id="line.38">@MagicNames({ "mustache", "handlebars" })</a>
+<span class="sourceLineNo">039</span><a id="line.39">@Description("Mustache (Handlebars) template evaluator")</a>
+<span class="sourceLineNo">040</span><a id="line.40">@NoArgsConstructor @ToString @Log4j2</a>
+<span class="sourceLineNo">041</span><a id="line.41">public class Mustache extends AbstractScriptEngineMagic {</a>
+<span class="sourceLineNo">042</span><a id="line.42">    @Override</a>
+<span class="sourceLineNo">043</span><a id="line.43">    protected void render(Object object) {</a>
+<span class="sourceLineNo">044</span><a id="line.44">        context.print(object);</a>
+<span class="sourceLineNo">045</span><a id="line.45">    }</a>
+<span class="sourceLineNo">046</span><a id="line.46">}</a>
 
 
 
