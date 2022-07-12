@@ -43,8 +43,15 @@
       <artifactId>ganymede-kernel</artifactId>
       <version>${project.version}</version>
       <exclusions>
-        <!-- Integrated in org.apache.velocity:velocity-engine-core -->
         <exclusion>
+          <groupId>com.sun</groupId>
+          <artifactId>tools</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.ant</groupId>
+          <artifactId>ant</artifactId>
+        </exclusion>
+        <exclusion><!-- Integrated in org.apache.velocity:velocity-engine-core -->
           <groupId>commons-io</groupId>
           <artifactId>commons-io</artifactId>
         </exclusion>
@@ -59,8 +66,7 @@
       <groupId>ball</groupId>
       <artifactId>ball-util</artifactId>
       <exclusions>
-        <!-- Integrated in org.apache.velocity:velocity-engine-core -->
-        <exclusion>
+        <exclusion><!-- Integrated in org.apache.velocity:velocity-engine-core -->
           <groupId>commons-io</groupId>
           <artifactId>commons-io</artifactId>
         </exclusion>
@@ -134,6 +140,28 @@
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-sql_${scala.binary.version}</artifactId>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.activation</groupId>
+          <artifactId>activation</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.servlet.jsp</groupId>
+          <artifactId>jsp-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.xml.bind</groupId>
+          <artifactId>jaxb-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.glassfish.hk2.external</groupId>
+          <artifactId>jakarta.inject</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.glassfish.hk2.external</groupId>
+          <artifactId>aopalliance-repackaged</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.graalvm.sdk</groupId>
@@ -226,6 +254,15 @@
         </executions>
         <configuration>
           <createDependencyReducedPom>true</createDependencyReducedPom>
+          <artifactSet>
+            <!-- https://maven.apache.org/plugins/maven-shade-plugin/shade-mojo.html -->
+            <excludes>
+              <exclude>com.google.code.findbugs:jsr305</exclude>
+              <exclude>javax.activation</exclude>
+              <exclude>javax.inject</exclude>
+              <exclude>javax.xml.bind</exclude>
+            </excludes>
+          </artifactSet>
           <filters>
             <filter>
               <artifact>org.codehaus.groovy:groovy-*</artifact>
