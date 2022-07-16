@@ -146,7 +146,8 @@
     <notebook.services.version>6.4.12</notebook.services.version>
     <notebook.services.spec>https://github.com/jupyter/notebook/raw/${notebook.services.version}/notebook/services/api/api.yaml</notebook.services.spec>
 
-    <spark.version>3.1.2</spark.version>
+    <spark.version>3.1.3</spark.version>
+    <hive.version>${spark.version}</hive.version>
     <scala.binary.version>2.12</scala.binary.version>
     <scala.version>${scala.binary.version}.15</scala.version>
     <jackson-bom.version>2.10.5.20201202</jackson-bom.version>
@@ -185,14 +186,14 @@
         <version>3.0.0</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.hive</groupId>
+        <artifactId>hive-jdbc</artifactId>
+        <version>${hive.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.apache.spark</groupId>
         <artifactId>spark-sql_${scala.binary.version}</artifactId>
         <version>${spark.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.hive</groupId>
-        <artifactId>hive-jdbc</artifactId>
-        <version>3.1.2</version>
       </dependency>
       <dependency>
         <groupId>org.apache.velocity</groupId>

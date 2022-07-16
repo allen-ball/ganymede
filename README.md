@@ -78,17 +78,17 @@ $ export JAVA_HOME=$(/usr/libexec/java_home -v 11)
 $ ${JAVA_HOME}/bin/java \
       -jar ${HOME}/.m2/repository/ganymede/ganymede/2.0.0-SNAPSHOT/ganymede-2.0.0-SNAPSHOT.jar \
       -i --sys-prefix --copy-jar=false \
-      --id-suffix=spark-3.1.2 --display-name-suffix="with Spark 3.1.2" \
-      --env=SPARK_HOME=/path/to/spark-3.1.2-bin-hadoop3.2
+      --id-suffix=spark-3.1.3 --display-name-suffix="with Spark 3.1.3" \
+      --env=SPARK_HOME=/path/to/spark-3.1.3-bin-hadoop3.2
 $ jupyter kernelspec list
 Available kernels:
 ...
-  ganymede-2.0.0-java-11-spark-3.1.2             /.../share/jupyter/kernels/ganymede-2.0.0-java-11-spark-3.1.2
+  ganymede-2.0.0-java-11-spark-3.1.3             /.../share/jupyter/kernels/ganymede-2.0.0-java-11-spark-3.1.3
 ...
 ```
 
 would result in the configured
-`${jupyter.data}/kernels/ganymede-2.0.0-java-11-spark-3.1.2/kernel.json`
+`${jupyter.data}/kernels/ganymede-2.0.0-java-11-spark-3.1.3/kernel.json`
 kernelspec:
 
 ```json
@@ -106,13 +106,13 @@ kernelspec:
     "-f",
     "{connection_file}"
   ],
-  "display_name" : "Ganymede 2.0.0 (Java 11) with Spark 3.1.2",
+  "display_name" : "Ganymede 2.0.0 (Java 11) with Spark 3.1.3",
   "env" : {
     "JUPYTER_CONFIG_DIR" : "/Users/jdoe/.jupyter",
     "JUPYTER_CONFIG_PATH" : "/Users/jdoe/.jupyter:/Users/jdoe/Notebooks/.venv/etc/jupyter:/usr/local/etc/jupyter:/etc/jupyter",
     "JUPYTER_DATA_DIR" : "/Users/jdoe/Library/Jupyter",
     "JUPYTER_RUNTIME_DIR" : "/Users/jdoe/Library/Jupyter/runtime",
-    "SPARK_HOME" : "/Users/jdoe/Notebooks/.venv/spark-3.1.2-bin-hadoop3.2"
+    "SPARK_HOME" : "/Users/jdoe/Notebooks/.venv/spark-3.1.3-bin-hadoop3.2"
   },
   "interrupt_mode" : "message",
   "language" : "java"
