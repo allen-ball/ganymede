@@ -24,38 +24,38 @@
                              http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <name>Ganymede GitHub Pages</name>
-  <groupId>ganymede</groupId>
+  <groupId>dev.hcf.ganymede</groupId>
   <artifactId>ganymede-gh-pages</artifactId>
   <packaging>pom</packaging>
   <parent>
-    <groupId>ganymede</groupId>
+    <groupId>dev.hcf.ganymede</groupId>
     <artifactId>parent</artifactId>
-    <version>2.0.0.20220717</version>
+    <version>2.0.1-SNAPSHOT</version>
     <relativePath/>
   </parent>
   <dependencies>
     <dependency>
-      <groupId>ganymede</groupId>
+      <groupId>dev.hcf.ganymede</groupId>
       <artifactId>ganymede</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>ganymede</groupId>
+      <groupId>dev.hcf.ganymede</groupId>
       <artifactId>ganymede-client</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>ganymede</groupId>
+      <groupId>dev.hcf.ganymede</groupId>
       <artifactId>ganymede-kernel</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>ganymede</groupId>
+      <groupId>dev.hcf.ganymede</groupId>
       <artifactId>ganymede-notebook</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>ganymede</groupId>
+      <groupId>dev.hcf.ganymede</groupId>
       <artifactId>jupyter-client</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -144,7 +144,7 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
           <includeDependencySources>true</includeDependencySources>
-          <dependencySourceIncludes>ganymede:*</dependencySourceIncludes>
+          <dependencySourceIncludes>dev.hcf.ganymede:*</dependencySourceIncludes>
           <doctitle>Ganymede Jupyter Kernel API Documentation</doctitle>
           <groups>
             <group>
