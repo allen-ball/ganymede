@@ -23,9 +23,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>ganymede</groupId>
+  <groupId>dev.hcf.ganymede</groupId>
   <artifactId>parent</artifactId>
-  <version>2.0.0.20220717</version>
+  <version>2.0.1.20220723</version>
   <packaging>pom</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
   <description>Ganymede Parent POM</description>
@@ -48,43 +48,29 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+  <developers>
+    <developer>
+      <name>Allen D. Ball</name>
+      <email>ball@hcf.dev</email>
+      <organization>hcf.dev</organization>
+      <organizationUrl>https://github.com/allen-ball</organizationUrl>
+    </developer>
+  </developers>
   <scm>
+    <connection>scm:git:git://github.com/allen-ball/ganymede.git</connection>
+    <developerConnection>scm:git:https://github.com/allen-ball/ganymede.git</developerConnection>
     <url>https://github.com/allen-ball/ganymede.git</url>
   </scm>
   <distributionManagement>
-    <downloadUrl>https://maven.pkg.github.com/allen-ball/${project.groupId}/</downloadUrl>
-    <repository>
-      <id>github</id>
-      <name>GitHub allen-ball Packages</name>
-      <url>https://maven.pkg.github.com/allen-ball/${project.groupId}/</url>
-    </repository>
     <snapshotRepository>
-      <id>github</id>
-      <name>GitHub allen-ball Packages</name>
-      <url>https://maven.pkg.github.com/allen-ball/${project.groupId}/</url>
+      <id>ossrh</id>
+      <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
     </snapshotRepository>
-  </distributionManagement>
-  <repositories>
     <repository>
-      <id>repo.hcf.dev-RELEASE</id>
-      <name>hcf.dev RELEASE Repository</name>
-      <url>https://repo.hcf.dev/maven/release/</url>
-      <layout>default</layout>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>never</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
+      <id>ossrh</id>
+      <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
-  </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>repo.hcf.dev-RELEASE</id>
-      <url>https://repo.hcf.dev/maven/release/</url>
-    </pluginRepository>
-  </pluginRepositories>
+  </distributionManagement>
   <profiles>
     <profile>
       <id>javadoc-jar</id>
@@ -137,6 +123,36 @@
       <properties>
         <jeromq.version>0.5.3-SNAPSHOT</jeromq.version>
       </properties>
+    </profile>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <extensions>true</extensions>
+            <configuration>
+              <serverId>ossrh</serverId>
+              <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+              <autoReleaseAfterClose>true</autoReleaseAfterClose>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
   <properties>
@@ -332,6 +348,11 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>3.0.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
           <configuration>
             <additionalJOptions>
@@ -349,6 +370,11 @@
             <serialwarn>true</serialwarn>
             <show>protected</show>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>nexus-staging-maven-plugin</artifactId>
+          <version>1.6.13</version>
         </plugin>
       </plugins>
     </pluginManagement>

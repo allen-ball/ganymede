@@ -23,15 +23,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>ganymede</groupId>
+  <groupId>dev.hcf.ganymede</groupId>
   <artifactId>ganymede-kernel</artifactId>
   <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
   <description>Ganymede Jupyter Kernel</description>
   <parent>
-    <groupId>ganymede</groupId>
+    <groupId>dev.hcf.ganymede</groupId>
     <artifactId>parent</artifactId>
-    <version>2.0.0.20220717</version>
+    <version>2.0.1.20220723</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <properties>
@@ -39,7 +39,7 @@
   </properties>
   <dependencies verbose="true">
     <dependency>
-      <groupId>ganymede</groupId>
+      <groupId>dev.hcf.ganymede</groupId>
       <artifactId>ganymede-notebook</artifactId>
       <version>${project.version}</version>
       <exclusions>
@@ -51,7 +51,7 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>ganymede</groupId>
+      <groupId>dev.hcf.ganymede</groupId>
       <artifactId>jupyter-client</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -322,7 +322,7 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>ganymede</groupId>
+                  <groupId>dev.hcf.ganymede</groupId>
                   <artifactId>ganymede-client</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
