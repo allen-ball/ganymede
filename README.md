@@ -169,6 +169,37 @@ plot objects include:
 
 The [trig.ipynb] notebook demonstrates rendering of an [XChart].
 
+As discussed in the next section, the magic identifier for java is `%%java`.
+A cell identified with `%%java` with no code will provide a table of variable
+bindings in the context with types and values.  The types are links to the
+corresponding javadoc (if known).
+
+<div>
+  <table border="1" class="bindings">
+    <thead>
+      <tr><th>Name</th><th>Type</th><th>Value</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>$$</td><td><a href="https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookContext.html?is-external=true" target="_newtab"><code>ganymede.notebook.NotebookContext</code></a></td><td>NotebookContext(super=ganymede.notebook.NotebookContext@af7e376)</td></tr>
+      <tr><td>by_state</td><td><a href="https://spark.apache.org/docs/latest/api/java/org/apache/spark/sql/Dataset.html?is-external=true" target="_newtab"><code>org.apache.spark.sql.Dataset&lt;Row&gt;</code></a></td><td>[Country/Region: string, Province/State: string ... 1 more field]</td></tr>
+      <tr><td>chart</td><td><a href="https://knowm.org/javadocs/xchart/org/knowm/xchart/PieChart.html?is-external=true" target="_newtab"><code>org.knowm.xchart.PieChart</code></a></td><td>org.knowm.xchart.PieChart@767f4a69</td></tr>
+      <tr><td>countries_aggregated</td><td><a href="https://spark.apache.org/docs/latest/api/java/org/apache/spark/sql/Dataset.html?is-external=true" target="_newtab"><code>org.apache.spark.sql.Dataset&lt;Row&gt;</code></a></td><td>[Date: date, Country: string ... 3 more fields]</td></tr>
+      <tr><td>dates</td><td><a href="https://spark.apache.org/docs/latest/api/java/org/apache/spark/sql/Dataset.html?is-external=true" target="_newtab"><code>org.apache.spark.sql.Dataset&lt;Row&gt;</code></a></td><td>[Date: date]</td></tr>
+      <tr><td>interval</td><td><a href="https://spark.apache.org/docs/latest/api/java/org/apache/spark/sql/Row.html?is-external=true" target="_newtab"><code>org.apache.spark.sql.Row</code></a></td><td>[2020-01-22,2022-04-16]</td></tr>
+      <tr><td>key_countries_pivoted</td><td><a href="https://spark.apache.org/docs/latest/api/java/org/apache/spark/sql/Dataset.html?is-external=true" target="_newtab"><code>org.apache.spark.sql.Dataset&lt;Row&gt;</code></a></td><td>[Date: date, China: int ... 7 more fields]</td></tr>
+      <tr><td>reader</td><td><a href="https://spark.apache.org/docs/latest/api/java/org/apache/spark/sql/DataFrameReader.html?is-external=true" target="_newtab"><code>org.apache.spark.sql.DataFrameReader</code></a></td><td>org.apache.spark.sql.DataFrameReader@5a88849</td></tr>
+      <tr><td>reference</td><td><a href="https://spark.apache.org/docs/latest/api/java/org/apache/spark/sql/Dataset.html?is-external=true" target="_newtab"><code>org.apache.spark.sql.Dataset&lt;Row&gt;</code></a></td><td>[UID: int, iso2: string ... 10 more fields]</td></tr>
+      <tr><td>session</td><td><a href="https://spark.apache.org/docs/latest/api/java/org/apache/spark/sql/SparkSession.html?is-external=true" target="_newtab"><code>org.apache.spark.sql.SparkSession</code></a></td><td>org.apache.spark.sql.SparkSession@1b6683c4</td></tr>
+      <tr><td>snapshot</td><td><a href="https://spark.apache.org/docs/latest/api/java/org/apache/spark/sql/Dataset.html?is-external=true" target="_newtab"><code>org.apache.spark.sql.Dataset&lt;Row&gt;</code></a></td><td>[Country/Region: string, Deaths: int]</td></tr>
+      <tr><td>time_series_19_covid_combined</td><td><a href="https://spark.apache.org/docs/latest/api/java/org/apache/spark/sql/Dataset.html?is-external=true" target="_newtab"><code>org.apache.spark.sql.Dataset&lt;Row&gt;</code></a></td><td>[Date: date, Country/Region: string ... 4 more fields]</td></tr>
+      <tr><td>us_confirmed</td><td><a href="https://spark.apache.org/docs/latest/api/java/org/apache/spark/sql/Dataset.html?is-external=true" target="_newtab"><code>org.apache.spark.sql.Dataset&lt;Row&gt;</code></a></td><td>[Admin2: string, Date: date ... 3 more fields]</td></tr>
+      <tr><td>us_deaths</td><td><a href="https://spark.apache.org/docs/latest/api/java/org/apache/spark/sql/Dataset.html?is-external=true" target="_newtab"><code>org.apache.spark.sql.Dataset&lt;Row&gt;</code></a></td><td>[Admin2: string, Date: date ... 3 more fields]</td></tr>
+      <tr><td>us_simplified</td><td><a href="https://spark.apache.org/docs/latest/api/java/org/apache/spark/sql/Dataset.html?is-external=true" target="_newtab"><code>org.apache.spark.sql.Dataset&lt;Row&gt;</code></a></td><td>[Date: date, Admin2: string ... 4 more fields]</td></tr>
+      <tr><td>worldwide_aggregate</td><td><a href="https://spark.apache.org/docs/latest/api/java/org/apache/spark/sql/Dataset.html?is-external=true" target="_newtab"><code>org.apache.spark.sql.Dataset&lt;Row&gt;</code></a></td><td>[Date: date, Confirmed: int ... 3 more fields]</td></tr>
+    </tbody>
+  </table>
+</div>
+
 
 ### Magics
 
