@@ -31,7 +31,7 @@
   <parent>
     <groupId>dev.hcf.ganymede</groupId>
     <artifactId>parent</artifactId>
-    <version>2.0.1.20220723</version>
+    <version>2.0.2-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <properties>
@@ -346,9 +346,7 @@
               <inputSpec>${project.build.directory}/dependency/ganymede-rest-protocol.yml</inputSpec>
               <generatorName>spring</generatorName>
               <library>spring-boot</library>
-              <importMappings>
-                <importMapping>JsonNode=com.fasterxml.jackson.databind.node.ObjectNode</importMapping>
-              </importMappings>
+              <importMappings>JsonNode=com.fasterxml.jackson.databind.JsonNode</importMappings>
               <configOptions>
                 <dateLibrary>java8</dateLibrary>
                 <hideGenerationTimestamp>true</hideGenerationTimestamp>

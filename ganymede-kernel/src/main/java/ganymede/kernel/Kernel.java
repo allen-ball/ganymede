@@ -18,6 +18,7 @@ package ganymede.kernel;
  * limitations under the License.
  * ##########################################################################
  */
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ganymede.notebook.Magic;
@@ -209,19 +210,19 @@ public class Kernel extends Server implements KernelApi, ApplicationContextAware
     }
 
     @Override
-    public ResponseEntity<ObjectNode> getExecuteRequest() {
+    public ResponseEntity<JsonNode> getExecuteRequest() {
         return new ResponseEntity<>(request.asObjectNode(), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<Void> display(ObjectNode body) {
+    public ResponseEntity<Void> display(JsonNode body) {
         var request = this.request;
 
         if (request != null) {
             var silent = request.content().at("/silent").asBoolean();
 
             if (! silent) {
-                pub(request.display_data(body));
+                pub(request.display_data(body.deepCopy()));
             }
         }
 
@@ -229,14 +230,14 @@ public class Kernel extends Server implements KernelApi, ApplicationContextAware
     }
 
     @Override
-    public ResponseEntity<Void> print(ObjectNode body) {
+    public ResponseEntity<Void> print(JsonNode body) {
         var request = this.request;
 
         if (request != null) {
             var silent = request.content().at("/silent").asBoolean();
 
             if (! silent) {
-                pub(request.execute_result(execution_count.intValue(), body));
+                pub(request.execute_result(execution_count.intValue(), body.deepCopy()));
             }
         }
 
