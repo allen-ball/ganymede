@@ -51,26 +51,12 @@
           <groupId>org.apache.ant</groupId>
           <artifactId>ant</artifactId>
         </exclusion>
-        <exclusion><!-- Integrated in org.apache.velocity:velocity-engine-core -->
-          <groupId>commons-io</groupId>
-          <artifactId>commons-io</artifactId>
-        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
       <groupId>ball</groupId>
       <artifactId>ball-java-jar</artifactId>
       <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>ball</groupId>
-      <artifactId>ball-util</artifactId>
-      <exclusions>
-        <exclusion><!-- Integrated in org.apache.velocity:velocity-engine-core -->
-          <groupId>commons-io</groupId>
-          <artifactId>commons-io</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <!-- Servlet Container -->
     <dependency>
@@ -92,17 +78,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!-- Logging -->
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <scope>runtime</scope>
-    </dependency>
     <!-- Ganymede Runtime -->
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -117,6 +92,11 @@
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -140,28 +120,6 @@
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-sql_${scala.binary.version}</artifactId>
       <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.activation</groupId>
-          <artifactId>activation</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>javax.servlet.jsp</groupId>
-          <artifactId>jsp-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>javax.xml.bind</groupId>
-          <artifactId>jaxb-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.glassfish.hk2.external</groupId>
-          <artifactId>jakarta.inject</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.glassfish.hk2.external</groupId>
-          <artifactId>aopalliance-repackaged</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.graalvm.sdk</groupId>
@@ -237,97 +195,25 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <dependencies>
-          <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-maven-plugin</artifactId>
-            <version>${spring-boot.version}</version>
-          </dependency>
-        </dependencies>
         <executions>
           <execution>
             <phase>package</phase>
             <goals>
               <goal>shade</goal>
             </goals>
+            <configuration>
+              <createDependencyReducedPom>true</createDependencyReducedPom>
+              <artifactSet>
+                <excludes>
+                  <exclude>com.google.code.findbugs:jsr305</exclude>
+                  <exclude>javax.activation</exclude>
+                  <exclude>javax.inject</exclude>
+                  <exclude>javax.xml.bind</exclude>
+                </excludes>
+              </artifactSet>
+            </configuration>
           </execution>
         </executions>
-        <configuration>
-          <createDependencyReducedPom>true</createDependencyReducedPom>
-          <artifactSet>
-            <!-- https://maven.apache.org/plugins/maven-shade-plugin/shade-mojo.html -->
-            <excludes>
-              <exclude>com.google.code.findbugs:jsr305</exclude>
-              <exclude>javax.activation</exclude>
-              <exclude>javax.inject</exclude>
-              <exclude>javax.xml.bind</exclude>
-            </excludes>
-          </artifactSet>
-          <filters>
-            <filter>
-              <artifact>org.codehaus.groovy:groovy-*</artifact>
-              <excludes>
-                <exclude>META-INF/groovy-release-info.properties</exclude>
-              </excludes>
-            </filter>
-            <filter>
-              <artifact>org.jetbrains.kotlin:kotlin-reflect</artifact>
-              <excludes>
-                <exclude>**/*.kotlin_module</exclude>
-              </excludes>
-            </filter>
-            <filter>
-              <artifact>org.jetbrains.kotlin:kotlin-stdlib</artifact>
-              <excludes>
-                <exclude>**/*.kotlin_builtins</exclude>
-              </excludes>
-            </filter>
-            <filter>
-              <artifact>*:*</artifact>
-              <excludes>
-                <exclude>META-INF/*.DSA</exclude>
-                <exclude>META-INF/*.RSA</exclude>
-                <exclude>META-INF/*.SF</exclude>
-                <exclude>META-INF/DEPENDENCIES</exclude>
-                <exclude>META-INF/README.txt</exclude>
-                <exclude>META-INF/spring-configuration-metadata.json</exclude>
-                <exclude>META-INF/additional-spring-configuration-metadata.json</exclude>
-                <exclude>**/.gitkeep</exclude>
-                <exclude>**/module-info.class</exclude>
-              </excludes>
-            </filter>
-          </filters>
-          <transformers>
-            <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer"/>
-            <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
-              <addHeader>false</addHeader>
-            </transformer>
-            <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-              <manifestEntries>
-                <Main-Class>${start-class}</Main-Class>
-              </manifestEntries>
-            </transformer>
-            <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-            <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-              <resource>META-INF/sisu/javax.inject.Named</resource>
-            </transformer>
-            <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-              <resource>META-INF/spring.handlers</resource>
-            </transformer>
-            <transformer implementation="org.springframework.boot.maven.PropertiesMergingResourceTransformer">
-              <resource>META-INF/spring.factories</resource>
-            </transformer>
-            <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-              <resource>META-INF/spring.schemas</resource>
-            </transformer>
-            <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-              <resource>META-INF/spring.tooling</resource>
-            </transformer>
-            <transformer implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer">
-              <resource>META-INF/web-fragment.xml</resource>
-            </transformer>
-          </transformers>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
