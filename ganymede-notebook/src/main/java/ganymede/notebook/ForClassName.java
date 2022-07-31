@@ -48,7 +48,7 @@ public @interface ForClassName {
      * {@link Processor} implementation.
      */
     @ServiceProviderFor({ Processor.class })
-    @For({ ForClass.class })
+    @For({ ForClassName.class })
     @NoArgsConstructor @ToString
     public static class ProcessorImpl extends AnnotatedProcessor {
     }
