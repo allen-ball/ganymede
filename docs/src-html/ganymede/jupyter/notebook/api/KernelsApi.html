@@ -27,7 +27,7 @@
 <span class="sourceLineNo">018</span><a id="line.18">import ganymede.jupyter.notebook.ApiException;</a>
 <span class="sourceLineNo">019</span><a id="line.19">import ganymede.jupyter.notebook.ApiResponse;</a>
 <span class="sourceLineNo">020</span><a id="line.20">import ganymede.jupyter.notebook.Pair;</a>
-<span class="sourceLineNo">021</span><a id="line.21">import ganymede.jupyter.notebook.model.InlineObject2;</a>
+<span class="sourceLineNo">021</span><a id="line.21">import ganymede.jupyter.notebook.model.ApiKernelsGetRequest;</a>
 <span class="sourceLineNo">022</span><a id="line.22">import ganymede.jupyter.notebook.model.Kernel;</a>
 <span class="sourceLineNo">023</span><a id="line.23">import java.io.IOException;</a>
 <span class="sourceLineNo">024</span><a id="line.24">import java.io.InputStream;</a>
@@ -482,82 +482,84 @@
 <span class="sourceLineNo">473</span><a id="line.473">  /**</a>
 <span class="sourceLineNo">474</span><a id="line.474">   * Start a kernel and return the uuid</a>
 <span class="sourceLineNo">475</span><a id="line.475">   *</a>
-<span class="sourceLineNo">476</span><a id="line.476">   * @param name  (optional)</a>
-<span class="sourceLineNo">477</span><a id="line.477">   * @return Kernel</a>
-<span class="sourceLineNo">478</span><a id="line.478">   * @throws ApiException if fails to make API call</a>
-<span class="sourceLineNo">479</span><a id="line.479">   */</a>
-<span class="sourceLineNo">480</span><a id="line.480">  public Kernel apiKernelsPost(InlineObject2 name) throws ApiException {</a>
-<span class="sourceLineNo">481</span><a id="line.481">    ApiResponse&lt;Kernel&gt; localVarResponse = apiKernelsPostWithHttpInfo(name);</a>
-<span class="sourceLineNo">482</span><a id="line.482">    return localVarResponse.getData();</a>
-<span class="sourceLineNo">483</span><a id="line.483">  }</a>
-<span class="sourceLineNo">484</span><a id="line.484"></a>
-<span class="sourceLineNo">485</span><a id="line.485">  /**</a>
-<span class="sourceLineNo">486</span><a id="line.486">   * Start a kernel and return the uuid</a>
-<span class="sourceLineNo">487</span><a id="line.487">   *</a>
-<span class="sourceLineNo">488</span><a id="line.488">   * @param name  (optional)</a>
-<span class="sourceLineNo">489</span><a id="line.489">   * @return ApiResponse&amp;lt;Kernel&amp;gt;</a>
-<span class="sourceLineNo">490</span><a id="line.490">   * @throws ApiException if fails to make API call</a>
-<span class="sourceLineNo">491</span><a id="line.491">   */</a>
-<span class="sourceLineNo">492</span><a id="line.492">  public ApiResponse&lt;Kernel&gt; apiKernelsPostWithHttpInfo(InlineObject2 name)</a>
-<span class="sourceLineNo">493</span><a id="line.493">      throws ApiException {</a>
-<span class="sourceLineNo">494</span><a id="line.494">    HttpRequest.Builder localVarRequestBuilder =</a>
-<span class="sourceLineNo">495</span><a id="line.495">        apiKernelsPostRequestBuilder(name);</a>
-<span class="sourceLineNo">496</span><a id="line.496">    try {</a>
-<span class="sourceLineNo">497</span><a id="line.497">      HttpResponse&lt;InputStream&gt; localVarResponse =</a>
-<span class="sourceLineNo">498</span><a id="line.498">          memberVarHttpClient.send(localVarRequestBuilder.build(),</a>
-<span class="sourceLineNo">499</span><a id="line.499">                                   HttpResponse.BodyHandlers.ofInputStream());</a>
-<span class="sourceLineNo">500</span><a id="line.500">      if (memberVarResponseInterceptor != null) {</a>
-<span class="sourceLineNo">501</span><a id="line.501">        memberVarResponseInterceptor.accept(localVarResponse);</a>
-<span class="sourceLineNo">502</span><a id="line.502">      }</a>
-<span class="sourceLineNo">503</span><a id="line.503">      try {</a>
-<span class="sourceLineNo">504</span><a id="line.504">        if (localVarResponse.statusCode() / 100 != 2) {</a>
-<span class="sourceLineNo">505</span><a id="line.505">          throw getApiException("apiKernelsPost", localVarResponse);</a>
-<span class="sourceLineNo">506</span><a id="line.506">        }</a>
-<span class="sourceLineNo">507</span><a id="line.507">        return new ApiResponse&lt;Kernel&gt;(</a>
-<span class="sourceLineNo">508</span><a id="line.508">            localVarResponse.statusCode(), localVarResponse.headers().map(),</a>
-<span class="sourceLineNo">509</span><a id="line.509">            memberVarObjectMapper.readValue(</a>
-<span class="sourceLineNo">510</span><a id="line.510">                localVarResponse.body(),</a>
-<span class="sourceLineNo">511</span><a id="line.511">                new TypeReference&lt;Kernel&gt;() {}) // closes the InputStream</a>
-<span class="sourceLineNo">512</span><a id="line.512"></a>
-<span class="sourceLineNo">513</span><a id="line.513">        );</a>
-<span class="sourceLineNo">514</span><a id="line.514">      } finally {</a>
-<span class="sourceLineNo">515</span><a id="line.515">      }</a>
-<span class="sourceLineNo">516</span><a id="line.516">    } catch (IOException e) {</a>
-<span class="sourceLineNo">517</span><a id="line.517">      throw new ApiException(e);</a>
-<span class="sourceLineNo">518</span><a id="line.518">    } catch (InterruptedException e) {</a>
-<span class="sourceLineNo">519</span><a id="line.519">      Thread.currentThread().interrupt();</a>
-<span class="sourceLineNo">520</span><a id="line.520">      throw new ApiException(e);</a>
-<span class="sourceLineNo">521</span><a id="line.521">    }</a>
-<span class="sourceLineNo">522</span><a id="line.522">  }</a>
-<span class="sourceLineNo">523</span><a id="line.523"></a>
-<span class="sourceLineNo">524</span><a id="line.524">  private HttpRequest.Builder apiKernelsPostRequestBuilder(InlineObject2 name)</a>
-<span class="sourceLineNo">525</span><a id="line.525">      throws ApiException {</a>
-<span class="sourceLineNo">526</span><a id="line.526"></a>
-<span class="sourceLineNo">527</span><a id="line.527">    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();</a>
+<span class="sourceLineNo">476</span><a id="line.476">   * @param name Kernel spec name (defaults to default kernel spec for server)</a>
+<span class="sourceLineNo">477</span><a id="line.477">   *     (optional)</a>
+<span class="sourceLineNo">478</span><a id="line.478">   * @return Kernel</a>
+<span class="sourceLineNo">479</span><a id="line.479">   * @throws ApiException if fails to make API call</a>
+<span class="sourceLineNo">480</span><a id="line.480">   */</a>
+<span class="sourceLineNo">481</span><a id="line.481">  public Kernel apiKernelsPost(ApiKernelsGetRequest name) throws ApiException {</a>
+<span class="sourceLineNo">482</span><a id="line.482">    ApiResponse&lt;Kernel&gt; localVarResponse = apiKernelsPostWithHttpInfo(name);</a>
+<span class="sourceLineNo">483</span><a id="line.483">    return localVarResponse.getData();</a>
+<span class="sourceLineNo">484</span><a id="line.484">  }</a>
+<span class="sourceLineNo">485</span><a id="line.485"></a>
+<span class="sourceLineNo">486</span><a id="line.486">  /**</a>
+<span class="sourceLineNo">487</span><a id="line.487">   * Start a kernel and return the uuid</a>
+<span class="sourceLineNo">488</span><a id="line.488">   *</a>
+<span class="sourceLineNo">489</span><a id="line.489">   * @param name Kernel spec name (defaults to default kernel spec for server)</a>
+<span class="sourceLineNo">490</span><a id="line.490">   *     (optional)</a>
+<span class="sourceLineNo">491</span><a id="line.491">   * @return ApiResponse&amp;lt;Kernel&amp;gt;</a>
+<span class="sourceLineNo">492</span><a id="line.492">   * @throws ApiException if fails to make API call</a>
+<span class="sourceLineNo">493</span><a id="line.493">   */</a>
+<span class="sourceLineNo">494</span><a id="line.494">  public ApiResponse&lt;Kernel&gt;</a>
+<span class="sourceLineNo">495</span><a id="line.495">  apiKernelsPostWithHttpInfo(ApiKernelsGetRequest name) throws ApiException {</a>
+<span class="sourceLineNo">496</span><a id="line.496">    HttpRequest.Builder localVarRequestBuilder =</a>
+<span class="sourceLineNo">497</span><a id="line.497">        apiKernelsPostRequestBuilder(name);</a>
+<span class="sourceLineNo">498</span><a id="line.498">    try {</a>
+<span class="sourceLineNo">499</span><a id="line.499">      HttpResponse&lt;InputStream&gt; localVarResponse =</a>
+<span class="sourceLineNo">500</span><a id="line.500">          memberVarHttpClient.send(localVarRequestBuilder.build(),</a>
+<span class="sourceLineNo">501</span><a id="line.501">                                   HttpResponse.BodyHandlers.ofInputStream());</a>
+<span class="sourceLineNo">502</span><a id="line.502">      if (memberVarResponseInterceptor != null) {</a>
+<span class="sourceLineNo">503</span><a id="line.503">        memberVarResponseInterceptor.accept(localVarResponse);</a>
+<span class="sourceLineNo">504</span><a id="line.504">      }</a>
+<span class="sourceLineNo">505</span><a id="line.505">      try {</a>
+<span class="sourceLineNo">506</span><a id="line.506">        if (localVarResponse.statusCode() / 100 != 2) {</a>
+<span class="sourceLineNo">507</span><a id="line.507">          throw getApiException("apiKernelsPost", localVarResponse);</a>
+<span class="sourceLineNo">508</span><a id="line.508">        }</a>
+<span class="sourceLineNo">509</span><a id="line.509">        return new ApiResponse&lt;Kernel&gt;(</a>
+<span class="sourceLineNo">510</span><a id="line.510">            localVarResponse.statusCode(), localVarResponse.headers().map(),</a>
+<span class="sourceLineNo">511</span><a id="line.511">            memberVarObjectMapper.readValue(</a>
+<span class="sourceLineNo">512</span><a id="line.512">                localVarResponse.body(),</a>
+<span class="sourceLineNo">513</span><a id="line.513">                new TypeReference&lt;Kernel&gt;() {}) // closes the InputStream</a>
+<span class="sourceLineNo">514</span><a id="line.514"></a>
+<span class="sourceLineNo">515</span><a id="line.515">        );</a>
+<span class="sourceLineNo">516</span><a id="line.516">      } finally {</a>
+<span class="sourceLineNo">517</span><a id="line.517">      }</a>
+<span class="sourceLineNo">518</span><a id="line.518">    } catch (IOException e) {</a>
+<span class="sourceLineNo">519</span><a id="line.519">      throw new ApiException(e);</a>
+<span class="sourceLineNo">520</span><a id="line.520">    } catch (InterruptedException e) {</a>
+<span class="sourceLineNo">521</span><a id="line.521">      Thread.currentThread().interrupt();</a>
+<span class="sourceLineNo">522</span><a id="line.522">      throw new ApiException(e);</a>
+<span class="sourceLineNo">523</span><a id="line.523">    }</a>
+<span class="sourceLineNo">524</span><a id="line.524">  }</a>
+<span class="sourceLineNo">525</span><a id="line.525"></a>
+<span class="sourceLineNo">526</span><a id="line.526">  private HttpRequest.Builder</a>
+<span class="sourceLineNo">527</span><a id="line.527">  apiKernelsPostRequestBuilder(ApiKernelsGetRequest name) throws ApiException {</a>
 <span class="sourceLineNo">528</span><a id="line.528"></a>
-<span class="sourceLineNo">529</span><a id="line.529">    String localVarPath = "/api/kernels";</a>
+<span class="sourceLineNo">529</span><a id="line.529">    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();</a>
 <span class="sourceLineNo">530</span><a id="line.530"></a>
-<span class="sourceLineNo">531</span><a id="line.531">    localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));</a>
+<span class="sourceLineNo">531</span><a id="line.531">    String localVarPath = "/api/kernels";</a>
 <span class="sourceLineNo">532</span><a id="line.532"></a>
-<span class="sourceLineNo">533</span><a id="line.533">    localVarRequestBuilder.header("Content-Type", "application/json");</a>
-<span class="sourceLineNo">534</span><a id="line.534">    localVarRequestBuilder.header("Accept", "application/json");</a>
-<span class="sourceLineNo">535</span><a id="line.535"></a>
-<span class="sourceLineNo">536</span><a id="line.536">    try {</a>
-<span class="sourceLineNo">537</span><a id="line.537">      byte[] localVarPostBody = memberVarObjectMapper.writeValueAsBytes(name);</a>
-<span class="sourceLineNo">538</span><a id="line.538">      localVarRequestBuilder.method(</a>
-<span class="sourceLineNo">539</span><a id="line.539">          "POST", HttpRequest.BodyPublishers.ofByteArray(localVarPostBody));</a>
-<span class="sourceLineNo">540</span><a id="line.540">    } catch (IOException e) {</a>
-<span class="sourceLineNo">541</span><a id="line.541">      throw new ApiException(e);</a>
-<span class="sourceLineNo">542</span><a id="line.542">    }</a>
-<span class="sourceLineNo">543</span><a id="line.543">    if (memberVarReadTimeout != null) {</a>
-<span class="sourceLineNo">544</span><a id="line.544">      localVarRequestBuilder.timeout(memberVarReadTimeout);</a>
-<span class="sourceLineNo">545</span><a id="line.545">    }</a>
-<span class="sourceLineNo">546</span><a id="line.546">    if (memberVarInterceptor != null) {</a>
-<span class="sourceLineNo">547</span><a id="line.547">      memberVarInterceptor.accept(localVarRequestBuilder);</a>
-<span class="sourceLineNo">548</span><a id="line.548">    }</a>
-<span class="sourceLineNo">549</span><a id="line.549">    return localVarRequestBuilder;</a>
-<span class="sourceLineNo">550</span><a id="line.550">  }</a>
-<span class="sourceLineNo">551</span><a id="line.551">}</a>
+<span class="sourceLineNo">533</span><a id="line.533">    localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));</a>
+<span class="sourceLineNo">534</span><a id="line.534"></a>
+<span class="sourceLineNo">535</span><a id="line.535">    localVarRequestBuilder.header("Content-Type", "application/json");</a>
+<span class="sourceLineNo">536</span><a id="line.536">    localVarRequestBuilder.header("Accept", "application/json");</a>
+<span class="sourceLineNo">537</span><a id="line.537"></a>
+<span class="sourceLineNo">538</span><a id="line.538">    try {</a>
+<span class="sourceLineNo">539</span><a id="line.539">      byte[] localVarPostBody = memberVarObjectMapper.writeValueAsBytes(name);</a>
+<span class="sourceLineNo">540</span><a id="line.540">      localVarRequestBuilder.method(</a>
+<span class="sourceLineNo">541</span><a id="line.541">          "POST", HttpRequest.BodyPublishers.ofByteArray(localVarPostBody));</a>
+<span class="sourceLineNo">542</span><a id="line.542">    } catch (IOException e) {</a>
+<span class="sourceLineNo">543</span><a id="line.543">      throw new ApiException(e);</a>
+<span class="sourceLineNo">544</span><a id="line.544">    }</a>
+<span class="sourceLineNo">545</span><a id="line.545">    if (memberVarReadTimeout != null) {</a>
+<span class="sourceLineNo">546</span><a id="line.546">      localVarRequestBuilder.timeout(memberVarReadTimeout);</a>
+<span class="sourceLineNo">547</span><a id="line.547">    }</a>
+<span class="sourceLineNo">548</span><a id="line.548">    if (memberVarInterceptor != null) {</a>
+<span class="sourceLineNo">549</span><a id="line.549">      memberVarInterceptor.accept(localVarRequestBuilder);</a>
+<span class="sourceLineNo">550</span><a id="line.550">    }</a>
+<span class="sourceLineNo">551</span><a id="line.551">    return localVarRequestBuilder;</a>
+<span class="sourceLineNo">552</span><a id="line.552">  }</a>
+<span class="sourceLineNo">553</span><a id="line.553">}</a>
 
 
 

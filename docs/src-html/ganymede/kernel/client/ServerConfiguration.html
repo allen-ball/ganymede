@@ -52,9 +52,9 @@
 <span class="sourceLineNo">043</span><a id="line.43">        value = variables.get(name);</a>
 <span class="sourceLineNo">044</span><a id="line.44">        if (serverVariable.enumValues.size() &gt; 0 &amp;&amp;</a>
 <span class="sourceLineNo">045</span><a id="line.45">            !serverVariable.enumValues.contains(value)) {</a>
-<span class="sourceLineNo">046</span><a id="line.46">          throw new RuntimeException("The variable " + name +</a>
-<span class="sourceLineNo">047</span><a id="line.47">                                     " in the server URL has invalid value " +</a>
-<span class="sourceLineNo">048</span><a id="line.48">                                     value + ".");</a>
+<span class="sourceLineNo">046</span><a id="line.46">          throw new IllegalArgumentException(</a>
+<span class="sourceLineNo">047</span><a id="line.47">              "The variable " + name + " in the server URL has invalid value " +</a>
+<span class="sourceLineNo">048</span><a id="line.48">              value + ".");</a>
 <span class="sourceLineNo">049</span><a id="line.49">        }</a>
 <span class="sourceLineNo">050</span><a id="line.50">      }</a>
 <span class="sourceLineNo">051</span><a id="line.51">      url = url.replaceAll("\\{" + name + "\\}", value);</a>
