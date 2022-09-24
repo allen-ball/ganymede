@@ -53,6 +53,12 @@
       <groupId>dev.hcf.ganymede</groupId>
       <artifactId>ganymede-notebook</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>dev.hcf.ganymede</groupId>
@@ -60,62 +66,8 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>ball</groupId>
-      <artifactId>ball-util</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.inject</groupId>
-      <artifactId>javax.inject</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.ant</groupId>
-      <artifactId>ant</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.spark</groupId>
-      <artifactId>spark-sql_${scala.binary.version}</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-log4j12</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-reload4j</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.jfree</groupId>
-      <artifactId>jfreechart</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.knowm.xchart</groupId>
-      <artifactId>xchart</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.scala-lang</groupId>
-      <artifactId>scala-compiler</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.scala-lang</groupId>
-      <artifactId>scala-library</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>tech.tablesaw</groupId>
-      <artifactId>tablesaw-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>tech.tablesaw</groupId>
-      <artifactId>tablesaw-jsplot</artifactId>
     </dependency>
   </dependencies>
   <build>
@@ -129,7 +81,7 @@
         <artifactId>maven-antrun-plugin</artifactId>
       </plugin>
       <plugin>
-        <groupId>ball</groupId>
+        <groupId>dev.hcf.ball</groupId>
         <artifactId>ball-javadoc-maven-plugin</artifactId>
         <executions>
           <execution>
