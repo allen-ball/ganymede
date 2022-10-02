@@ -95,7 +95,7 @@
                       <manifestFile>/dev/null</manifestFile>
                     </archive>
                     <classifier>javadoc</classifier>
-                    <classesDirectory>${basedir}/..//src/main/javadoc</classesDirectory>
+                    <classesDirectory>${basedir}/../src/main/javadoc</classesDirectory>
                   </configuration>
                 </execution>
               </executions>
