@@ -39,7 +39,7 @@
   </properties>
   <dependencies verbose="true">
     <dependency>
-      <groupId>ball</groupId>
+      <groupId>dev.hcf.ball</groupId>
       <artifactId>ball-util</artifactId>
     </dependency>
     <dependency>

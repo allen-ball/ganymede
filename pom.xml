@@ -31,7 +31,7 @@
   <description>Ganymede Parent POM</description>
   <url>https://github.com/allen-ball/ganymede</url>
   <parent>
-    <groupId>ball</groupId>
+    <groupId>dev.hcf.ball</groupId>
     <artifactId>parent</artifactId>
     <version>2022.1.2-SNAPSHOT</version>
     <relativePath/>
@@ -184,12 +184,12 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>ball</groupId>
+        <groupId>dev.hcf.ball</groupId>
         <artifactId>ball-java-jar</artifactId>
         <version>${ball-java-jar.version}</version>
       </dependency>
       <dependency>
-        <groupId>ball</groupId>
+        <groupId>dev.hcf.ball</groupId>
         <artifactId>ball-util</artifactId>
         <version>${ball-util.version}</version>
       </dependency>
@@ -424,7 +424,7 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>ball</groupId>
+          <groupId>${ball.groupId}</groupId>
           <artifactId>ball-license-maven-plugin</artifactId>
           <configuration>
             <selections>

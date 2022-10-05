@@ -54,7 +54,7 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>ball</groupId>
+      <groupId>dev.hcf.ball</groupId>
       <artifactId>ball-java-jar</artifactId>
       <scope>runtime</scope>
     </dependency>
