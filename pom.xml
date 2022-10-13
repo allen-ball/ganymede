@@ -159,7 +159,7 @@
     <license.skipUpdateProjectLicense>true</license.skipUpdateProjectLicense>
     <maven.compiler.release>11</maven.compiler.release>
 
-    <notebook.services.version>6.4.12</notebook.services.version>
+    <notebook.services.version>v6.5.1</notebook.services.version>
     <notebook.services.spec>https://github.com/jupyter/notebook/raw/${notebook.services.version}/notebook/services/api/api.yaml</notebook.services.spec>
 
     <spark.version>3.1.3</spark.version>
