@@ -33,7 +33,7 @@
   <parent>
     <groupId>dev.hcf.ball</groupId>
     <artifactId>parent</artifactId>
-    <version>2022.1.2-SNAPSHOT</version>
+    <version>2022.1.2</version>
     <relativePath/>
   </parent>
   <organization>
@@ -124,36 +124,6 @@
         <jeromq.version>0.5.3-SNAPSHOT</jeromq.version>
       </properties>
     </profile>
-    <profile>
-      <id>release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>nexus-staging-maven-plugin</artifactId>
-            <extensions>true</extensions>
-            <configuration>
-              <serverId>ossrh</serverId>
-              <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-              <autoReleaseAfterClose>true</autoReleaseAfterClose>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
   </profiles>
   <properties>
     <license.skipUpdateProjectLicense>true</license.skipUpdateProjectLicense>
@@ -171,8 +141,6 @@
     <commonmark.version>0.19.0</commonmark.version>
     <jeromq.version>0.5.2</jeromq.version>
     <tablesaw.version>0.43.1</tablesaw.version>
-
-    <ball-api.version>${ball-parent.version}</ball-api.version>
   </properties>
   <modules>
     <module>ganymede</module>
@@ -424,13 +392,17 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>${ball.groupId}</groupId>
+          <groupId>dev.hcf.ball</groupId>
           <artifactId>ball-license-maven-plugin</artifactId>
           <configuration>
             <selections>
               <selection>
                 <artifact>commons-el</artifact>
                 <license>Apache-2.0</license>
+              </selection>
+              <selection>
+                <artifact>com.mysql:mysql-connector-j</artifact>
+                <license>GPL-2.0 WITH Universal-FOSS-exception-1.0</license>
               </selection>
               <selection>
                 <artifact>mysql:mysql-connector-java</artifact>
@@ -460,9 +432,6 @@
             <detectOfflineLinks>true</detectOfflineLinks>
             <keywords>true</keywords>
             <doclint>none</doclint>
-            <links>
-              <link>https://allen-ball.github.io/javadoc/ball-api/${ball-api.version}/</link>
-            </links>
             <linksource>true</linksource>
             <locale>en_US</locale>
             <quiet>true</quiet>
