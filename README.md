@@ -38,7 +38,7 @@ and `python` commands must be on the `${PATH}`.  Then the typical (and
 minimal) installation command line:
 
 ```bash
-$ java -jar ganymede-2.0.1.20220723.jar -i
+$ java -jar ganymede-2.0.2.20221025.jar -i
 ```
 
 The [kernel][Ganymede Kernel] will be configured to use the same `java`
@@ -690,7 +690,7 @@ Ibid.
 
 
 [Ganymede Kernel]: https://github.com/allen-ball/ganymede
-[Ganymede Kernel download]: https://github.com/allen-ball/ganymede/releases/download/v2.0.1.20220723/ganymede-2.0.1.20220723.jar
+[Ganymede Kernel download]: https://github.com/allen-ball/ganymede/releases/download/v2.0.2.20221025/ganymede-2.0.2.20221025.jar
 [Ganymede API Javadoc]: https://allen-ball.github.io/ganymede/index.html?overview-summary.html
 [Magic]: https://allen-ball.github.io/ganymede/ganymede/shell/Magic.html
 [NotebookContext]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookContext.html
