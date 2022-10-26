@@ -78,42 +78,42 @@ $ export JAVA_HOME=$(/usr/libexec/java_home -v 11)
 $ ${JAVA_HOME}/bin/java \
       -jar ${HOME}/.m2/repository/ganymede/ganymede/2.1.0-SNAPSHOT/ganymede-2.1.0-SNAPSHOT.jar \
       -i --sys-prefix --copy-jar=false \
-      --id-suffix=spark-3.1.3 --display-name-suffix="with Spark 3.1.3" \
-      --spark_home=/path/to/spark-3.1.3-bin-hadoop3.2 \
-      --hive_home=/path/to/apache-hive-3.1.3-bin
+      --id-suffix=spark-3.3.1 --display-name-suffix="with Spark 3.3.1" \
+      --spark_home=/path/to/spark-home --hive_home=/path/to/hive-home
 $ jupyter kernelspec list
 Available kernels:
 ...
-  ganymede-2.1.0-java-11-spark-3.1.3             /.../share/jupyter/kernels/ganymede-2.1.0-java-11-spark-3.1.3
+  ganymede-2.1.0-java-11-spark-3.3.1             /.../share/jupyter/kernels/ganymede-2.1.0-java-11-spark-3.3.1
 ...
 ```
 
 would result in the configured
-`${jupyter.data}/kernels/ganymede-2.1.0-java-11-spark-3.1.3/kernel.json`
+`${jupyter.data}/kernels/ganymede-2.1.0-java-11-spark-3.3.1/kernel.json`
 kernelspec:
 
 ```json
 {
   "argv": [
-    "/usr/local/Cellar/openjdk@11/11.0.15/libexec/openjdk.jdk/Contents/Home/bin/java",
+    "/Library/Java/JavaVirtualMachines/graalvm-ce-java11-22.3.0/Contents/Home/bin/java",
     "--add-opens",
     "java.base/jdk.internal.misc=ALL-UNNAMED",
     "--illegal-access=permit",
     "-Djava.awt.headless=true",
     "-Djdk.disableLastUsageTracking=true",
+    "-Dmaven.repo.local=/Users/ball/Notebooks/.venv/share/jupyter/repository",
     "-jar",
-    "/Users/jdoe/.m2/repository/ganymede/ganymede/2.0.0-SNAPSHOT/ganymede-2.0.0-SNAPSHOT.jar",
+    "/Users/ball/.m2/repository/dev/hcf/ganymede/ganymede/2.1.0-SNAPSHOT/ganymede-2.1.0-SNAPSHOT.jar",
     "-f",
     "{connection_file}"
   ],
-  "display_name": "Ganymede 2.1.0 (Java 11) with Spark 3.1.3",
+  "display_name": "Ganymede 2.1.0 (Java 11) with Spark 3.3.1",
   "env": {
-    "JUPYTER_CONFIG_DIR": "/Users/jdoe/.jupyter",
-    "JUPYTER_CONFIG_PATH": "/Users/jdoe/.jupyter:/Users/jdoe/Notebooks/.venv/etc/jupyter:/usr/local/etc/jupyter:/etc/jupyter",
-    "JUPYTER_DATA_DIR": "/Users/jdoe/Library/Jupyter",
-    "JUPYTER_RUNTIME_DIR": "/Users/jdoe/Library/Jupyter/runtime",
-    "SPARK_HOME": "/Users/jdoe/Notebooks/.venv/spark-3.1.3-bin-hadoop3.2",
-    "HIVE_HOME": "/Users/jdoe/Notebooks/.venv/apache-hive-3.1.3-bin"
+    "JUPYTER_CONFIG_DIR": "/Users/ball/.jupyter",
+    "JUPYTER_CONFIG_PATH": "/Users/ball/.jupyter:/Users/ball/Notebooks/.venv/etc/jupyter:/usr/local/etc/jupyter:/etc/jupyter",
+    "JUPYTER_DATA_DIR": "/Users/ball/Library/Jupyter",
+    "JUPYTER_RUNTIME_DIR": "/Users/ball/Library/Jupyter/runtime",
+    "SPARK_HOME": "/path/to/spark-home",
+    "HIVE_HOME": "/path/to/hive-home"
   },
   "interrupt_mode": "message",
   "language": "java"
