@@ -25,7 +25,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>dev.hcf.ganymede</groupId>
   <artifactId>parent</artifactId>
-  <version>2.0.2.20221025</version>
+  <version>2.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
   <description>Ganymede Parent POM</description>
