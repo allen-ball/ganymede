@@ -138,7 +138,7 @@
     <jackson.version>2.10.5</jackson.version>
     <jackson-bom.version>2.10.5.20201202</jackson-bom.version>
 
-    <commonmark.version>0.19.0</commonmark.version>
+    <commonmark.version>0.21.0</commonmark.version>
     <jeromq.version>0.5.2</jeromq.version>
     <tablesaw.version>0.43.1</tablesaw.version>
   </properties>
@@ -180,7 +180,7 @@
       <dependency>
         <groupId>info.picocli</groupId>
         <artifactId>picocli</artifactId>
-        <version>4.6.3</version>
+        <version>4.7.0</version>
       </dependency>
       <dependency>
         <groupId>io.springfox</groupId>
