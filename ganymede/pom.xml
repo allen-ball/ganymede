@@ -217,7 +217,6 @@
                 <excludes>
                   <exclude>com.google.code.findbugs:jsr305</exclude>
                   <exclude>javax.activation</exclude>
-                  <exclude>javax.inject</exclude>
                   <exclude>javax.xml.bind</exclude>
                 </excludes>
               </artifactSet>

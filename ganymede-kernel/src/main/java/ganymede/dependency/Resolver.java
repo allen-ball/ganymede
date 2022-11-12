@@ -18,6 +18,7 @@ package ganymede.dependency;
  * limitations under the License.
  * ##########################################################################
  */
+import com.google.inject.Guice;
 import ganymede.shell.Shell;
 import ganymede.util.PathPropertyMap;
 import java.io.File;
@@ -42,28 +43,20 @@ import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.AbstractRepositoryListener;
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.DefaultRepositoryCache;
-/* import org.eclipse.aether.RepositoryEvent; */
+import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
-import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
-import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.resolution.DependencyResolutionException;
-import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
-import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
-import org.eclipse.aether.transport.classpath.ClasspathTransporterFactory;
-import org.eclipse.aether.transport.file.FileTransporterFactory;
-import org.eclipse.aether.transport.http.HttpTransporterFactory;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.filter.DependencyFilterUtils;
@@ -97,15 +90,7 @@ public class Resolver extends Analyzer {
 
     {
         try {
-            var locator = MavenRepositorySystemUtils.newServiceLocator();
-
-            locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
-            locator.addService(TransporterFactory.class, FileTransporterFactory.class);
-            locator.addService(TransporterFactory.class, HttpTransporterFactory.class);
-            locator.addService(TransporterFactory.class, ClasspathTransporterFactory.class);
-
-            system = locator.getService(RepositorySystem.class);
-
+            system = Guice.createInjector(new ResolverModule()).getInstance(RepositorySystem.class);
             pom = POM.getDefault();
 
             classpath.add(new ApplicationHome(getClass()).getSource());
@@ -461,6 +446,18 @@ public class Resolver extends Analyzer {
     private class RepositoryListener extends AbstractRepositoryListener {
         private final PrintStream out;
         private final PrintStream err;
+
+        @Override
+        public void artifactDescriptorInvalid(RepositoryEvent event) {
+        }
+
+        @Override
+        public void artifactDescriptorMissing(RepositoryEvent event) {
+        }
+
+        @Override
+        public void metadataInvalid(RepositoryEvent event) {
+        }
     }
 
     @RequiredArgsConstructor @ToString
