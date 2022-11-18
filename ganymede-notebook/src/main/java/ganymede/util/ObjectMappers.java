@@ -22,8 +22,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 
 /**
  * Common {@link ObjectMapper}s.
@@ -36,17 +37,19 @@ public interface ObjectMappers {
      * Common static JSON {@link ObjectMapper} instance.
      */
     public static final ObjectMapper JSON =
-        new ObjectMapper()
+        JsonMapper.builder()
         .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_VALUES)
-        .enable(SerializationFeature.INDENT_OUTPUT);
+        .enable(SerializationFeature.INDENT_OUTPUT)
+        .build();
 
     /**
      * Common static YAML {@link ObjectMapper} instance.
      */
     public static final ObjectMapper YAML =
-        new ObjectMapper(new YAMLFactory()
-                         .enable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER))
-        .setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
+        YAMLMapper.builder()
+        .enable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
         .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_VALUES)
-        .enable(SerializationFeature.INDENT_OUTPUT);
+        .enable(SerializationFeature.INDENT_OUTPUT)
+        .build()
+        .setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
 }
