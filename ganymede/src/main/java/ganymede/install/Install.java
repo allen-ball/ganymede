@@ -106,13 +106,13 @@ public class Install implements ApplicationRunner {
             .filter(t -> (! t.isEmpty()))
             .collect(joining(" "));
 
-        var sysPrefix = false;
+        var sys_prefix = false;
 
         for (var argument : arguments.getSourceArgs()) {
             if (argument.equals("--sys-prefix")) {
-                sysPrefix = true;
+                sys_prefix = true;
             } else if (argument.equals("--user")) {
-                sysPrefix = false;
+                sys_prefix = false;
             }
         }
 
@@ -132,6 +132,10 @@ public class Install implements ApplicationRunner {
              * which python
              */
             var python = which("python");
+            /*
+             * python -c 'import sys; print(sys.prefix)'
+             */
+            var sys_prefix_dir = getOutputAsString(python, "-c", "import sys; print(sys.prefix)");
             /*
              * which jupyter
              */
@@ -159,8 +163,8 @@ public class Install implements ApplicationRunner {
             /*
              * Maven local repository
              */
-            if (sysPrefix) {
-                var repository = Paths.get(paths.at("/data").get(1).asText(), "repository");
+            if (sys_prefix) {
+                var repository = Paths.get(data_dir, "repository");
 
                 sysProperties.put("maven.repo.local", repository);
 
@@ -188,9 +192,13 @@ public class Install implements ApplicationRunner {
 
                 copy(jarPath.toFile(), kernelspec.resolve(name).toFile());
 
-                var prefix = paths.at("/data").get(sysPrefix ? 1 : 0).asText();
+                var target = Paths.get(data_dir, "kernels").toString();
 
-                jar = Paths.get(prefix, "kernels", id, name).toString();
+                if (sys_prefix) {
+                    target = Paths.get(sys_prefix_dir, "share/jupyter/kernels").toString();
+                }
+
+                jar = Paths.get(target, id, name).toString();
             }
 
             Stream.of(Stream.of(java,
@@ -240,7 +248,7 @@ public class Install implements ApplicationRunner {
              * jupyter kernelspec install <kernelspec>
              */
             new ProcessBuilder(jupyter, "kernelspec", "install", kernelspec.toString(),
-                               sysPrefix ? "--sys-prefix" : "--user",
+                               sys_prefix ? "--sys-prefix" : "--user",
                                "--replace")
                 .inheritIO()
                 .start().waitFor();
