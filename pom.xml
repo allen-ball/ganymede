@@ -110,20 +110,6 @@
         </plugins>
       </build>
     </profile>
-    <profile>
-      <id>jeromq-SNAPSHOT</id>
-      <repositories>
-        <repository>
-          <id>sonatype-nexus-snapshots</id>
-          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-          <releases><enabled>false</enabled></releases>
-          <snapshots><enabled>true</enabled></snapshots>
-        </repository>
-      </repositories>
-      <properties>
-        <jeromq.version>0.5.3-SNAPSHOT</jeromq.version>
-      </properties>
-    </profile>
   </profiles>
   <properties>
     <license.skipUpdateProjectLicense>true</license.skipUpdateProjectLicense>
@@ -139,7 +125,7 @@
     <jackson.version>2.13.4</jackson.version>
 
     <commonmark.version>0.21.0</commonmark.version>
-    <jeromq.version>0.5.2</jeromq.version>
+    <jeromq.version>0.5.3</jeromq.version>
     <tablesaw.version>0.43.1</tablesaw.version>
   </properties>
   <modules>
