@@ -33,7 +33,7 @@
   <parent>
     <groupId>dev.hcf.ball</groupId>
     <artifactId>parent</artifactId>
-    <version>2022.2.0-SNAPSHOT</version>
+    <version>2022.2.0</version>
     <relativePath>../ball/parent/pom.xml</relativePath>
   </parent>
   <organization>
