@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -123,7 +124,7 @@ public class Kernel extends Server implements KernelApi, ApplicationContextAware
             shell.addKnownDependenciesToClasspath(parent);
         }
 
-        if (hive_home != null) {
+        if (hive_home != null && (! Objects.equals(hive_home, spark_home))) {
             var parent = Paths.get(hive_home, "lib").toFile();
 
             shell.addKnownDependenciesToClasspath(parent);
