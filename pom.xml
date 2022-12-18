@@ -25,7 +25,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>dev.hcf.ganymede</groupId>
   <artifactId>parent</artifactId>
-  <version>2.1.0.20221217</version>
+  <version>2.1.1.20221231</version>
   <packaging>pom</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
   <description>Ganymede Parent POM</description>
@@ -33,7 +33,7 @@
   <parent>
     <groupId>dev.hcf.ball</groupId>
     <artifactId>parent</artifactId>
-    <version>2022.2.0</version>
+    <version>2022.2.1</version>
     <relativePath>../ball/parent/pom.xml</relativePath>
   </parent>
   <organization>
@@ -125,6 +125,7 @@
     <jackson.version>2.13.4</jackson.version>
 
     <commonmark.version>0.21.0</commonmark.version>
+    <groovy.version>3.0.14</groovy.version>
     <jeromq.version>0.5.3</jeromq.version>
     <tablesaw.version>0.43.1</tablesaw.version>
   </properties>
@@ -297,7 +298,7 @@
       <dependency>
         <groupId>org.knowm.xchart</groupId>
         <artifactId>xchart</artifactId>
-        <version>3.8.2</version>
+        <version>3.8.3</version>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
