@@ -48,10 +48,10 @@ command line options are supported.
 | Option                               | Action                                                                                    | Default                                                  |
 | ---                                  | ---                                                                                       | ---                                                      |
 | --id-prefix=&lt;prefix&gt;           | Adds prefix to kernel ID                                                                  | &lt;none&gt;                                             |
-| --id=&lt;id&gt;                      | Specifies kernel ID                                                                       | ganymede-${version}-java-${java.specification.version}   |
+| --id=&lt;id&gt;                      | Specifies kernel ID                                                                       | `ganymede-${version}-java-${java.specification.version}` |
 | --id-suffix=&lt;suffix&gt;           | Adds suffix to kernel ID                                                                  | &lt;none&gt;                                             |
 | --display-name-prefix=&lt;prefix&gt; | Adds prefix to kernel display name                                                        | &lt;none&gt;                                             |
-| --display-name=&lt;name&gt;          | Specifies kernel display name                                                             | Ganymede ${version} (Java ${java.specification.version}) |
+| --display-name=&lt;name&gt;          | Specifies kernel display name                                                             | Ganymede `${version}` (Java `${java.specification.version}`) |
 | --display-name-suffix=&lt;suffix&gt; | Adds suffix to kernel display name                                                        | &lt;none&gt;                                             |
 | --env                                | Specify NAME=VALUE pair(s) to add to kernel environment                                   |                                                          |
 | --copy-jar=&lt;boolean&gt;           | Copies the [Ganymede Kernel] JAR to the `kernelspec` directory                            | true                                                     |
@@ -79,16 +79,16 @@ $ ${JAVA_HOME}/bin/java \
       -jar ${HOME}/.m2/repository/ganymede/ganymede/2.2.0-SNAPSHOT/ganymede-2.2.0-SNAPSHOT.jar \
       -i --sys-prefix --copy-jar=false \
       --id-suffix=spark-3.3.1 --display-name-suffix="with Spark 3.3.1" \
-      --spark_home=/path/to/spark-home --hive_home=/path/to/hive-home
+      --spark_home=/path/to/spark-home
 $ jupyter kernelspec list
 Available kernels:
 ...
-  ganymede-2.1.0-java-11-spark-3.3.1             /.../share/jupyter/kernels/ganymede-2.1.0-java-11-spark-3.3.1
+  ganymede-2.2.0-java-11-spark-3.3.1             /.../share/jupyter/kernels/ganymede-2.2.0-java-11-spark-3.3.1
 ...
 ```
 
 would result in the configured
-`${jupyter.data}/kernels/ganymede-2.1.0-java-11-spark-3.3.1/kernel.json`
+`${jupyter.data}/kernels/ganymede-2.2.0-java-11-spark-3.3.1/kernel.json`
 kernelspec:
 
 ```json
@@ -106,14 +106,13 @@ kernelspec:
     "-f",
     "{connection_file}"
   ],
-  "display_name": "Ganymede 2.1.0 (Java 11) with Spark 3.3.1",
+  "display_name": "Ganymede 2.2.0 (Java 11) with Spark 3.3.1",
   "env": {
     "JUPYTER_CONFIG_DIR": "/Users/ball/.jupyter",
     "JUPYTER_CONFIG_PATH": "/Users/ball/.jupyter:/Users/ball/Notebooks/.venv/etc/jupyter:/usr/local/etc/jupyter:/etc/jupyter",
     "JUPYTER_DATA_DIR": "/Users/ball/Library/Jupyter",
     "JUPYTER_RUNTIME_DIR": "/Users/ball/Library/Jupyter/runtime",
-    "SPARK_HOME": "/path/to/spark-home",
-    "HIVE_HOME": "/path/to/hive-home"
+    "SPARK_HOME": "/path/to/spark-home"
   },
   "interrupt_mode": "message",
   "language": "java"
