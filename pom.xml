@@ -3,7 +3,7 @@
   ##########################################################################
   Ganymede
   %%
-  Copyright (C) 2021, 2022 Allen D. Ball
+  Copyright (C) 2021 - 2023 Allen D. Ball
   %%
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>dev.hcf.ganymede</groupId>
   <artifactId>parent</artifactId>
-  <version>2.1.1.20221231</version>
+  <version>2.1.2-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
   <description>Ganymede Parent POM</description>
@@ -33,8 +33,8 @@
   <parent>
     <groupId>dev.hcf.ball</groupId>
     <artifactId>parent</artifactId>
-    <version>2022.2.1</version>
-    <relativePath>../ball/parent/pom.xml</relativePath>
+    <version>2023.1.3</version>
+    <relativePath/>
   </parent>
   <organization>
     <name><![CDATA[<a href="mailto:ball@hcf.dev">Allen D. Ball</a>]]></name>
@@ -118,15 +118,12 @@
     <jupyter-server.version>v2.5.0</jupyter-server.version>
     <jupyter-server.spec>https://github.com/jupyter-server/jupyter_server/raw/${jupyter-server.version}/jupyter_server/services/api/api.yaml</jupyter-server.spec>
 
-    <spark.version>3.3.1</spark.version>
+    <spark.version>3.3.2</spark.version>
     <scala.binary.version>2.12</scala.binary.version>
     <scala.version>${scala.binary.version}.15</scala.version>
-    <!-- <jackson-bom.version>2.13.4.20221013</jackson-bom.version> -->
-    <jackson.version>2.13.4</jackson.version>
+    <jackson.version>${jackson-bom.version}</jackson.version>
 
-    <groovy.version>3.0.15</groovy.version>
-    <lombok.version>1.18.26</lombok.version>
-    <postgresql.version>42.5.3</postgresql.version>
+    <openapi-generator-maven-plugin.version>6.6.0</openapi-generator-maven-plugin.version>
 
     <commonmark.version>0.21.0</commonmark.version>
     <jeromq.version>0.5.3</jeromq.version>
@@ -397,10 +394,6 @@
               </selection>
               <selection>
                 <artifact>com.mysql:mysql-connector-j</artifact>
-                <license>GPL-2.0 WITH Universal-FOSS-exception-1.0</license>
-              </selection>
-              <selection>
-                <artifact>mysql:mysql-connector-java</artifact>
                 <license>GPL-2.0 WITH Universal-FOSS-exception-1.0</license>
               </selection>
               <selection>

@@ -1,0 +1,5 @@
+org.scala-lang:scala-compiler:jar:2.12.17
+   org.scala-lang:scala-library:jar:2.12.17:compile
+   org.scala-lang:scala-reflect:jar:2.12.17:compile
+   org.scala-lang.modules:scala-xml_2.12:jar:2.1.0:compile
+   jline:jline:jar:2.14.6:compile
