@@ -3,7 +3,7 @@ package ganymede.install;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021, 2022 Allen D. Ball
+ * Copyright (C) 2021 - 2023 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,6 +60,8 @@ import static org.springframework.util.FileSystemUtils.deleteRecursively;
 @Command
 @NoArgsConstructor @ToString @Log4j2
 public class Install implements ApplicationRunner {
+    private static final String SHEBANG = "#!";
+
     @Option(description = { "Install Ganymede kernel" }, names = { "-i" })
     @Value("${install:#{null}}")
     private Boolean install = null;
@@ -129,14 +131,6 @@ public class Install implements ApplicationRunner {
              */
             var jarPath = new ApplicationHome(getClass()).getSource().toPath();
             /*
-             * which python
-             */
-            var python = which("python");
-            /*
-             * python -c 'import sys; print(sys.prefix)'
-             */
-            var sys_prefix_dir = getOutputAsString(python, "-c", "import sys; print(sys.prefix)");
-            /*
              * which jupyter
              */
             var jupyter = which("jupyter");
@@ -160,6 +154,27 @@ public class Install implements ApplicationRunner {
              * jupyter --runtime-dir
              */
             var runtime_dir = getOutputAsString(jupyter, "--runtime-dir");
+            /*
+             * Examine the jupyter script #! line to locate the python executable.
+             * If that heuristic fails, search for python3 on the ${PATH}.
+             */
+            var python = (String) null;
+
+            try (Stream<String> stream = Files.lines(Paths.get(jupyter))) {
+                var line = stream.findFirst().orElse(null);
+
+                if (line != null && line.startsWith(SHEBANG)) {
+                    python = line.substring(SHEBANG.length()).trim();
+                }
+            }
+
+            if (python == null || python.isEmpty()) {
+                python = which("python3");
+            }
+            /*
+             * python -c 'import sys; print(sys.prefix)'
+             */
+            var sys_prefix_dir = getOutputAsString(python, "-c", "import sys; print(sys.prefix)");
             /*
              * Maven local repository
              */
