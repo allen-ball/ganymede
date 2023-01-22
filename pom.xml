@@ -124,8 +124,11 @@
     <!-- <jackson-bom.version>2.13.4.20221013</jackson-bom.version> -->
     <jackson.version>2.13.4</jackson.version>
 
+    <groovy.version>3.0.15</groovy.version>
+    <lombok.version>1.18.26</lombok.version>
+    <postgresql.version>42.5.3</postgresql.version>
+
     <commonmark.version>0.21.0</commonmark.version>
-    <groovy.version>3.0.14</groovy.version>
     <jeromq.version>0.5.3</jeromq.version>
     <tablesaw.version>0.43.1</tablesaw.version>
   </properties>
@@ -172,7 +175,7 @@
       <dependency>
         <groupId>info.picocli</groupId>
         <artifactId>picocli</artifactId>
-        <version>4.7.0</version>
+        <version>4.7.1</version>
       </dependency>
       <dependency>
         <groupId>io.springfox</groupId>
@@ -282,7 +285,7 @@
       <dependency>
         <groupId>org.jfree</groupId>
         <artifactId>jfreechart</artifactId>
-        <version>1.5.3</version>
+        <version>1.5.4</version>
       </dependency>
       <dependency>
         <groupId>org.jooq</groupId>
