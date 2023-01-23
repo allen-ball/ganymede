@@ -69,6 +69,7 @@
               <inputSpec>${notebook.services.spec}</inputSpec>
               <generatorName>java</generatorName>
               <library>native</library>
+              <importMappings>JsonNode=com.fasterxml.jackson.databind.JsonNode</importMappings>
               <configOptions>
                 <java8>true</java8>
                 <dateLibrary>java8</dateLibrary>

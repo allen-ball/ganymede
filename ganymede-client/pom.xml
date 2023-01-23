@@ -70,9 +70,7 @@
               <inputSpec>${project.build.outputDirectory}/ganymede-rest-protocol.yml</inputSpec>
               <generatorName>java</generatorName>
               <library>native</library>
-              <importMappings>
-                <importMapping>JsonNode=com.fasterxml.jackson.databind.JsonNode</importMapping>
-              </importMappings>
+              <importMappings>JsonNode=com.fasterxml.jackson.databind.JsonNode,UUID=java.util.UUID</importMappings>
               <configOptions>
                 <java8>true</java8>
                 <dateLibrary>java8</dateLibrary>

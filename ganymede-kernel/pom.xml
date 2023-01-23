@@ -288,7 +288,7 @@
               <inputSpec>${project.build.directory}/dependency/ganymede-rest-protocol.yml</inputSpec>
               <generatorName>spring</generatorName>
               <library>spring-boot</library>
-              <importMappings>JsonNode=com.fasterxml.jackson.databind.JsonNode</importMappings>
+              <importMappings>JsonNode=com.fasterxml.jackson.databind.JsonNode,UUID=java.util.UUID</importMappings>
               <configOptions>
                 <dateLibrary>java8</dateLibrary>
                 <hideGenerationTimestamp>true</hideGenerationTimestamp>
