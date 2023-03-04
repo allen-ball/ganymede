@@ -115,8 +115,8 @@
     <license.skipUpdateProjectLicense>true</license.skipUpdateProjectLicense>
     <maven.compiler.release>11</maven.compiler.release>
 
-    <notebook.services.version>v6.5.2</notebook.services.version>
-    <notebook.services.spec>https://github.com/jupyter/notebook/raw/${notebook.services.version}/notebook/services/api/api.yaml</notebook.services.spec>
+    <jupyter-server.version>v2.5.0</jupyter-server.version>
+    <jupyter-server.spec>https://github.com/jupyter-server/jupyter_server/raw/${jupyter-server.version}/jupyter_server/services/api/api.yaml</jupyter-server.spec>
 
     <spark.version>3.3.1</spark.version>
     <scala.binary.version>2.12</scala.binary.version>

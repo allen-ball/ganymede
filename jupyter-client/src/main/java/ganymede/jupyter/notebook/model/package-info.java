@@ -1,5 +1,5 @@
 /**
- * {@link.uri https://github.com/jupyter/notebook/blob/v6.5.2/notebook/services/api/api.yaml target=newtab https://github.com/jupyter/notebook/blob/v6.5.2/notebook/services/api/api.yaml}
+ * {@link.uri https://github.com/jupyter-server/jupyter_server/blob/v2.5.0/jupyter_server/services/api/api.yaml target=newtab https://github.com/jupyter-server/jupyter_server/blob/v2.5.0/jupyter_server/services/api/api.yaml}
  * model classes.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
@@ -10,7 +10,7 @@ package ganymede.jupyter.notebook.model;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021, 2022 Allen D. Ball
+ * Copyright (C) 2021 - 2023 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
