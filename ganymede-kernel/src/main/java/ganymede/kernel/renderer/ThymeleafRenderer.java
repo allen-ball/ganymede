@@ -3,7 +3,7 @@ package ganymede.kernel.renderer;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021, 2022 Allen D. Ball
+ * Copyright (C) 2021 - 2023 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -126,8 +126,8 @@ public class ThymeleafRenderer extends AbstractRenderer {
             break;
         }
 
-        if (! bundle.with(DATA).has(mimeType)) {
-            bundle.with(DATA).put(mimeType, string);
+        if (! bundle.withObject(DATA).has(mimeType)) {
+            bundle.withObject(DATA).put(mimeType, string);
         }
     }
 

@@ -3,7 +3,7 @@ package ganymede.kernel;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021, 2022 Allen D. Ball
+ * Copyright (C) 2021 - 2023 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,7 +104,7 @@ public class Kernel extends Server implements KernelApi, ApplicationContextAware
     @PostConstruct
     public void init() throws Exception {
         try (var in = kernel_info_reply.getInputStream()) {
-            kernel_info_reply_content = (ObjectNode) ObjectMappers.YAML.readTree(in).with("content");
+            kernel_info_reply_content = ObjectMappers.YAML.readTree(in).withObject("content");
         } catch (Exception exception) {
             log.warn("{}", exception);
         }

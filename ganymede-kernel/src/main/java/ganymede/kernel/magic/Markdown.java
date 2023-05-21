@@ -3,7 +3,7 @@ package ganymede.kernel.magic;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021, 2022 Allen D. Ball
+ * Copyright (C) 2021 - 2023 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,8 +111,8 @@ public class Markdown extends Mustache {
         public void renderTo(ObjectNode bundle, Object object) {
             var node = (Node) object;
 
-            if (! bundle.with(DATA).has(TEXT_HTML_VALUE)) {
-                bundle.with(DATA).put(TEXT_HTML_VALUE, html.render(node));
+            if (! bundle.withObject(DATA).has(TEXT_HTML_VALUE)) {
+                bundle.withObject(DATA).put(TEXT_HTML_VALUE, html.render(node));
             }
 
             renderers.renderTo(bundle, text.render(node));

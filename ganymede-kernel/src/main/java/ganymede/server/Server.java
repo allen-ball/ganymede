@@ -3,7 +3,7 @@ package ganymede.server;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021, 2022 Allen D. Ball
+ * Copyright (C) 2021 - 2023 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -313,7 +313,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
 
                     var in = request.content().at("/user_expressions");
                     var iterator = in.fields();
-                    var out = reply.content().with("user_expressions");
+                    var out = reply.content().withObject("user_expressions");
 
                     while (iterator.hasNext()) {
                         var entry = iterator.next();
@@ -387,7 +387,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
         }
 
         private void comm_info(Dispatcher dispatcher, Message request, Message reply) throws Exception {
-            var comms = reply.content().with("comms");
+            var comms = reply.content().withObject("comms");
             /*
              * Currently unsupported so empty reply.  But remember to *copy*
              * internal state since output may be culled after satisfying

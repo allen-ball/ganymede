@@ -3,7 +3,7 @@ package ganymede.kernel.renderer;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021, 2022 Allen D. Ball
+ * Copyright (C) 2021 - 2023 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,10 +42,10 @@ public class JsonNodeRenderer extends AbstractRenderer {
     public void renderTo(ObjectNode bundle, Object object) {
         var node = (JsonNode) object;
 
-        if (! bundle.with(DATA).has(APPLICATION_JSON_VALUE)) {
-            bundle.with(DATA)
+        if (! bundle.withObject(DATA).has(APPLICATION_JSON_VALUE)) {
+            bundle.withObject(DATA)
                 .set(APPLICATION_JSON_VALUE, node);
-            bundle.with(METADATA).with(APPLICATION_JSON_VALUE)
+            bundle.withObject(METADATA).withObject(APPLICATION_JSON_VALUE)
                 .put("expanded", true);
         }
 

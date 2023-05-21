@@ -3,7 +3,7 @@ package ganymede.kernel.renderer;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021, 2022 Allen D. Ball
+ * Copyright (C) 2021 - 2023 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,16 +61,16 @@ public class TablesawTableRenderer extends AbstractRenderer {
         public void renderTo(ObjectNode bundle, Object object) {
             var table = (Table) object;
 /*
-            if (! bundle.with(DATA).has(APPLICATION_JSON_VALUE)) {
+            if (! bundle.withObject(DATA).has(APPLICATION_JSON_VALUE)) {
                 try {
                     if (hasWriterForExtension("json")) {
                         var string = table.write().toString("json");
                         var node = ObjectMappers.JSON.readTree(string);
 
-                        bundle.with(DATA)
+                        bundle.withObject(DATA)
                             .set(APPLICATION_JSON_VALUE, node);
-                        bundle.with(METADATA)
-                            .with(APPLICATION_JSON_VALUE)
+                        bundle.withObject(METADATA)
+                            .withObject(APPLICATION_JSON_VALUE)
                             .put("expanded", true);
                     }
                 } catch (Exception exception) {
@@ -78,10 +78,10 @@ public class TablesawTableRenderer extends AbstractRenderer {
                 }
             }
 */
-            if (! bundle.with(DATA).has(TEXT_HTML_VALUE)) {
+            if (! bundle.withObject(DATA).has(TEXT_HTML_VALUE)) {
                 try {
                     if (hasWriterForExtension("html")) {
-                        bundle.with(DATA)
+                        bundle.withObject(DATA)
                             .put(TEXT_HTML_VALUE, table.write().toString("html"));
                     }
                 } catch (Exception exception) {
