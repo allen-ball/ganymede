@@ -3,7 +3,7 @@ package ganymede.server;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021, 2022 Allen D. Ball
+ * Copyright (C) 2021 - 2023 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -295,7 +295,7 @@ public class Message {
         var message = new Pub(getCallingMethodName(1), this);
 
         message.content().setAll(content);
-        message.content().with("transient");
+        message.content().withObject("transient");
 
         return message;
     }

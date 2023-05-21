@@ -3,7 +3,7 @@ package ganymede.notebook;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021, 2022 Allen D. Ball
+ * Copyright (C) 2021 - 2023 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,8 +36,8 @@ import static org.springframework.util.MimeTypeUtils.TEXT_PLAIN_VALUE;
 public class DefaultRenderer extends AbstractRenderer {
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
-        if (! bundle.with(DATA).has(TEXT_PLAIN_VALUE)) {
-            bundle.with(DATA).put(TEXT_PLAIN_VALUE, String.valueOf(object));
+        if (! bundle.withObject(DATA).has(TEXT_PLAIN_VALUE)) {
+            bundle.withObject(DATA).put(TEXT_PLAIN_VALUE, String.valueOf(object));
         }
     }
 }
