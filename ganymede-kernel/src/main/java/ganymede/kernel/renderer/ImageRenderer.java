@@ -3,7 +3,7 @@ package ganymede.kernel.renderer;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021, 2022 Allen D. Ball
+ * Copyright (C) 2021 - 2023 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,11 +49,11 @@ public class ImageRenderer extends AbstractRenderer {
 
             var mimeType = reader.getOriginatingProvider().getMIMETypes()[0];
 
-            if (! bundle.with(DATA).has(mimeType)) {
-                bundle.with(DATA)
+            if (! bundle.withObject(DATA).has(mimeType)) {
+                bundle.withObject(DATA)
                     .put(mimeType, BASE64_ENCODER.encodeToString(bytes));
 
-                var metadata = bundle.with(METADATA).with(mimeType);
+                var metadata = bundle.withObject(METADATA).withObject(mimeType);
 
                 metadata.put("height", reader.getHeight(0));
                 metadata.put("width", reader.getWidth(0));
