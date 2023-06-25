@@ -172,7 +172,7 @@
       <dependency>
         <groupId>info.picocli</groupId>
         <artifactId>picocli</artifactId>
-        <version>4.7.1</version>
+        <version>4.7.4</version>
       </dependency>
       <dependency>
         <groupId>io.springfox</groupId>
@@ -298,7 +298,7 @@
       <dependency>
         <groupId>org.knowm.xchart</groupId>
         <artifactId>xchart</artifactId>
-        <version>3.8.3</version>
+        <version>3.8.4</version>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
