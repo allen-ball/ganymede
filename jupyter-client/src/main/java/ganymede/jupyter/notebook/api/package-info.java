@@ -1,5 +1,5 @@
 /**
- * {@link.uri https://github.com/jupyter-server/jupyter_server/blob/v2.6.0/jupyter_server/services/api/api.yaml target=newtab https://github.com/jupyter-server/jupyter_server/blob/v2.6.0/jupyter_server/services/api/api.yaml}
+ * {@link.uri https://github.com/jupyter-server/jupyter_server/blob/v2.7.0/jupyter_server/services/api/api.yaml target=newtab https://github.com/jupyter-server/jupyter_server/blob/v2.7.0/jupyter_server/services/api/api.yaml}
  * API classes.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
