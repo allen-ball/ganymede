@@ -104,7 +104,7 @@ public class Kernel extends Server implements KernelApi, ApplicationContextAware
     @PostConstruct
     public void init() throws Exception {
         try (var in = kernel_info_reply.getInputStream()) {
-            kernel_info_reply_content = ObjectMappers.YAML.readTree(in).withObject("content");
+            kernel_info_reply_content = ObjectMappers.YAML.readTree(in).withObject("/content");
         } catch (Exception exception) {
             log.warn("{}", exception);
         }

@@ -42,8 +42,8 @@ public class JOOQFormattableRenderer extends AbstractRenderer {
     public void renderTo(ObjectNode bundle, Object object) {
         var formattable = (Formattable) object;
 
-        if (! bundle.withObject(DATA).has(TEXT_HTML_VALUE)) {
-            bundle.withObject(DATA).put(TEXT_HTML_VALUE, formattable.formatHTML());
+        if (! bundle.withObject(DATA_JSONP).has(TEXT_HTML_VALUE)) {
+            bundle.withObject(DATA_JSONP).put(TEXT_HTML_VALUE, formattable.formatHTML());
         }
 
         renderers.renderTo(bundle, formattable.format());

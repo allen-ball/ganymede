@@ -49,11 +49,11 @@ public class ImageRenderer extends AbstractRenderer {
 
             var mimeType = reader.getOriginatingProvider().getMIMETypes()[0];
 
-            if (! bundle.withObject(DATA).has(mimeType)) {
-                bundle.withObject(DATA)
+            if (! bundle.withObject(DATA_JSONP).has(mimeType)) {
+                bundle.withObject(DATA_JSONP)
                     .put(mimeType, BASE64_ENCODER.encodeToString(bytes));
 
-                var metadata = bundle.withObject(METADATA).withObject(mimeType);
+                var metadata = bundle.withObject(METADATA_JSONP).withObject("/" + mimeType);
 
                 metadata.put("height", reader.getHeight(0));
                 metadata.put("width", reader.getWidth(0));

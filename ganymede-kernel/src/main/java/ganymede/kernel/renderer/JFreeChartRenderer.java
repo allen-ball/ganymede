@@ -83,18 +83,18 @@ public class JFreeChartRenderer extends AbstractRenderer {
 
                 renderers.renderTo(bundle, image);
 
-                if (! bundle.withObject(DATA).has(TEXT_HTML_VALUE)) {
+                if (! bundle.withObject(DATA_JSONP).has(TEXT_HTML_VALUE)) {
                     var html = new StringWriter();
                     var name = UUID.randomUUID().toString();
-                    var mimeType = bundle.withObject(METADATA).fieldNames().next();
-                    var base64 = bundle.withObject(DATA).get(mimeType).asText();
+                    var mimeType = bundle.withObject(METADATA_JSONP).fieldNames().next();
+                    var base64 = bundle.withObject(DATA_JSONP).get(mimeType).asText();
 
                     try (var writer = new PrintWriter(html)) {
                         writer.format("<img usemap=\"#%s\" src=\"data:%s;base64,%s\"/>\n", name, mimeType, base64);
                         ChartUtils.writeImageMap(writer, name, info, false);
                     }
 
-                    bundle.withObject(DATA).put(TEXT_HTML_VALUE, html.toString());
+                    bundle.withObject(DATA_JSONP).put(TEXT_HTML_VALUE, html.toString());
                 }
             } catch (Throwable throwable) {
                 throwable.printStackTrace(System.err);

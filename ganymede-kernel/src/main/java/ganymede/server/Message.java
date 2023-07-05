@@ -295,7 +295,7 @@ public class Message {
         var message = new Pub(getCallingMethodName(1), this);
 
         message.content().setAll(content);
-        message.content().withObject("transient");
+        message.content().withObject("/transient");
 
         return message;
     }

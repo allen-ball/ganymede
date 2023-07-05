@@ -36,8 +36,8 @@ import static org.springframework.util.MimeTypeUtils.TEXT_PLAIN_VALUE;
 public class DefaultRenderer extends AbstractRenderer {
     @Override
     public void renderTo(ObjectNode bundle, Object object) {
-        if (! bundle.withObject(DATA).has(TEXT_PLAIN_VALUE)) {
-            bundle.withObject(DATA).put(TEXT_PLAIN_VALUE, String.valueOf(object));
+        if (! bundle.withObject(DATA_JSONP).has(TEXT_PLAIN_VALUE)) {
+            bundle.withObject(DATA_JSONP).put(TEXT_PLAIN_VALUE, String.valueOf(object));
         }
     }
 }

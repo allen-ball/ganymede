@@ -3,7 +3,7 @@ package ganymede.notebook;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021, 2022 Allen D. Ball
+ * Copyright (C) 2021 - 2023 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,9 @@ import java.util.Optional;
 public interface Renderer {
     public static final String DATA = "data";
     public static final String METADATA = "metadata";
+
+    public static final String DATA_JSONP = "/" + DATA;
+    public static final String METADATA_JSONP = "/" + METADATA;
 
     /**
      * Singleton {@link RendererMap} instance.

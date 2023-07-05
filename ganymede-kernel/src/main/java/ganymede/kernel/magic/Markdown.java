@@ -111,8 +111,8 @@ public class Markdown extends Mustache {
         public void renderTo(ObjectNode bundle, Object object) {
             var node = (Node) object;
 
-            if (! bundle.withObject(DATA).has(TEXT_HTML_VALUE)) {
-                bundle.withObject(DATA).put(TEXT_HTML_VALUE, html.render(node));
+            if (! bundle.withObject(DATA_JSONP).has(TEXT_HTML_VALUE)) {
+                bundle.withObject(DATA_JSONP).put(TEXT_HTML_VALUE, html.render(node));
             }
 
             renderers.renderTo(bundle, text.render(node));

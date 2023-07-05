@@ -313,7 +313,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
 
                     var in = request.content().at("/user_expressions");
                     var iterator = in.fields();
-                    var out = reply.content().withObject("user_expressions");
+                    var out = reply.content().withObject("/user_expressions");
 
                     while (iterator.hasNext()) {
                         var entry = iterator.next();
@@ -387,7 +387,7 @@ public abstract class Server extends ScheduledThreadPoolExecutor {
         }
 
         private void comm_info(Dispatcher dispatcher, Message request, Message reply) throws Exception {
-            var comms = reply.content().withObject("comms");
+            var comms = reply.content().withObject("/comms");
             /*
              * Currently unsupported so empty reply.  But remember to *copy*
              * internal state since output may be culled after satisfying
