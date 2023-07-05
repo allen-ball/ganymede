@@ -126,8 +126,8 @@ public class ThymeleafRenderer extends AbstractRenderer {
             break;
         }
 
-        if (! bundle.withObject(DATA).has(mimeType)) {
-            bundle.withObject(DATA).put(mimeType, string);
+        if (! bundle.withObject(DATA_JSONP).has(mimeType)) {
+            bundle.withObject(DATA_JSONP).put(mimeType, string);
         }
     }
 

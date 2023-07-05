@@ -42,10 +42,10 @@ public class JsonNodeRenderer extends AbstractRenderer {
     public void renderTo(ObjectNode bundle, Object object) {
         var node = (JsonNode) object;
 
-        if (! bundle.withObject(DATA).has(APPLICATION_JSON_VALUE)) {
-            bundle.withObject(DATA)
+        if (! bundle.withObject(DATA_JSONP).has(APPLICATION_JSON_VALUE)) {
+            bundle.withObject(DATA_JSONP)
                 .set(APPLICATION_JSON_VALUE, node);
-            bundle.withObject(METADATA).withObject(APPLICATION_JSON_VALUE)
+            bundle.withObject(METADATA_JSONP).withObject(APPLICATION_JSON_VALUE)
                 .put("expanded", true);
         }
 

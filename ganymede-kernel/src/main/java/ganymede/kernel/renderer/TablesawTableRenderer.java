@@ -67,9 +67,9 @@ public class TablesawTableRenderer extends AbstractRenderer {
                         var string = table.write().toString("json");
                         var node = ObjectMappers.JSON.readTree(string);
 
-                        bundle.withObject(DATA)
+                        bundle.withObject(DATA_JSONP)
                             .set(APPLICATION_JSON_VALUE, node);
-                        bundle.withObject(METADATA)
+                        bundle.withObject(METADATA_JSONP)
                             .withObject(APPLICATION_JSON_VALUE)
                             .put("expanded", true);
                     }
@@ -78,10 +78,10 @@ public class TablesawTableRenderer extends AbstractRenderer {
                 }
             }
 */
-            if (! bundle.withObject(DATA).has(TEXT_HTML_VALUE)) {
+            if (! bundle.withObject(DATA_JSONP).has(TEXT_HTML_VALUE)) {
                 try {
                     if (hasWriterForExtension("html")) {
-                        bundle.withObject(DATA)
+                        bundle.withObject(DATA_JSONP)
                             .put(TEXT_HTML_VALUE, table.write().toString("html"));
                     }
                 } catch (Exception exception) {
