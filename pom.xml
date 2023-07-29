@@ -128,6 +128,9 @@
 
     <openapi-generator-maven-plugin.version>6.6.0</openapi-generator-maven-plugin.version>
 
+    <commons-lang3.version>3.13.0</commons-lang3.version>
+    <resolverVersion>1.9.14</resolverVersion>
+
     <commonmark.version>0.21.0</commonmark.version>
     <jeromq.version>0.5.3</jeromq.version>
     <tablesaw.version>0.43.1</tablesaw.version>
