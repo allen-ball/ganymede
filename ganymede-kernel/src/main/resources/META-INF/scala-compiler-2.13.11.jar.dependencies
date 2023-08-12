@@ -1,0 +1,6 @@
+org.scala-lang:scala-compiler:jar:2.13.11
+   org.scala-lang:scala-library:jar:2.13.11:compile
+   org.scala-lang:scala-reflect:jar:2.13.11:compile
+   io.github.java-diff-utils:java-diff-utils:jar:4.12:compile
+   org.jline:jline:jar:3.22.0:compile
+   net.java.dev.jna:jna:jar:5.13.0:compile

@@ -123,7 +123,7 @@
 
     <spark.version>3.3.2</spark.version>
     <scala.binary.version>2.12</scala.binary.version>
-    <scala.version>${scala.binary.version}.15</scala.version>
+    <scala.version>${scala.binary.version}.18</scala.version>
     <jackson.version>${jackson-bom.version}</jackson.version>
 
     <openapi-generator-maven-plugin.version>6.6.0</openapi-generator-maven-plugin.version>
