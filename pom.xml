@@ -302,7 +302,7 @@
       <dependency>
         <groupId>org.knowm.xchart</groupId>
         <artifactId>xchart</artifactId>
-        <version>3.8.4</version>
+        <version>3.8.5</version>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
