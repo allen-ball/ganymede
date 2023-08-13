@@ -3,7 +3,7 @@ package ganymede.dependency;
  * ##########################################################################
  * Ganymede
  * %%
- * Copyright (C) 2021, 2022 Allen D. Ball
+ * Copyright (C) 2021 - 2023 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package ganymede.dependency;
  * limitations under the License.
  * ##########################################################################
  */
-import com.google.inject.Guice;
 import ganymede.shell.Shell;
 import ganymede.util.PathPropertyMap;
 import java.io.File;
@@ -54,6 +53,7 @@ import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.resolution.DependencyResolutionException;
+import org.eclipse.aether.supplier.RepositorySystemSupplier;
 import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
@@ -90,7 +90,7 @@ public class Resolver extends Analyzer {
 
     {
         try {
-            system = Guice.createInjector(new ResolverModule()).getInstance(RepositorySystem.class);
+            system = new RepositorySystemSupplier().get();
             pom = POM.getDefault();
 
             classpath.add(new ApplicationHome(getClass()).getSource());

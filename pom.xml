@@ -121,6 +121,8 @@
     <jupyterlab-server.version>v2.23.0</jupyterlab-server.version>
     <jupyterlab-server.spec>https://github.com/jupyterlab/jupyterlab_server/raw/${jupyterlab-server.version}/jupyterlab_server/rest-api.yml</jupyterlab-server.spec>
 
+    <maven.version>3.9.4</maven.version>
+
     <spark.version>3.3.2</spark.version>
     <scala.binary.version>2.12</scala.binary.version>
     <scala.version>${scala.binary.version}.18</scala.version>
