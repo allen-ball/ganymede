@@ -118,7 +118,7 @@
     <jupyter-server.version>v2.7.1</jupyter-server.version>
     <jupyter-server.spec>https://github.com/jupyter-server/jupyter_server/raw/${jupyter-server.version}/jupyter_server/services/api/api.yaml</jupyter-server.spec>
 
-    <jupyterlab-server.version>v2.23.0</jupyterlab-server.version>
+    <jupyterlab-server.version>v2.24.0</jupyterlab-server.version>
     <jupyterlab-server.spec>https://github.com/jupyterlab/jupyterlab_server/raw/${jupyterlab-server.version}/jupyterlab_server/rest-api.yml</jupyterlab-server.spec>
 
     <maven.version>3.9.4</maven.version>
