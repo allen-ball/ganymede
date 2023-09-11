@@ -32,6 +32,11 @@ This kernel offers the following additional features:
 The [Ganymede Kernel] is distributed as a single JAR
 ([download here][Ganymede Kernel download]).
 
+> :warning:
+> Only [Jupyter Notebook] versions before 7 (`<7`) are fully supported at this
+> time.  See the `Pipfile` in [ganymede-notebooks] for a minimal Python
+> configuration.
+
 Java 11 or later is required.  In addition to Java, the [Jupyter Notebook]
 must be [installed][Jupyter Notebook Installation] first and the `jupyter`
 and `python` commands must be on the `${PATH}`.  Then the typical (and
@@ -699,6 +704,7 @@ Ibid.
 [NotebookFunction]: https://allen-ball.github.io/ganymede/ganymede/notebook/NotebookFunction.html
 [SQL]: https://allen-ball.github.io/ganymede/ganymede/shell/magic/SQL.html
 
+[ganymede-notebooks]: https://github.com/allen-ball/ganymede-notebooks
 [trig.ipynb]: https://github.com/allen-ball/ganymede-notebooks/blob/trunk/trig.ipynb
 
 [Apache License, Version 2.0, January 2004]: https://www.apache.org/licenses/LICENSE-2.0
