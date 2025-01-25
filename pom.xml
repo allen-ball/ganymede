@@ -3,7 +3,7 @@
   ##########################################################################
   Ganymede
   %%
-  Copyright (C) 2021 - 2024 Allen D. Ball
+  Copyright (C) 2021 - 2025 Allen D. Ball
   %%
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@
   <parent>
     <groupId>dev.hcf.ball</groupId>
     <artifactId>parent</artifactId>
-    <version>2024.0.2</version>
+    <version>2025.0.0</version>
     <relativePath/>
   </parent>
   <organization>
@@ -121,8 +121,8 @@
     <jupyterlab-server.version>v2.27.3</jupyterlab-server.version>
     <jupyterlab-server.spec>https://github.com/jupyterlab/jupyterlab_server/raw/${jupyterlab-server.version}/jupyterlab_server/rest-api.yml</jupyterlab-server.spec>
 
-    <maven.version>3.9.8</maven.version>
-    <resolverVersion>1.9.20</resolverVersion>
+    <mavenVersion>3.9.9</mavenVersion>
+    <resolverVersion>1.9.22</resolverVersion>
     <plexusXmlVersion>4.0.4</plexusXmlVersion>
 
     <spark.version>3.4.3</spark.version>
