@@ -131,7 +131,7 @@
     <jackson.version>${jackson-bom.version}</jackson.version>
 
     <commonmark.version>0.22.0</commonmark.version>
-    <groovy4.version>4.0.26</groovy4.version>
+    <groovy4.version>4.0.27</groovy4.version>
     <jeromq.version>0.6.0</jeromq.version>
     <tablesaw.version>0.43.1</tablesaw.version>
   </properties>
