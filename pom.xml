@@ -33,7 +33,7 @@
   <parent>
     <groupId>dev.hcf.ball</groupId>
     <artifactId>parent</artifactId>
-    <version>2025.0.0</version>
+    <version>2025.0.1</version>
     <relativePath/>
   </parent>
   <organization>
