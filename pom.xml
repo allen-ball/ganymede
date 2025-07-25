@@ -121,8 +121,8 @@
     <jupyterlab-server.version>v2.27.3</jupyterlab-server.version>
     <jupyterlab-server.spec>https://github.com/jupyterlab/jupyterlab_server/raw/${jupyterlab-server.version}/jupyterlab_server/rest-api.yml</jupyterlab-server.spec>
 
-    <mavenVersion>3.9.10</mavenVersion>
-    <resolverVersion>1.9.23</resolverVersion>
+    <mavenVersion>3.9.11</mavenVersion>
+    <resolverVersion>1.9.24</resolverVersion>
     <plexusXmlVersion>4.0.4</plexusXmlVersion>
 
     <spark.version>3.3.4</spark.version>
@@ -131,7 +131,7 @@
     <jackson.version>${jackson-bom.version}</jackson.version>
 
     <commonmark.version>0.22.0</commonmark.version>
-    <groovy4.version>4.0.27</groovy4.version>
+    <groovy4.version>4.0.28</groovy4.version>
     <jeromq.version>0.6.0</jeromq.version>
     <tablesaw.version>0.43.1</tablesaw.version>
   </properties>
