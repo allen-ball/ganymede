@@ -3,7 +3,7 @@
   ##########################################################################
   Ganymede
   %%
-  Copyright (C) 2021 - 2025 Allen D. Ball
+  Copyright (C) 2021 - 2026 Allen D. Ball
   %%
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@
   <parent>
     <groupId>dev.hcf.ball</groupId>
     <artifactId>parent</artifactId>
-    <version>2025.0.1</version>
+    <version>2026.0.0</version>
     <relativePath/>
   </parent>
   <organization>
@@ -115,23 +115,25 @@
     <license.skipUpdateProjectLicense>true</license.skipUpdateProjectLicense>
     <maven.compiler.release>11</maven.compiler.release>
 
-    <jupyter-server.version>v2.17.0</jupyter-server.version>
+    <jupyter-server.version>v2.21.1</jupyter-server.version>
     <jupyter-server.spec>https://github.com/jupyter-server/jupyter_server/raw/${jupyter-server.version}/jupyter_server/services/api/api.yaml</jupyter-server.spec>
 
-    <jupyterlab-server.version>v2.28.0</jupyterlab-server.version>
+    <jupyterlab-server.version>v2.28.1</jupyterlab-server.version>
     <jupyterlab-server.spec>https://github.com/jupyterlab/jupyterlab_server/raw/${jupyterlab-server.version}/jupyterlab_server/rest-api.yml</jupyterlab-server.spec>
 
-    <mavenVersion>3.9.11</mavenVersion>
-    <resolverVersion>1.9.24</resolverVersion>
+    <mavenVersion>3.10.1</mavenVersion>
+    <resolverVersion>2.0.25</resolverVersion>
     <plexusXmlVersion>4.0.4</plexusXmlVersion>
 
     <spark.version>3.3.4</spark.version>
     <scala.binary.version>2.12</scala.binary.version>
-    <scala.version>${scala.binary.version}.20</scala.version>
+    <scala.version>${scala.binary.version}.21</scala.version>
+    <jackson-bom.version>2.22.0</jackson-bom.version>
     <jackson.version>${jackson-bom.version}</jackson.version>
 
     <commonmark.version>0.22.0</commonmark.version>
-    <groovy4.version>4.0.28</groovy4.version>
+    <groovy4.version>4.0.33</groovy4.version>
+    <groovy5.version>5.1.2</groovy5.version>
     <jeromq.version>0.6.0</jeromq.version>
     <tablesaw.version>0.43.1</tablesaw.version>
   </properties>
@@ -145,6 +147,13 @@
   </modules>
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>com.fasterxml.jackson</groupId>
+        <artifactId>jackson-bom</artifactId>
+        <version>${jackson-bom.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
       <dependency>
         <groupId>dev.hcf.ball</groupId>
         <artifactId>ball-java-jar</artifactId>
