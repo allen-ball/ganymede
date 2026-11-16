@@ -3,7 +3,7 @@
   ##########################################################################
   Ganymede
   %%
-  Copyright (C) 2021 - 2025 Allen D. Ball
+  Copyright (C) 2021 - 2026 Allen D. Ball
   %%
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -118,7 +118,8 @@
     </dependency>
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-supplier</artifactId>
+      <artifactId>maven-resolver-supplier-mvn3</artifactId>
+      <version>${resolverVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
@@ -131,10 +132,6 @@
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-transport-file</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-transport-http</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.spark</groupId>
@@ -280,6 +277,8 @@
                 <hideGenerationTimestamp>true</hideGenerationTimestamp>
                 <interfaceOnly>true</interfaceOnly>
                 <openApiNullable>false</openApiNullable>
+                <useSpringBoot3>false</useSpringBoot3>
+                <useJakartaEe>false</useJakartaEe>
                 <invokerPackage>${target-package}</invokerPackage>
                 <apiPackage>${target-package}</apiPackage>
                 <modelPackage>${target-package}</modelPackage>
