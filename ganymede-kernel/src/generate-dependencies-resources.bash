@@ -3,7 +3,7 @@
 REPOSITORY="${HOME}/.m2/repository"
 TRANSITIVE=true
 
-MAVEN_DEPENDENCY_PLUGIN=dependency:3.6.1
+MAVEN_DEPENDENCY_PLUGIN=dependency:3.10.0
 
 set -u
 
